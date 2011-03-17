@@ -1,4 +1,4 @@
-// Setting save to fail if there is an error.
+// When true, saving a domain object throws an exception on save errors.
 grails.gorm.failOnError = true
 
 // locations to search for config files that get merged into the main config
