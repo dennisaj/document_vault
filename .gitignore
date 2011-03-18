@@ -6,3 +6,4 @@ ptsave.iml
 .project
 .settings/
 devDb.*
+web-app/WEB-INF/classes

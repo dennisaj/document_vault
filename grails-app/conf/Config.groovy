@@ -78,7 +78,9 @@ log4j = {
     //}
 
     info   'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-           'grails.app.filters'
+           'grails.app',
+		   'us.paperlesstech',
+		   'paperlesstech'
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP

@@ -26,6 +26,7 @@ class DocumentController {
 			response.status = 200
 			render "Document saved\n"
 			PclProcessorJob.triggerNow(documentId:document.id)
+			log.info "Saved document ${document.id}"
 		} catch(Exception e) {
 			log.error("Unable to save uploaded document", e)
 			response.status = 500
