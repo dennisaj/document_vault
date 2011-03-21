@@ -5,7 +5,11 @@ import grails.converters.JSON
 class DocumentController {
 	static allowedMethods = [saveApi: "POST"]
 
-	def index = {}
+	def index = {
+		def results = Document.listOrderByDateCreated(max:5)
+
+		[documents: results]
+	}
 
 	def search = {
 		if(!params.term || params.term.length() < 3) {
@@ -13,7 +17,7 @@ class DocumentController {
 			return
 		}
 		String roNumber = params.term.toLowerCase()
-		def results = SimpleDocument.executeQuery("from SimpleDocument d where lower(d.roNumber) like :roNumber", [roNumber: "%${roNumber}%"])
+		def results = Document.executeQuery("from Document d where d.id like :roNumber", [roNumber: "%${roNumber}%"])
 
 		render(template:"searchResults", model:[documents: results])
 	}
@@ -33,6 +37,20 @@ class DocumentController {
 			render "Error saving file\n"
 			document.delete()
 		}
+	}
+
+	def downloadImage = {
+		def document = Document.get(params.id)
+		if(!document.images) {
+			// TODO handle documents without images
+			return
+		}
+		def pageNumber = params.pageNumber ?: 0
+		def image = document.getSortedImages()[pageNumber]
+
+		response.setContentType("image/png")
+		response.setContentLength(image.data.length)
+		response.getOutputStream().write(image.data)
 	}
 
 	def downloadPdf = {

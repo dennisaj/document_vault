@@ -34,10 +34,8 @@
 		</form>
 	</div>
 	<div id='rightColumn' class='span-8 last'> &nbsp;</div>
-	<r:script>
-	$(function() {
+	<jq:jquery>
 		$("#j_username").focus();
-	});
-	</r:script>
+	</jq:jquery>
 </body>
 </html>

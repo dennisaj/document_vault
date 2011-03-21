@@ -1,4 +1,4 @@
-<div>
+<div id="searchResults" class="span-24 last">
 	<g:if test="${!documents}">
 		No results found.
 	</g:if>
@@ -8,8 +8,8 @@
 		</div>
 		<g:each in="${documents}">
 			<div class="span-24 last append-bottom">
-			    RO Number: ${it.roNumber}<br />
-				Customer Name: ${it.customerName}<br />
+			    Document: ${it.id}<br />
+			    <img width="400" src="${createLink(action: 'downloadImage', id: it.id) }" alt="Document ${it.id} Page 1"/><br />
 				Download: <a href="${createLink(action: 'downloadPdf', id: it.id)}">Download</a>
 			</div>
 		</g:each>

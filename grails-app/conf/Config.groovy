@@ -126,11 +126,12 @@ grails.plugins.springsecurity.interceptUrlMap = [
 // For the save api
 	'/':				['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/index':			['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/document/**':		['ROLE_USER'],
+	'/document/**':		['ROLE_USER', 'ROLE_ADMIN'],
 	'/api/**':			['ROLE_ADMIN'],
 	'/login/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/logout/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/js/**':			['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/css/**':			['IS_AUTHENTICATED_ANONYMOUSLY'],
+	'/plugins/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/images/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 ]

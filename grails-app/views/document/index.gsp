@@ -2,7 +2,6 @@
     <head>
         <meta name="layout" content="main" />
         <title> - Search</title>
-        <r:use modules="blueprint-link-icons" />
     </head>
     <body>
     	<g:formRemote name="searchForm" url="[action: 'search']" update="searchResults">
@@ -14,13 +13,10 @@
     		</p>
     	</fieldset>
     	</g:formRemote>
-    	<div id="searchResults" class="span-24 last">
-    	</div>
-    	<r:script>
-		$(function() {
+    	<g:render template="searchResults" />
+		<jq:jquery>
 			$("#term").focus();
-		});
-    	</r:script>
+    	</jq:jquery>
     </body>
 </html>
                 

@@ -2,12 +2,11 @@
 <html>
     <head>
         <title>Paperless Technologies Document Vault<g:layoutTitle default="" /></title>
-		<r:resourceLink uri="/images/favicon.ico" />
-    	<r:resourceLink uri="/css/main.css" media="screen, projection" />
-        <r:use modules="jquery-ui, blueprint, blueprint-fancy-type" />
-    	<r:layoutResources />
+	<link href="${resource(dir:'images',file:'favicon.ico')}" rel="icon" />
+	<link href="${resource(dir:'css',file:'main.css')}" rel="stylesheet" media="screen, projection" />
+	<blueprint:resources plugins="fancy-type, link-icons" />
         <g:layoutHead />
-<%--        <g:javascript library="jquery" plugin="jquery" /> --%>
+        <g:javascript library="jquery" plugin="jquery" />
     </head>
     <body>
         <div id="spinner" class="spinner" style="display:none;">
@@ -30,6 +29,5 @@
             
         	<g:layoutBody />
     	</div>
-        <r:layoutResources />
     </body>
 </html>
