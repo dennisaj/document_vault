@@ -11,6 +11,11 @@
 		<link href="${resource(dir:'css', file:'iphonep.css')}" rel="stylesheet" media="all and (orientation:landscape)" />
 		<blueprint:resources plugins="fancy-type, link-icons" />
 		<g:javascript library="jquery" plugin="jquery" />
+		<g:javascript>
+			function block(e) {
+				e.preventDefault();
+			} 
+		</g:javascript>
 		<g:layoutHead />
 	</head>
 	<body ontouchmove="block(event);">
