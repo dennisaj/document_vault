@@ -3,7 +3,9 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class DocumentController {
-	static allowedMethods = [saveApi: "POST"]
+	static allowedMethods = [finalize: "GET", image: "GET", saveApi: "POST"]
+	def scaffold = true
+	def imageDataPrefix = "data:image/png;base64,"
 
 	def index = {
 		def results = Document.listOrderByDateCreated(max:5)
@@ -58,5 +60,62 @@ class DocumentController {
 		response.setContentType("application/pdf")
 		response.setContentLength(document.data.length)
 		response.getOutputStream().write(document.data)
+	}
+	
+	def show = {
+		def document = Document.get(params.id)
+		
+		render([view: "edit", model:[document: document]])
+	}
+	
+	def edit = {
+		def document = Document.get(params.id)
+		
+		[document: document]
+	}
+	
+	def image = {
+		def document = Document.get(params.id)
+		
+		if (document) {
+			def image = document.getSortedImages()[params.pageNumber.toInteger()]
+			if (image) {
+				def j = [imageData: imageDataPrefix + image.data.encodeBase64().toString(), pageNumber: params.pageNumber]
+				render j as JSON
+			}
+		}
+		
+		render([]) as JSON
+	}
+	
+	def sign = {
+		def document = Document.get(params.id)
+		
+		if (document && params.imageData) {
+			if (!session.signatures) {
+				session.signatures = [:]
+			}
+			
+			def signatures = session.signatures.get(document.id.toString(), [:])
+			
+			def imageData = params.imageData.substring(imageDataPrefix.size()).decodeBase64()
+			
+			signatures[params.pageNumber] = imageData
+		}
+		
+		render([]) as JSON
+	}
+	
+	def finish = {
+		def document = Document.get(params.id)
+		if (document) {
+			print session.signatures
+			
+			// Do the pdf overlay stuff
+			document.signed = true
+			document.save()
+		}
+		
+		render([]) as JSON
 	}
 }

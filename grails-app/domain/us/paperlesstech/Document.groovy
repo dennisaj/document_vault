@@ -9,6 +9,7 @@ class Document {
 	// Ideally I would map these as static hasOne = which would put the FK in these respective
 	// tables instead of the Document table.  However currently that mapping forces grails to
 	// eagerly fetch the data and we don't want to eagerly fetch a huge PDF.
+
 	Pcl pcl
 	Pdf pdf
 	

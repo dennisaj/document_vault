@@ -9,7 +9,7 @@
 		<g:each in="${documents}">
 			<div class="span-24 last append-bottom">
 			    Document: ${it.id}<br />
-			    <img width="400" src="${createLink(action: 'downloadImage', id: it.id) }" alt="Document ${it.id} Page 1"/><br />
+			    <a href="${createLink(action: 'show', id: it.id) }"><img width="400" src="${createLink(action: 'downloadImage', id: it.id) }" alt="Document ${it.id} Page 1"/></a><br />
 				Download: <a href="${createLink(action: 'downloadPdf', id: it.id)}">Download</a>
 			</div>
 		</g:each>

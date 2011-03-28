@@ -18,5 +18,15 @@ class UrlMappings {
 			controller = "document"
 			action = "downloadPdf"
 		}
+		
+		"/document/image/$id/$pageNumber" {
+			controller = "document"
+			action = "image"
+		}
+		
+		"/document/sign/$id/$pageNumber" {
+			controller = "document"
+			action = "sign"
+		}
 	}
 }

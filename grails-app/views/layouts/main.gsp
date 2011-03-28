@@ -2,9 +2,9 @@
 <html>
     <head>
         <title>Paperless Technologies Document Vault<g:layoutTitle default="" /></title>
-	<link href="${resource(dir:'images',file:'favicon.ico')}" rel="icon" />
-	<link href="${resource(dir:'css',file:'main.css')}" rel="stylesheet" media="screen, projection" />
-	<blueprint:resources plugins="fancy-type, link-icons" />
+		<link href="${resource(dir:'images',file:'favicon.ico')}" rel="icon" />
+		<link href="${resource(dir:'css',file:'main.css')}" rel="stylesheet" media="screen, projection" />
+		<blueprint:resources plugins="fancy-type, link-icons" />
         <g:layoutHead />
         <g:javascript library="jquery" plugin="jquery" />
     </head>
