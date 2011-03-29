@@ -36,6 +36,7 @@
 				</div>
 			</div>
 		</div>
+   		<g:render template="/layouts/messages" />
 		<g:layoutBody />
 	</body>
 </html>

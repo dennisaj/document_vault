@@ -26,6 +26,7 @@
                 </div>
         	</div>
             <hr />
+    		<g:render template="/layouts/messages" />
             
         	<g:layoutBody />
     	</div>

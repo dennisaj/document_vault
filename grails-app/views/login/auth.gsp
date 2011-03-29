@@ -10,9 +10,6 @@
 		<form action='${postUrl}' method='POST' id='loginForm' autocomplete='off'>
 		<fieldset>
 			<legend>Login</legend>
-			<g:if test='${flash.message}'>
-				<div class='error'>${flash.message}</div>
-			</g:if>
 			<p>
 				<label for='username'>User Name</label><br />
 				<input type='text' class='text' name='j_username' id='j_username' />
