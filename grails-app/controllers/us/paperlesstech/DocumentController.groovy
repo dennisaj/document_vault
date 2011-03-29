@@ -6,6 +6,7 @@ class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", saveApi: "POST"]
 	def scaffold = true
 	def imageDataPrefix = "data:image/png;base64,"
+	def documentService
 
 	def index = {
 		def results = Document.listOrderByDateCreated(max:5, order:"desc")
@@ -84,38 +85,41 @@ class DocumentController {
 				render j as JSON
 			}
 		}
-		
+
 		render([]) as JSON
 	}
-	
+
 	def sign = {
 		def document = Document.get(params.id)
-		
+
 		if (document && params.imageData) {
 			if (!session.signatures) {
 				session.signatures = [:]
 			}
-			
+
 			def signatures = session.signatures.get(document.id.toString(), [:])
-			
+
 			def imageData = params.imageData.substring(imageDataPrefix.size()).decodeBase64()
-			
+
 			signatures[params.pageNumber] = imageData
 		}
-		
+
 		render([]) as JSON
 	}
-	
+
 	def finish = {
 		def document = Document.get(params.id)
 		if (document) {
 			print session.signatures
-			
-			// Do the pdf overlay stuff
+
+			documentService.signDocument(document, session.signatures.get(document.id.toString()))
+
 			document.signed = true
 			document.save()
+
+			flash.green = "Signature saved"
 		}
-		
+
 		render([]) as JSON
 	}
 }
