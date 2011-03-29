@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Draw</title>
+		<title> - Sign</title>
 		<meta name="layout" content="mobile" />
 		<jqui:resources theme="ui-lightness" />
 		<g:javascript src="jquery.ba-hashchange.js" />

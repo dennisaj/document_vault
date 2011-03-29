@@ -4,9 +4,13 @@ import grails.converters.JSON
 
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", saveApi: "POST"]
+	
+	// TODO Remove scaffolding
 	def scaffold = true
+	
 	def imageDataPrefix = "data:image/png;base64,"
 	def documentService
+	def activityLogService
 
 	def index = {
 		def results = Document.listOrderByDateCreated(max:5, order:"desc")
@@ -65,12 +69,14 @@ class DocumentController {
 
 	def show = {
 		def document = Document.get(params.id)
+		activityLogService.addViewLog(request, document)
 
 		render([view: "edit", model:[document: document]])
 	}
 
 	def edit = {
 		def document = Document.get(params.id)
+		activityLogService.addViewLog(request, document)
 
 		[document: document]
 	}
@@ -110,8 +116,7 @@ class DocumentController {
 	def finish = {
 		def document = Document.get(params.id)
 		if (document) {
-			print session.signatures
-
+			activityLogService.addSignLog(request, document, session.signatures.get(document.id.toString()).findAll {it.value})
 			documentService.signDocument(document, session.signatures.get(document.id.toString()))
 
 			document.signed = true

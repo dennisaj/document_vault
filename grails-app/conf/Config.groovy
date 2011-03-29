@@ -34,7 +34,7 @@ grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
 //grails.urlmapping.cache.maxsize = 1000
 
 // The version line is temporary due to an issue with the current version of the plugin
-jquery.version = "1.4.4"
+jquery.version = "1.5.1"
 grails.views.javascript.library="jquery"
 // The default codec used to encode data with ${}
 grails.views.default.codec = "none" // none, html, base64

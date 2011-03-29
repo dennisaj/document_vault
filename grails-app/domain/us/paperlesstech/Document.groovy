@@ -1,10 +1,12 @@
 package us.paperlesstech
 
+import org.joda.time.*
+
 class Document {
 	DocumentType type
 	boolean viewed = false
 	boolean signed = false
-	Date dateCreated
+	LocalDateTime dateCreated
 
 	// Ideally I would map these as static hasOne = which would put the FK in these respective
 	// tables instead of the Document table.  However currently that mapping forces grails to
@@ -27,7 +29,7 @@ class Document {
 		pcl(unique: true, nullable: true)
 		pdf(unique: true, nullable: true)
 	}
-
+	
 	String toString() {
 		"Document(${id})"
 	}
