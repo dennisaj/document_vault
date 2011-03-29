@@ -58,25 +58,25 @@ class DocumentController {
 	def downloadPdf = {
 		def document = Document.get(params.id)
 		response.setContentType("application/pdf")
-		response.setContentLength(document.data.length)
-		response.getOutputStream().write(document.data)
+		response.setContentLength(document.pdf.data.length)
+		response.getOutputStream().write(document.pdf.data)
 	}
-	
+
 	def show = {
 		def document = Document.get(params.id)
-		
+
 		render([view: "edit", model:[document: document]])
 	}
-	
+
 	def edit = {
 		def document = Document.get(params.id)
-		
+
 		[document: document]
 	}
-	
+
 	def image = {
 		def document = Document.get(params.id)
-		
+
 		if (document) {
 			def image = document.getSortedImages()[params.pageNumber.toInteger()]
 			if (image) {
