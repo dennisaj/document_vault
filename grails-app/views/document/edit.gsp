@@ -30,7 +30,7 @@
 			<canvas id="hidden-canvas" style="visibility: hidden; display: none"></canvas>
 		</div>
 		<div id="dialog-message" title="Saving Signatures">
-			<p>
+			<p style="overflow: hidden;">
 				<span class="ui-icon ui-icon-transferthick-e-w" style="float: left; margin: 0 7px 50px 0;"></span>
 				Please wait while the captured signatures are uploaded...
 				<div id="progressbar">

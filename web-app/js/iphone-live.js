@@ -168,7 +168,7 @@ var Drawing = {
 	 * @returns a base64 encoded png or "data:image/png;base64," if page is null.
 	 */
 	drawHiddenCanvas: function(page) {
-		if (!page) {
+		if (!page || !page.lines.length) {
 			return "data:image/png;base64,";
 		}
 		
@@ -185,18 +185,19 @@ var Drawing = {
 			if (page.lines[i] == this.LINEBREAK) {
 				continue;
 			}
-			this.drawLine(hiddenCanvas, page.lines[i]);
+			this.drawLine(hiddenCanvas, page.lines[i], 'rgba(0, 0, 0, 1)');
 		}
 		
 		return hiddenCanvas.toDataURL();
 	},
 	
-	drawLine: function(canvas, line) {
+	drawLine: function(canvas, line, strokeStyle) {
 		var context = canvas.getContext('2d');
+		strokeStyle = strokeStyle || 'rgba(0, 128, 0, 1)';
 		
-		context.strokeStyle = 'rgba(0, 128, 0, 1)';
+		context.strokeStyle = strokeStyle;
 		context.lineJoin = 'round';
-		context.lineWidth = 1;
+		context.lineWidth = 2;
 		context.beginPath();
 		context.moveTo(line.start.x, line.start.y);
 		context.lineTo(line.end.x, line.end.y);
@@ -349,7 +350,7 @@ var Drawing = {
 		} else {
 			var page = this.pages[pageNumber];
 			
-			$('#progressbar').progressbar('value', 100 * (pageNumber / this.pages.length));
+			$('#progressbar').progressbar('value', Math.round(100 * (pageNumber / this.pages.length), 0));
 			
 			var imageData = this.drawHiddenCanvas(page);
 			
@@ -468,7 +469,7 @@ var Drawing = {
 			var newPage = parseInt(location.hash.substring(1)) || 0;
 			
 			if (!Drawing.currentPage || newPage != Drawing.currentPage.pageNumber) {
-				Drawing.getPage(can, $('#documentId').val(), newPage);
+				Drawing.getPage(Drawing.can, $('#documentId').val(), newPage);
 			}
 		});
 		
