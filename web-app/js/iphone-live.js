@@ -259,6 +259,131 @@ var Drawing = {
 			x: Math.max(point1.x, point2.x), 
 			y: Math.max(point1.y, point2.y)
 		};
+	}
+}
+
+// Given opposite corners of a rectangle, zoom the screen to that area.
+function viewArea(canvas, page, point1, point2, scaleBy) {
+	var upperLeftCorner = {
+		x: Math.min(point1.x, point2.x), 
+		y: Math.min(point1.y, point2.y)
+	};
+	
+	var lowerRightCorner = {
+		x: Math.max(point1.x, point2.x), 
+		y: Math.max(point1.y, point2.y)
+	};
+	
+	
+	var newWidth = Math.max(page.background.width * .10, lowerRightCorner.x - upperLeftCorner.x);
+	var newHeight = Math.max(page.background.height * .10, lowerRightCorner.y - upperLeftCorner.y);
+	
+	if (scaleBy == 'width') {
+		scale = $main.width() / newWidth;
+	} else {
+		scale = $main.height() / newHeight;
+	}
+	
+	scrollCanX = -upperLeftCorner.x * scale;
+	scrollCanY = -upperLeftCorner.y * scale;
+	currentWidth = page.background.width * scale;
+	currentHeight = page.background.height * scale;
+	canvas.style.width = currentWidth + 'px';
+	canvas.style.height = currentHeight + 'px';
+
+	canvas.style.webkitTransform = 'translate(' + scrollCanX + 'px, ' + scrollCanY + 'px)';
+	canvas.style.MozTransform = 'translate(' + scrollCanX + 'px, ' + scrollCanY + 'px)';
+}
+
+function onAjaxError(jqXHR, textStatus, errorThrown) {
+	$('#dialog-message').dialog('close');
+
+	_alert('Unable to save the signatures', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Oopsie! ' + textStatus + '</p>');
+}
+
+function _alert(title, html) {
+	$('#alert').dialog('close');
+	
+	$('#alert').dialog({
+		autoOpen: false,
+	    buttons: {
+	        'Ok' : function(){
+	            $(this).dialog('close');;
+	        }
+	    },
+		closeOnEscape: true,
+	    hasClose: false, 
+		modal : true, 
+		resizable: false,
+		title: title
+	});
+	$('#alert').html(html);
+	
+	$('#alert').dialog('open');
+}
+
+// AJAX stuff
+function finishDocument(documentId) {
+	$dialog = $('#dialog-message');
+	$.ajax({
+		beforeSend: function() {/* Add throbber */ },
+		complete: function() {/* Remove throbber */ },
+		error: onAjaxError,
+		global: false,
+		success: function(data) {
+			$dialog.dialog('close');
+
+			window.location.href = "/document_vault/document/index"
+		},
+		type: 'GET',
+		url: '/document_vault/document/finish/' + documentId
+	});
+}
+
+function getPage(canvas, documentId, pageNumber) {
+	if (pageNumber >= pages.length) {
+		pageNumber = pages.length - 1;
+	} else if (pageNumber < 0) {
+		pageNumber = 0;
+	}
+	
+	if (pages[pageNumber]) {
+		setupCanvas(canvas, pages[pageNumber]);
+	} else {
+		$.ajax({
+			beforeSend: function() {/* Add throbber */ },
+			complete: function() {/* Remove throbber */ },
+			error: onAjaxError,
+			global: false,
+			success: function(data) {
+				if (data.imageData && data.pageNumber) {
+					var bg = new Image();
+					bg.src = data.imageData;
+					
+					pages[data.pageNumber] = {
+						lines: new Array(),
+						background: bg,
+						pageNumber: pageNumber
+					};
+					
+					setupCanvas(canvas, pages[data.pageNumber]);
+				}
+			},
+			type: 'GET',
+			url: '/document_vault/document/image/' + documentId + '/' + pageNumber
+		});
+	}
+}
+
+function submitPage(documentId, pageNumber) {
+	$dialog = $('#dialog-message');
+	
+	if (pageNumber >= pages.length) {
+		$('#progressbar').progressbar('value', 100);
+		finishDocument(documentId);
+	} else {
+		var page = pages[pageNumber];
+>>>>>>> Send the user to document search after signing.
 		
 		
 		var newWidth = Math.max(page.background.width * .10, lowerRightCorner.x - upperLeftCorner.x);
