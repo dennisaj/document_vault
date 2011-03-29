@@ -8,7 +8,7 @@ class DocumentController {
 	def imageDataPrefix = "data:image/png;base64,"
 
 	def index = {
-		def results = Document.listOrderByDateCreated(max:5)
+		def results = Document.listOrderByDateCreated(max:5, order:"desc")
 
 		[documents: results]
 	}
