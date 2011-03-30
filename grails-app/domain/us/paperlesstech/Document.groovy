@@ -1,6 +1,7 @@
 package us.paperlesstech
 
 import org.joda.time.*
+import org.joda.time.contrib.hibernate.PersistentLocalDateTime
 
 class Document {
 	DocumentType type
@@ -22,6 +23,7 @@ class Document {
 	}
 
 	static mapping = {
+		dateCreated(type:PersistentLocalDateTime)
 	}
 
 	static constraints = {
