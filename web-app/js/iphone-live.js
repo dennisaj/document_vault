@@ -92,21 +92,23 @@ var Drawing = {
 			} else {
 				var point = this.scalePoint(this.convertEventToPoint(event));
 				
+				var zoomWidth = this.ZOOM_SCALE * this.currentPage.background.width;
+				var widthOffset = zoomWidth / 2;
+				
 				var zoomHeight = this.ZOOM_SCALE * this.currentPage.background.height;
 				var heightOffset = zoomHeight / 2;
 				
 				var zoomStart = {
-					x: point.x,
+					x: point.x - widthOffset,
 					y: point.y - heightOffset
 				};
 				
 				var zoomEnd = {
-					x: point.x + (this.currentPage.background.width * this.ZOOM_SCALE), 
+					x: point.x + widthOffset, 
 					y: point.y + heightOffset
 				};
 				
-				this.viewArea(this.can, this.currentPage, zoomStart, zoomEnd, 'height');
-				
+				this.viewArea(this.can, this.currentPage, zoomStart, zoomEnd, 'width', true);
 				this.isZoomedIn = true;
 			}
 		} else if (isDrawing) {
@@ -250,7 +252,7 @@ var Drawing = {
 	},
 	
 	// Given opposite corners of a rectangle, zoom the screen to that area.
-	viewArea: function(canvas, page, point1, point2, scaleBy) {
+	viewArea: function(canvas, page, point1, point2, scaleBy, center) {
 		var upperLeftCorner = {
 			x: Math.min(point1.x, point2.x), 
 			y: Math.min(point1.y, point2.y)
@@ -270,9 +272,15 @@ var Drawing = {
 		} else {
 			this.scale = this.$main.height() / newHeight;
 		}
-		
+
 		this.scrollCanX = -upperLeftCorner.x * this.scale;
-		this.scrollCanY = -upperLeftCorner.y * this.scale;
+		
+		if (center) {
+			this.scrollCanY = (-upperLeftCorner.y * this.scale) - (this.$main.height() / 2);
+		} else {
+			this.scrollCanY = -upperLeftCorner.y * this.scale;
+		}
+		
 		this.currentWidth = page.background.width * this.scale;
 		this.currentHeight = page.background.height * this.scale;
 		canvas.style.width = this.currentWidth + 'px';
