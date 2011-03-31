@@ -1,5 +1,7 @@
 package us.paperlesstech
 
+import org.joda.time.LocalDateTime;
+
 import us.paperlesstech.Document
 import us.paperlesstech.Pcl
 
@@ -25,7 +27,7 @@ class ModelTests extends GroovyTestCase {
 
 		d = Document.findByIdIsNotNull()
 		assertNotNull "Date should have been filled in", d.dateCreated
-		assertTrue "The create date should be less than now", d.dateCreated <= new Date()
+		assertTrue "The create date should be less than now", d.dateCreated <= new LocalDateTime()
 	}
 
 	void testPclMapping() {
