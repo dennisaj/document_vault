@@ -43,18 +43,26 @@ class DocumentService {
 				throw new RuntimeException("Unable to process file for document ${d.id} - PCL to PNG conversion failed")
 			}
 
-			// Instead of parsing the PDF to see how many pages it has, we are going to just read the number of pages that the interpreter produced
-			for(int page = 1; ; page++) {
+			assert d.pdf != null
+			assert d.pdf.data != null
+			PdfReader pdfReader = new PdfReader(d.pdf.data)
+			int pageCount = pdfReader.getNumberOfPages()
+
+			for(int page = 1; page <= pageCount; page++) {
 				File f = new File("${baseName}-${page}.png")
 				if(!f.exists() || !f.canRead()) {
 					break;
 				}
 				filesToDelete += f
 
-				Image i = new Image(pageNumber:page)
+				Rectangle psize = pdfReader.getPageSize(page);
+
+				Image i = new Image(pageNumber:page, sourceWidth:psize.getWidth(), sourceHeight:psize.getHeight())
 				i.data = f.getBytes()
 				d.addToImages(i)
 			}
+
+			pdfReader.close();
 
 			assert d.images.size() > 0
 		} finally {

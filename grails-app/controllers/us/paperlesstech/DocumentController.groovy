@@ -87,7 +87,10 @@ class DocumentController {
 		if (document) {
 			def image = document.getSortedImages()[params.pageNumber.toInteger()]
 			if (image) {
-				def j = [imageData: imageDataPrefix + image.data.encodeBase64().toString(), pageNumber: params.pageNumber]
+				def j = [imageData: imageDataPrefix + image.data.encodeBase64().toString(),
+							pageNumber: params.pageNumber,
+							sourceHeight: image.sourceHeight,
+							sourceWidth: image.sourceWidth]
 				render j as JSON
 			}
 		}
