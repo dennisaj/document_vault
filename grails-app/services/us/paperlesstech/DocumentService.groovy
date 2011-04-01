@@ -2,9 +2,8 @@ package us.paperlesstech
 
 import java.awt.Graphics2D
 import java.awt.RenderingHints
-import java.awt.image.BufferedImage;
 
-import javax.imageio.ImageIO;
+import javax.imageio.ImageIO
 
 import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfContentByte
@@ -161,13 +160,14 @@ class DocumentService {
 
 			long start = System.currentTimeMillis()
 			Image image = d.getSortedImages()[i]
-			BufferedImage original = ImageIO.read(new ByteArrayInputStream(image.data))
-			BufferedImage signature = ImageIO.read(new ByteArrayInputStream(imageData))
+			java.awt.Image original = ImageIO.read(new ByteArrayInputStream(image.data))
+			java.awt.Image signature = ImageIO.read(new ByteArrayInputStream(imageData))
+			signature = signature.getScaledInstance(original.width, original.height, java.awt.Image.SCALE_SMOOTH)
 
 			Graphics2D buffer = original.createGraphics()
 			buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-			buffer.drawImage(original, 0, 0, null)
-			buffer.drawImage(signature, 0, 0, null)
+			buffer.drawImage(original, null, null)
+			buffer.drawImage(signature, null, null)
 			buffer.dispose()
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream()

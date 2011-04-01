@@ -178,9 +178,13 @@ var Drawing = {
 		hiddenCanvas.width = page.background.width;
 		hiddenCanvas.height = page.background.height;
 		
+		var scaleX = page.sourceWidth / page.background.width;
+		var scaleY = page.sourceHeight / page.background.height;
+		
 		var hiddenContext = hiddenCanvas.getContext('2d');
 		
 		hiddenContext.clearRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
+		hiddenContext.scale(scaleX, scaleY);
 		hiddenCanvas.width = hiddenCanvas.width;
 		
 		for (var i = 0; i < page.lines.length; i++) {
@@ -199,7 +203,7 @@ var Drawing = {
 		
 		context.strokeStyle = strokeStyle;
 		context.lineJoin = 'round';
-		context.lineWidth = 2;
+		context.lineWidth = 1.5;
 		context.beginPath();
 		context.moveTo(line.start.x, line.start.y);
 		context.lineTo(line.end.x, line.end.y);
@@ -210,23 +214,19 @@ var Drawing = {
 	realSetupCanvas: function(canvas, page) {
 		this.currentPage = page;
 				
-		// If the page changed to the page we requested, update the arrows
-		//if (currentPage.pageNumber == newPage) {
-			$('#right-arrow a').attr('href', '#' + Math.min(this.pages.length - 1, page.pageNumber + 1));
-			$('#left-arrow a').attr('href', '#' + Math.max(0, page.pageNumber - 1));
-			
-			$('.arrow a').removeClass('disabled');
-			
-			if (page.pageNumber == 0) {
-				$('#left-arrow a').addClass('disabled');
-			}
-			
-			if (page.pageNumber == this.pages.length - 1) {
-				$('#right-arrow a').addClass('disabled');
-			}
-		//}
+		$('#right-arrow a').attr('href', '#' + Math.min(this.pages.length - 1, page.pageNumber + 1));
+		$('#left-arrow a').attr('href', '#' + Math.max(0, page.pageNumber - 1));
 		
+		$('.arrow a').removeClass('disabled');
 		
+		if (page.pageNumber == 0) {
+			$('#left-arrow a').addClass('disabled');
+		}
+		
+		if (page.pageNumber == this.pages.length - 1) {
+			$('#right-arrow a').addClass('disabled');
+		}
+
 		canvas.width = page.background.width;
 		canvas.height = page.background.height;
 		
@@ -337,7 +337,9 @@ var Drawing = {
 						Drawing.pages[data.pageNumber] = {
 							lines: new Array(),
 							background: bg,
-							pageNumber: pageNumber
+							pageNumber: data.pageNumber,
+							sourceHeight: data.sourceHeight,
+							sourceWidth: data.sourceWidth
 						};
 						
 						Drawing.setupCanvas(canvas, Drawing.pages[data.pageNumber]);
@@ -470,7 +472,10 @@ var Drawing = {
 		
 		$('#save').click(function() {
 			$('#confirm-submit').dialog('open');
-			//window.open(drawHiddenCanvas(currentPage));
+		});
+		
+		$('#close').click(function() {
+			window.location.href = '/document_vault'
 		});
 		
 		$(window).hashchange(function() {

@@ -18,6 +18,7 @@
 				<input type="button" class="bigbutton" id="clearcan" value="Clear"/>
 			</g:if>
 			<input type="button" class="bigbutton" id="viewAll" value="View All" />
+			<input type="button" class="bigbutton" id="close" value="Close" />
 		</div>
 		<div id="main">
 			<div id="left-arrow" class="arrow">
