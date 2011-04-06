@@ -7,6 +7,7 @@ class ActivityLog {
 
 	enum ActivityType {
 		DELETE,
+		PRINT,
 		SIGN,
 		VIEW
 	}

@@ -13,18 +13,21 @@ class ActivityLogService {
 		return addLog(request, ActivityLog.ActivityType.DELETE, signatures)
 	}
 	
+	def addPrintLog(request, document) {
+		return addLog(request, ActivityLog.ActivityType.PRINT, document)
+	}
+	
 	def addSignLog(request, document, signatures) {
 		return addLog(request, ActivityLog.ActivityType.SIGN, document, signatures)
 	}
 	
 	def addLog(request, activityType, document, signatures=[:]) {
-		def activityLog = new ActivityLog()
-		activityLog.activityType = activityType
-		activityLog.userAgent = request.getHeader("User-Agent")
-		activityLog.ip = request.getRemoteAddr()
-		activityLog.user = springSecurityService.currentUser
-		activityLog.pagesAffected = signatures.keySet().join(',')
-		activityLog.document = document
+		def activityLog = new ActivityLog(activityType: activityType,
+				userAgent: request.getHeader("User-Agent"),
+				ip: request.getRemoteAddr(),
+				user: springSecurityService.currentUser,
+				pagesAffected: signatures.keySet().join(','),
+				document: document)
 		
 		activityLog.save()
 		

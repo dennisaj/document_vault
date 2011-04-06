@@ -1,6 +1,6 @@
 package us.paperlesstech
 
-import org.joda.time.*
+import org.joda.time.LocalDateTime
 import org.joda.time.contrib.hibernate.PersistentLocalDateTime
 
 class Document {

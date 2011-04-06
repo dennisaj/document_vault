@@ -108,7 +108,7 @@ grails.plugins.springsecurity.authority.className = 'us.paperlesstech.Role'
 grails.plugins.springsecurity.authority.nameField = 'name'
 // All URLs are secured by default
 grails.plugins.springsecurity.rejectIfNoRule = true
-// Use basic authhentication for the /api/ URLs only
+// Use basic authentication for the /api/ URLs only
 grails.plugins.springsecurity.useBasicAuth = true
 grails.plugins.springsecurity.basic.realmName = "Paperless Technologies Document Vault API"
 grails.plugins.springsecurity.filterChain.chainMap = [
@@ -127,7 +127,9 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/':				['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/index':			['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/document/**':		['ROLE_USER', 'ROLE_ADMIN'],
+	'/printQueue/**':	['ROLE_USER', 'ROLE_ADMIN'],
 	'/api/**':			['ROLE_ADMIN'],
+	'/printer/**':		['ROLE_ADMIN'],
 	'/login/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/logout/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/js/**':			['IS_AUTHENTICATED_ANONYMOUSLY'],

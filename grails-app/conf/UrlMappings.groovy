@@ -28,5 +28,15 @@ class UrlMappings {
 			controller = "document"
 			action = "sign"
 		}
+		
+		"/printQueue/push/$printerId/$documentId" {
+			controller = "printQueue"
+			action = "push"
+		}
+		
+		"/api/printQueue/get" {
+			controller = "printQueue"
+			action = "pop"
+		}
 	}
 }

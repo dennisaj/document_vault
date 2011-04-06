@@ -95,7 +95,7 @@ class DocumentController {
 			}
 		}
 
-		render([]) as JSON
+		render [:] as JSON
 	}
 
 	def sign = {
@@ -113,7 +113,7 @@ class DocumentController {
 			signatures[params.pageNumber] = imageData
 		}
 
-		render([]) as JSON
+		render [:] as JSON
 	}
 
 	def finish = {
@@ -128,6 +128,6 @@ class DocumentController {
 			flash.green = "Signature saved"
 		}
 
-		render([]) as JSON
+		render [:] as JSON
 	}
 }
