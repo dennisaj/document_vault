@@ -15,8 +15,11 @@
 				<input type="button" class="bigbutton" id="save" value="Submit Signatures" />
 				<input type="button" class="bigbutton" id="pen" value="Pen" />
 				<input type="button" class="bigbutton" id="undo" value="Undo" />
-				<input type="button" class="bigbutton" id="clearcan" value="Clear"/>
+				<input type="button" class="bigbutton" id="clearcan" value="Clear" />
 			</g:if>
+			<g:else>
+				<input type="button" class="bigbutton" id="print" value="Print" />
+			</g:else>
 			<input type="button" class="bigbutton" id="viewAll" value="View All" />
 			<input type="button" class="bigbutton" id="close" value="Close" />
 		</div>

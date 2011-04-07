@@ -87,30 +87,31 @@ var Drawing = {
 		var isDrawing = $('#pen').is('.on');
 			
 		if (!isDrawing && !this.isDragging) {
+			var zoomScale = this.ZOOM_SCALE;
+			
 			if (this.isZoomedIn) {
-				$('#viewAll').click();
-			} else {
-				var point = this.scalePoint(this.convertEventToPoint(event));
-				
-				var zoomWidth = this.ZOOM_SCALE * this.currentPage.background.width;
-				var widthOffset = zoomWidth / 2;
-				
-				var zoomHeight = this.ZOOM_SCALE * this.currentPage.background.height;
-				var heightOffset = zoomHeight / 2;
-				
-				var zoomStart = {
-					x: point.x - widthOffset,
-					y: point.y - heightOffset
-				};
-				
-				var zoomEnd = {
-					x: point.x + widthOffset, 
-					y: point.y + heightOffset
-				};
-				
-				this.viewArea(this.can, this.currentPage, zoomStart, zoomEnd, 'width', true);
-				this.isZoomedIn = true;
+				zoomScale = 1;
 			}
+			var point = this.scalePoint(this.convertEventToPoint(event));
+			
+			var zoomWidth = zoomScale * this.$main.width();
+			var widthOffset = zoomWidth / 2;
+			
+			var zoomHeight = zoomScale * this.$main.height();
+			var heightOffset = zoomHeight / 2;
+			
+			var zoomStart = {
+				x: point.x - widthOffset,
+				y: point.y - heightOffset
+			};
+			
+			var zoomEnd = {
+				x: point.x + widthOffset, 
+				y: point.y + heightOffset
+			};
+			
+			this.viewArea(this.can, this.currentPage, zoomStart, zoomEnd, 'width');
+			this.isZoomedIn = !this.isZoomedIn;//true;
 		} else if (isDrawing) {
 			this.addBreak(this.currentPage);
 		} else {
@@ -263,9 +264,8 @@ var Drawing = {
 			y: Math.max(point1.y, point2.y)
 		};
 		
-		
-		var newWidth = Math.max(page.background.width * .10, lowerRightCorner.x - upperLeftCorner.x);
-		var newHeight = Math.max(page.background.height * .10, lowerRightCorner.y - upperLeftCorner.y);
+		var newWidth = lowerRightCorner.x - upperLeftCorner.x;
+		var newHeight = lowerRightCorner.y - upperLeftCorner.y;
 		
 		if (scaleBy == 'width') {
 			this.scale = this.$main.width() / newWidth;
@@ -274,12 +274,7 @@ var Drawing = {
 		}
 
 		this.scrollCanX = -upperLeftCorner.x * this.scale;
-		
-		if (center) {
-			this.scrollCanY = (-upperLeftCorner.y * this.scale) - (this.$main.height() / 2);
-		} else {
-			this.scrollCanY = -upperLeftCorner.y * this.scale;
-		}
+		this.scrollCanY = -upperLeftCorner.y * this.scale;
 		
 		this.currentWidth = page.background.width * this.scale;
 		this.currentHeight = page.background.height * this.scale;
@@ -350,7 +345,24 @@ var Drawing = {
 			});
 		}
 	},
-	
+
+	print: function(documentId, printerId) {
+		$.ajax({
+			beforeSend: function() {/* Add throbber */ },
+			complete: function() {/* Remove throbber */ },
+			error: this.onAjaxError,
+			global: false,
+			success: function(data) {
+				if (data.status == 'success') {
+					Drawing._alert('Print has been queue', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>This document has been sent to the printer</p>');
+				} else {
+					Drawing._alert('There has been an error', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>This document has NOT been sent to the printer</p>');
+				}
+			},
+			type: 'GET',
+			url: '/document_vault/printQueue/push/' + printerId + '/' + documentId
+		});
+	},	
 	submitPage: function(documentId, pageNumber) {
 		var $dialog = $('#dialog-message');
 		
@@ -549,6 +561,10 @@ var Drawing = {
 				$('#pblabel').text(Math.min(100, $(this).progressbar('option', 'value')) + '%');
 			},
 			value: 1
+		});
+
+		$('#print').click(function() {
+			Drawing.print($('#documentId').val(), 1);
 		});
 		
 		// Load the page indicated by the location hash

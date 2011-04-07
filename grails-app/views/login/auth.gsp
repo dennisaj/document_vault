@@ -12,7 +12,7 @@
 			<legend>Login</legend>
 			<p>
 				<label for='username'>User Name</label><br />
-				<input type='text' class='text' name='j_username' id='j_username' />
+				<input type='text' class='text' name='j_username' id='j_username' autocapitalize='off' />
 			</p>
 			<p>
 				<label for='password'>Password</label>
