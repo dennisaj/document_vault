@@ -5,8 +5,8 @@
 		<link href="${resource(dir:'images',file:'favicon.ico')}" rel="icon" />
 		<link href="${resource(dir:'css',file:'main.css')}" rel="stylesheet" media="screen, projection" />
 		<blueprint:resources plugins="fancy-type, link-icons" />
-        <g:layoutHead />
         <g:javascript library="jquery" plugin="jquery" />
+        <g:layoutHead />
     </head>
     <body>
         <div id="spinner" class="spinner" style="display:none;">

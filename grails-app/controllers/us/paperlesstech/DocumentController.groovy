@@ -2,31 +2,67 @@ package us.paperlesstech
 
 import grails.converters.JSON
 
+import org.compass.core.engine.SearchEngineQueryParseException
+
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", saveApi: "POST"]
-	
+
 	// TODO Remove scaffolding
 	def scaffold = true
-	
-	def imageDataPrefix = "data:image/png;base64,"
-	def documentService
+
 	def activityLogService
+	def documentService
+	def imageDataPrefix = "data:image/png;base64,"
+	def searchableService
 
 	def index = {
 		def results = Document.listOrderByDateCreated(max:5, order:"desc")
+		def docCount = Document.count()
 
-		[documents: results]
+		["searchResult":["results":results, "offset":0, "total":docCount, "max":docCount], "queryString":"5 most recent documents"]
+	}
+
+	def documentTypeOptions = {
+		def dt = params.documentTypeId?.trim() ? DocumentType.get(params.documentTypeId) : null
+		render(template:"documentTypeSearch", model:[documentType: dt])
 	}
 
 	def search = {
-		if(!params.term || params.term.length() < 3) {
-			render(template:"searchResults")
-			return
-		}
-		String roNumber = params.term.toLowerCase()
-		def results = Document.executeQuery("from Document d where d.id like :roNumber", [roNumber: "%${roNumber}%"])
+		def results = [:]
 
-		render(template:"searchResults", model:[documents: results])
+		// Default to simple search
+		def simpleSearch = params?.simpleSearch ? params.simpleSearch.toBoolean() : true
+		
+		System.err.println("simple search '${simpleSearch}'")
+
+		def queryString = ""
+		if(!simpleSearch) {
+			// Find the incoming fields that start with field_, strip off the field_
+			// and create a query string from them
+			def advancedQuery = params.findAll { it.key.startsWith("field_") && it.value }.collect { "${it.key[6..-1]}:*${it.value}*" }.join(" ")
+			System.err.println("advancedQuery '${advancedQuery}'")
+			def dt = DocumentType.get(params.documentType)
+			// if there is a document type add it to the search
+			queryString = dt ? "DocumentType:${dt.name} ${advancedQuery}" : advancedQuery
+		} else {
+			queryString = params.q
+		}
+		System.err.println("queryString '${queryString}'")
+
+		queryString = queryString.trim()
+		System.err.println("queryString '${queryString}'")
+		if (queryString) {
+			try {
+				def ss = searchableService.search(queryString, params)
+				def docs = ss?.results.collect { Document.findWhere(text: it) }
+				results = ["searchResult":["results":docs, "offset":ss.offset, "total":ss.total, "max":ss.max]]
+			} catch (SearchEngineQueryParseException ex) {
+				results = [parseException: true]
+			}
+		}
+
+		results.queryString = queryString
+		render(template:"searchResults", model:results)
 	}
 
 	def saveApi = {

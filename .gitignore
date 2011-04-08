@@ -1,4 +1,5 @@
 .DS_Store
+local/
 target/
 .idea/
 ptsave.iml
@@ -7,3 +8,4 @@ ptsave.iml
 .settings/
 devDb.*
 web-app/WEB-INF/classes
+*.log

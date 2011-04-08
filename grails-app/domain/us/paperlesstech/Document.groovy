@@ -15,6 +15,7 @@ class Document {
 
 	Pcl pcl
 	Pdf pdf
+	Text text
 	
 	static hasMany = [images: Image]
 	
@@ -30,6 +31,7 @@ class Document {
 		type(nullable: true)
 		pcl(unique: true, nullable: true)
 		pdf(unique: true, nullable: true)
+		text(unique: true, nullable: true)
 	}
 	
 	String toString() {

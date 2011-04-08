@@ -5,6 +5,8 @@ import java.awt.RenderingHints
 
 import javax.imageio.ImageIO
 
+import us.paperlesstech.module.document_parsing.ferman.FermanDocumentType
+
 import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfReader
@@ -107,6 +109,20 @@ class DocumentService {
 		}
 
 		log.info "Pdf created for document ${d}"
+		d.save()
+	}
+
+	def createTextFromPcl(Document d) {
+		FermanDocumentType fdt = new FermanDocumentType()
+		DocumentType type = fdt.getDocumentType(d)
+		d.type = type
+
+		def text = fdt.parseDocument(d)
+		d.text = text
+		if(!d.text.parsedFields) d.text.parsedFields = [:]
+		d.text.parsedFields.DocumentType = d.type.name
+
+		log.info "Text saved for document ${d} - identified as ${d.type}"
 		d.save()
 	}
 

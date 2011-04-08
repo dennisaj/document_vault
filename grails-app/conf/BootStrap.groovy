@@ -1,6 +1,8 @@
+import us.paperlesstech.DocumentType;
 import us.paperlesstech.Role
 import us.paperlesstech.User
 import us.paperlesstech.UserRole
+import us.paperlesstech.module.document_parsing.ferman.FermanDocumentType;
 
 class BootStrap {
 	def springSecurityService
@@ -15,6 +17,35 @@ class BootStrap {
 			def adminUser = new User(username: 'admin', enabled: true, userPassword: password)
 			adminUser.save(flush: true)
 			UserRole.create adminUser, adminRole, true
+		}
+
+		if(DocumentType.count() == 0) {
+			new DocumentType(name:FermanDocumentType.Types.CUSTOMER_HARD_COPY.name(),
+					searchOptions:[
+						"RO_Number",
+						"Customer_Name",
+						"Customer_Address",
+						"Home_Phone",
+						"Work_Phone",
+						"VIN",
+						"License_Number",
+						"RO_Open_Date",
+						"Time_Received",
+						"Time_Promised",
+						"Current_Mileage",
+						"Mileage_Out",
+						"Estimate_Of_Repairs",
+						"Service_Advisor",
+						"Delivery_Date",
+						"In_Service_Date",
+						"Model_Year",
+						"Make",
+						"Model",
+						"Body",
+						"Color"
+					]).save()
+
+			new DocumentType(name:FermanDocumentType.Types.UNKNOWN.name()).save()
 		}
 	}
 	def destroy = {

@@ -25,6 +25,7 @@ class PclProcessorJob {
 		log.info "Converting document - ${id}"
 		documentService.createPdfFromPcl(d)
 		documentService.createImagesFromPcl(d)
+		documentService.createTextFromPcl(d)
 		d.save(flush:true)
 		log.info "Finished converting document - ${id}"
 	}

@@ -27,10 +27,12 @@ environments {
     }
     production {
         dataSource {
-	driverClassName = "com.mysql.jdbc.Driver"
-	dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
+            username = "document_vault"
+            password = "K6mouJjt"
+            driverClassName = "com.mysql.jdbc.Driver"
+            dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
             dbCreate = "update"
-            url = "jdbc:hsqldb:file:prodDb;shutdown=true"
+            url = "jdbc:mysql://localhost/document_vault"
         }
     }
 }
