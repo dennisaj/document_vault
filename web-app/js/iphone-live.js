@@ -82,17 +82,33 @@ var Drawing = {
 			return this.ORIGIN;
 		}
 	},
-	
+
+	currentCenter: function() {
+		var upperLeftCorner = $.extend({}, Drawing.ORIGIN);
+		var lowerRightCorner = $.extend({}, Drawing.ORIGIN);
+
+		upperLeftCorner.x = -this.scrollCanX / this.scale
+		upperLeftCorner.y = -this.scrollCanY / this.scale;
+
+		lowerRightCorner.x = upperLeftCorner.x + (this.$main.width() / this.scale);
+		lowerRightCorner.y = upperLeftCorner.y + (this.$main.height() / this.scale);
+
+		return {x: (upperLeftCorner.x + lowerRightCorner.x) / 2, y: (upperLeftCorner.y + lowerRightCorner.y) / 2};
+	},
+
 	doEnd: function(event) {
 		var isDrawing = $('#pen').is('.on');
 			
 		if (!isDrawing && !this.isDragging) {
 			var zoomScale = this.ZOOM_SCALE;
+
+			var point = this.scalePoint(this.convertEventToPoint(event));
 			
 			if (this.isZoomedIn) {
-				zoomScale = 1;
+				zoomScale = this.currentPage.background.width / this.$main.width();
+
+				point = this.currentCenter();
 			}
-			var point = this.scalePoint(this.convertEventToPoint(event));
 			
 			var zoomWidth = zoomScale * this.$main.width();
 			var widthOffset = zoomWidth / 2;
@@ -258,15 +274,15 @@ var Drawing = {
 			x: Math.min(point1.x, point2.x), 
 			y: Math.min(point1.y, point2.y)
 		};
-		
+
 		var lowerRightCorner = {
 			x: Math.max(point1.x, point2.x), 
 			y: Math.max(point1.y, point2.y)
 		};
-		
+
 		var newWidth = lowerRightCorner.x - upperLeftCorner.x;
 		var newHeight = lowerRightCorner.y - upperLeftCorner.y;
-		
+
 		if (scaleBy == 'width') {
 			this.scale = this.$main.width() / newWidth;
 		} else {
@@ -275,22 +291,22 @@ var Drawing = {
 
 		this.scrollCanX = -upperLeftCorner.x * this.scale;
 		this.scrollCanY = -upperLeftCorner.y * this.scale;
-		
+
 		this.currentWidth = page.background.width * this.scale;
 		this.currentHeight = page.background.height * this.scale;
 		canvas.style.width = this.currentWidth + 'px';
 		canvas.style.height = this.currentHeight + 'px';
-	
+
 		canvas.style.webkitTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
 		canvas.style.MozTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
 	},
-	
+
 	onAjaxError: function(jqXHR, textStatus, errorThrown) {
 		$('#dialog-message').dialog('close');
 	
 		this._alert('Unable to save the signatures', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Oopsie! ' + textStatus + '</p>');
 	},
-	
+
 	// AJAX stuff
 	finishDocument: function(documentId) {
 		var $dialog = $('#dialog-message');
@@ -346,7 +362,7 @@ var Drawing = {
 		}
 	},
 
-	print: function(documentId, printerId) {
+	print: function(printerId, documentId) {
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
@@ -354,7 +370,7 @@ var Drawing = {
 			global: false,
 			success: function(data) {
 				if (data.status == 'success') {
-					Drawing._alert('Print has been queue', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>This document has been sent to the printer</p>');
+					Drawing._alert('Print has been queue', '<p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 50px 0;"></span>This document has been sent to the printer</p>');
 				} else {
 					Drawing._alert('There has been an error', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>This document has NOT been sent to the printer</p>');
 				}
@@ -362,7 +378,8 @@ var Drawing = {
 			type: 'GET',
 			url: '/document_vault/printQueue/push/' + printerId + '/' + documentId
 		});
-	},	
+	},
+	
 	submitPage: function(documentId, pageNumber) {
 		var $dialog = $('#dialog-message');
 		
@@ -562,9 +579,28 @@ var Drawing = {
 			},
 			value: 1
 		});
+		
+		$('#printer-select').dialog({
+			autoOpen: false,
+			buttons: {
+				'Print': function() {
+					$(this).dialog('close');
+					Drawing.print($('#printer').val(), $('#documentId').val());
+				},
+				'Cancel' :function() {
+					$(this).dialog('close');
+				}
+			},
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			open: function(event, ui) {	},
+			resizable: false,
+			width: 400
+		});
 
 		$('#print').click(function() {
-			Drawing.print($('#documentId').val(), 1);
+			$('#printer-select').dialog('open');
 		});
 		
 		// Load the page indicated by the location hash
