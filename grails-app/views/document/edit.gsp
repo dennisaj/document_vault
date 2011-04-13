@@ -5,7 +5,7 @@
 		<meta name="layout" content="mobile" />
 		<jqui:resources theme="ui-lightness" />
 		<g:javascript src="jquery.ba-hashchange.js" />
-		<g:javascript src="iphone-live.js" />
+		<g:javascript src="drawing.js" />
 	</head>
 	<body>
 		<input type="hidden" id="pageCount" value="${document.images.size()}" />
