@@ -7,8 +7,7 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<link href="${resource(dir:'images',file:'favicon.ico')}" rel="icon" />
 		<link href="${resource(dir:'css',file:'mobile.css')}" rel="stylesheet" media="screen, projection" />
-		<link href="${resource(dir:'css', file:'iphone.css')}" rel="stylesheet" media="all" />
-		<link href="${resource(dir:'css', file:'iphonep.css')}" rel="stylesheet" media="all and (orientation:landscape)" />
+		<link href="${resource(dir:'css', file:'drawing.css')}" rel="stylesheet" media="all" />
 		<blueprint:resources plugins="fancy-type, link-icons" />
 		<g:javascript library="jquery" plugin="jquery" />
 		<g:javascript>
