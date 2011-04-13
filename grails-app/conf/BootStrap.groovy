@@ -1,8 +1,8 @@
-import us.paperlesstech.DocumentType;
+import us.paperlesstech.DocumentType
 import us.paperlesstech.Role
 import us.paperlesstech.User
 import us.paperlesstech.UserRole
-import us.paperlesstech.module.document_parsing.ferman.FermanDocumentType;
+import us.paperlesstech.module.document_parsing.ferman.FermanDocumentType
 
 class BootStrap {
 	def springSecurityService
@@ -10,13 +10,22 @@ class BootStrap {
 		println "All users ${User.list(max: 100)}"
 		println "Admin ${User.findByUsername("admin")}"
 		println "Authorities ${User.findByUsername("admin")?.getAuthorities()}"
+
+		if (!checkForPcl6()) {
+			throw new RuntimeException()
+		}
+
 		if(User.count() == 0) {
 			def adminRole = new Role(name: 'ROLE_ADMIN').save(flush: true)
 			def userRole = new Role(name: 'ROLE_USER').save(flush: true)
-			String password = springSecurityService.encodePassword('admin')
-			def adminUser = new User(username: 'admin', enabled: true, userPassword: password)
+			String adminPassword = springSecurityService.encodePassword('admin')
+			String normalPassword = springSecurityService.encodePassword('normal')
+			def adminUser = new User(username: 'admin', enabled: true, userPassword: adminPassword)
+			def normalUser = new User(username: 'normal', enabled: true, userPassword: normalPassword)
 			adminUser.save(flush: true)
+			normalUser.save(flush: true)
 			UserRole.create adminUser, adminRole, true
+			UserRole.create normalUser, userRole, true
 		}
 
 		if(DocumentType.count() == 0) {
@@ -48,6 +57,12 @@ class BootStrap {
 			new DocumentType(name:FermanDocumentType.Types.UNKNOWN.name()).save()
 		}
 	}
+
+	def checkForPcl6 = {
+		def file = new File('/usr/local/bin/pcl6')
+		return file?.exists() && file?.canRead() && file?.canExecute()
+	}
+
 	def destroy = {
 	}
 }
