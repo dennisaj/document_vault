@@ -23,7 +23,7 @@ class FermanDocumentTypeTests extends GrailsUnitTestCase {
 		FermanDocumentType fdt = new FermanDocumentType()
 
 		def hcType = new DocumentType(name:FermanDocumentType.Types.CUSTOMER_HARD_COPY.name())
-		def unknownType = new DocumentType(name:FermanDocumentType.Types.UNKNOWN.name())
+		def unknownType = new DocumentType(name:FermanDocumentType.Types.OTHER.name())
 		def testInstances = [unknownType, hcType]
 		mockDomain(DocumentType.class, testInstances)
 

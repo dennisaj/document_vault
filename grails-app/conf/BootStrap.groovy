@@ -54,7 +54,7 @@ class BootStrap {
 						"Color"
 					]).save()
 
-			new DocumentType(name:FermanDocumentType.Types.UNKNOWN.name()).save()
+			new DocumentType(name:FermanDocumentType.Types.OTHER.name()).save()
 		}
 	}
 

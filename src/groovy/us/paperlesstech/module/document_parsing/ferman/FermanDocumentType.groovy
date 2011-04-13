@@ -7,7 +7,7 @@ import us.paperlesstech.Text
 class FermanDocumentType {
 	public static enum Types {
 		CUSTOMER_HARD_COPY,
-		UNKNOWN
+		OTHER
 	}
 
 	public DocumentType getDocumentType(Document d) {
@@ -15,7 +15,7 @@ class FermanDocumentType {
 
 		String data = pclToString(d)
 
-		Types type = Types.UNKNOWN
+		Types type = Types.OTHER
 		if(data.contains("&f20901y")) {
 			type = Types.CUSTOMER_HARD_COPY
 		}
@@ -114,7 +114,7 @@ class FermanDocumentType {
 		Types t = Types.valueOf(d.type.name)
 		Text text = new Text()
 		switch(t) {
-			case Types.UNKNOWN:
+			case Types.OTHER:
 				text.raw = parseUnknown(d)
 				break
 			case Types.CUSTOMER_HARD_COPY:
