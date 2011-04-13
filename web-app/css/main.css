@@ -1,0 +1,79 @@
+div.paginateButtons a {
+	background: #F6A828;
+	border: 1px;
+	color: #f0f0f0;
+	margin: .1em;
+	padding: .5em 1em;
+	text-decoration: none;
+}
+
+div.paginateButtons a:hover {
+	background: #1C94C4;
+	color: #f0f0f0;
+}
+
+.nextLink:after {
+	content: ' \00BB'
+}
+
+.prevLink:before {
+	content: '\00AB '
+}
+
+div.paginateButtons .currentStep {
+	background: #1C94C4;
+	border: 0;
+	color: #f0f0f0;
+	margin: .1em;
+	padding: .5em 1em;
+}
+
+.menuButton {
+	font-size: 10px;
+	padding: 0 5px;
+}
+.menuButton a {
+	color: #333;
+	padding: 4px 6px;
+}
+.menuButton a.home {
+	background: url(../images/skin/house.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
+.menuButton a.list {
+	background: url(../images/skin/database_table.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
+.menuButton a.create {
+	background: url(../images/skin/database_add.png) center left no-repeat;
+	color: #333;
+	padding-left: 25px;
+}
+
+th.asc a:after, th.desc a:after {
+	float: right;
+}
+
+th.asc a:after {
+	content: url(../images/skin/sorted_asc.gif);
+}
+th.desc a:after {
+	content: url(../images/skin/sorted_desc.gif);
+}
+
+/* LIST */
+
+.buttons input.delete {
+	background: transparent url(../images/skin/database_delete.png) 5px 50% no-repeat;
+	padding-left: 28px;
+}
+.buttons input.edit {
+	background: transparent url(../images/skin/database_edit.png) 5px 50% no-repeat;
+	padding-left: 28px;
+}
+.buttons input.save {
+	background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;
+	padding-left: 28px;
+}

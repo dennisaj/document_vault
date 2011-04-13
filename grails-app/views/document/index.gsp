@@ -3,7 +3,7 @@
 <head>
 <meta name="layout" content="main" />
 <jqui:resources theme="ui-lightness" />
-<title>- Search</title>
+<title> - Search</title>
 </head>
 <body>
 	<g:formRemote name="searchForm" url="[action: 'search']"
@@ -55,6 +55,6 @@
 			$("#advancedSearch").click(function() {
 				$("#advancedPanel").toggle('fast');
 			});
-    	</jq:jquery>
+	</jq:jquery>
 </body>
 </html>

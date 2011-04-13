@@ -5,7 +5,8 @@ import grails.converters.JSON
 import org.compass.core.engine.SearchEngineQueryParseException
 
 class DocumentController {
-	static allowedMethods = [finalize: "GET", image: "GET", saveApi: "POST"]
+	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
+	static navigation = [[action:'index', isVisible: {springSecurityService.isLoggedIn()}, order:0, title:'Home']]
 
 	// TODO Remove scaffolding
 	def scaffold = true
@@ -14,6 +15,7 @@ class DocumentController {
 	def documentService
 	def imageDataPrefix = "data:image/png;base64,"
 	def searchableService
+	def springSecurityService
 
 	def index = {
 		def results = Document.listOrderByDateCreated(max:5, order:"desc")
@@ -65,7 +67,7 @@ class DocumentController {
 		render(template:"searchResults", model:results)
 	}
 
-	def saveApi = {
+	def savePcl = {
 		Document document = new Document()
 		try {
 			document.pcl = new Pcl(data:params.data)
