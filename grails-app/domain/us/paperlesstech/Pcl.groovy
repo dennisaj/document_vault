@@ -8,5 +8,6 @@ class Pcl {
 	byte[] data
 
     static constraints = {
+		data(maxSize:20*1024*1024)
     }
 }

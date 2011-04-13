@@ -9,8 +9,6 @@ class Image {
 
     static constraints = {
 		pageNumber(unique:"document")
+		data(maxSize:20*1024*1024)
     }
-	
-	static mapping = {
-	}
 }

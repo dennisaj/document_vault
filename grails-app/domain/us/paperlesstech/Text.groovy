@@ -8,10 +8,6 @@ class Text {
 	Map<String, String> parsedFields
 
 	static constraints = {
-		raw(nullable:true, blank:true)
-	}
-	
-	static mapping = {
-		raw(type:"text")
+		raw(nullable:true, blank:true, maxSize:20*1024*1024)
 	}
 }

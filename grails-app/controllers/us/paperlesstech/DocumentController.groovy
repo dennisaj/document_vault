@@ -35,24 +35,19 @@ class DocumentController {
 		// Default to simple search
 		def simpleSearch = params?.simpleSearch ? params.simpleSearch.toBoolean() : true
 		
-		System.err.println("simple search '${simpleSearch}'")
-
 		def queryString = ""
 		if(!simpleSearch) {
 			// Find the incoming fields that start with field_, strip off the field_
 			// and create a query string from them
 			def advancedQuery = params.findAll { it.key.startsWith("field_") && it.value }.collect { "${it.key[6..-1]}:*${it.value}*" }.join(" ")
-			System.err.println("advancedQuery '${advancedQuery}'")
 			def dt = DocumentType.get(params.documentType)
 			// if there is a document type add it to the search
 			queryString = dt ? "DocumentType:${dt.name} ${advancedQuery}" : advancedQuery
 		} else {
 			queryString = params.q
 		}
-		System.err.println("queryString '${queryString}'")
 
 		queryString = queryString.trim()
-		System.err.println("queryString '${queryString}'")
 		if (queryString) {
 			try {
 				def ss = searchableService.search(queryString, params)

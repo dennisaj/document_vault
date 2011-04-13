@@ -11,8 +11,7 @@ class FermanDocumentType {
 	}
 
 	public DocumentType getDocumentType(Document d) {
-		assert d.pcl
-		assert d.pcl.data
+		assert d?.pcl?.data
 
 		String data = pclToString(d)
 
@@ -25,8 +24,7 @@ class FermanDocumentType {
 	}
 
 	Map parseCustomerHardCopy(Document d) {
-		assert d.pcl
-		assert d.pcl.data
+		assert d?.pcl?.data
 
 		String data = pclToString(d)
 		// The text starts after the first double blank line
@@ -35,8 +33,7 @@ class FermanDocumentType {
 			startOfText = data.indexOf("\r\n\r\n")
 		data = data.substring(startOfText)
 
-		def lines = []
-		data.eachLine { lines += it }
+		def lines = data.split(/\r\n|\n/).toList()
 
 		lines = lines.reverse()
 
@@ -112,7 +109,7 @@ class FermanDocumentType {
 	}
 
 	public Text parseDocument(Document d) {
-		assert d.type
+		assert d?.type
 
 		Types t = Types.valueOf(d.type.name)
 		Text text = new Text()
@@ -136,18 +133,9 @@ class FermanDocumentType {
 		String data = pclToString(d)
 
 		def m = data =~ /(?m)\s([A-Za-z0-9.,\\/:-]+)\s/
-		def lines = []
-		m.each { lines += it[1] }
+		def lines = m*.getAt(1)
 
 		return lines.join("\n")
-	}
-
-	private String advanceToNonBlankLine(List lines) {
-		while(lines.last().isEmpty()) {
-			lines.pop()
-		}
-
-		return lines.pop()
 	}
 
 	private String getField(String line, int start, int end) {
