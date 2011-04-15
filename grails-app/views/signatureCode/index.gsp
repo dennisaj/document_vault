@@ -9,31 +9,25 @@
 		<g:javascript>
 			$(document).ready(function() {
 				Drawing.init({
-						'email': '/document_vault/signatureCode/send/{0}/{1}',
-						'finish': '/document_vault/document/finish/{0}',
-						'image': '/document_vault/document/image/{0}/{1}',
-						'print': '/document_vault/printQueue/push/{0}/{1}',
-						'sign': '/document_vault/document/sign/{0}/{1}',
-						'finish_redirect': '/document_vault/document/index',
-						'close': '/document_vault/document/index'
+						'finish': '/document_vault/signatureCode/finish/{0}',
+						'image': '/document_vault/signatureCode/image/{0}/{1}',
+						'sign': '/document_vault/signatureCode/sign/{0}/{1}',
+						'finish_redirect': '/document_vault/signatureCode/done',
+						'close': '/document_vault/signatureCode/done'
 				});
 			});
 		</g:javascript>
 	</head>
 	<body>
-		<input type="hidden" id="pageCount" value="${document.images.size()}" />
-		<input type="hidden" id="documentId" value="${document.id}" />
+		<input type="hidden" id="pageCount" value="${document?.images?.size()}" />
+		<input type="hidden" id="documentId" value="${document?.id}" />
 		<div id="buttonPanel">
-			<g:if test="${!document.signed}">
+			<g:if test="${!document?.signed}">
 				<input type="button" class="bigbutton" id="save" value="Submit Signatures" />
 				<input type="button" class="bigbutton" id="pen" value="Pen" />
 				<input type="button" class="bigbutton" id="undo" value="Undo" />
 				<input type="button" class="bigbutton" id="clearcan" value="Clear" />
-				<input type="button" class="bigbutton" id="email" value="Email" />
 			</g:if>
-			<g:else>
-				<input type="button" class="bigbutton" id="print" value="Print" />
-			</g:else>
 			<input type="button" class="bigbutton" id="viewAll" value="View All" />
 			<input type="button" class="bigbutton" id="close" value="Close" />
 		</div>
@@ -56,26 +50,13 @@
 				</div>
 			</p>
 		</div>
-		<div id="printer-select" title="Choose a Printer">
-			<p>
-				<span class="ui-icon ui-icon-print" style="float: left; margin: 0 7px 50px 0;"></span>
-				<g:select name="printer" from="${us.paperlesstech.Printer.list()}" optionKey="id" />
-			</p>
-		</div>
 		<div id="confirm-submit" title="Confirm Submit">
 			<p>
 				<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>
 				Are you sure you want to want to submit the signature for this document?
 			</p>
 		</div>
-		<div id="email-dialog" title="Email Document">
-			<p>
-				<span class="ui-icon ui-icon-mail-closed" style="float: left; margin: 0 7px 50px 0;"></span>
-				<g:textField name="address" />
-			</p>
-		</div>
 		<div id="alert">
 		</div>
 	</body>
 </html>
-

@@ -15,6 +15,9 @@ import com.itextpdf.text.pdf.PdfStamper
 
 class DocumentService {
 	static transactional = true
+	static imageDataPrefix = "data:image/png;base64,"
+	
+	def activityLogService
 
 	def chopExtension(String fileName, String extension) {
 		return fileName.substring(0, fileName.length() - extension.length())
@@ -194,5 +197,35 @@ class DocumentService {
 		}
 
 		d.save()
+	}
+	
+	def getImageDataAsJSON(documentId, pageNumber) {
+		
+		def document = Document.get(documentId)
+
+		if (document) {
+			def image = document.getSortedImages()[pageNumber]
+			if (image) {
+				return [imageData: imageDataPrefix + image.data.encodeBase64().toString(),
+						pageNumber: pageNumber,
+						sourceHeight: image.sourceHeight,
+						sourceWidth: image.sourceWidth]
+			}
+		}
+
+		return [status:"error"]
+	}
+	
+	def saveSignature(documentId, signatures, pageNumber, imageData) {
+		def document = Document.get(documentId)
+
+		if (document && imageData) {
+			imageData = imageData.substring(imageDataPrefix.size()).decodeBase64()
+
+			signatures[pageNumber] = imageData
+			return true
+		}
+
+		return false
 	}
 }

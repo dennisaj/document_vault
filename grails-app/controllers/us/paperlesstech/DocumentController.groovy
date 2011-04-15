@@ -15,6 +15,7 @@ class DocumentController {
 	def documentService
 	def imageDataPrefix = "data:image/png;base64,"
 	def searchableService
+	def signatureCodeService
 	def springSecurityService
 
 	def index = {
@@ -95,9 +96,11 @@ class DocumentController {
 
 	def downloadPdf = {
 		def document = Document.get(params.id)
-		response.setContentType("application/pdf")
-		response.setContentLength(document.pdf.data.length)
-		response.getOutputStream().write(document.pdf.data)
+		if (document) {
+			response.setContentType("application/pdf")
+			response.setContentLength(document.pdf.data.length)
+			response.getOutputStream().write(document.pdf.data)
+		}
 	}
 
 	def show = {
@@ -115,52 +118,40 @@ class DocumentController {
 	}
 
 	def image = {
-		def document = Document.get(params.id)
-
-		if (document) {
-			def image = document.getSortedImages()[params.pageNumber.toInteger()]
-			if (image) {
-				def j = [imageData: imageDataPrefix + image.data.encodeBase64().toString(),
-							pageNumber: params.pageNumber,
-							sourceHeight: image.sourceHeight,
-							sourceWidth: image.sourceWidth]
-				render j as JSON
-			}
-		}
-
-		render [:] as JSON
+		render (documentService.getImageDataAsJSON(params.id.toInteger(), params.pageNumber.toInteger()) as JSON)
 	}
 
 	def sign = {
-		def document = Document.get(params.id)
-
-		if (document && params.imageData) {
-			if (!session.signatures) {
-				session.signatures = [:]
-			}
-
-			def signatures = session.signatures.get(document.id.toString(), [:])
-
-			def imageData = params.imageData.substring(imageDataPrefix.size()).decodeBase64()
-
-			signatures[params.pageNumber] = imageData
+		if (!session.signatures) {
+			session.signatures = [:]
 		}
-
-		render [:] as JSON
+		
+		def signatures = session.signatures.get(params.id.toString(), [:])
+		
+		if (documentService.saveSignature(params.id, signatures, params.pageNumber, params.imageData)) {
+			session.signatures[params.id] = signatures
+			render ([status:"success"] as JSON)
+		} else {
+			render ([status:"error"] as JSON)
+		}
 	}
 
 	def finish = {
 		def document = Document.get(params.id)
 		if (document) {
-			activityLogService.addSignLog(request, document, session.signatures.get(document.id.toString()).findAll {it.value})
+			
+			def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
+
+			activityLogService.addSignLog(request, document, signatures)
 			documentService.signDocument(document, session.signatures.get(document.id.toString()))
 
 			document.signed = true
 			document.save()
 
 			flash.green = "Signature saved"
+			render ([status:"success"] as JSON)
 		}
 
-		render [:] as JSON
+		render ([status:"error"] as JSON)
 	}
 }
