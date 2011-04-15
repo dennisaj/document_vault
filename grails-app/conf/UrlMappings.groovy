@@ -38,5 +38,20 @@ class UrlMappings {
 			controller = "printQueue"
 			action = "pop"
 		}
+		
+		"/signatureCode/send/$documentId/$email" {
+			controller = "signatureCode"
+			action = "send"
+		}
+		
+		"/signatureCode/image/$id/$pageNumber" {
+			controller = "signatureCode"
+			action = "image"
+		}
+		
+		"/signatureCode/sign/$id/$pageNumber" {
+			controller = "signatureCode"
+			action = "sign"
+		}
 	}
 }

@@ -17,6 +17,7 @@ var Drawing = {
 	scrollCanX: 0,
 	scrollCanY: 0,
 	trackingTouchId: null,
+	urls: {},
 	ZOOM_SCALE: .3,
 
 	_alert: function(title, html) {
@@ -304,7 +305,25 @@ var Drawing = {
 	onAjaxError: function(jqXHR, textStatus, errorThrown) {
 		$('#dialog-message').dialog('close');
 	
-		this._alert('Unable to save the signatures', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Oopsie! ' + textStatus + '</p>');
+		Drawing._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Oopsie! ' + textStatus + '</p>');
+	},
+
+	email: function(documentId, email) {
+		$.ajax({
+			beforeSend: function() {/* Add throbber */ },
+			complete: function() {/* Remove throbber */ },
+			error: Drawing.onAjaxError,
+			global: false,
+			success: function(data) {
+				if (data.status == 'success') {
+					Drawing._alert('Email was sent', '<p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 50px 0;"></span>This document has been sent to ' + email + '</p>');
+				} else {
+					Drawing._alert('There has been an error', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>This document has NOT been sent to ' + email + '</p>');
+				}
+			},
+			type: 'GET',
+			url: Drawing.urls['email'].format(documentId, email)
+		});
 	},
 
 	// AJAX stuff
@@ -313,15 +332,15 @@ var Drawing = {
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
-			error: this.onAjaxError,
+			error: Drawing.onAjaxError,
 			global: false,
 			success: function(data) {
 				$dialog.dialog('close');
 
-				window.location.href = "/document_vault/document/index";
+				window.location.href = Drawing.urls['finish_redirect'];
 			},
 			type: 'GET',
-			url: '/document_vault/document/finish/' + documentId
+			url: Drawing.urls['finish'].format(documentId)
 		});
 	},
 	
@@ -338,10 +357,10 @@ var Drawing = {
 			$.ajax({
 				beforeSend: function() {/* Add throbber */ },
 				complete: function() {/* Remove throbber */ },
-				error: this.onAjaxError,
+				error: Drawing.onAjaxError,
 				global: false,
 				success: function(data) {
-					if (data.imageData && data.pageNumber) {
+					if (data.imageData) {
 						var bg = new Image();
 						bg.src = data.imageData;
 						
@@ -357,7 +376,7 @@ var Drawing = {
 					}
 				},
 				type: 'GET',
-				url: '/document_vault/document/image/' + documentId + '/' + pageNumber
+				url: Drawing.urls['image'].format(documentId, pageNumber)
 			});
 		}
 	},
@@ -366,7 +385,7 @@ var Drawing = {
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
-			error: this.onAjaxError,
+			error: Drawing.onAjaxError,
 			global: false,
 			success: function(data) {
 				if (data.status == 'success') {
@@ -376,7 +395,7 @@ var Drawing = {
 				}
 			},
 			type: 'GET',
-			url: '/document_vault/printQueue/push/' + printerId + '/' + documentId
+			url: Drawing.urls['print'].format(printerId, documentId)
 		});
 	},
 	
@@ -397,19 +416,20 @@ var Drawing = {
 				beforeSend: function() {/* Add throbber */ },
 				complete: function() {/* Remove throbber */ },
 				data: {imageData: imageData},
-				error: this.onAjaxError,
+				error: Drawing.onAjaxError,
 				global: false,
 				success: function(data) {
 					Drawing.submitPage(documentId, pageNumber + 1);
 				},
 				type: 'POST',
-				url: '/document_vault/document/sign/' + documentId + '/' + pageNumber
+				url: Drawing.urls['sign'].format(documentId, pageNumber)
 			});
 		}
 	},
 	// !AJAX Stuff
 	
-	init: function() {
+	init: function(urls) {
+		this.urls = urls;
 		//window.scrollTo(0, 60);
 		this.$main = $('#main');
 		this.can = document.getElementById('can');
@@ -504,7 +524,7 @@ var Drawing = {
 		});
 		
 		$('#close').click(function() {
-			window.location.href = '/document_vault'
+			window.location.href = Drawing.urls['close'];
 		});
 		
 		$(window).hashchange(function() {
@@ -598,9 +618,32 @@ var Drawing = {
 			resizable: false,
 			width: 400
 		});
+		
+		$('#email-dialog').dialog({
+			autoOpen: false,
+			buttons: {
+				'Email': function() {
+					$(this).dialog('close');
+					Drawing.email($('#documentId').val(), $('#address').val());
+				},
+				'Cancel' :function() {
+					$(this).dialog('close');
+				}
+			},
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			open: function(event, ui) {	},
+			resizable: false,
+			width: 400
+		});
 
 		$('#print').click(function() {
 			$('#printer-select').dialog('open');
+		});
+		
+		$('#email').click(function() {
+			$('#email-dialog').dialog('open');
 		});
 		
 		// Load the page indicated by the location hash
@@ -608,6 +651,7 @@ var Drawing = {
 	}
 }
 
-$(document).ready(function() {
-	Drawing.init();
-});
+String.prototype.format = function () {
+  var args = arguments;
+  return this.replace(/\{(\d+)\}/g, function (m, n) { return args[n]; });
+};

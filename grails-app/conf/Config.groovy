@@ -137,4 +137,21 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/css/**':			['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/plugins/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/images/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
+	'/signatureCode/**':	['IS_AUTHENTICATED_ANONYMOUSLY'],
+	'/signatureCode/send/**':	['ROLE_USER', 'ROLE_ADMIN'],
 ]
+
+grails {
+	mail {
+		host = "smtp.gmail.com"
+		port = 465
+		username = "donotreply@paperlesstech.us"
+		password = "ZgJ7Gy2W"
+		props = ["mail.smtp.auth":"true", 					   
+				"mail.smtp.socketFactory.port":"465",
+				"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+				"mail.smtp.socketFactory.fallback":"false"]
+	}
+}
+
+grails.mail.default.from="donotreply@paperlesstech.us"
