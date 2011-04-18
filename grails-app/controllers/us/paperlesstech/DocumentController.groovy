@@ -69,7 +69,7 @@ class DocumentController {
 			document.pcl = new Pcl(data:params.data)
 			document.save(flush:true)
 			response.status = 200
-			render "Document saved\n"
+			render "Document ${document.id} saved\n"
 			PclProcessorJob.triggerNow(documentId:document.id)
 			log.info "Saved document ${document.id}"
 		} catch(Exception e) {
@@ -138,8 +138,7 @@ class DocumentController {
 
 	def finish = {
 		def document = Document.get(params.id)
-		if (document) {
-			
+		if (document && !document.signed) {
 			def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
 
 			activityLogService.addSignLog(request, document, signatures)

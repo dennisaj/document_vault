@@ -20,38 +20,17 @@ var Drawing = {
 	urls: {},
 	ZOOM_SCALE: .3,
 
-	_alert: function(title, html) {
-		$('#alert').dialog('close');
-		
-		$('#alert').dialog({
-			autoOpen: false,
-		    buttons: {
-		        'Ok' : function(){
-		            $(this).dialog('close');;
-		        }
-		    },
-			closeOnEscape: true,
-		    hasClose: false, 
-			modal : true, 
-			resizable: false,
-			title: title
-		});
-		$('#alert').html(html);
-		
-		$('#alert').dialog('open');
-	},
-	
 	addBreak: function(page) {
 		// Don't add consecutive LINEBREAKs
 		if (page.lines[page.lines.length - 1] != this.LINEBREAK) {
 			page.lines.push(this.LINEBREAK);
 		}
 	},
-	
+
 	addLine: function(page, line) {
 		page.lines.push(line);
 	},
-	
+
 	// Make sure at least 150 x 150 pixels of the screen are visible at any time. 
 	canScroll: function(x, y) {
 		
@@ -64,13 +43,13 @@ var Drawing = {
 		} else if (this.$main.height() - y < this.minVisible) {
 			return false;
 		}
-		
+
 		return true;
 	},
-	
+
 	clearCanvas: function(canvas, page) {
 		var context = canvas.getContext('2d');
-		
+
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		canvas.width = canvas.width;
 		context.drawImage(page.background, 0, 0, canvas.width, canvas.height);
@@ -305,131 +284,47 @@ var Drawing = {
 	onAjaxError: function(jqXHR, textStatus, errorThrown) {
 		$('#dialog-message').dialog('close');
 	
-		Drawing._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Oopsie! ' + textStatus + '</p>');
+		HtmlAlert._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Oopsie! ' + textStatus + '</p>');
 	},
 
-	email: function(documentId, email) {
-		$.ajax({
-			beforeSend: function() {/* Add throbber */ },
-			complete: function() {/* Remove throbber */ },
-			error: Drawing.onAjaxError,
-			global: false,
-			success: function(data) {
-				if (data.status == 'success') {
-					Drawing._alert('Email was sent', '<p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 50px 0;"></span>This document has been sent to ' + email + '</p>');
-				} else {
-					Drawing._alert('There has been an error', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>This document has NOT been sent to ' + email + '</p>');
-				}
-			},
-			type: 'GET',
-			url: Drawing.urls['email'].format(documentId, email)
-		});
-	},
-
-	// AJAX stuff
-	finishDocument: function(documentId) {
-		var $dialog = $('#dialog-message');
-		$.ajax({
-			beforeSend: function() {/* Add throbber */ },
-			complete: function() {/* Remove throbber */ },
-			error: Drawing.onAjaxError,
-			global: false,
-			success: function(data) {
-				$dialog.dialog('close');
-
-				window.location.href = Drawing.urls['finish_redirect'];
-			},
-			type: 'GET',
-			url: Drawing.urls['finish'].format(documentId)
-		});
-	},
-	
+	// Document functions
 	getPage: function(canvas, documentId, pageNumber) {
 		if (pageNumber >= this.pages.length) {
 			pageNumber = this.pages.length - 1;
 		} else if (pageNumber < 0) {
 			pageNumber = 0;
 		}
-		
+
 		if (this.pages[pageNumber]) {
 			this.setupCanvas(canvas, this.pages[pageNumber]);
 		} else {
-			$.ajax({
-				beforeSend: function() {/* Add throbber */ },
-				complete: function() {/* Remove throbber */ },
-				error: Drawing.onAjaxError,
-				global: false,
-				success: function(data) {
-					if (data.imageData) {
-						var bg = new Image();
-						bg.src = data.imageData;
-						
-						Drawing.pages[data.pageNumber] = {
-							lines: new Array(),
-							background: bg,
-							pageNumber: data.pageNumber,
-							sourceHeight: data.sourceHeight,
-							sourceWidth: data.sourceWidth
-						};
-						
-						Drawing.setupCanvas(canvas, Drawing.pages[data.pageNumber]);
-					}
-				},
-				type: 'GET',
-				url: Drawing.urls['image'].format(documentId, pageNumber)
+			Document.getPage(documentId, pageNumber, function(page) {
+				Drawing.pages[page.pageNumber] = page;
+				Drawing.setupCanvas(Drawing.can, Drawing.pages[page.pageNumber]);
 			});
 		}
 	},
 
-	print: function(printerId, documentId) {
-		$.ajax({
-			beforeSend: function() {/* Add throbber */ },
-			complete: function() {/* Remove throbber */ },
-			error: Drawing.onAjaxError,
-			global: false,
-			success: function(data) {
-				if (data.status == 'success') {
-					Drawing._alert('Print has been queue', '<p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 50px 0;"></span>This document has been sent to the printer</p>');
-				} else {
-					Drawing._alert('There has been an error', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>This document has NOT been sent to the printer</p>');
-				}
-			},
-			type: 'GET',
-			url: Drawing.urls['print'].format(printerId, documentId)
-		});
-	},
-	
 	submitPage: function(documentId, pageNumber) {
-		var $dialog = $('#dialog-message');
-		
-		if (pageNumber >= this.pages.length) {
+		if (pageNumber >= Drawing.pages.length) {
 			$('#progressbar').progressbar('value', 100);
-			this.finishDocument(documentId);
-		} else {
-			var page = this.pages[pageNumber];
-			
-			$('#progressbar').progressbar('value', Math.round(100 * (pageNumber / this.pages.length), 0));
-			
-			var imageData = this.drawHiddenCanvas(page);
-			
-			$.ajax({
-				beforeSend: function() {/* Add throbber */ },
-				complete: function() {/* Remove throbber */ },
-				data: {imageData: imageData},
-				error: Drawing.onAjaxError,
-				global: false,
-				success: function(data) {
-					Drawing.submitPage(documentId, pageNumber + 1);
-				},
-				type: 'POST',
-				url: Drawing.urls['sign'].format(documentId, pageNumber)
+			Document.finishDocument(documentId, function() {
+				$('#dialog-message').dialog('close');
+				window.location.href = Drawing.urls['finish_redirect'];
 			});
+		} else {
+			var page = Drawing.pages[pageNumber];
+			var imageData = Drawing.drawHiddenCanvas(page);
+
+			$('#progressbar').progressbar('value', Math.round(100 * (pageNumber / Drawing.pages.length), 0));
+			Document.submitPage(documentId, pageNumber, imageData, Drawing.submitPage);
 		}
 	},
-	// !AJAX Stuff
-	
+	// !Document functions
+
 	init: function(urls) {
 		this.urls = urls;
+
 		//window.scrollTo(0, 60);
 		this.$main = $('#main');
 		this.can = document.getElementById('can');
@@ -439,11 +334,11 @@ var Drawing = {
 		this.can.ontouchstart = function(e) {
 			if (Drawing.trackingTouchId == null) {
 				Drawing.trackingTouchId = e.touches[0].identifier;
-				
+
 				Drawing.previousPoint = Drawing.convertEventToPoint(e.touches[0]);
 			}
 		};
-		
+
 		this.can.ontouchmove = function(e) {
 			var currentTouch = null;
 			for (var i = 0; i < e.touches.length; i++) {
@@ -451,12 +346,12 @@ var Drawing = {
 					currentTouch = e.touches[i];
 				}
 			}
-			
+
 			if (currentTouch) {
 				Drawing.doMove(currentTouch);
 			}
 		};
-		
+
 		this.can.ontouchend = function(e) {
 			var currentTouch = null;
 			for (var i = 0; i < e.changedTouches.length; i++) {
@@ -575,7 +470,7 @@ var Drawing = {
 			},
 			resizable: false
 		});
-		
+
 		$('#confirm-submit').dialog({
 			autoOpen: false,
 			buttons: {
@@ -592,66 +487,25 @@ var Drawing = {
 			modal: true,
 			resizable: false
 		});
-		
+
 		$('#progressbar').progressbar({
 			change: function() {
 				$('#pblabel').text(Math.min(100, $(this).progressbar('option', 'value')) + '%');
 			},
 			value: 1
 		});
-		
-		$('#printer-select').dialog({
-			autoOpen: false,
-			buttons: {
-				'Print': function() {
-					$(this).dialog('close');
-					Drawing.print($('#printer').val(), $('#documentId').val());
-				},
-				'Cancel' :function() {
-					$(this).dialog('close');
-				}
-			},
-			closeOnEscape: false,
-			draggable: false,
-			modal: true,
-			open: function(event, ui) {	},
-			resizable: false,
-			width: 400
-		});
-		
-		$('#email-dialog').dialog({
-			autoOpen: false,
-			buttons: {
-				'Email': function() {
-					$(this).dialog('close');
-					Drawing.email($('#documentId').val(), $('#address').val());
-				},
-				'Cancel' :function() {
-					$(this).dialog('close');
-				}
-			},
-			closeOnEscape: false,
-			draggable: false,
-			modal: true,
-			open: function(event, ui) {	},
-			resizable: false,
-			width: 400
+
+		// Setup document
+		Document.init($.extend({}, this.urls), this.onAjaxError);
+		$('#print').click(function() {
+			Document.print();
 		});
 
-		$('#print').click(function() {
-			$('#printer-select').dialog('open');
-		});
-		
 		$('#email').click(function() {
-			$('#email-dialog').dialog('open');
+			Document.email();
 		});
-		
+
 		// Load the page indicated by the location hash
 		$(window).hashchange();
 	}
-}
-
-String.prototype.format = function () {
-  var args = arguments;
-  return this.replace(/\{(\d+)\}/g, function (m, n) { return args[n]; });
 };
