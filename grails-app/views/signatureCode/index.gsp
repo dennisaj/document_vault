@@ -5,6 +5,8 @@
 		<meta name="layout" content="mobile" />
 		<jqui:resources theme="ui-lightness" />
 		<g:javascript src="jquery.ba-hashchange.js" />
+		<g:javascript src="HtmlAlert.js" />
+		<g:javascript src="document.js" />
 		<g:javascript src="drawing.js" />
 		<g:javascript>
 			$(document).ready(function() {

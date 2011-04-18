@@ -4,6 +4,7 @@
 <meta name="layout" content="main" />
 <jqui:resources theme="ui-lightness" />
 <title> - Search</title>
+<link href="${resource(dir:'css',file:'menu.css')}" rel="stylesheet" media="screen, projection" />
 </head>
 <body>
 	<g:formRemote name="searchForm" url="[action: 'search']"

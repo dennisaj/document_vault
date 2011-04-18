@@ -200,11 +200,13 @@ class DocumentService {
 	}
 	
 	def getImageDataAsJSON(documentId, pageNumber) {
-		
 		def document = Document.get(documentId)
 
 		if (document) {
-			def image = document.getSortedImages()[pageNumber]
+			def images = document.getSortedImages()
+			// Make sure that the page number falls within the list of pages for this document
+			pageNumber = Math.min(images.size - 1, Math.max(0, pageNumber))
+			def image = images[pageNumber]
 			if (image) {
 				return [imageData: imageDataPrefix + image.data.encodeBase64().toString(),
 						pageNumber: pageNumber,

@@ -5,6 +5,8 @@
 		<meta name="layout" content="mobile" />
 		<jqui:resources theme="ui-lightness" />
 		<g:javascript src="jquery.ba-hashchange.js" />
+		<g:javascript src="HtmlAlert.js" />
+		<g:javascript src="document.js" />
 		<g:javascript src="drawing.js" />
 		<g:javascript>
 			$(document).ready(function() {
@@ -56,25 +58,14 @@
 				</div>
 			</p>
 		</div>
-		<div id="printer-select" title="Choose a Printer">
-			<p>
-				<span class="ui-icon ui-icon-print" style="float: left; margin: 0 7px 50px 0;"></span>
-				<g:select name="printer" from="${us.paperlesstech.Printer.list()}" optionKey="id" />
-			</p>
-		</div>
+		<g:render template="printerDialog" />
+		<g:render template="emailDialog" />
+		<g:render template="/alert" />
 		<div id="confirm-submit" title="Confirm Submit">
 			<p>
 				<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>
 				Are you sure you want to want to submit the signature for this document?
 			</p>
-		</div>
-		<div id="email-dialog" title="Email Document">
-			<p>
-				<span class="ui-icon ui-icon-mail-closed" style="float: left; margin: 0 7px 50px 0;"></span>
-				<g:textField name="address" />
-			</p>
-		</div>
-		<div id="alert">
 		</div>
 	</body>
 </html>
