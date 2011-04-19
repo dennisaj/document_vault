@@ -1,34 +1,35 @@
 package us.paperlesstech
 
 class ActivityLogService {
+	def requestService
 	def springSecurityService
 
     static transactional = true
 
-	def addViewLog(request, document) {
-		return addLog(request, ActivityLog.ActivityType.VIEW, document)
+	def addViewLog(document) {
+		return addLog(ActivityLog.ActivityType.VIEW, document)
 	}
 
-	def addDeleteLog(request, document) {
-		return addLog(request, ActivityLog.ActivityType.DELETE, document)
+	def addDeleteLog(document) {
+		return addLog(ActivityLog.ActivityType.DELETE, document)
 	}
 
-	def addEmailLog(request, document, notes) {
-		return addLog(request, ActivityLog.ActivityType.EMAIL, document, notes)
+	def addEmailLog(document, notes) {
+		return addLog(ActivityLog.ActivityType.EMAIL, document, notes)
 	}
 
-	def addPrintLog(request, document, notes="") {
-		return addLog(request, ActivityLog.ActivityType.PRINT, document, notes)
+	def addPrintLog(document, notes="") {
+		return addLog(ActivityLog.ActivityType.PRINT, document, notes)
 	}
 
-	def addSignLog(request, document, signatures, notes="") {
-		return addLog(request, ActivityLog.ActivityType.SIGN, document, notes, signatures)
+	def addSignLog(document, signatures, notes="") {
+		return addLog(ActivityLog.ActivityType.SIGN, document, notes, signatures)
 	}
 
-	def addLog(request, activityType, document, notes="", signatures=[:]) {
+	def addLog(activityType, document, notes="", signatures=[:]) {
 		def activityLog = new ActivityLog(activityType: activityType,
-				userAgent: request.getHeader("User-Agent"),
-				ip: request.getRemoteAddr(),
+				userAgent: requestService.getHeader("User-Agent"),
+				ip: requestService.getRemoteAddr(),
 				user: springSecurityService.currentUser,
 				pagesAffected: signatures.keySet().join(','),
 				document: document,

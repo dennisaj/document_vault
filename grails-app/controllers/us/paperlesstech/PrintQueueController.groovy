@@ -25,7 +25,7 @@ class PrintQueueController {
 
 		// Documents can be printed if they are signed. This should probably be configurable.
 		if (printer && document?.signed) {
-			activityLogService.addPrintLog(request, document)
+			activityLogService.addPrintLog(document)
 			def queue = new PrintQueue(document:document, printer:printer, user:springSecurityService.currentUser)
 			if (queue.save()) {
 				render([status:"success"] as JSON)

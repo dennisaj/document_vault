@@ -105,14 +105,14 @@ class DocumentController {
 
 	def show = {
 		def document = Document.get(params.id)
-		activityLogService.addViewLog(request, document)
+		activityLogService.addViewLog(document)
 
 		render([view: "edit", model:[document: document]])
 	}
 
 	def edit = {
 		def document = Document.get(params.id)
-		activityLogService.addViewLog(request, document)
+		activityLogService.addViewLog(document)
 
 		[document: document]
 	}
@@ -141,7 +141,7 @@ class DocumentController {
 		if (document && !document.signed) {
 			def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
 
-			activityLogService.addSignLog(request, document, signatures)
+			activityLogService.addSignLog(document, signatures)
 			documentService.signDocument(document, session.signatures.get(document.id.toString()))
 
 			document.signed = true

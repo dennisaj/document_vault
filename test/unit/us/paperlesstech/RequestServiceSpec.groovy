@@ -51,4 +51,35 @@ class RequestServiceSpec extends UnitSpec {
 		then: "request.setAttribute() was called twice"
 		2 * request.setAttribute({ it.startsWith("field") }, { it.startsWith("value") })
 	}
+
+	def "should be able to get the remote addr"() {
+		given: "a test request object"
+		service.testRequest = request
+
+		when: "Get the remote request"
+		def t1 = service.remoteAddr
+
+		then: "The address is returned"
+		1 * request.getRemoteAddr() >> addr
+		t1 == addr
+
+		where:
+		addr = "addr"
+	}
+
+	def "should be able to retrieve values from the header"() {
+		given: "a test request object"
+		service.testRequest = request
+
+		when: "get something from the header"
+		def t1 = service.getHeader(field)
+
+		then: "The address is returned"
+		1 * request.getHeader(field) >> browser
+		t1 == browser
+
+		where:
+		field = "User-Agent"
+		browser = "FF"
+	}
 }

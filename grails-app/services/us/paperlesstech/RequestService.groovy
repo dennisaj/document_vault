@@ -17,6 +17,14 @@ class RequestService {
 		getRealRequest().getAttribute(entry)
 	}
 
+	String getHeader(String field) {
+		getRealRequest().getHeader(field)
+	}
+
+	String getRemoteAddr() {
+		getRealRequest().getRemoteAddr()
+	}
+
 	void set(String entry, Object value) {
 		getRealRequest().setAttribute(entry, value)
 	}

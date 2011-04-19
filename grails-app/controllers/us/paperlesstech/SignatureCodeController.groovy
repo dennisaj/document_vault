@@ -22,7 +22,7 @@ class SignatureCodeController {
 				def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
 				
 				def notes = "Signed using code " + session.signatureCode
-				activityLogService.addSignLog(request, document, signatures, notes)
+				activityLogService.addSignLog(document, signatures, notes)
 				documentService.signDocument(document, session.signatures.get(document.id.toString()))
 	
 				document.signed = true
@@ -61,7 +61,7 @@ class SignatureCodeController {
 		def email = params.email
 
 		if (document && email) {
-			activityLogService.addEmailLog(request, document, "This document was sent to " + email)
+			activityLogService.addEmailLog(document, "This document was sent to " + email)
 			signatureCodeService.sendCode document, email
 
 			render([status:"success"] as JSON)
