@@ -1,15 +1,16 @@
-package us.paperlesstech.module.document_parsing.ferman
+package us.paperlesstech.document_parsing
 
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentType
 import us.paperlesstech.Text
 
-class FermanDocumentType {
+class FermanDocumentParser extends DocumentParser {
 	public static enum Types {
 		CUSTOMER_HARD_COPY,
 		OTHER
 	}
 
+	@Override
 	public DocumentType getDocumentType(Document d) {
 		assert d?.pcl?.data
 
@@ -108,25 +109,26 @@ class FermanDocumentType {
 		return m
 	}
 
-	public Text parseDocument(Document d) {
+	@Override
+	public Map parseDocument(Document d) {
 		assert d?.type
 
 		Types t = Types.valueOf(d.type.name)
-		Text text = new Text()
+		def m = [:]
 		switch(t) {
 			case Types.OTHER:
-				text.raw = parseUnknown(d)
+				m.raw = parseUnknown(d)
 				break
 			case Types.CUSTOMER_HARD_COPY:
-				def m = parseCustomerHardCopy(d)
-				sanitizeAll(m)
-				text.parsedFields = m
+				m = parseCustomerHardCopy(d)
 				break
 			default:
 				throw new IllegalArgumentException(t)
 		}
 
-		return text
+		sanitizeAll(m)
+
+		m
 	}
 
 	public String parseUnknown(Document d) {

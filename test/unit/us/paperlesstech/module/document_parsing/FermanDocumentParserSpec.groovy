@@ -1,4 +1,4 @@
-package us.paperlesstech.module.document_parsing.ferman
+package us.paperlesstech.module.document_parsing
 
 import grails.plugin.spock.UnitSpec
 
@@ -7,10 +7,11 @@ import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentType
 import us.paperlesstech.Pcl
+import us.paperlesstech.document_parsing.FermanDocumentParser;
 
-class FermanDocumentTypeSpec extends UnitSpec {
+class FermanDocumentParserSpec extends UnitSpec {
 	Document doc = new Document();
-	FermanDocumentType fdt = new FermanDocumentType()
+	FermanDocumentParser fdt = new FermanDocumentParser()
 
 	def "identifying cust_hard_copy from the pcl"() {
 		given: "Two domain objects in the database"
@@ -25,8 +26,8 @@ class FermanDocumentTypeSpec extends UnitSpec {
 		type == hcType
 
 		where:
-		hcType = new DocumentType(name:FermanDocumentType.Types.CUSTOMER_HARD_COPY.name())
-		otherType = new DocumentType(name:FermanDocumentType.Types.OTHER.name())
+		hcType = new DocumentType(name:FermanDocumentParser.Types.CUSTOMER_HARD_COPY.name())
+		otherType = new DocumentType(name:FermanDocumentParser.Types.OTHER.name())
 		testInstances = [hcType, otherType]
 	}
 

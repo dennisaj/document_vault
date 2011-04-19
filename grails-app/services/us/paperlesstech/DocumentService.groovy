@@ -5,7 +5,7 @@ import java.awt.RenderingHints
 
 import javax.imageio.ImageIO
 
-import us.paperlesstech.module.document_parsing.ferman.FermanDocumentType
+import us.paperlesstech.document_parsing.DocumentParser
 
 import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfContentByte
@@ -18,6 +18,7 @@ class DocumentService {
 	static imageDataPrefix = "data:image/png;base64,"
 
 	def activityLogService
+	DocumentParser documentParser
 
 	/**
 	 * Removes the extension from the file name.
@@ -129,13 +130,12 @@ class DocumentService {
 	}
 
 	def createTextFromPcl(Document d) {
-		FermanDocumentType fdt = new FermanDocumentType()
-		DocumentType type = fdt.getDocumentType(d)
+		DocumentType type = documentParser.getDocumentType(d)
 		d.type = type
 
-		def text = fdt.parseDocument(d)
+		def m = documentParser.parseDocument(d)
+		Text text = new Text(parsedFields: m)
 		d.text = text
-		if(!d.text.parsedFields) d.text.parsedFields = [:]
 		d.text.parsedFields.DocumentType = d.type.name
 
 		log.info "Text saved for document ${d} - identified as ${d.type}"

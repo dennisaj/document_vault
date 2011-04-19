@@ -3,7 +3,7 @@ import us.paperlesstech.Printer
 import us.paperlesstech.Role
 import us.paperlesstech.User
 import us.paperlesstech.UserRole
-import us.paperlesstech.module.document_parsing.ferman.FermanDocumentType
+import us.paperlesstech.document_parsing.FermanDocumentParser;
 
 class BootStrap {
 	def springSecurityService
@@ -30,7 +30,7 @@ class BootStrap {
 		}
 
 		if(DocumentType.count() == 0) {
-			new DocumentType(name:FermanDocumentType.Types.CUSTOMER_HARD_COPY.name(),
+			new DocumentType(name:FermanDocumentParser.Types.CUSTOMER_HARD_COPY.name(),
 					searchOptions:[
 						"RO_Number",
 						"Customer_Name",
@@ -56,7 +56,7 @@ class BootStrap {
 						"Note"
 					]).save()
 
-			new DocumentType(name:FermanDocumentType.Types.OTHER.name(), searchOptions:["Note"]).save()
+			new DocumentType(name:FermanDocumentParser.Types.OTHER.name(), searchOptions:["Note"]).save()
 		}
 		
 		if (Printer.count() == 0) {
