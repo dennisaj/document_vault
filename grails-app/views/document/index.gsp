@@ -1,11 +1,30 @@
 <%@ page import="us.paperlesstech.DocumentType"%>
 <html>
-<head>
-<meta name="layout" content="main" />
-<jqui:resources theme="ui-lightness" />
-<title> - Search</title>
-<link href="${resource(dir:'css',file:'menu.css')}" rel="stylesheet" media="screen, projection" />
-</head>
+	<head>
+		<meta name="layout" content="main" />
+		<jqui:resources theme="ui-lightness" />
+		<title> - Search</title>
+		<link href="${resource(dir:'css', file:'document-menu.css')}" rel="stylesheet" media="screen, projection" />
+		<link href="${resource(dir:'css', file:'callout.css')}" rel="stylesheet" media="screen, projection" />
+		<g:javascript src="jquery.jeditable.min.js" />
+		<g:javascript src="documentnote.js" />
+		<g:javascript src="HtmlAlert.js" />
+		<g:javascript src="document.js" />
+		<g:javascript>
+			$(document).ready(function() {
+				DocumentNote.init({ 'save': '/document_vault/document/saveNote' });
+				Document.init({
+						'email': '/document_vault/signatureCode/send/{0}/{1}',
+						'finish': '/document_vault/document/finish/{0}',
+						'image': '/document_vault/document/image/{0}/{1}',
+						'print': '/document_vault/printQueue/push/{0}/{1}',
+						'sign': '/document_vault/document/sign/{0}/{1}',
+						'finish_redirect': '/document_vault/document/index',
+						'close': '/document_vault/document/index'
+				});
+			});
+		</g:javascript>
+	</head>
 <body>
 	<g:formRemote name="searchForm" url="[action: 'search']"
 		update="searchResults">
@@ -38,6 +57,9 @@
 		</fieldset>
 	</g:formRemote>
 	<g:render template="searchResults" />
+	<g:render template="printerDialog" />
+	<g:render template="emailDialog" />
+	<g:render template="/alert" />
 	<jq:jquery>
 			$("#q").focus();
 			$("#search-tabs").tabs();

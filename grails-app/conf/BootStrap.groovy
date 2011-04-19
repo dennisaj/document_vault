@@ -1,4 +1,5 @@
 import us.paperlesstech.DocumentType
+import us.paperlesstech.Printer
 import us.paperlesstech.Role
 import us.paperlesstech.User
 import us.paperlesstech.UserRole
@@ -51,10 +52,15 @@ class BootStrap {
 						"Make",
 						"Model",
 						"Body",
-						"Color"
+						"Color",
+						"Note"
 					]).save()
 
-			new DocumentType(name:FermanDocumentType.Types.OTHER.name()).save()
+			new DocumentType(name:FermanDocumentType.Types.OTHER.name(), searchOptions:["Note"]).save()
+		}
+		
+		if (Printer.count() == 0) {
+			new Printer(name:"Recursive", host:"localhost", deviceType:"lj5gray", port:9100).save()
 		}
 	}
 

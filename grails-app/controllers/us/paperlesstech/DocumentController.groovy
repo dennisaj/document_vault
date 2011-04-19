@@ -63,6 +63,21 @@ class DocumentController {
 		render(template:"searchResults", model:results)
 	}
 
+	def saveNote = {
+		def idRegex = params.id =~ /^.+\-(\d+)$/
+
+		if (idRegex.matches() && Document.exists(idRegex[0][1])) {
+			def document = Document.get(idRegex[0][1])
+			document.text.parsedFields['Note'] = params.value
+			document.save(flush:true)
+
+			render text:params.value, contentType: "text/plain"
+			return
+		}
+
+		render ([status:"error"] as JSON)
+	}
+
 	def savePcl = {
 		Document document = new Document()
 		try {

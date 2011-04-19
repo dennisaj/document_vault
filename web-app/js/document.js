@@ -38,7 +38,13 @@ var Document = {
 		});
 	},
 
-	email: function() {
+	email: function(documentId) {
+		if (documentId) {
+			$('#email-documentId').val(documentId);
+		} else {
+			$('#email-documentId').val($('#documentId').val());
+		}
+
 		$('#email-dialog').dialog('open');
 	},
 
@@ -82,7 +88,13 @@ var Document = {
 		});
 	},
 
-	print: function() {
+	print: function(documentId) {
+		if (documentId) {
+			$('#print-documentId').val(documentId);
+		} else {
+			$('#print-documentId').val($('#documentId').val());
+		}
+
 		$('#printer-select').dialog('open');
 	},
 
@@ -110,7 +122,7 @@ var Document = {
 			buttons: {
 				'Print': function() {
 					$(this).dialog('close');
-					Document._print($('#printer').val(), $('#documentId').val());
+					Document._print($('#printer').val(), $('#print-documentId').val());
 				},
 				'Cancel' :function() {
 					$(this).dialog('close');
@@ -129,7 +141,7 @@ var Document = {
 			buttons: {
 				'Email': function() {
 					$(this).dialog('close');
-					Document._email($('#documentId').val(), $('#address').val());
+					Document._email($('#email-documentId').val(), $('#address').val());
 				},
 				'Cancel' :function() {
 					$(this).dialog('close');

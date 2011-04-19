@@ -5,7 +5,7 @@
 		<link href="${resource(dir:'images',file:'favicon.ico')}" rel="icon" />
 		<link href="${resource(dir:'css',file:'main.css')}" rel="stylesheet" media="screen, projection" />
 		<link href="${resource(dir:'css',file:'navigation.css')}" rel="stylesheet" media="screen, projection" />
-		<blueprint:resources plugins="fancy-type, link-icons" />
+		<blueprint:resources plugins="fancy-type" />
 		<g:javascript src="global.js" />
 		<g:javascript library="jquery" plugin="jquery" />
 		<nav:resources override="true" />

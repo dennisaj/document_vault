@@ -10,9 +10,8 @@ class SignatureCodeController {
 
 	def done = {
 	}
-	
+
 	def error = {
-		
 	}
 
 	def finish = {
@@ -34,18 +33,17 @@ class SignatureCodeController {
 		}
 
 		render ([status:"error"] as JSON)
-
 	}
 
 	def image = {
 		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
 			render (documentService.getImageDataAsJSON(params.id, params.pageNumber.toInteger()) as JSON)
 		}
-		
+
 		render ([status:"error"] as JSON)
 	}
 
-    def index = {
+	def index = {
 		session.signatureCode = params.code
 		def document = signatureCodeService.getDocument(session.signatureCode)
 
@@ -68,14 +66,14 @@ class SignatureCodeController {
 		}
 
 		render([status:"error"] as JSON)
-    }
+	}
 
 	def sign = {
 		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
 			if (!session.signatures) {
 				session.signatures = [:]
 			}
-			
+
 			def signatures = session.signatures.get(params.id, [:])
 			
 			if (documentService.saveSignature(params.id, signatures, params.pageNumber, params.imageData)) {

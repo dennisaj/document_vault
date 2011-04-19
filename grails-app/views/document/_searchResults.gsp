@@ -22,11 +22,42 @@
 			<div class="result">
 				Document: ${it.id}<br />
 				Date printed: ${it.dateCreated.toString("yyyy-MM-dd hh:mma")}<br />
-				<a href="${createLink(action: 'show', id: it.id) }"><img
-					width="400"
-					src="${createLink(action: 'downloadImage', id: it.id) }"
-					alt="Document ${it.id} Page 1" /></a><br /> Download: 
-					<a href="${createLink(action: 'downloadPdf', id: it.id)}">Download</a>
+				<div>
+					<ul class="actions">
+						<li>
+							<a href="${createLink(action: 'show', id: it.id) }">
+								<img src="${resource(dir:'images', file:'document-sign.png')}" alt="" /><br />View/Sign
+							</a>
+						</li>
+						<li>
+							<a href="${createLink(action: 'downloadPdf', id: it.id)}">
+								<img src="${resource(dir:'images', file:'application-pdf.png')}" alt="" /><br />Download
+							</a>
+						</li>
+						<li>
+							<a href="javascript:Document.print(${it.id});">
+								<img src="${resource(dir:'images', file:'document-print.png')}" alt="" /><br />Print
+							</a>
+						</li>
+						<li>
+							<a href="javascript:Document.email(${it.id});">
+								<img src="${resource(dir:'images', file:'mail-send.png')}" alt="" /><br />Email
+							</a>
+						</li>
+						<li>
+							<a href="javascript:DocumentNote.show('#notebox-${it.id}');">
+								<img src="${resource(dir:'images', file:'note.png')}" alt="" /><br />Notes
+							</a>
+						</li>
+					</ul>
+					<br /><br /><br />
+					<a href="${createLink(action: 'show', id: it.id) }">
+						<img class="thumb" width="400" src="${createLink(action: 'downloadImage', id: it.id) }" alt="Document ${it.id} Page 1" />
+					</a>
+					<div class="triangle-border left-arrow hidden" id="notebox-${it.id}">
+						<span class="noteField" id="note-${it.id}">${it.text.parsedFields['Note']}</span>
+					</div>
+				</div>
 			</div>
 		</g:each>
 	</div>
