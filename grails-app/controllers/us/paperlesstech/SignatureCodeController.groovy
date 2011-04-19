@@ -37,7 +37,7 @@ class SignatureCodeController {
 
 	def image = {
 		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
-			render (documentService.getImageDataAsJSON(params.id, params.pageNumber.toInteger()) as JSON)
+			render (documentService.getImageDataAsMap(params.id, params.pageNumber.toInteger()) as JSON)
 		}
 
 		render ([status:"error"] as JSON)
@@ -76,7 +76,7 @@ class SignatureCodeController {
 
 			def signatures = session.signatures.get(params.id, [:])
 			
-			if (documentService.saveSignature(params.id, signatures, params.pageNumber, params.imageData)) {
+			if (documentService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
 				session.signatures[params.id] = signatures
 				render ([status:"success"] as JSON)
 			} else {

@@ -16,11 +16,24 @@ import com.itextpdf.text.pdf.PdfStamper
 class DocumentService {
 	static transactional = true
 	static imageDataPrefix = "data:image/png;base64,"
-	
+
 	def activityLogService
 
+	/**
+	 * Removes the extension from the file name.
+	 * 
+	 * <pre>
+	 * assert chopExtension("/tmp/test.pdf", ".pdf") == "/tmp/test"
+	 * </pre>
+	 * 
+	 * @param fileName the string name of the file
+	 * @param extension the extension including the period
+	 * 
+	 * @return The filename without the extension
+	 */
 	def chopExtension(String fileName, String extension) {
-		return fileName.substring(0, fileName.length() - extension.length())
+		int chopLength = (extension.size() + 1) * -1
+		return fileName[0 .. chopLength]
 	}
 
 	def createImagesFromPcl(Document d) {
@@ -129,6 +142,32 @@ class DocumentService {
 		d.save()
 	}
 
+	/**
+	 * Loads the specified document and returns the image data for the given page.
+	 * The actual image will be base64 encoded.
+	 * 
+	 * @param documentId The id of the document to load
+	 * @param pageNumber Retrieve the data for this page
+	 * 
+	 * @return A map of the data contained on the image for the given page.
+	 */
+	def getImageDataAsMap(documentId, pageNumber) {
+		def document = Document.get(documentId)
+		assert document, "Cannot load document - $documentId"
+
+		def images = document.getSortedImages()
+		assert images, "${document} has no images."
+
+		// Make sure that the page number falls within the list of pages for this document
+		pageNumber = (0 ..< images.size).contains(pageNumber) ? pageNumber : 0
+		def image = images[pageNumber]
+
+		[imageData: imageDataPrefix + image.data.encodeBase64().toString(),
+					pageNumber: pageNumber,
+					sourceHeight: image.sourceHeight,
+					sourceWidth: image.sourceWidth]
+	}
+
 	def signDocument(Document d, Map signatures) {
 		log.info "Signing the PDF for document ${d}"
 
@@ -198,36 +237,21 @@ class DocumentService {
 
 		d.save()
 	}
-	
-	def getImageDataAsJSON(documentId, pageNumber) {
-		def document = Document.get(documentId)
 
-		if (document) {
-			def images = document.getSortedImages()
-			// Make sure that the page number falls within the list of pages for this document
-			pageNumber = Math.min(images.size - 1, Math.max(0, pageNumber))
-			def image = images[pageNumber]
-			if (image) {
-				return [imageData: imageDataPrefix + image.data.encodeBase64().toString(),
-						pageNumber: pageNumber,
-						sourceHeight: image.sourceHeight,
-						sourceWidth: image.sourceWidth]
-			}
-		}
+	/**
+	 * Loads the specified document and adds the signatures to it
+	 * 
+	 * @param signatures A map of the raw signature image data for each page of the document
+	 * @param pageNumber The page number the signature goes on
+	 * @param imageData Base64 encoded image of the signature
+	 * 
+	 * @return the map with the decoded images
+	 */
+	def saveSignatureToMap(Map<Integer, Byte[]> signatures, pageNumber, imageData) {
+		assert imageData
 
-		return [status:"error"]
-	}
-	
-	def saveSignature(documentId, signatures, pageNumber, imageData) {
-		def document = Document.get(documentId)
+		def decodedData = imageData[imageDataPrefix.size() .. -1].decodeBase64()
 
-		if (document && imageData) {
-			imageData = imageData.substring(imageDataPrefix.size()).decodeBase64()
-
-			signatures[pageNumber] = imageData
-			return true
-		}
-
-		return false
+		signatures[pageNumber] = decodedData
 	}
 }

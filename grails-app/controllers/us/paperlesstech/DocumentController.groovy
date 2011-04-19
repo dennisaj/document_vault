@@ -133,7 +133,7 @@ class DocumentController {
 	}
 
 	def image = {
-		render (documentService.getImageDataAsJSON(params.id.toInteger(), params.pageNumber.toInteger()) as JSON)
+		render (documentService.getImageDataAsMap(params.id.toInteger(), params.pageNumber.toInteger()) as JSON)
 	}
 
 	def sign = {
@@ -143,7 +143,7 @@ class DocumentController {
 		
 		def signatures = session.signatures.get(params.id.toString(), [:])
 		
-		if (documentService.saveSignature(params.id, signatures, params.pageNumber, params.imageData)) {
+		if (documentService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
 			session.signatures[params.id] = signatures
 			render ([status:"success"] as JSON)
 		} else {
