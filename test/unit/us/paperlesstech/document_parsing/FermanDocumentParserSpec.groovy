@@ -1,13 +1,10 @@
-package us.paperlesstech.module.document_parsing
+package us.paperlesstech.document_parsing
 
 import grails.plugin.spock.UnitSpec
-
 import org.springframework.core.io.ClassPathResource
-
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentType
 import us.paperlesstech.Pcl
-import us.paperlesstech.document_parsing.FermanDocumentParser;
 
 class FermanDocumentParserSpec extends UnitSpec {
 	Document doc = new Document();
