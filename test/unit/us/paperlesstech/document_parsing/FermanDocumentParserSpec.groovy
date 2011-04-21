@@ -14,7 +14,7 @@ class FermanDocumentParserSpec extends UnitSpec {
 		given: "Two domain objects in the database"
 		mockDomain(DocumentType.class, testInstances)
 		and: "A document with cust_hard_copy pcl"
-		doc.pcl = new Pcl(data:new ClassPathResource("dt_cust_hard.pcl").getFile().getBytes())
+		doc.pcl = new Pcl(data: new ClassPathResource("dt_cust_hard.pcl").getFile().getBytes())
 
 		when: "When we lookup with a PCL with the CUST_HARD_COPY identifier in it"
 		def type = fdt.getDocumentType(doc)
@@ -23,14 +23,14 @@ class FermanDocumentParserSpec extends UnitSpec {
 		type == hcType
 
 		where:
-		hcType = new DocumentType(name:FermanDocumentParser.Types.CUSTOMER_HARD_COPY.name())
-		otherType = new DocumentType(name:FermanDocumentParser.Types.OTHER.name())
+		hcType = new DocumentType(name: FermanDocumentParser.Types.CUSTOMER_HARD_COPY.name())
+		otherType = new DocumentType(name: FermanDocumentParser.Types.OTHER.name())
 		testInstances = [hcType, otherType]
 	}
 
 	def "parsing cust_hard_copy pcl"() {
 		given: "A document with cust_hard_copy pcl"
-		doc.pcl = new Pcl(data:new ClassPathResource("dt_cust_hard.pcl").getFile().getBytes())
+		doc.pcl = new Pcl(data: new ClassPathResource("dt_cust_hard.pcl").getFile().getBytes())
 
 		when: "The document is parsed"
 		def m = fdt.parseCustomerHardCopy(doc)
@@ -57,5 +57,32 @@ class FermanDocumentParserSpec extends UnitSpec {
 		"GOOD" == m["Body"]
 		"RED" == m["Color"]
 		"123XX" == m["License_Number"]
+	}
+
+	def "parsing unknown should split the words in the document"() {
+		given: "A document with an unknown PCL"
+		doc.pcl = new Pcl(data: data)
+
+		expect: "To split the document on words"
+		fdt.parseOther(doc).split("\n") == ["Regular", "data1", "go3s,", "here", "and", "can", "span", "multiple", "lines."]
+
+		where:
+		data = """BINARY STUFF GOES HERE IN THE PCL\r\n\r\n
+      Regular data1 go3s, here
+      and can span multiple lines."""
+	}
+
+	def "should sanitize strings"() {
+		when: "Harmful characters should be replaced"
+		def m = fdt.sanitizeAll(single: singleSlash, multiple: multipleSlashes)
+
+		then: "slashes should be replaced"
+		m.single == "ends with a /"
+		m.multiple == "/one slash /two slash"
+
+
+		where:
+		singleSlash = "ends with a \\"
+		multipleSlashes = /\one slash \two slash/
 	}
 }

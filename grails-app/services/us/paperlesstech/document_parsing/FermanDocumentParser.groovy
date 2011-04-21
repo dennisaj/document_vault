@@ -2,7 +2,6 @@ package us.paperlesstech.document_parsing
 
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentType
-import us.paperlesstech.Text
 
 class FermanDocumentParser extends DocumentParser {
 	public static enum Types {
@@ -14,7 +13,7 @@ class FermanDocumentParser extends DocumentParser {
 	public DocumentType getDocumentType(Document d) {
 		assert d?.pcl?.data
 
-		String data = pclToString(d)
+		String data = pclToString(d, false)
 
 		Types type = Types.OTHER
 		if(data.contains("&f20901y")) {
@@ -28,12 +27,6 @@ class FermanDocumentParser extends DocumentParser {
 		assert d?.pcl?.data
 
 		String data = pclToString(d)
-		// The text starts after the first double blank line
-		def startOfText = data.indexOf("\n\n")
-		if(startOfText < 0)
-			startOfText = data.indexOf("\r\n\r\n")
-		data = data.substring(startOfText)
-
 		def lines = data.split(/\r\n|\n/).toList()
 
 		lines = lines.reverse()
@@ -117,7 +110,7 @@ class FermanDocumentParser extends DocumentParser {
 		def m = [:]
 		switch(t) {
 			case Types.OTHER:
-				m.raw = parseUnknown(d)
+				m.raw = parseOther(d)
 				break
 			case Types.CUSTOMER_HARD_COPY:
 				m = parseCustomerHardCopy(d)
@@ -131,10 +124,10 @@ class FermanDocumentParser extends DocumentParser {
 		m
 	}
 
-	public String parseUnknown(Document d) {
+	public String parseOther(Document d) {
 		String data = pclToString(d)
 
-		def m = data =~ /(?m)\s([A-Za-z0-9.,\\/:-]+)\s/
+		def m = data =~ /(?m)(\S+)/
 		def lines = m*.getAt(1)
 
 		return lines.join("\n")
@@ -149,18 +142,39 @@ class FermanDocumentParser extends DocumentParser {
 		return line[start ..< Math.min(end+1, length)].trim()
 	}
 
-	private String pclToString(Document d) {
+	private String pclToString(Document d, boolean skipPclHeader = true) {
 		String data = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(d.pcl.data))).getText();
+
+		// The text starts after the first double blank line
+		if (skipPclHeader) {
+			def startOfText = data.indexOf("\n\n")
+			if (startOfText < 0)
+				startOfText = data.indexOf("\r\n\r\n")
+			data = data.substring(startOfText)
+		}
 
 		return data
 	}
 
+	/**
+	 * Replaces \ with / because the searchable plugin doesn't escape them
+	 *
+	 * @param input The string to sanitize
+	 *
+	 * @return The input string with all \ replaced by /
+	 */
 	private String sanitize(String input) {
-		// Replace all backslashes because the searchable plugin doesn't escape them.
-		return input.replaceAll(/\x5c/, "/")
+		input.replaceAll(/\x5c/, "/")
 	}
 
-	private void sanitizeAll(Map m) {
+	/**
+	 * Replaces every value in the map with the value sanitized by #sanitize
+	 *
+	 * @param m The map to sanitize
+	 *
+	 * @return The original map with the values replaced
+	 */
+	private Map sanitizeAll(Map m) {
 		m.each { k, v ->
 			m[k] = sanitize(v)
 		}
