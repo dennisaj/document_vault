@@ -1,12 +1,13 @@
 package us.paperlesstech.handlers
 
+import us.paperlesstech.DocumentData
+import us.paperlesstech.MimeType
+
 import com.itextpdf.text.Image
 import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfStamper
-import us.paperlesstech.DocumentData
-import us.paperlesstech.MimeType
 
 class PdfHandlerService extends Handler {
 	static handlerFor = MimeType.PDF
@@ -18,6 +19,7 @@ class PdfHandlerService extends Handler {
 	@InterceptHandler
 	void sign(Map inputs) {
 		def document = getDocument(inputs)
+		log.info "Signing the PDF for document ${document}"
 		def data = getDocumentData(inputs)
 		def signatures = inputs.signatures
 
@@ -30,14 +32,14 @@ class PdfHandlerService extends Handler {
 		ByteArrayOutputStream output = new ByteArrayOutputStream()
 		PdfStamper pdfStamper = new PdfStamper(pdfReader, output)
 
-		(0..data.pages).each { i ->
+		(1..data.pages).each { i ->
 			byte[] imageData = signatures[i.toString()]
-			if (!imageData)
+			if (!imageData) {
 				return
+			}
 
-			// iText is 1 based where as we are 0 based
-			PdfContentByte content = pdfStamper.getOverContent(i + 1)
-			Rectangle psize = pdfReader.getPageSize(i + 1);
+			PdfContentByte content = pdfStamper.getOverContent(i)
+			Rectangle psize = pdfReader.getPageSize(i);
 
 			Image image = Image.getInstance(imageData)
 			image.scaleAbsolute psize.getWidth(), psize.getHeight()
@@ -45,7 +47,7 @@ class PdfHandlerService extends Handler {
 
 			content.addImage(image)
 
-			handlerChain.sign(document: document, documentData: document.previewImage(i + 1),
+			handlerChain.sign(document: document, documentData: document.previewImage(i).data,
 					signature: imageData)
 		}
 

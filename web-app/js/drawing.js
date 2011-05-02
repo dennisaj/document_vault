@@ -4,14 +4,17 @@ var Drawing = {
 	currentHeight: 0,
 	currentWidth: 0,
 	currentPage: null,
-	LINEBREAK: 'LINEBREAK',
-	$main : null,
-	isDragging: false,
+	FIRST_PAGE: 1,
+	highlightStart: null,
+	isMoving: false,
 	isPainting: false,
 	isZoomedIn: false,
+	LINEBREAK: 'LINEBREAK',
+	$main : null,
 	minVisible: 150,
 	ORIGIN: {x:0, y:0},
 	previousPoint: null,
+	pageCount: 0,
 	pages: null,
 	scale: 1,
 	scrollCanX: 0,
@@ -33,7 +36,6 @@ var Drawing = {
 
 	// Make sure at least 150 x 150 pixels of the screen are visible at any time. 
 	canScroll: function(x, y) {
-		
 		if ((this.currentWidth + x) < this.minVisible) {
 			return false;
 		} else if ((this.currentHeight + y) < this.minVisible) {
@@ -54,7 +56,7 @@ var Drawing = {
 		canvas.width = canvas.width;
 		context.drawImage(page.background, 0, 0, canvas.width, canvas.height);
 	},
-	
+
 	convertEventToPoint: function(touch) {
 		if (touch) {
 			return {x: touch.pageX, y: touch.pageY};
@@ -64,8 +66,8 @@ var Drawing = {
 	},
 
 	currentCenter: function() {
-		var upperLeftCorner = $.extend({}, Drawing.ORIGIN);
-		var lowerRightCorner = $.extend({}, Drawing.ORIGIN);
+		var upperLeftCorner = $.extend({}, this.ORIGIN);
+		var lowerRightCorner = $.extend({}, this.ORIGIN);
 
 		upperLeftCorner.x = -this.scrollCanX / this.scale
 		upperLeftCorner.y = -this.scrollCanY / this.scale;
@@ -78,81 +80,94 @@ var Drawing = {
 
 	doEnd: function(event) {
 		var isDrawing = $('#pen').is('.on');
-			
-		if (!isDrawing && !this.isDragging) {
+		var isHighlighting = $('#highlight').is('.on');
+
+		if (!isDrawing && !this.isMoving && !isHighlighting) {
 			var zoomScale = this.ZOOM_SCALE;
 
 			var point = this.scalePoint(this.convertEventToPoint(event));
-			
+
 			if (this.isZoomedIn) {
 				zoomScale = this.currentPage.background.width / this.$main.width();
 
 				point = this.currentCenter();
 			}
-			
+
 			var zoomWidth = zoomScale * this.$main.width();
 			var widthOffset = zoomWidth / 2;
-			
+
 			var zoomHeight = zoomScale * this.$main.height();
 			var heightOffset = zoomHeight / 2;
-			
+
 			var zoomStart = {
 				x: point.x - widthOffset,
 				y: point.y - heightOffset
 			};
-			
+
 			var zoomEnd = {
 				x: point.x + widthOffset, 
 				y: point.y + heightOffset
 			};
-			
+
 			this.viewArea(this.can, this.currentPage, zoomStart, zoomEnd, 'width');
 			this.isZoomedIn = !this.isZoomedIn;//true;
 		} else if (isDrawing) {
 			this.addBreak(this.currentPage);
+		} else if (isHighlighting) {
+			$('#box').hide().width(0).height(0);
+			this.highlight(this.can, this.currentPage, this.scalePoint(this.highlightStart), this.scalePoint(this.previousPoint));
+			this.highlightStart = null;
 		} else {
 			this.$main.css('cursor', 'default');
 		}
-		
-		this.isDragging = false;
+
+		this.isMoving = false;
 	},
-	
+
 	doMove: function(event) {
-		this.isDragging = true;
+		this.isMoving = true;
 		var point = this.convertEventToPoint(event);
 		var isDrawing = $('#pen').is('.on');
-		
-		if (!isDrawing) {
+		var isHighlighting = $('#highlight').is('.on');
+
+		if (!isDrawing && !isHighlighting) {
 			this.$main.css('cursor', 'move');
-			this.dragCanvas(this.previousPoint, point);
-		} else {
+			this.dragCanvas(this.can, this.previousPoint, point);
+		} else if (isDrawing) {
 			var line = {
 				start: this.scalePoint(this.previousPoint),
 				end: this.scalePoint(point),
 			};
 			this.addLine(this.currentPage, line);
 			this.drawLine(this.can, line);
+		} else if (isHighlighting) {
+			if (!this.highlightStart) {
+				$('#box').show();
+				this.highlightStart = point;
+			} else {
+				this.drawBox(this.can, this.currentPage, this.highlightStart, point);
+			}
 		}
-		
+
 		this.previousPoint = point;
 	},
-	
-	dragCanvas: function(oldPoint, newPoint) {
+
+	dragCanvas: function(canvas, oldPoint, newPoint) {
 		var newScrollCanX = this.scrollCanX + newPoint.x - oldPoint.x;
 		var newScrollCanY = this.scrollCanY + newPoint.y - oldPoint.y;
-		
+
 		if (this.canScroll(newScrollCanX, newScrollCanY)) {
 			this.scrollCanX = newScrollCanX;
 			this.scrollCanY = newScrollCanY;
-			this.can.style.webkitTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
-			this.can.style.MozTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
+			canvas.style.webkitTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
+			canvas.style.MozTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
 		}
 	},
-	
+
 	// Rename me
 	draw: function(canvas, page) {
 		this.clearCanvas(canvas, page);
-		
+
 		for (var i = 0; i < page.lines.length; i++) {
 			if (page.lines[i] == this.LINEBREAK) {
 				continue;
@@ -160,44 +175,44 @@ var Drawing = {
 			this.drawLine(canvas, page.lines[i]);
 		}
 	},
-	
+
 	/**
 	 * 
 	 * @param page
 	 * @returns a base64 encoded png or "data:image/png;base64," if page is null.
 	 */
 	drawHiddenCanvas: function(page) {
-		if (!page || !page.lines.length) {
+		if (!page || !page.lines || !page.lines.length) {
 			return "data:image/png;base64,";
 		}
-		
+
 		var hiddenCanvas = document.getElementById('hidden-canvas');
 		hiddenCanvas.width = page.background.width;
 		hiddenCanvas.height = page.background.height;
-		
+
 		var scaleX = page.sourceWidth / page.background.width;
 		var scaleY = page.sourceHeight / page.background.height;
-		
+
 		var hiddenContext = hiddenCanvas.getContext('2d');
-		
+
 		hiddenContext.clearRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
 		hiddenContext.scale(scaleX, scaleY);
 		hiddenCanvas.width = hiddenCanvas.width;
-		
+
 		for (var i = 0; i < page.lines.length; i++) {
 			if (page.lines[i] == this.LINEBREAK) {
 				continue;
 			}
 			this.drawLine(hiddenCanvas, page.lines[i], 'rgba(0, 0, 0, 1)');
 		}
-		
+
 		return hiddenCanvas.toDataURL();
 	},
-	
+
 	drawLine: function(canvas, line, strokeStyle) {
 		var context = canvas.getContext('2d');
 		strokeStyle = strokeStyle || 'rgba(0, 128, 0, 1)';
-		
+
 		context.strokeStyle = strokeStyle;
 		context.lineJoin = 'round';
 		context.lineWidth = 1.5;
@@ -207,37 +222,79 @@ var Drawing = {
 		context.closePath();
 		context.stroke();
 	},
-	
+
+	drawBox: function(canvas, page, point1, point2, color) {
+		color = color || "rgba(255, 255, 0, 0.7)";
+		var upperLeftCorner = {
+			x: Math.min(point1.x, point2.x),
+			y: Math.min(point1.y, point2.y)
+		};
+
+		var lowerRightCorner = {
+			x: Math.max(point1.x, point2.x),
+			y: Math.max(point1.y, point2.y)
+		};
+
+		//this.draw(canvas, page);
+		//var context = canvas.getContext('2d');
+		//context.strokeStyle = color;
+		//context.strokeRect(upperLeftCorner.x, upperLeftCorner.y, lowerRightCorner.x - upperLeftCorner.x, lowerRightCorner.y - upperLeftCorner.y);
+		var $box = $('#box');
+		$box.css('border', '1px solid ' + color);
+		$box.css('background', color);
+		$box.offset({left:upperLeftCorner.x, top:upperLeftCorner.y});
+		$box.width(lowerRightCorner.x - upperLeftCorner.x);
+		$box.height(lowerRightCorner.y - upperLeftCorner.y);
+	},
+
+	highlight: function(canvas, page, point1, point2, color) {
+		color = color || "rgba(255, 255, 0, 0.7)";
+		var upperLeftCorner = {
+			x: Math.min(point1.x, point2.x), 
+			y: Math.min(point1.y, point2.y)
+		};
+
+		var lowerRightCorner = {
+			x: Math.max(point1.x, point2.x), 
+			y: Math.max(point1.y, point2.y)
+		};
+
+		this.draw(canvas, page);
+		var context = canvas.getContext('2d');
+		context.fillStyle = color;
+		context.fillRect(upperLeftCorner.x, upperLeftCorner.y, lowerRightCorner.x - upperLeftCorner.x, lowerRightCorner.y - upperLeftCorner.y);
+	},
+
 	realSetupCanvas: function(canvas, page) {
 		this.currentPage = page;
-				
-		$('#right-arrow a').attr('href', '#' + Math.min(this.pages.length - 1, page.pageNumber + 1));
-		$('#left-arrow a').attr('href', '#' + Math.max(0, page.pageNumber - 1));
-		
+
+		$('#right-arrow a').attr('href', '#' + Math.min(this.pageCount, page.pageNumber + 1));
+		$('#left-arrow a').attr('href', '#' + Math.max(1, page.pageNumber - 1));
+
 		$('.arrow a').removeClass('disabled');
-		
-		if (page.pageNumber == 0) {
+
+		if (page.pageNumber == 1) {
 			$('#left-arrow a').addClass('disabled');
 		}
-		
-		if (page.pageNumber == this.pages.length - 1) {
+
+		if (page.pageNumber == this.pageCount) {
 			$('#right-arrow a').addClass('disabled');
 		}
 
 		canvas.width = page.background.width;
 		canvas.height = page.background.height;
-		
+
 		this.viewArea(canvas, page, this.ORIGIN, {x:page.background.width, y:page.background.height}, 'width');
 		this.draw(canvas, page);
 	},
-	
+
 	scalePoint: function(point) {
 		return {
 			x: (point.x - this.scrollCanX) / this.scale, 
 			y: (point.y - this.scrollCanY) / this.scale
 		}
 	},
-	
+
 	setupCanvas: function(canvas, page) {
 		if (page.background.complete) {
 			this.realSetupCanvas(canvas, page)
@@ -283,16 +340,16 @@ var Drawing = {
 
 	onAjaxError: function(jqXHR, textStatus, errorThrown) {
 		$('#dialog-message').dialog('close');
-	
-		HtmlAlert._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Oopsie! ' + textStatus + '</p>');
+
+		HtmlAlert._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>There was an error communicating with the server. Please try again.</p>');
 	},
 
 	// Document functions
 	getPage: function(canvas, documentId, pageNumber) {
-		if (pageNumber >= this.pages.length) {
-			pageNumber = this.pages.length - 1;
-		} else if (pageNumber < 0) {
-			pageNumber = 0;
+		if (pageNumber > this.pageCount) {
+			pageNumber = this.pageCount;
+		} else if (pageNumber < this.FIRST_PAGE) {
+			pageNumber = this.FIRST_PAGE;
 		}
 
 		if (this.pages[pageNumber]) {
@@ -306,7 +363,7 @@ var Drawing = {
 	},
 
 	submitPage: function(documentId, pageNumber) {
-		if (pageNumber >= Drawing.pages.length) {
+		if (pageNumber > Drawing.pageCount) {
 			$('#progressbar').progressbar('value', 100);
 			Document.finishDocument(documentId, function() {
 				$('#dialog-message').dialog('close');
@@ -316,147 +373,165 @@ var Drawing = {
 			var page = Drawing.pages[pageNumber];
 			var imageData = Drawing.drawHiddenCanvas(page);
 
-			$('#progressbar').progressbar('value', Math.round(100 * (pageNumber / Drawing.pages.length), 0));
+			$('#progressbar').progressbar('value', Math.round(100 * (pageNumber / Drawing.pageCount), 0));
 			Document.submitPage(documentId, pageNumber, imageData, Drawing.submitPage);
 		}
 	},
 	// !Document functions
 
 	init: function(urls) {
+		var self = this;
 		this.urls = urls;
 
-		//window.scrollTo(0, 60);
 		this.$main = $('#main');
 		this.can = document.getElementById('can');
 		this.previousPoint = this.ORIGIN;
-		this.pages = new Array(parseInt($('#pageCount').val() || 1));
-		
-		this.can.ontouchstart = function(e) {
-			if (Drawing.trackingTouchId == null) {
-				Drawing.trackingTouchId = e.touches[0].identifier;
+		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
+		this.pages = new Array(pageCount + this.FIRST_PAGE);
+		$('#box').hide();
 
-				Drawing.previousPoint = Drawing.convertEventToPoint(e.touches[0]);
+		this.can.ontouchstart = function(e) {
+			if (self.trackingTouchId == null) {
+				self.trackingTouchId = e.touches[0].identifier;
+
+				self.previousPoint = self.convertEventToPoint(e.touches[0]);
 			}
 		};
 
 		this.can.ontouchmove = function(e) {
 			var currentTouch = null;
 			for (var i = 0; i < e.touches.length; i++) {
-				if (Drawing.trackingTouchId == e.touches[i].identifier) {
+				if (self.trackingTouchId == e.touches[i].identifier) {
 					currentTouch = e.touches[i];
 				}
 			}
 
 			if (currentTouch) {
-				Drawing.doMove(currentTouch);
+				self.doMove(currentTouch);
 			}
 		};
 
 		this.can.ontouchend = function(e) {
 			var currentTouch = null;
 			for (var i = 0; i < e.changedTouches.length; i++) {
-				if (Drawing.trackingTouchId == e.changedTouches[i].identifier) {
+				if (self.trackingTouchId == e.changedTouches[i].identifier) {
 					currentTouch = e.changedTouches[i];
 				}
 			}
-			
+
 			if (currentTouch) {
-				Drawing.trackingTouchId = null;
-				Drawing.doEnd(currentTouch);
+				self.trackingTouchId = null;
+				self.doEnd(currentTouch);
 			}
 		};
-		
+
 		// Do this server side, maybe
 		if (!navigator.userAgent.match(/iPhone|iPad/i)) {
 			$('#can').mousedown(function(e) {
 				if (e.which == 1) {
-					Drawing.isPainting = true;
-					Drawing.previousPoint = {x: e.pageX, y: e.pageY};
+					self.isPainting = true;
+					self.previousPoint = {x: e.pageX, y: e.pageY};
 				}
 			});
-			
+
 			$('#can').mousemove(function(e) {
-				if (Drawing.isPainting) {
-					Drawing.doMove(e);
+				if (self.isPainting) {
+					self.doMove(e);
 				}
 			});
-			
+
 			$('#can').mouseup(function(e) {
-				if (Drawing.isPainting) {
-					Drawing.doEnd(e);
-					Drawing.isPainting = false;
+				if (self.isPainting) {
+					self.doEnd(e);
+					self.isPainting = false;
 				}
 			});
-			
+
 			$('#can').mouseleave(function(e) {
-				if (Drawing.isPainting) {
-					Drawing.doEnd(e);
-					Drawing.isPainting = false;
+				if (self.isPainting) {
+					self.doEnd(e);
+					self.isPainting = false;
 				}
+			});
+		} else if (navigator.userAgent.match(/iPhone/i)) {
+			$('h1', '#header').slideUp('fast');
+			$("head").append("<link>");
+			// TODO: Replace this with grails browser detection
+			var css = $("head").children(":last").attr({
+				rel: "stylesheet",
+				type: "text/css",
+				href: "/document_vault/css/iphone.css"
 			});
 		}
-		
+
 		$('#clearcan').click(function() {
-			Drawing.currentPage.lines.splice(0, Drawing.currentPage.lines.length);
-			Drawing.draw(Drawing.can, Drawing.currentPage);
+			self.currentPage.lines.splice(0, self.currentPage.lines.length);
+			self.draw(self.can, self.currentPage);
 		});
-		
+
 		$('#undo').click(function() {
-			var splicePoint = Drawing.currentPage.lines.length;
-			for (var i = Drawing.currentPage.lines.length - 2; i >= 0; i--) {
-				if (Drawing.currentPage.lines[i] == Drawing.LINEBREAK || i == 0) {
+			var splicePoint = self.currentPage.lines.length;
+			for (var i = self.currentPage.lines.length - 2; i >= 0; i--) {
+				if (self.currentPage.lines[i] == self.LINEBREAK || i == 0) {
 					splicePoint = i;
 					break;
 				}
 			}
-			Drawing.currentPage.lines.splice(splicePoint, Drawing.currentPage.lines.length);
-			Drawing.addBreak(Drawing.currentPage);
-			Drawing.draw(Drawing.can, Drawing.currentPage);
+			self.currentPage.lines.splice(splicePoint, self.currentPage.lines.length);
+			self.addBreak(self.currentPage);
+			self.draw(self.can, self.currentPage);
 		});
-		
+
 		$('#save').click(function() {
 			$('#confirm-submit').dialog('open');
 		});
-		
+
 		$('#close').click(function() {
-			window.location.href = Drawing.urls['close'];
+			window.location.href = self.urls['close'];
 		});
-		
-		$(window).hashchange(function() {
-			var newPage = parseInt(location.hash.substring(1)) || 0;
-			
-			if (!Drawing.currentPage || newPage != Drawing.currentPage.pageNumber) {
-				Drawing.getPage(Drawing.can, $('#documentId').val(), newPage);
-			}
-		});
-		
+
 		$('.arrow a').click(function() {
 			if ($(this).is('.disabled')) {
 				return false;
 			}
 		});
-		
+
+		$(window).hashchange(function() {
+			var newPage = parseInt(location.hash.substring(1)) || self.FIRST_PAGE;
+
+			if (!self.currentPage || newPage != self.currentPage.pageNumber) {
+				self.getPage(self.can, $('#documentId').val(), newPage);
+			}
+		});
+
 		window.onorientationchange = function() {
-			if (!Drawing.isZoomedIn) {
-				$('#viewAll').click();
+			window.scrollTo(0, 1);
+			if (!self.isZoomedIn) {
+				$('#zoomWidth').click();
 			}
 		};
-		
-		$('#viewAll').click(function() {
-			Drawing.viewArea(Drawing.can, Drawing.currentPage, Drawing.ORIGIN, {x:Drawing.currentPage.background.width, y:Drawing.currentPage.background.height}, 'width');
-			Drawing.isZoomedIn = false;
+
+		$('#zoomWidth').click(function() {
+			self.viewArea(self.can, self.currentPage, self.ORIGIN, {x:self.currentPage.background.width, y:self.currentPage.background.height}, 'width');
+			self.isZoomedIn = false;
 		});
-		
-		$('#pen').click(function(e) {
-			$(this).toggleClass('on');
-			
-			if ($(this).is('.on')) {
-				Drawing.$main.css('cursor', 'crosshair');
+
+		$('.mark').click(function(e) {
+			var $this = $(this);
+			var wasOn = $this.is('.on');
+
+			$('.mark').removeClass('on');
+			if (!wasOn) {
+				$this.toggleClass('on');
+			}
+
+			if ($this.is('.on')) {
+				self.$main.css('cursor', 'crosshair');
 			} else {
-				Drawing.$main.css('cursor', 'default');
+				self.$main.css('cursor', 'default');
 			}
 		});
-		
+
 		$('#dialog-message').dialog({
 			autoOpen: false,
 			buttons: {},
@@ -477,7 +552,7 @@ var Drawing = {
 				'Submit': function() {
 					$(this).dialog('close');
 					$('#dialog-message').dialog('open');
-					Drawing.submitPage($('#documentId').val(), 0);
+					self.submitPage($('#documentId').val(), self.FIRST_PAGE);
 				},
 				'Cancel' :function() {
 					$(this).dialog('close');

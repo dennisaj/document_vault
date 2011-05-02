@@ -6,8 +6,8 @@
 		<link href="${resource(dir:'css',file:'main.css')}" rel="stylesheet" media="screen, projection" />
 		<link href="${resource(dir:'css',file:'navigation.css')}" rel="stylesheet" media="screen, projection" />
 		<blueprint:resources plugins="fancy-type" />
-		<g:javascript src="global.js" />
 		<g:javascript library="jquery" plugin="jquery" />
+		<g:javascript src="global.js" />
 		<nav:resources override="true" />
 		<g:layoutHead />
 	</head>

@@ -23,7 +23,7 @@ class SignatureCodeController {
 				
 				def notes = "Signed using code " + session.signatureCode
 				activityLogService.addSignLog(document, signatures, notes)
-				handlerChain.sign(document: document, documentData: document.files.first(), signatures)
+				handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
 
 				document.signed = true
 				document.save()

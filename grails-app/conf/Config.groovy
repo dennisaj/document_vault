@@ -35,7 +35,7 @@ grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
 
 grails.views.javascript.library="jquery"
 // The default codec used to encode data with ${}
-grails.views.default.codec = "none" // none, html, base64
+grails.views.default.codec = "html" // none, html, base64
 grails.views.gsp.encoding = "UTF-8"
 grails.converters.encoding = "UTF-8"
 // enable Sitemesh preprocessing of GSP pages
@@ -74,7 +74,6 @@ log4j = {
     //appenders {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
-
     info   'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
            'grails.app',
 		   'us.paperlesstech',
@@ -126,11 +125,11 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/index':			['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/document/**':		['ROLE_USER', 'ROLE_ADMIN'],
 	'/printQueue/**':	['ROLE_USER', 'ROLE_ADMIN'],
-	'/searchable**':		['ROLE_ADMIN'],
+	'/searchable**':	['ROLE_ADMIN'],
 	'/api/**':			['ROLE_ADMIN'],
 	'/printer/**':		['ROLE_ADMIN'],
 	'/admin/**':		['ROLE_ADMIN'],
-	'/activityLog/**':		['ROLE_ADMIN'],
+	'/activityLog/**':	['ROLE_ADMIN'],
 	'/login/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/logout/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/js/**':			['IS_AUTHENTICATED_ANONYMOUSLY'],
@@ -139,6 +138,8 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/images/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/signatureCode/**':	['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/signatureCode/send/**':	['ROLE_USER', 'ROLE_ADMIN'],
+	'/upload/**':		['ROLE_USER', 'ROLE_ADMIN'],
+	'/tag/**':			['ROLE_USER', 'ROLE_ADMIN'],
 ]
 
 grails {

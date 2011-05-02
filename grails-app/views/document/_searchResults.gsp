@@ -49,8 +49,16 @@
 								<img src="${resource(dir:'images', file:'note.png')}" alt="" /><br />Notes
 							</a>
 						</li>
+						<li>
+							<a href="javascript:Tagging.showTagbox('#tagbox-${it.id}');">
+								<img src="${resource(dir:'images', file:'list-add.png')}" alt="" /><br />Tags
+							</a>
+						</li>
 					</ul>
 					<br /><br /><br />
+					<div>
+						<ul class="taggable hidden" id="tagbox-${it.id}" documentid="${it.id}"></ul>
+					</div>
 					<a href="${createLink(action: 'show', id: it.id) }">
 						<img class="thumb" width="400" src="${createLink(action: 'downloadImage', id: it.id) }" alt="Document ${it.id} Page 1" />
 					</a>

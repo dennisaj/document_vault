@@ -14,10 +14,11 @@ class PngHandlerService extends Handler {
 	@Override
 	@InterceptHandler
 	void sign(Map inputs) {
+		def d = getDocument(inputs)
 		def data = getDocumentData(inputs)
 		def signatureData = inputs.signature
 
-		assert signature, "This method requires a signature"
+		assert signatureData, "This method requires a signature"
 
 		log.info "Updating the images for document ${d}"
 

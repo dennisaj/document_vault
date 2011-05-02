@@ -14,8 +14,9 @@ class SignatureService {
 	 */
 	def saveSignatureToMap(Map<Integer, Byte[]> signatures, pageNumber, imageData) {
 		assert imageData
+		assert imageData.size() >= PreviewImage.imageDataPrefix.size()
 
-		def decodedData = imageData[PreviewImage.imageDataPrefix.size()..-1].decodeBase64()
+		def decodedData = imageData.substring(PreviewImage.imageDataPrefix.size()).decodeBase64()
 
 		signatures[pageNumber] = decodedData
 	}

@@ -131,10 +131,12 @@ class PclHandlerService extends Handler {
 	}
 
 	@Override
+	@InterceptHandler
 	void print(Map input) {
 	}
 
 	@Override
+	@InterceptHandler
 	void sign(Map input) {
 	}
 }

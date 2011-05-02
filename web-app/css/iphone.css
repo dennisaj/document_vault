@@ -1,0 +1,21 @@
+body {
+	overflow: visible;
+}
+
+#header {
+	font-size: .4em !important;
+}
+
+.bigbutton {
+	font-size: .5em !important;
+	margin: .1em 0 .1em .1em !important;
+	padding: .1em !important;
+}
+
+.arrow {
+	top: 55%;
+}
+
+.arrow a {
+	font-size: 2em;
+}

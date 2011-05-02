@@ -5,10 +5,13 @@
 		<title> - Search</title>
 		<link href="${resource(dir:'css', file:'document-menu.css')}" rel="stylesheet" media="screen, projection" />
 		<link href="${resource(dir:'css', file:'callout.css')}" rel="stylesheet" media="screen, projection" />
+		<link href="${resource(dir:'css', file:'tagit-simple-blue.css')}" rel="stylesheet" media="screen, projection" />
 		<g:javascript src="jquery.jeditable.min.js" />
+		<g:javascript src="tagit.js" />
 		<g:javascript src="documentnote.js" />
 		<g:javascript src="HtmlAlert.js" />
 		<g:javascript src="document.js" />
+		<g:javascript src="tagging.js" />
 		<g:javascript>
 			$(document).ready(function() {
 				DocumentNote.init({ 'save': '/document_vault/document/saveNote' });

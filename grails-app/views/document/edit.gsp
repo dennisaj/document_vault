@@ -3,6 +3,7 @@
 	<head>
 		<title> - Sign</title>
 		<meta name="layout" content="mobile" />
+		<link href="${resource(dir:'css', file:'drawing.css')}" rel="stylesheet" media="all" />
 		<jqui:resources theme="ui-lightness" />
 		<g:javascript src="jquery.ba-hashchange.js" />
 		<g:javascript src="HtmlAlert.js" />
@@ -23,21 +24,24 @@
 		</g:javascript>
 	</head>
 	<body>
-		<input type="hidden" id="pageCount" value="${document.previewImages.size()}" />
+		<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
 		<input type="hidden" id="documentId" value="${document.id}" />
 		<div id="buttonPanel">
+			<hr />
 			<g:if test="${!document.signed()}">
-				<input type="button" class="bigbutton" id="save" value="Submit Signatures" />
-				<input type="button" class="bigbutton" id="pen" value="Pen" />
-				<input type="button" class="bigbutton" id="undo" value="Undo" />
-				<input type="button" class="bigbutton" id="clearcan" value="Clear" />
-				<input type="button" class="bigbutton" id="email" value="Email" />
+				<button class="bigbutton" id="save"><img src="${resource(dir:'images', file:'dialog-yes.png')}" alt="" /><br />Submit Signatures</button>
+				<button class="bigbutton mark" id="pen"><img src="${resource(dir:'images', file:'favicon.ico')}" alt="" width="24" /><br />Pen</button>
+				<button class="bigbutton mark" id="highlight"><img src="${resource(dir:'images', file:'highlight.png')}" alt="" /><br />Highlight</button>
+				<button class="bigbutton" id="undo"><img src="${resource(dir:'images', file:'edit-undo.png')}" alt="" /><br />Undo</button>
+				<button class="bigbutton" id="clearcan"><img src="${resource(dir:'images', file:'edit-clear.png')}" alt="" /><br />Clear</button>
+				<button class="bigbutton" id="email"><img src="${resource(dir:'images', file:'mail-send.png')}" alt="" /><br />Email</button>
 			</g:if>
 			<g:else>
-				<input type="button" class="bigbutton" id="print" value="Print" />
+				<button class="bigbutton" id="print"><img src="${resource(dir:'images', file:'document-print.png')}" alt="" /><br />Print</button>
 			</g:else>
-			<input type="button" class="bigbutton" id="viewAll" value="View All" />
-			<input type="button" class="bigbutton" id="close" value="Close" />
+			<button class="bigbutton" id="zoomWidth"><img src="${resource(dir:'images', file:'zoom-fit-width.png')}" alt="" /><br />Zoom Width</button>
+			<button class="bigbutton" id="close"><img src="${resource(dir:'images', file:'document-close.png')}" alt="" /><br />Close</button>
+			<hr />
 		</div>
 		<div id="main">
 			<div id="left-arrow" class="arrow">
@@ -67,6 +71,7 @@
 				Are you sure you want to want to submit the signature for this document?
 			</p>
 		</div>
+		<div id="box" style="position: absolute;z-index:100"></div>
 	</body>
 </html>
 

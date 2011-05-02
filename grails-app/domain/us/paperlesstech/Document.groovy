@@ -1,10 +1,10 @@
 package us.paperlesstech
 
+import org.grails.taggable.Taggable
 import org.joda.time.LocalDateTime
 import org.joda.time.contrib.hibernate.PersistentLocalDateTime
-import javax.persistence.Transient
 
-class Document {
+class Document implements Taggable {
 	static transients = ["previewImage", "previewImageAsMap", "signed"]
 	LocalDateTime dateCreated
 	SortedSet files

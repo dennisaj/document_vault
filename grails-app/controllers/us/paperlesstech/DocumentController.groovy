@@ -143,9 +143,9 @@ class DocumentController {
 		if (!session.signatures) {
 			session.signatures = [:]
 		}
-		
+
 		def signatures = session.signatures.get(params.id.toString(), [:])
-		
+
 		if (signatureService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
 			session.signatures[params.id] = signatures
 			render ([status:"success"] as JSON)
@@ -156,13 +156,12 @@ class DocumentController {
 
 	def finish = {
 		def document = Document.get(params.id)
-		if (document && !document.signed) {
+		if (document && !document.signed()) {
 			def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
 
 			activityLogService.addSignLog(document, signatures)
-			handlerChain.sign(document: document, documentData: document.files.first(), signatures)
+			handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
 
-			document.signed = true
 			document.save()
 
 			flash.green = "Signature saved"
