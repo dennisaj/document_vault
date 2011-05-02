@@ -1,4 +1,3 @@
-<%@ page import="us.paperlesstech.DocumentType"%>
 <html>
 	<head>
 		<meta name="layout" content="main" />
@@ -45,6 +44,7 @@
 						value="Clear Form" />
 				</div>
 				<div id="advancedSearch" class="ui-tabs-hide">
+					<%--
 					<g:select name="documentType" value="" id="documentType"
 						from="${DocumentType.list()}" noSelection="['':'Document Type']"
 						optionKey="id" optionValue="name"
@@ -52,6 +52,7 @@
 					<div id="documentTypeOptions">&nbsp;</div>
 					<input type="submit" name="submit" value="Search" /> <input
 						id='reset2' type="reset" name="reset" value="Clear Form" />
+						--%>
 				</div>
 			</div>
 		</fieldset>

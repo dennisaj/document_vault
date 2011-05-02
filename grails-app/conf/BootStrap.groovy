@@ -1,9 +1,7 @@
-import us.paperlesstech.DocumentType
 import us.paperlesstech.Printer
 import us.paperlesstech.Role
 import us.paperlesstech.User
 import us.paperlesstech.UserRole
-import us.paperlesstech.document_parsing.FermanDocumentParser;
 
 class BootStrap {
 	def springSecurityService
@@ -29,36 +27,6 @@ class BootStrap {
 			UserRole.create normalUser, userRole, true
 		}
 
-		if(DocumentType.count() == 0) {
-			new DocumentType(name:FermanDocumentParser.Types.CUSTOMER_HARD_COPY.name(),
-					searchOptions:[
-						"RO_Number",
-						"Customer_Name",
-						"Customer_Address",
-						"Home_Phone",
-						"Work_Phone",
-						"VIN",
-						"License_Number",
-						"RO_Open_Date",
-						"Time_Received",
-						"Time_Promised",
-						"Current_Mileage",
-						"Mileage_Out",
-						"Estimate_Of_Repairs",
-						"Service_Advisor",
-						"Delivery_Date",
-						"In_Service_Date",
-						"Model_Year",
-						"Make",
-						"Model",
-						"Body",
-						"Color",
-						"Note"
-					]).save()
-
-			new DocumentType(name:FermanDocumentParser.Types.OTHER.name(), searchOptions:["Note"]).save()
-		}
-		
 		if (Printer.count() == 0) {
 			new Printer(name:"Recursive", host:"localhost", deviceType:"lj5gray", port:9100).save()
 		}

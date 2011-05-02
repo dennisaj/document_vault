@@ -55,7 +55,7 @@
 						<img class="thumb" width="400" src="${createLink(action: 'downloadImage', id: it.id) }" alt="Document ${it.id} Page 1" />
 					</a>
 					<div class="triangle-border left-arrow hidden" id="notebox-${it.id}">
-						<span class="noteField" id="note-${it.id}">${it.text.parsedFields['Note']}</span>
+						<span class="noteField" id="note-${it.id}">${it.searchFields['Note']}</span>
 					</div>
 				</div>
 			</div>

@@ -1,0 +1,7 @@
+%-12345X@PJL USTATUSOFF
+@PJL INFO STATUS
+@PJL USTATUS DEVICE=ON
+%-12345X%-12345XE(s15.6H&l8D(s0p16.60h008v0s0b006T(s0B&d@&l0O&l0S&l006C&l005C(s0p15.00h008v0s0b003T(s0p15.00h008v0s0b003T(s0B&d@&l0O&l0S&l005C(s0p10.00h012v0s0b003T&l008C&l0O&l0S(s0p16.60h008v0s0b006T&l006C&l0O&l02A&l006C&l006CE&l0o2A&f20901y3X&l0e84F&a0L&l6D(s10h0P&a1h85V
+
+Regular data1 go3s, here
+and can span multiple lines.

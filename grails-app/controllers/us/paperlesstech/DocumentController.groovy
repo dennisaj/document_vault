@@ -3,6 +3,7 @@ package us.paperlesstech
 import grails.converters.JSON
 
 import org.compass.core.engine.SearchEngineQueryParseException
+import us.paperlesstech.handlers.Handler
 
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
@@ -12,10 +13,11 @@ class DocumentController {
 	def scaffold = true
 
 	def activityLogService
-	def documentService
+	Handler handlerChain
 	def imageDataPrefix = "data:image/png;base64,"
 	def searchableService
 	def signatureCodeService
+	def signatureService
 	def springSecurityService
 
 	def index = {
@@ -23,11 +25,6 @@ class DocumentController {
 		def docCount = Document.count()
 
 		["searchResult":["results":results, "offset":0, "total":docCount, "max":docCount], "queryString":"5 most recent documents"]
-	}
-
-	def documentTypeOptions = {
-		def dt = params.documentTypeId?.trim() ? DocumentType.get(params.documentTypeId) : null
-		render(template:"documentTypeSearch", model:[documentType: dt])
 	}
 
 	def search = {
@@ -41,7 +38,8 @@ class DocumentController {
 			// Find the incoming fields that start with field_, strip off the field_
 			// and create a query string from them
 			def advancedQuery = params.findAll { it.key.startsWith("field_") && it.value }.collect { "${it.key[6..-1]}:*${it.value}*" }.join(" ")
-			def dt = DocumentType.get(params.documentType)
+			// TODO fix me
+			def dt = null
 			// if there is a document type add it to the search
 			queryString = dt ? "DocumentType:${dt.name} ${advancedQuery}" : advancedQuery
 		} else {
@@ -68,7 +66,7 @@ class DocumentController {
 
 		if (idRegex.matches() && Document.exists(idRegex[0][1])) {
 			def document = Document.get(idRegex[0][1])
-			document.text.parsedFields['Note'] = params.value
+			document.searchFields['Note'] = params.value
 			document.save(flush:true)
 
 			render text:params.value, contentType: "text/plain"
@@ -79,42 +77,44 @@ class DocumentController {
 	}
 
 	def savePcl = {
-		Document document = new Document()
 		try {
-			document.pcl = new Pcl(data:params.data)
-			document.save(flush:true)
+			Document document = new Document()
+			def documentData = new DocumentData(mimeType: MimeType.PCL, data: params.data)
+			handlerChain.importFile(document: document, documentData: documentData)
+
+			assert document.files.size() == 1
+			document.save()
+
 			response.status = 200
 			render "Document ${document.id} saved\n"
-			PclProcessorJob.triggerNow(documentId:document.id)
 			log.info "Saved document ${document.id}"
-		} catch(Exception e) {
+		} catch (Exception e) {
 			log.error("Unable to save uploaded document", e)
 			response.status = 500
 			render "Error saving file\n"
-			document.delete()
 		}
 	}
 
 	def downloadImage = {
 		def document = Document.get(params.id)
-		if(!document.images) {
+		if(!document.previewImages) {
 			// TODO handle documents without images
 			return
 		}
-		def pageNumber = params.pageNumber ?: 0
-		def image = document.getSortedImages()[pageNumber]
+		def pageNumber = params.pageNumber ?: 1
+		def image = document.previewImage(pageNumber)
 
 		response.setContentType("image/png")
-		response.setContentLength(image.data.length)
-		response.getOutputStream().write(image.data)
+		response.setContentLength(image.data.data.length)
+		response.getOutputStream().write(image.data.data)
 	}
 
 	def downloadPdf = {
 		def document = Document.get(params.id)
 		if (document) {
 			response.setContentType("application/pdf")
-			response.setContentLength(document.pdf.data.length)
-			response.getOutputStream().write(document.pdf.data)
+			response.setContentLength(document.files.first().data.length)
+			response.getOutputStream().write(document.files.first().data)
 		}
 	}
 
@@ -133,7 +133,10 @@ class DocumentController {
 	}
 
 	def image = {
-		render (documentService.getImageDataAsMap(params.id.toInteger(), params.pageNumber.toInteger()) as JSON)
+		def d = Document.get(params.id.toInteger())
+		assert d
+
+		render(d.previewImageAsMap(params.pageNumber.toInteger()) as JSON)
 	}
 
 	def sign = {
@@ -143,7 +146,7 @@ class DocumentController {
 		
 		def signatures = session.signatures.get(params.id.toString(), [:])
 		
-		if (documentService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
+		if (signatureService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
 			session.signatures[params.id] = signatures
 			render ([status:"success"] as JSON)
 		} else {
@@ -157,7 +160,7 @@ class DocumentController {
 			def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
 
 			activityLogService.addSignLog(document, signatures)
-			documentService.signDocument(document, session.signatures.get(document.id.toString()))
+			handlerChain.sign(document: document, documentData: document.files.first(), signatures)
 
 			document.signed = true
 			document.save()

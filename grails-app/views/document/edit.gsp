@@ -23,10 +23,10 @@
 		</g:javascript>
 	</head>
 	<body>
-		<input type="hidden" id="pageCount" value="${document.images.size()}" />
+		<input type="hidden" id="pageCount" value="${document.previewImages.size()}" />
 		<input type="hidden" id="documentId" value="${document.id}" />
 		<div id="buttonPanel">
-			<g:if test="${!document.signed}">
+			<g:if test="${!document.signed()}">
 				<input type="button" class="bigbutton" id="save" value="Submit Signatures" />
 				<input type="button" class="bigbutton" id="pen" value="Pen" />
 				<input type="button" class="bigbutton" id="undo" value="Undo" />

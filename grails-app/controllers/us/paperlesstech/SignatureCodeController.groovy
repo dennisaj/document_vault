@@ -1,12 +1,13 @@
 package us.paperlesstech
 
 import grails.converters.JSON
+import us.paperlesstech.handlers.Handler
 
 class SignatureCodeController {
-
 	def activityLogService
-	def documentService
+	Handler handlerChain
 	def signatureCodeService
+	def signatureService
 
 	def done = {
 	}
@@ -22,8 +23,8 @@ class SignatureCodeController {
 				
 				def notes = "Signed using code " + session.signatureCode
 				activityLogService.addSignLog(document, signatures, notes)
-				documentService.signDocument(document, session.signatures.get(document.id.toString()))
-	
+				handlerChain.sign(document: document, documentData: document.files.first(), signatures)
+
 				document.signed = true
 				document.save()
 	
@@ -37,7 +38,10 @@ class SignatureCodeController {
 
 	def image = {
 		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
-			render (documentService.getImageDataAsMap(params.id, params.pageNumber.toInteger()) as JSON)
+			def d = Document.get(params.id.toInteger())
+			assert d
+
+			render(d.previewImageAsMap(params.pageNumber.toInteger()) as JSON)
 		}
 
 		render ([status:"error"] as JSON)
@@ -76,7 +80,7 @@ class SignatureCodeController {
 
 			def signatures = session.signatures.get(params.id, [:])
 			
-			if (documentService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
+			if (signatureService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
 				session.signatures[params.id] = signatures
 				render ([status:"success"] as JSON)
 			} else {
