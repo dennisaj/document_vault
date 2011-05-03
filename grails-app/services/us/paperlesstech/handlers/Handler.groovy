@@ -4,7 +4,7 @@ import us.paperlesstech.DocumentData
 import us.paperlesstech.Document
 
 class Handler {
-	void importFile(Document d, DocumentData data) {
+	void importFile(Map inputs) {
 		throw new UnsupportedOperationException("importFile has no handler for ${data.mimeType}")
 	}
 

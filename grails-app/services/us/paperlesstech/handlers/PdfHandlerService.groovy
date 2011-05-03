@@ -12,16 +12,18 @@ class PdfHandlerService extends Handler {
 	static handlerFor = MimeType.PDF
 	static transactional = true
 	Handler handlerChain
+	def nextService
 
 	@Override
 	@InterceptHandler
 	void sign(Map inputs) {
-		log.info "Signing the PDF for document ${d}"
 		def document = getDocument(inputs)
 		def data = getDocumentData(inputs)
 		def signatures = inputs.signatures
 
 		assert signatures, "This method requires a map of signatures"
+
+		log.info "Signing the PDF for document ${document}"
 
 		PdfReader pdfReader = new PdfReader(data.data)
 

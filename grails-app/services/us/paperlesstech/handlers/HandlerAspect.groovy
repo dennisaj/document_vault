@@ -36,8 +36,8 @@ class HandlerAspect {
 		def methodName = pjp.signature.name
 
 		if (data.mimeType != targetHandles) {
-			target.nextHandler."$methodName"(*args)
-			log.debug "Skipping execution of $pjp passing to the next handler"
+			target.nextService."$methodName"(*args)
+			log.debug "Skipping execution of $pjp passing to the next handler passing to ${target.nextService}"
 			return
 		}
 		log.debug "Executing $pjp"

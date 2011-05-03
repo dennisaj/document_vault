@@ -9,6 +9,7 @@ import us.paperlesstech.MimeType
 class PngHandlerService extends Handler {
 	static handlerFor = MimeType.PNG
 	static transactional = true
+	def nextService
 
 	@Override
 	@InterceptHandler

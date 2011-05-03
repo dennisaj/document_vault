@@ -12,11 +12,7 @@ class PclHandlerService extends Handler {
 	static handlerFor = MimeType.PCL
 	static transactional = true
 	Handler handlerChain
-	def nextHandler
-
-	def createImages(DocumentData d) {
-
-	}
+	def nextService
 
 	DocumentData createPdf(DocumentData d) {
 		assert d?.data
