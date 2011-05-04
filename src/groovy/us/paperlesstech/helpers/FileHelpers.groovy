@@ -17,4 +17,20 @@ class FileHelpers {
 		int chopLength = (extension.size() + 1) * -1
 		return fileName[0..chopLength]
 	}
+
+	/**
+	 * Determines the extension from the fileName.
+	 *
+	 * <pre>
+	 * getExtension("file.pdf.png") == ".png"
+	 * </pre>
+	 *
+	 * @param fileName the fileName to parse
+	 * @return the extension or null if the extension cannot be determined
+	 */
+	static String getExtension(String fileName) {
+		def idx = fileName.lastIndexOf('.')
+
+		idx >= 0 ? fileName.substring(idx + 1) : null
+	}
 }
