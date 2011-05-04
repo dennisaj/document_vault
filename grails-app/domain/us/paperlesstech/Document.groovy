@@ -8,6 +8,7 @@ class Document implements Taggable {
 	static transients = ["previewImage", "previewImageAsMap", "signed"]
 	LocalDateTime dateCreated
 	SortedSet files
+	String name
 	Map otherFields = [:]
 	SortedSet previewImages
 	Map searchFields = [:]
@@ -17,6 +18,7 @@ class Document implements Taggable {
 	static constraints = {
 		// minSize won't fire on the initial save if files is null
 		files(nullable: false, minSize: 1)
+		name(nullable: true, blank: true)
 	}
 
 	static mapping = {
@@ -48,12 +50,24 @@ class Document implements Taggable {
 		image?.getImageAsMap()
 	}
 
+	/**
+	 * Deletes all of the documents from the previewImages collection
+	 */
+	def resetPreviewImages = {
+		previewImages.each {
+			it.data.delete()
+			it.delete()
+		}
+
+		previewImages?.clear()
+	}
+
 	// TODO fix me
 	def signed = {
 		false
 	}
 
 	String toString() {
-		"Document(${id})"
+		"Document(${id}) - $name"
 	}
 }

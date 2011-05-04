@@ -4,20 +4,20 @@ import us.paperlesstech.DocumentData
 import us.paperlesstech.Document
 
 class Handler {
-	void importFile(Map inputs) {
-		throw new UnsupportedOperationException("importFile has no handler for ${inputs.documentData.mimeType}")
+	void importFile(Map input) {
+		throw new UnsupportedOperationException("importFile has no handler for ${input.documentData.mimeType}")
 	}
 
-	void generatePreview(Map inputs) {
-		throw new UnsupportedOperationException("generatePreview has no handler for ${inputs.documentData.mimeType}")
+	void generatePreview(Map input) {
+		throw new UnsupportedOperationException("generatePreview has no handler for ${input.documentData.mimeType}")
 	}
 
-	void print(Map inputs) {
-		throw new UnsupportedOperationException("print has no handler for ${inputs.documentData.mimeType}")
+	void print(Map input) {
+		throw new UnsupportedOperationException("print has no handler for ${input.documentData.mimeType}")
 	}
 
-	void sign(Map inputs) {
-		throw new UnsupportedOperationException("sign has no handler for ${inputs.documentData.mimeType}")
+	void sign(Map input) {
+		throw new UnsupportedOperationException("sign has no handler for ${input.documentData.mimeType}")
 	}
 
 	static Document getDocument(Map map) {

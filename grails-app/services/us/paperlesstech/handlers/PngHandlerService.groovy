@@ -5,18 +5,48 @@ import java.awt.Image
 import java.awt.RenderingHints
 import javax.imageio.ImageIO
 import us.paperlesstech.MimeType
+import us.paperlesstech.PreviewImage
+import us.paperlesstech.helpers.ImageHelpers
 
 class PngHandlerService extends Handler {
 	static handlerFor = MimeType.PNG
 	static transactional = true
+	def handlerChain
 	def nextService
 
 	@Override
+	void generatePreview(Map input) {
+		def d = getDocument(input)
+		def data = getDocumentData(input)
+
+		d.resetPreviewImages()
+
+		def (width, height) = ImageHelpers.getDimensions(data.data)
+		PreviewImage image = new PreviewImage(data: data.clone(), height: height, pageNumber: 1, width: width)
+		d.addToPreviewImages(image)
+	}
+
+	@Override
 	@InterceptHandler
-	void sign(Map inputs) {
-		def d = getDocument(inputs)
-		def data = getDocumentData(inputs)
-		def signatureData = inputs.signature
+	void importFile(Map input) {
+		def d = getDocument(input)
+		def data = getDocumentData(input)
+
+		d.addToFiles(data)
+		handlerChain.generatePreview(input)
+	}
+
+	@Override
+	void print(Map input) {
+		super.print(input) //To change body of overridden methods use File | Settings | File Templates.
+	}
+
+	@Override
+	@InterceptHandler
+	void sign(Map input) {
+		def d = getDocument(input)
+		def data = getDocumentData(input)
+		def signatureData = input.signature
 
 		assert signatureData, "This method requires a signature"
 

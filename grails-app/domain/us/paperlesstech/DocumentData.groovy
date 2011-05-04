@@ -3,7 +3,7 @@ package us.paperlesstech
 import org.joda.time.LocalDateTime
 import org.joda.time.contrib.hibernate.PersistentLocalDateTime
 
-class DocumentData implements Comparable {
+class DocumentData implements Cloneable, Comparable {
 	byte[] data
 	LocalDateTime dateCreated
 	MimeType mimeType
@@ -18,6 +18,10 @@ class DocumentData implements Comparable {
 	static mapping = {
 		data(lazy: true)
 		dateCreated(type:PersistentLocalDateTime)
+	}
+
+	@Override protected Object clone() {
+		new DocumentData(mimeType: mimeType, pages: pages, data: data.clone())
 	}
 
 	public int compareTo(def other) {

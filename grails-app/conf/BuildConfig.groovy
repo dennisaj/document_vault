@@ -23,11 +23,13 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
 		mavenRepo "http://maven.itextpdf.com/"
+		mavenRepo "http://maven.thebuzzmedia.com"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         compile group:'com.itextpdf', name:'itextpdf', version:'5.0.6'
-	runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'
+		runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'
+		compile group:'com.thebuzzmedia', name:'imgscalr-lib', version:'3.1'
     }
 }

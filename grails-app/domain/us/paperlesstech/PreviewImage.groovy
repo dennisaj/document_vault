@@ -3,7 +3,7 @@ package us.paperlesstech
 import org.joda.time.LocalDateTime
 import org.joda.time.contrib.hibernate.PersistentLocalDateTime
 
-class PreviewImage implements Comparable {
+class PreviewImage implements Cloneable, Comparable {
 	static belongsTo = [document: Document]
 	static imageDataPrefix = "data:image/png;base64,"
 	static transients = ["imageAsMap"]
@@ -21,6 +21,10 @@ class PreviewImage implements Comparable {
 	static mapping = {
 		data(nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh,  evict")
 		dateCreated(type: PersistentLocalDateTime)
+	}
+
+	@Override protected Object clone() {
+		new PreviewImage(data: data.clone(), height: height, pageNumber: pageNumber, width: width)
 	}
 
 	public int compareTo(def other) {

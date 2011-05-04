@@ -6,13 +6,8 @@ import us.paperlesstech.UserRole
 class BootStrap {
 	def springSecurityService
 	def init = { servletContext ->
-		println "All users ${User.list(max: 100)}"
-		println "Admin ${User.findByUsername("admin")}"
-		println "Authorities ${User.findByUsername("admin")?.getAuthorities()}"
-
-		if (!checkForPcl6()) {
-			throw new RuntimeException()
-		}
+		assert new File("/usr/local/bin/pcl6")?.canExecute(), "Cannot execute /usr/local/bin/pcl6"
+		assert new File("/usr/local/bin/gs")?.canExecute(), "Cannot execute /usr/local/bin/gs"
 
 		if(User.count() == 0) {
 			def adminRole = new Role(name: 'ROLE_ADMIN').save(flush: true)
@@ -30,11 +25,6 @@ class BootStrap {
 		if (Printer.count() == 0) {
 			new Printer(name:"Recursive", host:"localhost", deviceType:"lj5gray", port:9100).save()
 		}
-	}
-
-	def checkForPcl6 = {
-		def file = new File('/usr/local/bin/pcl6')
-		return file?.exists() && file?.canRead() && file?.canExecute()
 	}
 
 	def destroy = {
