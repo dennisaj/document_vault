@@ -30,8 +30,8 @@
 							</a>
 						</li>
 						<li>
-							<a href="${createLink(action: 'downloadPdf', id: it.id)}">
-								<img src="${resource(dir:'images', file:'application-pdf.png')}" alt="" /><br />Download
+							<a href="${createLink(action: 'download', id: it.id)}">
+								<img src="${resource(dir:'images', file:'download.png')}" alt="" /><br />Download
 							</a>
 						</li>
 						<li>

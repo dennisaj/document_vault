@@ -3,6 +3,7 @@ package us.paperlesstech
 import grails.converters.JSON
 
 import org.compass.core.engine.SearchEngineQueryParseException
+
 import us.paperlesstech.handlers.Handler
 
 class DocumentController {
@@ -13,11 +14,9 @@ class DocumentController {
 	def scaffold = true
 
 	def activityLogService
+	def grailsApplication
 	Handler handlerChain
-	def imageDataPrefix = "data:image/png;base64,"
 	def searchableService
-	def signatureCodeService
-	def signatureService
 	def springSecurityService
 
 	def index = {
@@ -101,19 +100,21 @@ class DocumentController {
 			// TODO handle documents without images
 			return
 		}
-		def pageNumber = params.pageNumber ?: 1
+		def pageNumber = params.pageNumber?.toInteger() ?: 1
 		def image = document.previewImage(pageNumber)
 
-		response.setContentType("image/png")
+		response.setContentType(image.data.mimeType.downloadContentType)
 		response.setContentLength(image.data.data.length)
 		response.getOutputStream().write(image.data.data)
 	}
 
-	def downloadPdf = {
+	def download = {
 		def document = Document.get(params.id)
 		if (document) {
-			response.setContentType("application/pdf")
+			def filename = document.toString() + document.files.first().mimeType.getDownloadExtension()
+			response.setContentType(document.files.first().mimeType.downloadContentType)
 			response.setContentLength(document.files.first().data.length)
+			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
 			response.getOutputStream().write(document.files.first().data)
 		}
 	}
@@ -136,22 +137,22 @@ class DocumentController {
 		def d = Document.get(params.id.toInteger())
 		assert d
 
-		render(d.previewImageAsMap(params.pageNumber.toInteger()) as JSON)
+		def map = d.previewImageAsMap(params.pageNumber.toInteger())
+		render(map as JSON)
 	}
 
 	def sign = {
+		assert params.lines
+
 		if (!session.signatures) {
 			session.signatures = [:]
 		}
 
-		def signatures = session.signatures.get(params.id.toString(), [:])
+		def signatures = session.signatures.get(params.id, [:])
+		signatures[params.pageNumber] = JSON.parse(params.lines)
+		session.signatures[params.id] = signatures
 
-		if (signatureService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
-			session.signatures[params.id] = signatures
-			render ([status:"success"] as JSON)
-		} else {
-			render ([status:"error"] as JSON)
-		}
+		render ([status:"success"] as JSON)
 	}
 
 	def finish = {
@@ -159,10 +160,12 @@ class DocumentController {
 		if (document && !document.signed()) {
 			def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
 
-			activityLogService.addSignLog(document, signatures)
-			handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
+			if (signatures) {
+				activityLogService.addSignLog(document, signatures)
+				handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
 
-			document.save()
+				document.save()
+			}
 
 			flash.green = "Signature saved"
 			render ([status:"success"] as JSON)

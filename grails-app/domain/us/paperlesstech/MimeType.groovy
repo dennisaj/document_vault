@@ -3,16 +3,26 @@ package us.paperlesstech
 import us.paperlesstech.helpers.FileHelpers
 
 public enum MimeType {
-	PCL(["application/pcl", "application/vnd.hp-pcl"] as Set, ["pcl"] as Set),
-	PNG(["image/png"] as Set, ["png"] as Set),
-	PDF(["application/pdf", "application/x-pdf"] as Set, ["pdf"] as Set)
+	JPEG(["image/jpeg"], [".jpg", ".jpeg", ".jpe", ".jif", ".jfif", ".jfi"]),
+	PCL(["application/pcl", "application/vnd.hp-pcl"], [".pcl"]),
+	PDF(["application/pdf", "application/x-pdf"], [".pdf"]),
+	PNG(["image/png"], [".png"]),
+	TIFF(["image/tiff", "image/tiff-fx"], [".tff", ".tif"])
 
-	private final Set mimeTypes
-	private final Set fileExtensions
+	private final List mimeTypes
+	private final List fileExtensions
 
-	MimeType(Set mimeTypes, Set fileExtensions) {
+	MimeType(List mimeTypes, List fileExtensions) {
 		this.mimeTypes = mimeTypes
 		this.fileExtensions = fileExtensions
+	}
+
+	String getDownloadContentType() {
+		mimeTypes[0]
+	}
+
+	String getDownloadExtension() {
+		fileExtensions[0]
 	}
 
 	/**

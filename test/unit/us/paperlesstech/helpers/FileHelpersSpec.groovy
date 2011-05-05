@@ -8,9 +8,18 @@ class FileHelpersSpec extends UnitSpec {
 		FileHelpers.chopExtension("/tmp/file.pdf", ".pdf")  == "/tmp/file"
 	}
 
+	def "chopExtension should properly remove the file extension even when it is not supplied"() {
+		expect:	"Should return the path to the file minus the extension"
+		FileHelpers.chopExtension("/tmp/file.pdf")  == "/tmp/file"
+
+		FileHelpers.chopExtension("/tmp/file")  == "/tmp/file"
+	}
+
 	def "getExtension should return the file extension"() {
 		expect:
-		FileHelpers.getExtension("/tmp/file.pDf.png")  == "png"
+		FileHelpers.getExtension("/tmp/file.pDf.png") == ".png"
 		!FileHelpers.getExtension(".")
+		!FileHelpers.getExtension("")
+		!FileHelpers.getExtension(null)
 	}
 }

@@ -1,6 +1,7 @@
 package us.paperlesstech
 
 import us.paperlesstech.handlers.Handler
+import us.paperlesstech.helpers.FileHelpers
 
 class UploadService {
 
@@ -15,7 +16,7 @@ class UploadService {
 		if (mimeType) {
 			try {
 				Document document = new Document()
-				document.name = name
+				document.name = FileHelpers.chopExtension(name)
 				def documentData = new DocumentData(mimeType: mimeType, data: data)
 				handlerChain.importFile(document: document, documentData: documentData)
 

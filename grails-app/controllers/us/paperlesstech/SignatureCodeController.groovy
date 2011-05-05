@@ -7,9 +7,24 @@ class SignatureCodeController {
 	def activityLogService
 	Handler handlerChain
 	def signatureCodeService
-	def signatureService
 
 	def done = {
+	}
+
+	def downloadImage = {
+		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
+			def document = Document.get(params.id)
+			if(!document.previewImages) {
+				// TODO handle documents without images
+				return
+			}
+			def pageNumber = params.pageNumber?.toInteger() ?: 1
+			def image = document.previewImage(pageNumber)
+	
+			response.setContentType(image.data.mimeType.downloadContentType)
+			response.setContentLength(image.data.data.length)
+			response.getOutputStream().write(image.data.data)
+		}
 	}
 
 	def error = {
@@ -79,13 +94,11 @@ class SignatureCodeController {
 			}
 
 			def signatures = session.signatures.get(params.id, [:])
-			
-			if (signatureService.saveSignatureToMap(signatures, params.pageNumber, params.imageData)) {
-				session.signatures[params.id] = signatures
-				render ([status:"success"] as JSON)
-			} else {
-				render ([status:"error"] as JSON)
-			}
+
+			signatures[params.pageNumber] = JSON.parse(params.lines)
+			session.signatures[params.id] = signatures
+
+			render ([status:"success"] as JSON)
 		}
 	}
 }

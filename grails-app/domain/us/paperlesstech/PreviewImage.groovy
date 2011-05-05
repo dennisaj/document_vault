@@ -5,7 +5,6 @@ import org.joda.time.contrib.hibernate.PersistentLocalDateTime
 
 class PreviewImage implements Cloneable, Comparable {
 	static belongsTo = [document: Document]
-	static imageDataPrefix = "data:image/png;base64,"
 	static transients = ["imageAsMap"]
 	DocumentData data
 	LocalDateTime dateCreated
@@ -19,7 +18,7 @@ class PreviewImage implements Cloneable, Comparable {
 	}
 
 	static mapping = {
-		data(nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh,  evict")
+		data(nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh, evict")
 		dateCreated(type: PersistentLocalDateTime)
 	}
 
@@ -32,10 +31,7 @@ class PreviewImage implements Cloneable, Comparable {
 	}
 
 	public Map getImageAsMap() {
-		[imageData: imageDataPrefix + data.data.encodeBase64().toString(),
-				pageNumber: pageNumber,
-				sourceHeight: height,
-				sourceWidth: width]
+		[pageNumber: pageNumber, sourceHeight: height, sourceWidth: width]
 	}
 
 	String toString() {

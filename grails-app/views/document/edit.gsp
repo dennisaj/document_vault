@@ -12,13 +12,14 @@
 		<g:javascript>
 			$(document).ready(function() {
 				Drawing.init({
+						'close': '/document_vault/document/index',
+						'downloadImage': '/document_vault/document/downloadImage/{0}/{1}',
 						'email': '/document_vault/signatureCode/send/{0}/{1}',
 						'finish': '/document_vault/document/finish/{0}',
+						'finish_redirect': '/document_vault/document/index',
 						'image': '/document_vault/document/image/{0}/{1}',
 						'print': '/document_vault/printQueue/push/{0}/{1}',
-						'sign': '/document_vault/document/sign/{0}/{1}',
-						'finish_redirect': '/document_vault/document/index',
-						'close': '/document_vault/document/index'
+						'sign': '/document_vault/document/sign/{0}/{1}'
 				});
 			});
 		</g:javascript>
@@ -51,7 +52,6 @@
 				<a href="#">&gt;</a>
 			</div>
 			<canvas id="can" style="border: 1px solid #444;"></canvas>
-			<canvas id="hidden-canvas" style="visibility: hidden; display: none"></canvas>
 		</div>
 		<div id="dialog-message" title="Saving Signatures">
 			<p style="overflow: hidden;">

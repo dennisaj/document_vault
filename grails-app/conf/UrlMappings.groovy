@@ -14,9 +14,9 @@ class UrlMappings {
 			action = "savePcl"
 		}
 
-		"/document/downloadPdf/$id**.pdf" {
+		"/document/downloadImage/$id/$pageNumber" {
 			controller = "document"
-			action = "downloadPdf"
+			action = "downloadImage"
 		}
 
 		"/document/image/$id/$pageNumber" {
@@ -37,6 +37,11 @@ class UrlMappings {
 		"/api/printQueue/get" {
 			controller = "printQueue"
 			action = "pop"
+		}
+
+		"/signatureCode/downloadImage/$id/$pageNumber" {
+			controller = "signatureCode"
+			action = "downloadImage"
 		}
 
 		"/signatureCode/send/$documentId/$email" {

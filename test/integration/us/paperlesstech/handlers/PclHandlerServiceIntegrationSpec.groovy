@@ -1,12 +1,12 @@
 package us.paperlesstech.handlers
 
-import grails.plugin.spock.UnitSpec
-import us.paperlesstech.handlers.business_logic.FermanBusinessLogicService
 import grails.plugin.spock.IntegrationSpec
+
+import org.springframework.core.io.ClassPathResource
+
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
-import org.springframework.core.io.ClassPathResource
 
 class PclHandlerServiceIntegrationSpec extends IntegrationSpec {
 	def pclHandlerService
@@ -19,7 +19,7 @@ class PclHandlerServiceIntegrationSpec extends IntegrationSpec {
 		pclData.data = new ClassPathResource("dt_combined.pcl").getFile().getBytes()
 	}
 
-    def "import ferman pcl file"() {
+	def "import ferman pcl file"() {
 		def input = [document: document, documentData: pclData]
 		when:
 		pclHandlerService.importFile(input)
@@ -32,5 +32,5 @@ class PclHandlerServiceIntegrationSpec extends IntegrationSpec {
 		document.previewImages.size() == 1
 		document.previewImage(1).data.pages == 1
 		document.previewImage(1).data.mimeType == MimeType.PNG
-    }
+	}
 }

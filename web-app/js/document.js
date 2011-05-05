@@ -69,9 +69,9 @@ var Document = {
 			error: Document.ajaxErrorHandler,
 			global: false,
 			success: function(data) {
-				if (data.imageData) {
+				if (data.pageNumber) {
 					var bg = new Image();
-					bg.src = data.imageData;
+					bg.src = Document.urls['downloadImage'].format(documentId, pageNumber);
 					if (callback) {
 						callback({
 							lines: new Array(),
@@ -98,11 +98,11 @@ var Document = {
 		$('#printer-select').dialog('open');
 	},
 
-	submitPage: function(documentId, pageNumber, imageData, callback) {
+	submitPage: function(documentId, pageNumber, lines, callback) {
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
-			data: {imageData: imageData},
+			data: {lines: JSON.stringify(lines)},
 			error: Document.ajaxErrorHandler,
 			global: false,
 			success: function(data) {

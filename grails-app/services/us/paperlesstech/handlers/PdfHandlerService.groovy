@@ -1,18 +1,19 @@
 package us.paperlesstech.handlers
 
-import com.itextpdf.text.Image
-import com.itextpdf.text.Rectangle
-import com.itextpdf.text.pdf.PdfContentByte
-import com.itextpdf.text.pdf.PdfReader
-import com.itextpdf.text.pdf.PdfStamper
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 import us.paperlesstech.PreviewImage
 import us.paperlesstech.helpers.FileHelpers
 import us.paperlesstech.helpers.ImageHelpers
 
+import com.itextpdf.text.Rectangle
+import com.itextpdf.text.pdf.PdfContentByte
+import com.itextpdf.text.pdf.PdfReader
+import com.itextpdf.text.pdf.PdfStamper
+
 class PdfHandlerService extends Handler {
 	static handlerFor = MimeType.PDF
+	static LINEBREAK = 'LINEBREAK'
 	static transactional = true
 	Handler handlerChain
 	def nextService
@@ -52,7 +53,7 @@ class PdfHandlerService extends Handler {
 				assert f.canRead(), "Didn't generate page $page from the PDF for document $d"
 				filesToDelete += f
 
-				Rectangle psize = pdfReader.getPageSize(page);
+				Rectangle psize = pdfReader.getPageSize(page)
 
 				PreviewImage i = new PreviewImage(pageNumber: page, width: psize.getWidth(), height: psize.getHeight())
 				def bytes = ImageHelpers.scaleImage(f.getBytes(), i.width * 2, i.height * 2)
@@ -76,7 +77,11 @@ class PdfHandlerService extends Handler {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
 
+		PdfReader pdfReader = new PdfReader(data.data)
+		data.pages = pdfReader.getNumberOfPages()
+		pdfReader.close()
 		d.addToFiles(data)
+
 		handlerChain.generatePreview(input)
 	}
 
@@ -103,19 +108,22 @@ class PdfHandlerService extends Handler {
 		PdfStamper pdfStamper = new PdfStamper(pdfReader, output)
 
 		(1..data.pages).each { i ->
-			byte[] imageData = signatures[i.toString()]
-			if (!imageData) {
+			def lines = signatures[i.toString()]
+			if (!lines) {
 				return
 			}
 
 			PdfContentByte content = pdfStamper.getOverContent(i)
-			Rectangle psize = pdfReader.getPageSize(i);
+			Rectangle psize = pdfReader.getPageSize(i)
 
-			Image image = Image.getInstance(imageData)
-			image.scaleAbsolute psize.getWidth(), psize.getHeight()
-			image.setAbsolutePosition(0f, 0f)
-
-			content.addImage(image)
+			content.setLineWidth(0.05f)
+			lines.each {
+				if (it != LINEBREAK) {
+					content.moveTo(it.start.x as float, (psize.height - it.start.y) as float)
+					content.lineTo(it.end.x as float, (psize.height - it.end.y) as float)
+					content.stroke()
+				}
+			}
 		}
 
 		pdfStamper.close()
@@ -123,6 +131,7 @@ class PdfHandlerService extends Handler {
 		DocumentData newPdf = new DocumentData(mimeType: data.mimeType, pages: data.pages)
 		newPdf.data = output.toByteArray()
 		document.addToFiles(newPdf)
+		input.documentData = newPdf
 
 		handlerChain.generatePreview(input)
 	}

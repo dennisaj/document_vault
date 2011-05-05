@@ -19,6 +19,23 @@ class FileHelpers {
 	}
 
 	/**
+	 * Gets the extension using {@link #getExtension(String)} and removes it from the file name.
+	 * If there is no extension, the filename is returned.
+	 *
+	 * <pre>
+	 * assert chopExtension("/tmp/test.pdf") == "/tmp/test"
+	 * </pre>
+	 *
+	 * @param fileName the string name of the file
+	 *
+	 * @return The filename without the extension
+	 */
+	static String chopExtension(String fileName) {
+		String extension = getExtension(fileName);
+		return extension ? chopExtension(fileName, extension) : fileName;
+	}
+
+	/**
 	 * Determines the extension from the fileName.
 	 *
 	 * <pre>
@@ -29,8 +46,8 @@ class FileHelpers {
 	 * @return the extension or null if the extension cannot be determined
 	 */
 	static String getExtension(String fileName) {
-		def idx = fileName.lastIndexOf('.')
+		def idx = fileName?.lastIndexOf('.')
 
-		idx >= 0 ? fileName.substring(idx + 1) : null
+		idx >= 0 && idx < fileName?.length() - 1 ? fileName?.substring(idx) : null
 	}
 }

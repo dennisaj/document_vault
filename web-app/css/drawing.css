@@ -119,3 +119,7 @@ img {
 	color: #888 !important;
 	cursor: default !important;
 }
+
+#box {
+	cursor: crosshair
+}

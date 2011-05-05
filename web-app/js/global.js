@@ -12,3 +12,5 @@ $.extend({
 		return $('<div/>').html(value).text();
 	}
 });
+
+$.support.touch = (typeof Touch === 'object' || 'ontouchstart' in window);

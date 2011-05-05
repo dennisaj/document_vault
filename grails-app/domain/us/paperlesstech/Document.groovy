@@ -54,12 +54,13 @@ class Document implements Taggable {
 	 * Deletes all of the documents from the previewImages collection
 	 */
 	def resetPreviewImages = {
-		previewImages.each {
-			it.data.delete()
+		previewImages?.each {
 			it.delete()
 		}
 
 		previewImages?.clear()
+		// TODO Find a way to remove this save
+		save(flush:true)
 	}
 
 	// TODO fix me
@@ -68,6 +69,6 @@ class Document implements Taggable {
 	}
 
 	String toString() {
-		"Document(${id}) - $name"
+		name ?: "Document(${id})"
 	}
 }

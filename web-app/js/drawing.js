@@ -1,5 +1,6 @@
 var Drawing = {
 	//global objects
+	$box: null,
 	can: null,
 	currentHeight: 0,
 	currentWidth: 0,
@@ -81,6 +82,7 @@ var Drawing = {
 	doEnd: function(event) {
 		var isDrawing = $('#pen').is('.on');
 		var isHighlighting = $('#highlight').is('.on');
+		$('.arrow').fadeIn('fast');
 
 		if (!isDrawing && !this.isMoving && !isHighlighting) {
 			var zoomScale = this.ZOOM_SCALE;
@@ -110,11 +112,11 @@ var Drawing = {
 			};
 
 			this.viewArea(this.can, this.currentPage, zoomStart, zoomEnd, 'width');
-			this.isZoomedIn = !this.isZoomedIn;//true;
+			this.isZoomedIn = !this.isZoomedIn;
 		} else if (isDrawing) {
 			this.addBreak(this.currentPage);
-		} else if (isHighlighting) {
-			$('#box').hide().width(0).height(0);
+		} else if (isHighlighting && this.highlightStart) {
+			this.$box.hide().width(0).height(0);
 			this.highlight(this.can, this.currentPage, this.scalePoint(this.highlightStart), this.scalePoint(this.previousPoint));
 			this.highlightStart = null;
 		} else {
@@ -129,6 +131,9 @@ var Drawing = {
 		var point = this.convertEventToPoint(event);
 		var isDrawing = $('#pen').is('.on');
 		var isHighlighting = $('#highlight').is('.on');
+		if ($('.arrow:visible')) {
+			$('.arrow').fadeOut('fast');
+		}
 
 		if (!isDrawing && !isHighlighting) {
 			this.$main.css('cursor', 'move');
@@ -142,7 +147,7 @@ var Drawing = {
 			this.drawLine(this.can, line);
 		} else if (isHighlighting) {
 			if (!this.highlightStart) {
-				$('#box').show();
+				this.$box.show();
 				this.highlightStart = point;
 			} else {
 				this.drawBox(this.can, this.currentPage, this.highlightStart, point);
@@ -176,39 +181,6 @@ var Drawing = {
 		}
 	},
 
-	/**
-	 * 
-	 * @param page
-	 * @returns a base64 encoded png or "data:image/png;base64," if page is null.
-	 */
-	drawHiddenCanvas: function(page) {
-		if (!page || !page.lines || !page.lines.length) {
-			return "data:image/png;base64,";
-		}
-
-		var hiddenCanvas = document.getElementById('hidden-canvas');
-		hiddenCanvas.width = page.background.width;
-		hiddenCanvas.height = page.background.height;
-
-		var scaleX = page.sourceWidth / page.background.width;
-		var scaleY = page.sourceHeight / page.background.height;
-
-		var hiddenContext = hiddenCanvas.getContext('2d');
-
-		hiddenContext.clearRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
-		hiddenContext.scale(scaleX, scaleY);
-		hiddenCanvas.width = hiddenCanvas.width;
-
-		for (var i = 0; i < page.lines.length; i++) {
-			if (page.lines[i] == this.LINEBREAK) {
-				continue;
-			}
-			this.drawLine(hiddenCanvas, page.lines[i], 'rgba(0, 0, 0, 1)');
-		}
-
-		return hiddenCanvas.toDataURL();
-	},
-
 	drawLine: function(canvas, line, strokeStyle) {
 		var context = canvas.getContext('2d');
 		strokeStyle = strokeStyle || 'rgba(0, 128, 0, 1)';
@@ -225,44 +197,40 @@ var Drawing = {
 
 	drawBox: function(canvas, page, point1, point2, color) {
 		color = color || "rgba(255, 255, 0, 0.7)";
-		var upperLeftCorner = {
-			x: Math.min(point1.x, point2.x),
-			y: Math.min(point1.y, point2.y)
-		};
+		var corners = this._normalizeCorners(point1, point2);
 
-		var lowerRightCorner = {
-			x: Math.max(point1.x, point2.x),
-			y: Math.max(point1.y, point2.y)
-		};
-
-		//this.draw(canvas, page);
-		//var context = canvas.getContext('2d');
-		//context.strokeStyle = color;
-		//context.strokeRect(upperLeftCorner.x, upperLeftCorner.y, lowerRightCorner.x - upperLeftCorner.x, lowerRightCorner.y - upperLeftCorner.y);
-		var $box = $('#box');
-		$box.css('border', '1px solid ' + color);
-		$box.css('background', color);
-		$box.offset({left:upperLeftCorner.x, top:upperLeftCorner.y});
-		$box.width(lowerRightCorner.x - upperLeftCorner.x);
-		$box.height(lowerRightCorner.y - upperLeftCorner.y);
+		this.$box.css('border', '1px solid ' + color);
+		this.$box.css('background', color);
+		this.$box.offset({left:corners.upperLeftCorner.x, top:corners.upperLeftCorner.y});
+		this.$box.width(corners.lowerRightCorner.x - corners.upperLeftCorner.x);
+		this.$box.height(corners.lowerRightCorner.y - corners.upperLeftCorner.y);
 	},
 
 	highlight: function(canvas, page, point1, point2, color) {
 		color = color || "rgba(255, 255, 0, 0.7)";
-		var upperLeftCorner = {
-			x: Math.min(point1.x, point2.x), 
-			y: Math.min(point1.y, point2.y)
-		};
 
-		var lowerRightCorner = {
-			x: Math.max(point1.x, point2.x), 
-			y: Math.max(point1.y, point2.y)
-		};
+		var context = canvas.getContext('2d');
+		var corners = this._normalizeCorners(point1, point2);
+		var width = corners.lowerRightCorner.x - corners.upperLeftCorner.x;
+		var height = corners.lowerRightCorner.y - corners.upperLeftCorner.y;
 
 		this.draw(canvas, page);
-		var context = canvas.getContext('2d');
 		context.fillStyle = color;
-		context.fillRect(upperLeftCorner.x, upperLeftCorner.y, lowerRightCorner.x - upperLeftCorner.x, lowerRightCorner.y - upperLeftCorner.y);
+		context.fillRect(corners.upperLeftCorner.x, corners.upperLeftCorner.y, width, height);
+	},
+
+	_normalizeCorners: function(point1, point2) {
+		return {
+			upperLeftCorner: {
+				x: Math.min(point1.x, point2.x), 
+				y: Math.min(point1.y, point2.y)
+			},
+
+			lowerRightCorner: {
+				x: Math.max(point1.x, point2.x), 
+				y: Math.max(point1.y, point2.y)
+			}
+		}
 	},
 
 	realSetupCanvas: function(canvas, page) {
@@ -287,6 +255,35 @@ var Drawing = {
 		this.viewArea(canvas, page, this.ORIGIN, {x:page.background.width, y:page.background.height}, 'width');
 		this.draw(canvas, page);
 	},
+	scaleLines: function(page) {
+		if (!page || !page.lines || !page.lines.length) {
+			return {};
+		}
+
+		var scaleX = page.sourceWidth / page.background.width;
+		var scaleY = page.sourceHeight / page.background.height;
+		var lines = [];
+
+		for (var i = 0; i < page.lines.length; i++) {
+			if (page.lines[i] == this.LINEBREAK) {
+				lines[i] = this.LINEBREAK;
+				continue;
+			}
+
+			lines[i] = {
+				start: {
+					x:page.lines[i].start.x * scaleX,
+					y:page.lines[i].start.y * scaleY
+				},
+				end: {
+					x:page.lines[i].end.x * scaleX,
+					y:page.lines[i].end.y * scaleY
+				}
+			};
+		}
+
+		return lines;
+	},
 
 	scalePoint: function(point) {
 		return {
@@ -307,18 +304,10 @@ var Drawing = {
 	
 	// Given opposite corners of a rectangle, zoom the screen to that area.
 	viewArea: function(canvas, page, point1, point2, scaleBy, center) {
-		var upperLeftCorner = {
-			x: Math.min(point1.x, point2.x), 
-			y: Math.min(point1.y, point2.y)
-		};
+		var corners = this._normalizeCorners(point1, point2);
 
-		var lowerRightCorner = {
-			x: Math.max(point1.x, point2.x), 
-			y: Math.max(point1.y, point2.y)
-		};
-
-		var newWidth = lowerRightCorner.x - upperLeftCorner.x;
-		var newHeight = lowerRightCorner.y - upperLeftCorner.y;
+		var newWidth = corners.lowerRightCorner.x - corners.upperLeftCorner.x;
+		var newHeight = corners.lowerRightCorner.y - corners.upperLeftCorner.y;
 
 		if (scaleBy == 'width') {
 			this.scale = this.$main.width() / newWidth;
@@ -326,8 +315,8 @@ var Drawing = {
 			this.scale = this.$main.height() / newHeight;
 		}
 
-		this.scrollCanX = -upperLeftCorner.x * this.scale;
-		this.scrollCanY = -upperLeftCorner.y * this.scale;
+		this.scrollCanX = -corners.upperLeftCorner.x * this.scale;
+		this.scrollCanY = -corners.upperLeftCorner.y * this.scale;
 
 		this.currentWidth = page.background.width * this.scale;
 		this.currentHeight = page.background.height * this.scale;
@@ -371,10 +360,9 @@ var Drawing = {
 			});
 		} else {
 			var page = Drawing.pages[pageNumber];
-			var imageData = Drawing.drawHiddenCanvas(page);
 
 			$('#progressbar').progressbar('value', Math.round(100 * (pageNumber / Drawing.pageCount), 0));
-			Document.submitPage(documentId, pageNumber, imageData, Drawing.submitPage);
+			Document.submitPage(documentId, pageNumber, Drawing.scaleLines(Drawing.pages[pageNumber]), Drawing.submitPage);
 		}
 	},
 	// !Document functions
@@ -384,49 +372,49 @@ var Drawing = {
 		this.urls = urls;
 
 		this.$main = $('#main');
+		this.$box = $('#box');
 		this.can = document.getElementById('can');
 		this.previousPoint = this.ORIGIN;
 		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
-		this.pages = new Array(pageCount + this.FIRST_PAGE);
-		$('#box').hide();
+		this.pages = new Array(this.pageCount + this.FIRST_PAGE);
+		this.$box.hide();
 
-		this.can.ontouchstart = function(e) {
-			if (self.trackingTouchId == null) {
-				self.trackingTouchId = e.touches[0].identifier;
+		if ($.support.touch) {
+			this.can.ontouchstart = function(e) {
+				if (self.trackingTouchId == null) {
+					self.trackingTouchId = e.touches[0].identifier;
 
-				self.previousPoint = self.convertEventToPoint(e.touches[0]);
-			}
-		};
-
-		this.can.ontouchmove = function(e) {
-			var currentTouch = null;
-			for (var i = 0; i < e.touches.length; i++) {
-				if (self.trackingTouchId == e.touches[i].identifier) {
-					currentTouch = e.touches[i];
+					self.previousPoint = self.convertEventToPoint(e.touches[0]);
 				}
-			}
+			};
 
-			if (currentTouch) {
-				self.doMove(currentTouch);
-			}
-		};
-
-		this.can.ontouchend = function(e) {
-			var currentTouch = null;
-			for (var i = 0; i < e.changedTouches.length; i++) {
-				if (self.trackingTouchId == e.changedTouches[i].identifier) {
-					currentTouch = e.changedTouches[i];
+			this.can.ontouchmove = function(e) {
+				var currentTouch = null;
+				for (var i = 0; i < e.touches.length; i++) {
+					if (self.trackingTouchId == e.touches[i].identifier) {
+						currentTouch = e.touches[i];
+					}
 				}
-			}
+	
+				if (currentTouch) {
+					self.doMove(currentTouch);
+				}
+			};
 
-			if (currentTouch) {
-				self.trackingTouchId = null;
-				self.doEnd(currentTouch);
-			}
-		};
+			this.can.ontouchend = function(e) {
+				var currentTouch = null;
+				for (var i = 0; i < e.changedTouches.length; i++) {
+					if (self.trackingTouchId == e.changedTouches[i].identifier) {
+						currentTouch = e.changedTouches[i];
+					}
+				}
 
-		// Do this server side, maybe
-		if (!navigator.userAgent.match(/iPhone|iPad/i)) {
+				if (currentTouch) {
+					self.trackingTouchId = null;
+					self.doEnd(currentTouch);
+				}
+			};
+		} else {
 			$('#can').mousedown(function(e) {
 				if (e.which == 1) {
 					self.isPainting = true;
@@ -434,13 +422,13 @@ var Drawing = {
 				}
 			});
 
-			$('#can').mousemove(function(e) {
+			$('#can, #box').mousemove(function(e) {
 				if (self.isPainting) {
 					self.doMove(e);
 				}
 			});
 
-			$('#can').mouseup(function(e) {
+			$('#can, #box').mouseup(function(e) {
 				if (self.isPainting) {
 					self.doEnd(e);
 					self.isPainting = false;
@@ -448,12 +436,14 @@ var Drawing = {
 			});
 
 			$('#can').mouseleave(function(e) {
-				if (self.isPainting) {
+				if (e.toElement.id != 'box' && self.isPainting) {
 					self.doEnd(e);
 					self.isPainting = false;
 				}
 			});
-		} else if (navigator.userAgent.match(/iPhone/i)) {
+		}
+
+		if (navigator.userAgent.match(/iphone|android/i)) {
 			$('h1', '#header').slideUp('fast');
 			$("head").append("<link>");
 			// TODO: Replace this with grails browser detection
@@ -521,6 +511,7 @@ var Drawing = {
 			var wasOn = $this.is('.on');
 
 			$('.mark').removeClass('on');
+
 			if (!wasOn) {
 				$this.toggleClass('on');
 			}

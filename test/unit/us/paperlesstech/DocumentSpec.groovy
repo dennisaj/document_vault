@@ -5,14 +5,12 @@ import grails.plugin.spock.UnitSpec
 class DocumentSpec extends UnitSpec {
 	byte[] rawBytes = new byte[8];
 	String encodedBytes = null
-	String imageData = null
 
 	def setup() {
 		"CAFEBABE".eachWithIndex { it, idx ->
 			rawBytes[idx] = Byte.decode("#$it")
 		}
 		encodedBytes = rawBytes.encodeBase64().toString()
-		imageData = "data:image/png;base64," + encodedBytes
 
 	}
 
@@ -54,10 +52,9 @@ class DocumentSpec extends UnitSpec {
 		when: "Map is called"
 		def m = doc.previewImageAsMap(pageNumber)
 
-		then: "It should encode the image as base64 and return the other fields"
+		then: "It should return the width, height and pageNumberq"
 		m.sourceWidth == width
 		m.sourceHeight == height
-		m.imageData == imageData
 		m.pageNumber == pageNumber
 
 		where:

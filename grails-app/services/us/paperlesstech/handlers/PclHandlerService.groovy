@@ -1,11 +1,7 @@
 package us.paperlesstech.handlers
 
-import com.itextpdf.text.Rectangle
-import com.itextpdf.text.pdf.PdfReader
-import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
-import us.paperlesstech.PreviewImage
 import us.paperlesstech.helpers.FileHelpers
 
 class PclHandlerService extends Handler {
@@ -36,10 +32,6 @@ class PclHandlerService extends Handler {
 			DocumentData pdf = new DocumentData(mimeType: MimeType.PDF)
 			pdf.data = pdfFile.getBytes()
 
-			PdfReader pdfReader = new PdfReader(pdf.data)
-			pdf.pages = pdfReader.getNumberOfPages()
-			pdfReader.close();
-
 			return pdf
 		} finally {
 			if (pdfFile) {
@@ -65,7 +57,7 @@ class PclHandlerService extends Handler {
 
 		DocumentData pdf = createPdf(data)
 		d.addToFiles(pdf)
-		handlerChain.generatePreview(document: d, documentData: pdf)
+		handlerChain.importFile(document: d, documentData: pdf)
 	}
 
 	static String pclToString(DocumentData data, boolean skipPclHeader = true) {
