@@ -21,7 +21,7 @@
 		<g:each var="it" in="${searchResult.results}" status="index">
 			<div class="result">
 				Document: ${it.id}<br />
-				Date printed: ${it.dateCreated.toString("yyyy-MM-dd hh:mma")}<br />
+				Date printed: <g:formatDate date="${it.dateCreated}" format="yyyy-MM-dd hh:mma" /><br />
 				<div>
 					<ul class="actions">
 						<li>

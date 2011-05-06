@@ -1,11 +1,7 @@
 package us.paperlesstech
 
-import org.joda.time.LocalDateTime
-import org.joda.time.contrib.hibernate.PersistentLocalDateTime
-
 class PrintQueue {
-
-	LocalDateTime dateCreated
+	Date dateCreated
 	Document document
 	Printer printer
 	User user
@@ -14,6 +10,5 @@ class PrintQueue {
     }
 	
 	static mapping = {
-		dateCreated type:PersistentLocalDateTime
 	}
 }

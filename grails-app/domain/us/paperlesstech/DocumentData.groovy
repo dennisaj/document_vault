@@ -1,11 +1,8 @@
 package us.paperlesstech
 
-import org.joda.time.LocalDateTime
-import org.joda.time.contrib.hibernate.PersistentLocalDateTime
-
 class DocumentData implements Cloneable, Comparable {
 	byte[] data
-	LocalDateTime dateCreated
+	Date dateCreated
 	MimeType mimeType
 	int pages = 1
 
@@ -17,7 +14,6 @@ class DocumentData implements Cloneable, Comparable {
 
 	static mapping = {
 		data(lazy: true)
-		dateCreated(type:PersistentLocalDateTime)
 	}
 
 	@Override protected Object clone() {

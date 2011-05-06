@@ -1,14 +1,13 @@
 package us.paperlesstech
 
 import grails.plugin.spock.IntegrationSpec
-import org.joda.time.LocalDateTime
 
 class DomainIntegrationSpec extends IntegrationSpec {
 	def sessionFactory
 	def previewImageData
 	def fileData
-	def firstDateCreated = new LocalDateTime(2011, 1, 1, 0, 0)
-	def secondDateCreated = new LocalDateTime(2010, 1, 1, 0, 0)
+	def firstDateCreated = new GregorianCalendar(2011, 1, 1).time
+	def secondDateCreated = new GregorianCalendar(2010, 1, 1).time
 
 	def setup() {
 		previewImageData = new DocumentData(mimeType: MimeType.PDF, data: new byte[1], dateCreated: firstDateCreated)

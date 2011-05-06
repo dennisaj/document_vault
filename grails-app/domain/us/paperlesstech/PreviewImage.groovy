@@ -1,13 +1,10 @@
 package us.paperlesstech
 
-import org.joda.time.LocalDateTime
-import org.joda.time.contrib.hibernate.PersistentLocalDateTime
-
 class PreviewImage implements Cloneable, Comparable {
 	static belongsTo = [document: Document]
 	static transients = ["imageAsMap"]
 	DocumentData data
-	LocalDateTime dateCreated
+	Date dateCreated
 	int height
 	int pageNumber
 	int width
@@ -19,7 +16,6 @@ class PreviewImage implements Cloneable, Comparable {
 
 	static mapping = {
 		data(nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh, evict")
-		dateCreated(type: PersistentLocalDateTime)
 	}
 
 	@Override protected Object clone() {

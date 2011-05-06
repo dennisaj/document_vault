@@ -1,8 +1,5 @@
 package us.paperlesstech
 
-import org.joda.time.LocalDateTime
-import org.joda.time.contrib.hibernate.PersistentLocalDateTime
-
 class ActivityLog {
 
 	enum ActivityType {
@@ -12,9 +9,9 @@ class ActivityLog {
 		SIGN,
 		VIEW
 	}
-	
+
 	ActivityType activityType
-	LocalDateTime dateCreated
+	Date dateCreated
 	Document document
 	String ip
 	String notes
@@ -23,9 +20,8 @@ class ActivityLog {
 	String userAgent
 
 	static mapping = {
-		dateCreated type:PersistentLocalDateTime
 	}
-	
+
     static constraints = {
 		notes blank:true, nullable:true, size:0..2048
 		pagesAffected nullable:true

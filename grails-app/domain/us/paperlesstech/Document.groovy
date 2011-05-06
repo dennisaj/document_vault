@@ -1,12 +1,10 @@
 package us.paperlesstech
 
 import org.grails.taggable.Taggable
-import org.joda.time.LocalDateTime
-import org.joda.time.contrib.hibernate.PersistentLocalDateTime
 
 class Document implements Taggable {
 	static transients = ["previewImage", "previewImageAsMap", "signed"]
-	LocalDateTime dateCreated
+	Date dateCreated
 	SortedSet files
 	String name
 	Map otherFields = [:]
@@ -22,7 +20,6 @@ class Document implements Taggable {
 	}
 
 	static mapping = {
-		dateCreated(type: PersistentLocalDateTime)
 	}
 
 	/**
