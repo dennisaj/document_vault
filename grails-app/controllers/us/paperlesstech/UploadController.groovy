@@ -23,7 +23,7 @@ class UploadController {
 		def red = []
 		request.getMultiFileMap().each {inputName, files ->
 			files.each {
-				def document = uploadService.upload(it.originalFilename, it.bytes, it.contentType, [tag])
+				def document = uploadService.upload(it.originalFilename, it.bytes, it.contentType, tag ? [tag] : null)
 
 				if (document) {
 					green += document
@@ -48,7 +48,7 @@ class UploadController {
 		def f = request.getFile('file')
 		def tag = params.tag?.trim()
 		if (!f.empty) {
-			def document = uploadService.upload(f.originalFilename, f.bytes, f.contentType, [tag])
+			def document = uploadService.upload(f.originalFilename, f.bytes, f.contentType, tag ? [tag] : null)
 
 			if (document) {
 				render (text:[name:document.toString(), size:f.bytes.length] as JSON, contentType:"text/plain")

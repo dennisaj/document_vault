@@ -14,6 +14,7 @@ class DocumentController {
 	def scaffold = true
 
 	def activityLogService
+	def businessLogicService
 	def grailsApplication
 	Handler handlerChain
 	def searchableService
@@ -83,6 +84,10 @@ class DocumentController {
 
 			assert document.files.size() == 1
 			document.save()
+
+			if (businessLogicService.addTags(document)) {
+				document.save()
+			}
 
 			response.status = 200
 			render "Document ${document.id} saved\n"
