@@ -5,7 +5,7 @@ import us.paperlesstech.MimeType
 import us.paperlesstech.helpers.FileHelpers
 
 class PclHandlerService extends Handler {
-	static handlerFor = MimeType.PCL
+	static handlerFor = [MimeType.PCL]
 	static transactional = true
 	Handler handlerChain
 	def nextService

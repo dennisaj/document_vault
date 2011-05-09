@@ -1,10 +1,47 @@
 package us.paperlesstech.helpers
 
-import com.thebuzzmedia.imgscalr.Scalr
+import java.awt.Graphics2D
+import java.awt.RenderingHints
+import java.awt.image.BufferedImage
+
 import javax.imageio.ImageIO
 
-class ImageHelpers {
+import com.thebuzzmedia.imgscalr.Scalr
 
+class ImageHelpers {
+	static final String LINEBREAK = 'LINEBREAK'
+
+	/**
+	 * Draw lines on the passed in BufferedImage.
+	 * 
+	 * @param lines A list of maps. The maps should be formatted as
+	 * <pre>
+	 * 		line = {
+	 * 			start: {
+	 * 				x: a,
+	 * 				y: b
+	 * 			},
+	 * 			end: {
+	 * 				x: c,
+	 * 				y: d
+	 * 			}
+	 * 		}
+	 * </pre>		
+	 */
+	static void drawLines(BufferedImage image, List lines) {
+		Graphics2D buffer = image.createGraphics()
+		buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+		buffer.setColor(java.awt.Color.BLACK)
+
+		lines.each {
+			if (it != LINEBREAK) {
+				buffer.drawLine(it.start.x as int, it.start.y as int, it.end.x as int, it.end.y as int)
+			}
+		}
+
+		buffer.dispose()
+	}
+	
 	/**
 	 * Returns the width and height of the given image
 	 *
