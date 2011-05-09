@@ -1,14 +1,20 @@
-<g:set var="haveResults" value="${searchResult?.results}" />
+<g:set var="haveResults" value="${documents?.results}" />
 <div id="searchResults" class="span-24 last">
+	<g:if test="${tagSearchResults}">
+	<div id="tag results" class="span-24 last append-bottom">
+		<p>Tags</p>
+		<g:render template="/tag/tagSearchResults" model="${pageScope.variables}"/>
+	</div>
+	</g:if>
 	<div class="span-24 last append-bottom quiet small">
 		<g:if test="${haveResults}">
-      		Showing <strong> ${searchResult.offset + 1} </strong> - <strong>
-				${searchResult.results.size() + searchResult.offset} </strong> of <strong>
-				${searchResult.total} </strong>
+      		Showing <strong> ${documents.offset + 1} </strong> - <strong>
+				${documents.results.size() + documents.offset} </strong> of <strong>
+				${documents.total} </strong>
        		results for <strong> ${queryString} </strong>
 		</g:if>
 		<g:else>
-			No results found for <strong>${queryString}</strong>.
+			No documents found for <strong>${queryString}</strong>.
        	</g:else>
 		<g:if test="${parseException}">
 			<p>
@@ -18,7 +24,7 @@
 	</div>
 <g:if test="${haveResults}">
 	<div class="span-24 last append-bottom">
-		<g:each var="it" in="${searchResult.results}" status="index">
+		<g:each var="it" in="${documents.results}" status="index">
 			<div class="result">
 				Document: ${it.id}<br />
 				Date printed: <g:formatDate date="${it.dateCreated}" format="yyyy-MM-dd hh:mma" /><br />
@@ -73,13 +79,13 @@
 	<div class="paging span-24 last append-bottom">
 		Page:
 		<g:set var="totalPages"
-			value="${Math.ceil(searchResult.total / searchResult.max)}" />
+			value="${Math.ceil(documents.total / documents.max)}" />
 		<g:if test="${totalPages == 1}">
 			<span class="currentStep">1</span>
 		</g:if>
 		<g:else>
 			<g:paginate controller="searchable" action="index"
-				params="[q: queryString]" total="${searchResult.total}"
+				params="[q: queryString]" total="${documents.total}"
 				prev="&lt; previous" next="next &gt;" />
 		</g:else>
 	</div>

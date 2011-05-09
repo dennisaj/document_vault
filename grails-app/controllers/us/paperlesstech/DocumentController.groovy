@@ -5,6 +5,8 @@ import grails.converters.JSON
 import org.compass.core.engine.SearchEngineQueryParseException
 
 import us.paperlesstech.handlers.Handler
+import org.grails.taggable.Tag
+import org.compass.core.CompassQuery
 
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
@@ -19,45 +21,54 @@ class DocumentController {
 	Handler handlerChain
 	def searchableService
 	def springSecurityService
+	def tagService
 
 	def index = {
-		def results = Document.listOrderByDateCreated(max:5, order:"desc")
+		def results = Document.listOrderByDateCreated(max:10, order:"desc")
 		def docCount = Document.count()
 
-		["searchResult":["results":results, "offset":0, "total":docCount, "max":docCount], "queryString":"5 most recent documents"]
+		def tagList =  tagService.getRecentTags()
+
+		["tagSearchResults": tagList,
+				"documents": new SearchResult(results: results, offset: 0, total: docCount,
+						max: docCount),
+				"queryString": "*"]
 	}
 
 	def search = {
 		def results = [:]
 
-		// Default to simple search
-		def simpleSearch = params?.simpleSearch ? params.simpleSearch.toBoolean() : true
-		
-		def queryString = ""
-		if(!simpleSearch) {
-			// Find the incoming fields that start with field_, strip off the field_
-			// and create a query string from them
-			def advancedQuery = params.findAll { it.key.startsWith("field_") && it.value }.collect { "${it.key[6..-1]}:*${it.value}*" }.join(" ")
-			// TODO fix me
-			def dt = null
-			// if there is a document type add it to the search
-			queryString = dt ? "DocumentType:${dt.name} ${advancedQuery}" : advancedQuery
-		} else {
-			queryString = params.q
-		}
+		def q = params?.q?.trim()
+		results.queryString = q
 
-		queryString = queryString.trim()
-		if (queryString) {
-			try {
-				def ss = searchableService.search(queryString, params)
-				def docs = ss?.results.collect { Document.findWhere(text: it) }
-				results = ["searchResult":["results":docs, "offset":ss.offset, "total":ss.total, "max":ss.max]]
-			} catch (SearchEngineQueryParseException ex) {
-				results = [parseException: true]
+		if (searchTags) {
+			def tagList = []
+			def terms = q?.tokenize(",").collect { it.trim() }.findAll { it }
+			if (terms?.size()) {
+				tagList = tagService.tagSearch(terms)
+			} else {
+				tagList = tagService.getRecentTags()
 			}
+
+			results.tagSearchResults = tagList
 		}
 
-		results.queryString = queryString
+		q = q ? q.tokenize().collect { "*$it*" }.join(" ") : "*"
+
+		try {
+			if(searchDocuments) {
+				def ss = Document.search(reload: true) {
+					must(queryString(q, [useAndDefaultOperator: true]))
+					sort(CompassQuery.SortImplicitType.SCORE)
+					sort("dateCreated", CompassQuery.SortPropertyType.STRING, CompassQuery.SortDirection.REVERSE)
+				}
+				results.documents = new SearchResult(results: ss.results, offset: ss.offset, total: ss.total,
+						max: ss.max)
+			}
+		} catch (SearchEngineQueryParseException ex) {
+			results.parseException = true
+		}
+
 		render(template:"searchResults", model:results)
 	}
 

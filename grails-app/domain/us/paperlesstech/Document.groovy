@@ -3,6 +3,9 @@ package us.paperlesstech
 import org.grails.taggable.Taggable
 
 class Document implements Taggable {
+	static searchable = {
+		only: ["dateCreated", "name", "tags", "searchFields"]
+	}
 	static transients = ["previewImage", "previewImageAsMap", "signed"]
 	Date dateCreated
 	SortedSet files
