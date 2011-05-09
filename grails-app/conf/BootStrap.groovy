@@ -9,6 +9,9 @@ class BootStrap {
 		assert new File("/usr/local/bin/pcl6")?.canExecute(), "Cannot execute /usr/local/bin/pcl6"
 		assert new File("/usr/local/bin/gs")?.canExecute(), "Cannot execute /usr/local/bin/gs"
 
+		// Disable JAI native acceleration layer
+		System.setProperty('com.sun.media.jai.disableMediaLib', 'true')
+
 		if(User.count() == 0) {
 			def adminRole = new Role(name: 'ROLE_ADMIN').save(flush: true)
 			def userRole = new Role(name: 'ROLE_USER').save(flush: true)

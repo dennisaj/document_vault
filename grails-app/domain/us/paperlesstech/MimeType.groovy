@@ -3,16 +3,21 @@ package us.paperlesstech
 import us.paperlesstech.helpers.FileHelpers
 
 public enum MimeType {
+	BMP(["image/x-ms-bmp", "image/x-bmp"], [".bmp", ".dib"]),
+	GIF(["image/gif"], [".gif"]),
 	JPEG(["image/jpeg"], [".jpg", ".jpeg", ".jpe", ".jif", ".jfif", ".jfi"]),
 	PCL(["application/pcl", "application/vnd.hp-pcl"], [".pcl"]),
 	PDF(["application/pdf", "application/x-pdf"], [".pdf"]),
 	PNG(["image/png"], [".png"]),
-	TIFF(["image/tiff", "image/tiff-fx"], [".tff", ".tif"])
+	TIFF(["image/tiff", "image/tiff-fx"], [".tiff", ".tif"])
 
 	private final List mimeTypes
 	private final List fileExtensions
 
 	MimeType(List mimeTypes, List fileExtensions) {
+		assert mimeTypes.size() >= 1
+		assert fileExtensions.size() >= 1
+
 		this.mimeTypes = mimeTypes
 		this.fileExtensions = fileExtensions
 	}

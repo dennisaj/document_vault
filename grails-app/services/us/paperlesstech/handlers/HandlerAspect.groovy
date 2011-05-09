@@ -32,18 +32,18 @@ class HandlerAspect {
 		def target = pjp.target
 		def targetHandles = target.handlerFor
 
-		assert targetHandles instanceof MimeType, "Handler classes must declare static handlerFor = MimeType.something"
+		assert targetHandles[0] instanceof MimeType, "Handler classes must declare static handlerFor = MimeType.something"
 
 		def methodName = pjp.signature.name
 
-		if (data.mimeType != targetHandles) {
+		if (!targetHandles.contains(data.mimeType)) {
 			target.nextService."$methodName"(*args)
 			log.debug "Skipping execution of $pjp passing to the next handler passing to ${target.nextService}"
 			return
 		}
 		log.debug "Executing $pjp"
 
-		def businessMethod = "before${targetHandles.toString()}${methodName.capitalize()}"
+		def businessMethod = "before${data.mimeType.toString()}${methodName.capitalize()}"
 		if (businessLogicService?.metaClass?.respondsTo(businessLogicService, businessMethod)) {
 			log.debug "calling $businessLogicService.$businessMethod"
 			businessLogicService?."$businessMethod"(*args)
@@ -53,7 +53,7 @@ class HandlerAspect {
 
 		pjp.proceed();
 
-		businessMethod = "after${targetHandles.toString()}$methodName"
+		businessMethod = "after${data.mimeType.toString()}$methodName"
 		if (businessLogicService?.metaClass?.respondsTo(businessLogicService, businessMethod)) {
 			log.debug "calling $businessLogicService.$businessMethod"
 			businessLogicService?."$businessMethod"(*args)

@@ -7,13 +7,18 @@ beans = {
 		bean.autowire = 'byName'
 	}
 
-	pngService(us.paperlesstech.handlers.PngHandlerService) { bean ->
+	tiffService(us.paperlesstech.handlers.TiffHandlerService) { bean ->
 		bean.autowire = 'byName'
+	}
+
+	defaultImageService(us.paperlesstech.handlers.DefaultImageHandlerService) { bean ->
+		bean.autowire = 'byName'
+		nextService = tiffService
 	}
 
 	pdfService(us.paperlesstech.handlers.PdfHandlerService) { bean ->
 		bean.autowire = 'byName'
-		nextService = pngService
+		nextService = defaultImageService
 	}
 
 	handlerChain(us.paperlesstech.handlers.PclHandlerService) { bean ->

@@ -12,7 +12,7 @@ import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfStamper
 
 class PdfHandlerService extends Handler {
-	static handlerFor = MimeType.PDF
+	static handlerFor = [MimeType.PDF]
 	static LINEBREAK = 'LINEBREAK'
 	static transactional = true
 	Handler handlerChain

@@ -11,14 +11,14 @@ import us.paperlesstech.MimeType
 import us.paperlesstech.PreviewImage
 import us.paperlesstech.helpers.ImageHelpers
 
-class PngHandlerService extends Handler {
-	static handlerFor = MimeType.PNG
-	static LINEBREAK = 'LINEBREAK'
+class DefaultImageHandlerService extends Handler {
+	static handlerFor = [MimeType.BMP, MimeType.GIF, MimeType.JPEG,MimeType.PNG]
 	static transactional = true
 	def handlerChain
 	def nextService
 
 	@Override
+	@InterceptHandler
 	void generatePreview(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
@@ -41,6 +41,7 @@ class PngHandlerService extends Handler {
 	}
 
 	@Override
+	@InterceptHandler
 	void print(Map input) {
 	}
 
@@ -49,7 +50,7 @@ class PngHandlerService extends Handler {
 	void sign(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
-		// PNGs only have one page
+		// By default, images only have one page
 		def signatureData = input.signatures["1"]
 
 		assert signatureData, "This method requires a signature"
@@ -58,25 +59,15 @@ class PngHandlerService extends Handler {
 
 		Image original = ImageIO.read(new ByteArrayInputStream(data.data))
 
-		Graphics2D buffer = original.createGraphics()
-		buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-		buffer.setColor(java.awt.Color.BLACK)
-
-		signatureData.each {
-			if (it != LINEBREAK) {
-				buffer.drawLine(it.start.x as int, it.start.y as int, it.end.x as int, it.end.y as int)
-			}
-		}
-
-		buffer.dispose()
+		ImageHelpers.drawLines(original, signatureData)
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream()
-		ImageIO.write(original, "png", output)
+		ImageIO.write(original, data.mimeType.toString().toLowerCase(), output)
 
-		DocumentData newPng = new DocumentData(mimeType: data.mimeType, pages: data.pages)
-		newPng.data = output.toByteArray()
-		d.addToFiles(newPng)
-		input.documentData = newPng
+		DocumentData newImage = new DocumentData(mimeType: data.mimeType, pages: data.pages)
+		newImage.data = output.toByteArray()
+		d.addToFiles(newImage)
+		input.documentData = newImage
 		handlerChain.generatePreview(input)
 	}
 }
