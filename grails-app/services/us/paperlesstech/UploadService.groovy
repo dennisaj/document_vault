@@ -8,6 +8,7 @@ class UploadService {
 	static transactional = true
 
 	Handler handlerChain
+	def businessLogicService
 	def tagService
 
 	Document upload(String name, byte[] data, String contentType, List<String> tags) {
@@ -25,6 +26,10 @@ class UploadService {
 
 				tags?.each {
 					tagService.addDocumentTag(document, it)
+				}
+
+				if (businessLogicService.addTags(document)) {
+					document.save()
 				}
 
 				log.info "Saved document ${document.id}"

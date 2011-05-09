@@ -3,13 +3,32 @@ package us.paperlesstech.handlers.business_logic
 import us.paperlesstech.DocumentData
 import us.paperlesstech.handlers.Handler
 import us.paperlesstech.handlers.PclHandlerService
+import us.paperlesstech.Document
 
 class FermanBusinessLogicService {
 	static transactional = true
+	def tagService
 
 	enum FermanDocumentTypes {
 		CustomerHardCopy,
 		Other
+	}
+
+	boolean addTags(Document d) {
+		def tagged = false
+
+		["RO_Number", "VIN"].each {
+			if (d.searchFields."$it") {
+				def tag = d.searchFields."$it"
+				log.info "Creating tag $tag"
+				tagService.createTag(tag)
+				d.addTag(tag)
+				log.info "Added tag $tag to document $d"
+				tagged = true
+			}
+		}
+
+		tagged
 	}
 
 	void beforePCLImportFile(Map input) {
