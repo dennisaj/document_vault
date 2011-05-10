@@ -52,7 +52,7 @@ class DocumentSpec extends UnitSpec {
 		when: "Map is called"
 		def m = doc.previewImageAsMap(pageNumber)
 
-		then: "It should return the width, height and pageNumberq"
+		then: "It should return the width, height and pageNumber"
 		m.sourceWidth == width
 		m.sourceHeight == height
 		m.pageNumber == pageNumber

@@ -5,10 +5,14 @@ import grails.converters.JSON
 import org.springframework.util.MultiValueMap
 import org.springframework.web.multipart.MultipartFile
 
+import us.paperlesstech.handlers.Handler;
+
 class UploadController {
 	static allowedMethods = [save: "POST", saveAjax: "POST"]
 	static navigation = [[action:'index', isVisible: {springSecurityService.isLoggedIn()}, order:10, title:'Upload']]
 	
+	def businessLogicService
+	Handler handlerChain
 	def springSecurityService
 	def tagService
 	def uploadService
@@ -56,5 +60,28 @@ class UploadController {
 			}
 		}
 		render (text:[:] as JSON, contentType:"text/plain")
+	}
+
+	def savePcl = {
+		try {
+			Document document = new Document()
+			def documentData = new DocumentData(mimeType: MimeType.PCL, data: params.data)
+			handlerChain.importFile(document: document, documentData: documentData)
+
+			assert document.files.size() == 1
+			document.save()
+
+			if (businessLogicService.addTags(document)) {
+				document.save()
+			}
+
+			response.status = 200
+			render "Document ${document.id} saved\n"
+			log.info "Saved document ${document.id}"
+		} catch (Exception e) {
+			log.error("Unable to save uploaded document", e)
+			response.status = 500
+			render "Error saving file\n"
+		}
 	}
 }

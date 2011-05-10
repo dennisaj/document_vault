@@ -26,7 +26,7 @@ class DefaultImageHandlerService extends Handler {
 		d.resetPreviewImages()
 
 		def (width, height) = ImageHelpers.getDimensions(data.data)
-		PreviewImage image = new PreviewImage(data: data.clone(), height: height, pageNumber: 1, width: width)
+		PreviewImage image = new PreviewImage(data: data, height: height, pageNumber: 1, width: width)
 		d.addToPreviewImages(image)
 	}
 
@@ -64,8 +64,7 @@ class DefaultImageHandlerService extends Handler {
 		ByteArrayOutputStream output = new ByteArrayOutputStream()
 		ImageIO.write(original, data.mimeType.toString().toLowerCase(), output)
 
-		DocumentData newImage = new DocumentData(mimeType: data.mimeType, pages: data.pages)
-		newImage.data = output.toByteArray()
+		DocumentData newImage = new DocumentData(data: output.toByteArray(), mimeType: data.mimeType, pages: data.pages)
 		d.addToFiles(newImage)
 		input.documentData = newImage
 		handlerChain.generatePreview(input)

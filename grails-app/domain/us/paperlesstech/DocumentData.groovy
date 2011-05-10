@@ -13,7 +13,8 @@ class DocumentData implements Cloneable, Comparable {
 	}
 
 	static mapping = {
-		data(lazy: true)
+		data lazy: true
+		cache 'read-only'
 	}
 
 	@Override protected Object clone() {

@@ -12,11 +12,14 @@ class TiffHandlerServiceIntegrationSpec extends IntegrationSpec {
 	def tiffHandlerService
 	def tiffDocument
 	def tiffData
+	def line
 
 	def setup() {
 		tiffDocument = new Document()
 		tiffData = new DocumentData(mimeType: MimeType.TIFF)
 		tiffData.data = new ClassPathResource("multipage.tif").getFile().getBytes()
+		
+		line = [start:[x:0,y:0], end:[x:100,y:100]]
 	}
 
 	def "import tiff file"() {
@@ -28,6 +31,25 @@ class TiffHandlerServiceIntegrationSpec extends IntegrationSpec {
 			tiffDocument.files.first().pages == 6
 			tiffDocument.files.first().mimeType == MimeType.TIFF
 			tiffDocument.files.first().data == tiffData.data
+			tiffDocument.previewImages.size() == 6
+			tiffDocument.previewImages*.data.pages == [1] * 6
+			tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
+			tiffDocument.previewImages*.pageNumber == 1..6
+	}
+
+	def "sign a tiff"() {
+		given:
+			def lines = ['1':[line], '2':[line], '4':[line]]
+			def input = [document: tiffDocument, documentData: tiffData, signatures: lines]
+		when:
+			tiffHandlerService.importFile(input)
+			tiffHandlerService.sign(input)
+
+		then:
+			tiffDocument.files.size() == 2
+			tiffDocument.files.first().pages == 6
+			tiffDocument.files.first().mimeType == MimeType.TIFF
+			tiffDocument.files.first().data != tiffDocument.files.last().data
 			tiffDocument.previewImages.size() == 6
 			tiffDocument.previewImages*.data.pages == [1] * 6
 			tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6

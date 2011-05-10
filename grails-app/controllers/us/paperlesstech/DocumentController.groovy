@@ -16,7 +16,6 @@ class DocumentController {
 	def scaffold = true
 
 	def activityLogService
-	def businessLogicService
 	def grailsApplication
 	Handler handlerChain
 	def searchableService
@@ -85,29 +84,6 @@ class DocumentController {
 		}
 
 		render ([status:"error"] as JSON)
-	}
-
-	def savePcl = {
-		try {
-			Document document = new Document()
-			def documentData = new DocumentData(mimeType: MimeType.PCL, data: params.data)
-			handlerChain.importFile(document: document, documentData: documentData)
-
-			assert document.files.size() == 1
-			document.save()
-
-			if (businessLogicService.addTags(document)) {
-				document.save()
-			}
-
-			response.status = 200
-			render "Document ${document.id} saved\n"
-			log.info "Saved document ${document.id}"
-		} catch (Exception e) {
-			log.error("Unable to save uploaded document", e)
-			response.status = 500
-			render "Error saving file\n"
-		}
 	}
 
 	def downloadImage = {
