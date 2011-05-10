@@ -5,7 +5,7 @@ import us.paperlesstech.handlers.Handler
 
 class SignatureCodeController {
 	def activityLogService
-	Handler handlerChain
+	def handlerChain
 	def signatureCodeService
 
 	def done = {

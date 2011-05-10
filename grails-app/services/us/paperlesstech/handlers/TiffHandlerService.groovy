@@ -25,13 +25,12 @@ import com.sun.media.jai.codec.TIFFDecodeParam
 import com.sun.media.jai.codec.TIFFEncodeParam
 
 class TiffHandlerService extends Handler {
-	static handlerFor = [MimeType.TIFF]
+	static final handlerFor = [MimeType.TIFF]
 	static transactional = true
 	def handlerChain
 	def nextService
 
 	@Override
-	@InterceptHandler
 	void generatePreview(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
@@ -59,7 +58,6 @@ class TiffHandlerService extends Handler {
 	}
 
 	@Override
-	@InterceptHandler
 	void importFile(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
@@ -75,12 +73,6 @@ class TiffHandlerService extends Handler {
 	}
 
 	@Override
-	@InterceptHandler
-	void print(Map input) {
-	}
-
-	@Override
-	@InterceptHandler
 	void sign(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)

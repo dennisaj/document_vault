@@ -12,14 +12,13 @@ import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfStamper
 
 class PdfHandlerService extends Handler {
-	static handlerFor = [MimeType.PDF]
-	static LINEBREAK = 'LINEBREAK'
+	static final handlerFor = [MimeType.PDF]
+	static final LINEBREAK = 'LINEBREAK'
 	static transactional = true
-	Handler handlerChain
+	def handlerChain
 	def nextService
 
 	@Override
-	@InterceptHandler
 	void generatePreview(Map input) {
 		def d = getDocument(input)
 		log.info "Generating previews for the PDF for document ${d}"
@@ -72,7 +71,6 @@ class PdfHandlerService extends Handler {
 	}
 
 	@Override
-	@InterceptHandler
 	void importFile(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
@@ -86,12 +84,6 @@ class PdfHandlerService extends Handler {
 	}
 
 	@Override
-	@InterceptHandler
-	void print(Map inputs) {
-	}
-
-	@Override
-	@InterceptHandler
 	void sign(Map input) {
 		def document = getDocument(input)
 		log.info "Signing the PDF for document ${document}"

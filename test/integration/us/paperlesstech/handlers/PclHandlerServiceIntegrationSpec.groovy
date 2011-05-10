@@ -9,7 +9,7 @@ import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 
 class PclHandlerServiceIntegrationSpec extends IntegrationSpec {
-	def pclHandlerService
+	def handlerChain
 	def document
 	def pclData
 
@@ -22,7 +22,7 @@ class PclHandlerServiceIntegrationSpec extends IntegrationSpec {
 	def "import ferman pcl file"() {
 		def input = [document: document, documentData: pclData]
 		when:
-		pclHandlerService.importFile(input)
+		handlerChain.importFile(input)
 
 		then:
 		document.searchFields.DocumentType == "CustomerHardCopy"

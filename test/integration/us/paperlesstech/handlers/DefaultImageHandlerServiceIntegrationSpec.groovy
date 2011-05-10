@@ -4,7 +4,6 @@ import grails.plugin.spock.IntegrationSpec
 
 import org.springframework.core.io.ClassPathResource
 
-import spock.lang.Shared
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
@@ -21,8 +20,8 @@ class DefaultImageHandlerServiceIntegrationSpec extends IntegrationSpec {
 		then:
 			document.files.first().pages == 1
 			document.files.first().mimeType == mimeType
-			document.files.first().id == documentData.id
 			document.previewImages.size() == 1
+			document.previewImage(1).data.id == document.files.first().id
 			document.previewImage(1).data.pages == 1
 			document.previewImage(1).data.mimeType == mimeType
 		where:

@@ -1,8 +1,6 @@
 package us.paperlesstech.handlers
 
-import java.awt.Graphics2D
 import java.awt.Image
-import java.awt.RenderingHints
 
 import javax.imageio.ImageIO
 
@@ -12,13 +10,12 @@ import us.paperlesstech.PreviewImage
 import us.paperlesstech.helpers.ImageHelpers
 
 class DefaultImageHandlerService extends Handler {
-	static handlerFor = [MimeType.BMP, MimeType.GIF, MimeType.JPEG,MimeType.PNG]
+	static final handlerFor = [MimeType.BMP, MimeType.GIF, MimeType.JPEG, MimeType.PNG]
 	static transactional = true
 	def handlerChain
 	def nextService
 
 	@Override
-	@InterceptHandler
 	void generatePreview(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
@@ -31,7 +28,6 @@ class DefaultImageHandlerService extends Handler {
 	}
 
 	@Override
-	@InterceptHandler
 	void importFile(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
@@ -41,12 +37,6 @@ class DefaultImageHandlerService extends Handler {
 	}
 
 	@Override
-	@InterceptHandler
-	void print(Map input) {
-	}
-
-	@Override
-	@InterceptHandler
 	void sign(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)

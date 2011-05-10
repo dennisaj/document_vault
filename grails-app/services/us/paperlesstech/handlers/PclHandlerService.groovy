@@ -7,7 +7,7 @@ import us.paperlesstech.helpers.FileHelpers
 class PclHandlerService extends Handler {
 	static handlerFor = [MimeType.PCL]
 	static transactional = true
-	Handler handlerChain
+	def handlerChain
 	def nextService
 
 	DocumentData createPdf(DocumentData d) {
@@ -45,12 +45,6 @@ class PclHandlerService extends Handler {
 	}
 
 	@Override
-	@InterceptHandler
-	void generatePreview(Map input) {
-	}
-
-	@Override
-	@InterceptHandler
 	void importFile(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
@@ -72,15 +66,5 @@ class PclHandlerService extends Handler {
 		}
 
 		return text
-	}
-
-	@Override
-	@InterceptHandler
-	void print(Map input) {
-	}
-
-	@Override
-	@InterceptHandler
-	void sign(Map input) {
 	}
 }

@@ -21,10 +21,12 @@ class DocumentData implements Cloneable, Comparable {
 		new DocumentData(mimeType: mimeType, pages: pages, data: data.clone())
 	}
 
+	@Override
 	public int compareTo(def other) {
 		return other?.dateCreated <=> dateCreated
 	}
 
+	@Override
 	String toString() {
 		"DocumentData(${id})"
 	}

@@ -1,11 +1,5 @@
 beans = {
-	xmlns aop: "http://www.springframework.org/schema/aop"
-
 	businessLogicService(us.paperlesstech.handlers.business_logic.FermanBusinessLogicService) { bean ->
-		bean.autowire = 'byName'
-	}
-
-	handlerAspect(us.paperlesstech.handlers.HandlerAspect) { bean ->
 		bean.autowire = 'byName'
 	}
 
@@ -15,16 +9,18 @@ beans = {
 
 	defaultImageService(us.paperlesstech.handlers.DefaultImageHandlerService) { bean ->
 		bean.autowire = 'byName'
-		nextService = tiffService
 	}
 
 	pdfService(us.paperlesstech.handlers.PdfHandlerService) { bean ->
 		bean.autowire = 'byName'
-		nextService = defaultImageService
 	}
 
-	handlerChain(us.paperlesstech.handlers.PclHandlerService) { bean ->
+	pclService(us.paperlesstech.handlers.PclHandlerService) { bean ->
 		bean.autowire = 'byName'
-		nextService = pdfService
+	}
+
+	handlerChain(us.paperlesstech.handlers.HandlerChain) { bean->
+		bean.autowire = 'byName'
+		handlers = [pclService, pdfService, defaultImageService, tiffService]
 	}
 }

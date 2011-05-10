@@ -12,7 +12,7 @@ class UploadController {
 	static navigation = [[action:'index', isVisible: {springSecurityService.isLoggedIn()}, order:10, title:'Upload']]
 	
 	def businessLogicService
-	Handler handlerChain
+	def handlerChain
 	def springSecurityService
 	def tagService
 	def uploadService

@@ -7,7 +7,7 @@ class UploadService {
 
 	static transactional = true
 
-	Handler handlerChain
+	def handlerChain
 	def businessLogicService
 	def tagService
 

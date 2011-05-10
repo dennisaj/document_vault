@@ -2,11 +2,10 @@ package us.paperlesstech
 
 import grails.converters.JSON
 
+import org.compass.core.CompassQuery
 import org.compass.core.engine.SearchEngineQueryParseException
 
-import us.paperlesstech.handlers.Handler
-import org.grails.taggable.Tag
-import org.compass.core.CompassQuery
+import us.paperlesstech.handlers.HandlerChain
 
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
@@ -17,7 +16,7 @@ class DocumentController {
 
 	def activityLogService
 	def grailsApplication
-	Handler handlerChain
+	def handlerChain
 	def searchableService
 	def springSecurityService
 	def tagService
