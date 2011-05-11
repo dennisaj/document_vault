@@ -14,9 +14,8 @@
 				Drawing.init({
 						'close': '/document_vault/signatureCode/done',
 						'downloadImage': '/document_vault/signatureCode/downloadImage/{0}/{1}',
-						'finish': '/document_vault/signatureCode/finish/{0}',
 						'image': '/document_vault/signatureCode/image/{0}/{1}',
-						'sign': '/document_vault/signatureCode/sign/{0}/{1}',
+						'sign': '/document_vault/signatureCode/sign/{0}',
 						'finish_redirect': '/document_vault/signatureCode/done'
 				});
 			});
@@ -50,9 +49,7 @@
 			<p style="overflow: hidden;">
 				<span class="ui-icon ui-icon-transferthick-e-w" style="float: left; margin: 0 7px 50px 0;"></span>
 				Please wait while the captured signatures are uploaded...
-				<div id="progressbar">
-					<span id="pblabel" style="position: absolute; width: 90%; text-align: center;"> </span>
-				</div>
+				<img src="${resource(dir:'images',file:'spinner.gif')}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
 			</p>
 		</div>
 		<div id="confirm-submit" title="Confirm Submit">

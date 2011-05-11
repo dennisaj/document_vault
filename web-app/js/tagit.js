@@ -171,7 +171,7 @@
             if (this.options.select)
                 this._popSelect(text);
             
-            if (this.options.onRemove && $.isFunction(this.options.onRemove)) {
+            if ($.isFunction(this.options.onRemove)) {
                 this.options.onRemove(this.element, text);
             }
         }
@@ -193,7 +193,7 @@
             if (this.options.select)
                 this._addSelect(value);
             
-            if (!skipCallback && this.options.onAdd && $.isFunction(this.options.onAdd)) {
+            if (!skipCallback && $.isFunction(this.options.onAdd)) {
                 this.options.onAdd(this.element, value);
             }
             return true;
@@ -252,7 +252,7 @@
                             tagit._addTag(value, true);
                         });
                     }
-                    });
+                });
             } else if ($.isArray(this.options.initialTags)) {
                 for (var i in this.options.initialTags)
                     if (!this._exists(this.options.initialTags[i]))

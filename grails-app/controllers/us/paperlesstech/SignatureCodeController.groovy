@@ -26,11 +26,12 @@ class SignatureCodeController {
 	def error = {
 	}
 
-	def finish = {
+	def sign = {
 		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
+		assert params.lines
 			def document = signatureCodeService.getDocument(session.signatureCode)
 			if (document) {
-				def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
+				def signatures = JSON.parse(params.lines).findAll {it.value}
 				
 				def notes = "Signed using code " + session.signatureCode
 				activityLogService.addSignLog(document, signatures, notes)
@@ -81,20 +82,5 @@ class SignatureCodeController {
 		}
 
 		render([status:"error"] as JSON)
-	}
-
-	def sign = {
-		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
-			if (!session.signatures) {
-				session.signatures = [:]
-			}
-
-			def signatures = session.signatures.get(params.id, [:])
-
-			signatures[params.pageNumber] = JSON.parse(params.lines)
-			session.signatures[params.id] = signatures
-
-			render ([status:"success"] as JSON)
-		}
 	}
 }

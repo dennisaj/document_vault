@@ -134,22 +134,9 @@ class DocumentController {
 
 	def sign = {
 		assert params.lines
-
-		if (!session.signatures) {
-			session.signatures = [:]
-		}
-
-		def signatures = session.signatures.get(params.id, [:])
-		signatures[params.pageNumber] = JSON.parse(params.lines)
-		session.signatures[params.id] = signatures
-
-		render ([status:"success"] as JSON)
-	}
-
-	def finish = {
 		def document = Document.get(params.id)
 		if (document && !document.signed()) {
-			def signatures = session.signatures.get(document.id.toString()).findAll {it.value}
+			def signatures = JSON.parse(params.lines).findAll {it.value}
 
 			if (signatures) {
 				activityLogService.addSignLog(document, signatures)

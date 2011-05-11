@@ -255,6 +255,7 @@ var Drawing = {
 		this.viewArea(canvas, page, this.ORIGIN, {x:page.background.width, y:page.background.height}, 'width');
 		this.draw(canvas, page);
 	},
+
 	scaleLines: function(page) {
 		if (!page || !page.lines || !page.lines.length) {
 			return {};
@@ -351,19 +352,16 @@ var Drawing = {
 		}
 	},
 
-	submitPage: function(documentId, pageNumber) {
-		if (pageNumber > Drawing.pageCount) {
-			$('#progressbar').progressbar('value', 100);
-			Document.finishDocument(documentId, function() {
-				$('#dialog-message').dialog('close');
-				window.location.href = Drawing.urls['finish_redirect'];
-			});
-		} else {
-			var page = Drawing.pages[pageNumber];
+	submitPages: function(documentId) {
+		var lines = {}
+		$.each(Drawing.pages, function(index, element) {
+			lines[index] = Drawing.scaleLines(element);
+		});
 
-			$('#progressbar').progressbar('value', Math.round(100 * (pageNumber / Drawing.pageCount), 0));
-			Document.submitPage(documentId, pageNumber, Drawing.scaleLines(Drawing.pages[pageNumber]), Drawing.submitPage);
-		}
+		Document.submitPages(documentId, lines, function() {
+			$('#dialog-message').dialog('close');
+			window.location.href = Drawing.urls['finish_redirect'];
+		});
 	},
 	// !Document functions
 
@@ -530,7 +528,6 @@ var Drawing = {
 			draggable: false,
 			modal: true,
 			open: function(event, ui) {
-				$('#progressbar').progressbar('value', 0); 
 				$(".ui-dialog-titlebar-close", $(this).parent()).hide();
 				$(this).dialog('option', 'buttons', {});
 			},
@@ -543,7 +540,7 @@ var Drawing = {
 				'Submit': function() {
 					$(this).dialog('close');
 					$('#dialog-message').dialog('open');
-					self.submitPage($('#documentId').val(), self.FIRST_PAGE);
+					self.submitPages($('#documentId').val());
 				},
 				'Cancel' :function() {
 					$(this).dialog('close');
@@ -552,13 +549,6 @@ var Drawing = {
 			draggable: false,
 			modal: true,
 			resizable: false
-		});
-
-		$('#progressbar').progressbar({
-			change: function() {
-				$('#pblabel').text(Math.min(100, $(this).progressbar('option', 'value')) + '%');
-			},
-			value: 1
 		});
 
 		// Setup document

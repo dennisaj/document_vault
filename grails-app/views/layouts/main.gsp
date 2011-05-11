@@ -30,7 +30,6 @@
 				<nav:render />
 			</div>
 			<g:render template="/layouts/messages" />
-			
 			<g:layoutBody />
 		</div>
 	</body>

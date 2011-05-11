@@ -48,20 +48,6 @@ var Document = {
 		$('#email-dialog').dialog('open');
 	},
 
-	finishDocument: function(documentId, callback) {
-		$.ajax({
-			beforeSend: function() {/* Add throbber */ },
-			complete: function() {/* Remove throbber */ },
-			error: Document.ajaxErrorHandler,
-			global: false,
-			success: function(data) {
-				callback();
-			},
-			type: 'GET',
-			url: Document.urls['finish'].format(documentId)
-		});
-	},
-
 	getPage: function(documentId, pageNumber, callback) {
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
@@ -72,7 +58,7 @@ var Document = {
 				if (data.pageNumber) {
 					var bg = new Image();
 					bg.src = Document.urls['downloadImage'].format(documentId, pageNumber);
-					if (callback) {
+					if ($.isFunction(callback)) {
 						callback({
 							lines: new Array(),
 							background: bg,
@@ -98,7 +84,7 @@ var Document = {
 		$('#printer-select').dialog('open');
 	},
 
-	submitPage: function(documentId, pageNumber, lines, callback) {
+	submitPages: function(documentId, lines, callback) {
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
@@ -106,10 +92,12 @@ var Document = {
 			error: Document.ajaxErrorHandler,
 			global: false,
 			success: function(data) {
-				callback(documentId, pageNumber + 1);
+				if ($.isFunction(callback)) {
+					callback();
+				}
 			},
 			type: 'POST',
-			url: Document.urls['sign'].format(documentId, pageNumber)
+			url: Document.urls['sign'].format(documentId)
 		});
 	},
 

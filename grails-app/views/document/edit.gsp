@@ -15,11 +15,10 @@
 						'close': '/document_vault/document/index',
 						'downloadImage': '/document_vault/document/downloadImage/{0}/{1}',
 						'email': '/document_vault/signatureCode/send/{0}/{1}',
-						'finish': '/document_vault/document/finish/{0}',
 						'finish_redirect': '/document_vault/document/index',
 						'image': '/document_vault/document/image/{0}/{1}',
 						'print': '/document_vault/printQueue/push/{0}/{1}',
-						'sign': '/document_vault/document/sign/{0}/{1}'
+						'sign': '/document_vault/document/sign/{0}'
 				});
 			});
 		</g:javascript>
@@ -57,9 +56,7 @@
 			<p style="overflow: hidden;">
 				<span class="ui-icon ui-icon-transferthick-e-w" style="float: left; margin: 0 7px 50px 0;"></span>
 				Please wait while the captured signatures are uploaded...
-				<div id="progressbar">
-					<span id="pblabel" style="position: absolute; width: 90%; text-align: center;"> </span>
-				</div>
+				<img src="${resource(dir:'images',file:'spinner.gif')}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
 			</p>
 		</div>
 		<g:render template="printerDialog" />
