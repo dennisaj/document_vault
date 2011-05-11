@@ -14,16 +14,12 @@ class SignatureCodeController {
 	def downloadImage = {
 		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
 			def document = Document.get(params.id)
-			if(!document.previewImages) {
-				// TODO handle documents without images
-				return
-			}
-			def pageNumber = params.pageNumber?.toInteger() ?: 1
-			def image = document.previewImage(pageNumber)
-	
-			response.setContentType(image.data.mimeType.downloadContentType)
-			response.setContentLength(image.data.data.length)
-			response.getOutputStream().write(image.data.data)
+			def (filename, data, contentType) = handlerChain.retrievePreview(document: document, documentData: document.files.first(), page: params.pageNumber?.toInteger() ?: 1)
+			response.setContentType(contentType)
+			response.setContentLength(data.length)
+			response.getOutputStream().write(data)
+
+			response.status = 404
 		}
 	}
 

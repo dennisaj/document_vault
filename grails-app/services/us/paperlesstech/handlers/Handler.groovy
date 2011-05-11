@@ -2,6 +2,7 @@ package us.paperlesstech.handlers
 
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
+import us.paperlesstech.PreviewImage
 
 class Handler {
 	void importFile(Map input) {
@@ -18,6 +19,29 @@ class Handler {
 
 	void sign(Map input) {
 		throw new UnsupportedOperationException("sign has no handler for ${input.documentData.mimeType}")
+	}
+
+	def retrievePreview(Map input) {
+		def d = getDocument(input)
+
+		def page = input.page
+		assert page, "This method requires a page number"
+
+		def previewImage = d.previewImage(page)
+		assert previewImage, "No preview image exists for page '$page'"
+
+		def filename = "${d.toString()} - page($page)${d.previewImage(page).data.mimeType.getDownloadExtension()}"
+
+		[filename, previewImage.data.data, previewImage.data.mimeType.downloadContentType]
+	}
+
+	def download(Map input) {
+		def d = getDocument(input)
+		def data = getDocumentData(input)
+
+		def filename = d.toString() +data.mimeType.getDownloadExtension()
+
+		[filename, data.data, data.mimeType.downloadContentType]
 	}
 
 	static Document getDocument(Map map) {

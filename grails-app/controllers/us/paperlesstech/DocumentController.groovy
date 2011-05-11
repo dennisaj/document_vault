@@ -87,27 +87,27 @@ class DocumentController {
 
 	def downloadImage = {
 		def document = Document.get(params.id)
-		if(!document.previewImages) {
-			// TODO handle documents without images
-			return
+		if (document) {
+			def (filename, data, contentType) = handlerChain.retrievePreview(document: document, page: params.pageNumber?.toInteger() ?: 1)
+			response.setContentType(contentType)
+			response.setContentLength(data.length)
+			response.getOutputStream().write(data)
 		}
-		def pageNumber = params.pageNumber?.toInteger() ?: 1
-		def image = document.previewImage(pageNumber)
 
-		response.setContentType(image.data.mimeType.downloadContentType)
-		response.setContentLength(image.data.data.length)
-		response.getOutputStream().write(image.data.data)
+		response.status = 404
 	}
 
 	def download = {
 		def document = Document.get(params.id)
 		if (document) {
-			def filename = document.toString() + document.files.first().mimeType.getDownloadExtension()
-			response.setContentType(document.files.first().mimeType.downloadContentType)
-			response.setContentLength(document.files.first().data.length)
+			def (filename, data, contentType) = handlerChain.download(document: document, documentData: document.files.first())
+			response.setContentType(contentType)
+			response.setContentLength(data.length)
 			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
-			response.getOutputStream().write(document.files.first().data)
+			response.getOutputStream().write(data)
 		}
+
+		response.status = 404
 	}
 
 	def show = {
