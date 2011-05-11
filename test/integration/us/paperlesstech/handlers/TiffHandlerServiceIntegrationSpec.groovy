@@ -43,6 +43,7 @@ class TiffHandlerServiceIntegrationSpec extends IntegrationSpec {
 			def input = [document: tiffDocument, documentData: tiffData, signatures: lines]
 		when:
 			tiffHandlerService.importFile(input)
+			tiffDocument.save()
 			tiffHandlerService.sign(input)
 
 		then:

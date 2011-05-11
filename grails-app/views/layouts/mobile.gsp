@@ -25,9 +25,9 @@
 			<div id="header" class="span-24 last">
 		  		<h1>Paperless Technologies Document Vault</h1>
 				<div class="last" style="text-align: right">
-					<sec:ifLoggedIn>
-						<a href="${createLink(controller: 'logout')}">Logout</a>
-					</sec:ifLoggedIn>
+					<shiro:isLoggedIn>
+						<a href="${createLink(controller: 'auth', action: 'signOut')}">Logout</a>
+					</shiro:isLoggedIn>
 				</div>
 			</div>
 		</div>

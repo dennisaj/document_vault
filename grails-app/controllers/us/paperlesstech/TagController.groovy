@@ -5,11 +5,11 @@ import grails.converters.JSON
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.taggable.Tag
 import org.grails.taggable.TagLink
+import org.apache.shiro.SecurityUtils
 
 class TagController {
-	static navigation = [[action:'index', isVisible: {springSecurityService.isLoggedIn()}, order:20, title:"Tags"]]
+	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.isPermitted("tag:*")}, order:20, title:"Tags"]]
 
-	def springSecurityService
 	def tagService
 
 	def create = {

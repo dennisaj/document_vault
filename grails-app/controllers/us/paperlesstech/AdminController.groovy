@@ -1,9 +1,9 @@
 package us.paperlesstech
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.apache.shiro.SecurityUtils
 
 class AdminController {
-	static navigation = [[action:'index', isVisible: {SpringSecurityUtils.ifAllGranted 'ROLE_ADMIN'}, order:90, title:'Admin']]
+	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.isPermitted("admin:*")}, order:90, title:'Admin']]
 
     def index = { }
 }

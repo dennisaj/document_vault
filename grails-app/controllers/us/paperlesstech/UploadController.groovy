@@ -1,19 +1,14 @@
 package us.paperlesstech
 
 import grails.converters.JSON
-
-import org.springframework.util.MultiValueMap
-import org.springframework.web.multipart.MultipartFile
-
-import us.paperlesstech.handlers.Handler;
+import org.apache.shiro.SecurityUtils
 
 class UploadController {
 	static allowedMethods = [save: "POST", saveAjax: "POST"]
-	static navigation = [[action:'index', isVisible: {springSecurityService.isLoggedIn()}, order:10, title:'Upload']]
-	
+	static navigation = [[action: 'index', isVisible: {SecurityUtils.subject.isPermitted("upload:*")}, order: 10, title: 'Upload']]
+
 	def businessLogicService
 	def handlerChain
-	def springSecurityService
 	def tagService
 	def uploadService
 

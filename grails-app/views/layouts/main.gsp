@@ -22,7 +22,7 @@
 					<h3 class="alt">Electronic document storage and signature solutions.</h3>
 				</div>
 				<div class="span-8 last" style="text-align: right">
-					<sec:ifLoggedIn>You are logged in as <sec:username />.</sec:ifLoggedIn>
+					<shiro:isLoggedIn>You are logged in as <shiro:principal />.</shiro:isLoggedIn>
 				</div>
 			</div>
 			<hr />

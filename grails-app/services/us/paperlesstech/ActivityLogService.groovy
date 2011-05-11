@@ -1,8 +1,8 @@
 package us.paperlesstech
 
 class ActivityLogService {
+	def authenticateService
 	def requestService
-	def springSecurityService
 
     static transactional = true
 
@@ -30,7 +30,7 @@ class ActivityLogService {
 		def activityLog = new ActivityLog(activityType: activityType,
 				userAgent: requestService.getHeader("User-Agent"),
 				ip: requestService.getRemoteAddr(),
-				user: springSecurityService.currentUser,
+				user: authenticateService.userDomain(),
 				pagesAffected: signatures.keySet().join(','),
 				document: document,
 				notes: notes)

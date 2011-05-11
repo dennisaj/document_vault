@@ -97,51 +97,6 @@ log4j = {
 	//trace 'org.hibernate.type'
 }
 
-// Added by the Spring Security Core plugin:
-grails.plugins.springsecurity.userLookup.userDomainClassName = 'us.paperlesstech.User'
-grails.plugins.springsecurity.userLookup.passwordPropertyName = 'userPassword'
-grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'us.paperlesstech.UserRole'
-grails.plugins.springsecurity.authority.className = 'us.paperlesstech.Role'
-grails.plugins.springsecurity.authority.nameField = 'name'
-// All URLs are secured by default
-grails.plugins.springsecurity.rejectIfNoRule = true
-// Use basic authentication for the /api/ URLs only
-grails.plugins.springsecurity.useBasicAuth = true
-grails.plugins.springsecurity.basic.realmName = "Paperless Technologies Document Vault API"
-grails.plugins.springsecurity.filterChain.chainMap = [
-   '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
-   '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
-]
-
-// Define the security for all URLs here
-import grails.plugins.springsecurity.SecurityConfigType
-grails.plugins.springsecurity.securityConfigType = SecurityConfigType.InterceptUrlMap
-
-grails.plugins.springsecurity.interceptUrlMap = [
-// API Can't be mapped like this it has to be mapped to the actual controller not the url from UrlMappings
-//	'/api/**':		['ROLE_ADMIN'],
-// For the save api
-	'/':				['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/index':			['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/document/**':		['ROLE_USER', 'ROLE_ADMIN'],
-	'/printQueue/**':	['ROLE_USER', 'ROLE_ADMIN'],
-	'/searchable**':	['ROLE_ADMIN'],
-	'/api/**':			['ROLE_ADMIN'],
-	'/printer/**':		['ROLE_ADMIN'],
-	'/admin/**':		['ROLE_ADMIN'],
-	'/activityLog/**':	['ROLE_ADMIN'],
-	'/login/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/logout/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/js/**':			['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/css/**':			['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/plugins/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/images/**':		['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/signatureCode/**':	['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/signatureCode/send/**':	['ROLE_USER', 'ROLE_ADMIN'],
-	'/upload/**':		['ROLE_USER', 'ROLE_ADMIN'],
-	'/tag/**':			['ROLE_USER', 'ROLE_ADMIN'],
-]
-
 grails {
 	mail {
 		host = "smtp.gmail.com"

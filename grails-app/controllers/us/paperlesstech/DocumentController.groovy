@@ -6,19 +6,20 @@ import org.compass.core.CompassQuery
 import org.compass.core.engine.SearchEngineQueryParseException
 
 import us.paperlesstech.handlers.HandlerChain
+import org.apache.shiro.SecurityUtils
 
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
-	static navigation = [[action:'index', isVisible: {springSecurityService.isLoggedIn()}, order:0, title:'Home']]
+	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.isPermitted("document:*")}, order:0, title:'Home']]
 
 	// TODO Remove scaffolding
 	def scaffold = true
 
 	def activityLogService
+	def authenticateService
 	def grailsApplication
 	def handlerChain
 	def searchableService
-	def springSecurityService
 	def tagService
 
 	def index = {

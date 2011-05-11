@@ -1,17 +1,11 @@
 package us.paperlesstech
-
 class Role {
-	String name
+    String name
 
-	static mapping = {
-		cache true
-	}
+    static hasMany = [ users: User, permissions: String ]
+    static belongsTo = User
 
-	static constraints = {
-		name(blank: false, unique: true)
-	}
-
-	String toString() {
-		"Role(${id}) - ${name}"
-	}
+    static constraints = {
+        name(nullable: false, blank: false, unique: true)
+    }
 }

@@ -4,7 +4,7 @@ import grails.converters.JSON
 
 class PrintQueueController {
 	def activityLogService
-	def springSecurityService
+	def authenticateService
 
     def scaffold = true
 
@@ -25,7 +25,7 @@ class PrintQueueController {
 
 		if (printer && document) {
 			activityLogService.addPrintLog(document)
-			def queue = new PrintQueue(document:document, printer:printer, user:springSecurityService.currentUser)
+			def queue = new PrintQueue(document:document, printer:printer, user: authenticateService.userDomain())
 			if (queue.save()) {
 				render([status:"success"] as JSON)
 			}
