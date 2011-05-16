@@ -1,12 +1,10 @@
 package us.paperlesstech
 
-class User {
-	String username
-	String passwordHash
+import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
-	static hasMany = [roles: Role, permissions: String]
+@MultiTenant
+class User extends grails.plugins.nimble.core.UserBase {
 
-	static constraints = {
-		username(nullable: false, blank: false, unique: true)
-	}
+	// Extend UserBase with your custom values here
+
 }

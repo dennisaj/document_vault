@@ -4,9 +4,10 @@ import grails.converters.JSON
 
 class PrintQueueController {
 	def activityLogService
-	def authenticateService
+	def authenticatedService
 
-    def scaffold = true
+	// TODO Remove scaffolding
+	def scaffold = true
 
 	def pop = {
 		def results = PrintQueue.listOrderByDateCreated(max:1, order:"asc")
@@ -17,7 +18,7 @@ class PrintQueueController {
 		}
 
 		render ([:] as JSON)
-    }
+	}
 
 	def push = {
 		def printer = Printer.load(params.printerId)
@@ -25,12 +26,12 @@ class PrintQueueController {
 
 		if (printer && document) {
 			activityLogService.addPrintLog(document)
-			def queue = new PrintQueue(document:document, printer:printer, user: authenticateService.userDomain())
+			def queue = new PrintQueue(document:document, printer:printer, user: authenticatedService.authenticatedUser)
 			if (queue.save()) {
 				render([status:"success"] as JSON)
 			}
 		}
 
 		render([status:"error"] as JSON)
-    }
+	}
 }

@@ -111,3 +111,8 @@ grails {
 }
 
 grails.mail.default.from="donotreply@paperlesstech.us"
+
+tenant {
+	domainTenantBeanName = "us.paperlesstech.DomainTenantMap"
+	resolver.request.dns.type = "db"
+}

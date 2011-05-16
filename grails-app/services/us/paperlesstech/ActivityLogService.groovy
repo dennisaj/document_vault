@@ -1,10 +1,10 @@
 package us.paperlesstech
 
 class ActivityLogService {
-	def authenticateService
+	def authenticatedService
 	def requestService
 
-    static transactional = true
+	static transactional = true
 
 	def addViewLog(document) {
 		return addLog(ActivityLog.ActivityType.VIEW, document)
@@ -30,11 +30,11 @@ class ActivityLogService {
 		def activityLog = new ActivityLog(activityType: activityType,
 				userAgent: requestService.getHeader("User-Agent"),
 				ip: requestService.getRemoteAddr(),
-				user: authenticateService.userDomain(),
+				user: authenticatedService.authenticatedUser,
 				pagesAffected: signatures.keySet().join(','),
 				document: document,
 				notes: notes)
-		
+
 		activityLog.save()
 
 		return activityLog

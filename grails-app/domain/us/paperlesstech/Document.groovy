@@ -1,7 +1,10 @@
 package us.paperlesstech
 
+import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+
 import org.grails.taggable.Taggable
 
+@MultiTenant
 class Document implements Taggable {
 	static searchable = {
 		only: ["dateCreated", "name", "tags", "searchFields"]
@@ -68,6 +71,7 @@ class Document implements Taggable {
 		false
 	}
 
+	@Override
 	String toString() {
 		name ?: "Document(${id})"
 	}

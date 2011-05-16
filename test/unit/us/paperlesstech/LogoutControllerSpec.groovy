@@ -3,7 +3,7 @@ package us.paperlesstech
 import spock.lang.*
 import grails.plugin.spock.*
 
-class AuthenticateServiceSpec extends UnitSpec {
+class LogoutControllerSpec extends ControllerSpec {
     def "feature method"() {
 
     }

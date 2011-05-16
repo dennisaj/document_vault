@@ -1,5 +1,8 @@
 package us.paperlesstech
 
+import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+
+@MultiTenant
 class SignatureCode {
 	String email
 	String code

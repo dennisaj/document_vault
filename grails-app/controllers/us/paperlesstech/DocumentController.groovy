@@ -2,10 +2,6 @@ package us.paperlesstech
 
 import grails.converters.JSON
 
-import org.compass.core.CompassQuery
-import org.compass.core.engine.SearchEngineQueryParseException
-
-import us.paperlesstech.handlers.HandlerChain
 import org.apache.shiro.SecurityUtils
 
 class DocumentController {
@@ -16,7 +12,6 @@ class DocumentController {
 	def scaffold = true
 
 	def activityLogService
-	def authenticateService
 	def grailsApplication
 	def handlerChain
 	def searchableService
@@ -28,10 +23,7 @@ class DocumentController {
 
 		def tagList =  tagService.getRecentTags()
 
-		["tagSearchResults": tagList,
-				"documents": new SearchResult(results: results, offset: 0, total: docCount,
-						max: docCount),
-				"queryString": "*"]
+		["tagSearchResults": tagList, "documents": [offset: 0, results: Document.list([max:10, order:'desc', sort:'dateCreated']), total:10, max:10], "queryString": "*"]
 	}
 
 	def search = {
@@ -40,34 +32,18 @@ class DocumentController {
 		def q = params?.q?.trim()
 		results.queryString = q
 
-		if (searchTags) {
-			def tagList = []
-			def terms = q?.tokenize(",").collect { it.trim() }.findAll { it }
-			if (terms?.size()) {
-				tagList = tagService.tagSearch(terms)
-			} else {
-				tagList = tagService.getRecentTags()
-			}
-
-			results.tagSearchResults = tagList
+		def tagList = []
+		def terms = q?.tokenize(",").collect { it.trim() }.findAll { it }
+		if (terms?.size()) {
+			tagList = tagService.tagSearch(terms)
+		} else {
+			tagList = tagService.getRecentTags()
 		}
 
-		q = q ? q.tokenize().collect { "*$it*" }.join(" ") : "*"
+		results.tagSearchResults = tagList
 
-		try {
-			if(searchDocuments) {
-				def ss = Document.search(reload: true) {
-					must(queryString(q, [useAndDefaultOperator: true]))
-					sort(CompassQuery.SortImplicitType.SCORE)
-					sort("dateCreated", CompassQuery.SortPropertyType.STRING, CompassQuery.SortDirection.REVERSE)
-				}
-				results.documents = new SearchResult(results: ss.results, offset: ss.offset, total: ss.total,
-						max: ss.max)
-			}
-		} catch (SearchEngineQueryParseException ex) {
-			results.parseException = true
-		}
-
+		def docs = Document.findAllByNameIlike("%$q%", [max:10, order:'desc', sort:'dateCreated'])
+		results.documents = [results: docs, offset: 0, total:docs.size(), max:10]
 		render(template:"searchResults", model:results)
 	}
 

@@ -1,5 +1,8 @@
 package us.paperlesstech
 
+import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+
+@MultiTenant
 class PreviewImage implements Cloneable, Comparable {
 	static belongsTo = [document: Document]
 	static transients = ["imageAsMap"]
@@ -18,10 +21,12 @@ class PreviewImage implements Cloneable, Comparable {
 		data(nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh, evict")
 	}
 
-	@Override protected Object clone() {
+	@Override
+	protected Object clone() {
 		new PreviewImage(data: data.clone(), height: height, pageNumber: pageNumber, width: width)
 	}
 
+	@Override
 	public int compareTo(def other) {
 		return pageNumber <=> other?.pageNumber
 	}
@@ -29,7 +34,8 @@ class PreviewImage implements Cloneable, Comparable {
 	public Map getImageAsMap() {
 		[pageNumber: pageNumber, sourceHeight: height, sourceWidth: width]
 	}
-
+	
+	@Override
 	String toString() {
 		"PreviewImage(${id})"
 	}
