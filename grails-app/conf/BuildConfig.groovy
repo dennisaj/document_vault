@@ -12,20 +12,25 @@ grails.project.dependency.resolution = {
 	repositories {
 		grailsPlugins()
 		grailsHome()
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release-local/"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-release-local/"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/remote-repos"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-snapshot"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-release"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-snapshot"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/itextpdf/"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/thebuzzmedia/"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/jboss/"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/mygrid/"
+		grailsRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins.grails.org/"
 		grailsCentral()
 
 		// uncomment the below to enable remote dependency resolution
 		// from public Maven repositories
-		mavenLocal()
-		mavenCentral()
+		//mavenLocal()
+		//mavenCentral()
 		//mavenRepo "http://snapshots.repository.codehaus.org"
-		//mavenRepo "http://repository.codehaus.org"
-		//mavenRepo "http://download.java.net/maven/2/"
-		//mavenRepo "http://repository.jboss.com/maven2/"
-		mavenRepo "http://maven.itextpdf.com/"
-		mavenRepo "http://maven.thebuzzmedia.com/"
-		mavenRepo "http://repository.jboss.org/nexus/content/groups/public-jboss/"
-		mavenRepo "http://www.mygrid.org.uk/maven/repository/"
 	}
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
