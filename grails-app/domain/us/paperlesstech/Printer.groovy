@@ -10,10 +10,11 @@ class Printer {
 	int port
 
 	static constraints = {
-		name blank:false, unique:true
+		name blank:false, unique:"tenantId"
 		port range:0..65535
 	}
 
+	@Override
 	String toString() {
 		"Printer (${id}) - ${name} - ${host}:${port}"
 	}

@@ -12,8 +12,8 @@ grails.project.dependency.resolution = {
 	repositories {
 		grailsPlugins()
 		grailsHome()
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release-local/"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-release-local/"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release-local"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-release-local"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/remote-repos"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-snapshot"
@@ -23,7 +23,7 @@ grails.project.dependency.resolution = {
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/thebuzzmedia/"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/jboss/"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/mygrid/"
-		grailsRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins.grails.org/"
+		grailsRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins.grails.org"
 		grailsCentral()
 
 		// uncomment the below to enable remote dependency resolution
