@@ -45,11 +45,11 @@
 								<img src="${resource(dir:'images', file:'document-print.png')}" alt="" /><br />Print
 							</a>
 						</li>
-						<li>
+						<%--<li>
 							<a href="javascript:Document.email(${it.id});">
 								<img src="${resource(dir:'images', file:'mail-send.png')}" alt="" /><br />Email
 							</a>
-						</li>
+						</li>--%>
 						<li>
 							<a href="javascript:DocumentNote.show('#notebox-${it.id}');">
 								<img src="${resource(dir:'images', file:'note.png')}" alt="" /><br />Notes

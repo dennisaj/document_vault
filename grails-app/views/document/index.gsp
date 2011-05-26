@@ -63,7 +63,7 @@
 	</g:formRemote>
 	<g:render template="searchResults" />
 	<g:render template="printerDialog" />
-	<g:render template="emailDialog" />
+	<%--<g:render template="emailDialog" />--%>
 	<g:render template="/alert" />
 	<jq:jquery>
 			$("#q").focus();

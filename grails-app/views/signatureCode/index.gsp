@@ -26,12 +26,10 @@
 		<input type="hidden" id="documentId" value="${document?.id}" />
 		<div id="buttonPanel">
 			<hr />
-			<g:if test="${!document.signed()}">
-				<button class="bigbutton" id="save"><img src="${resource(dir:'images', file:'dialog-yes.png')}" alt="" /><br />Submit Signatures</button>
-				<button class="bigbutton mark" id="pen"><img src="${resource(dir:'images', file:'favicon.ico')}" alt="" width="24" /><br />Pen</button>
-				<button class="bigbutton" id="undo"><img src="${resource(dir:'images', file:'edit-undo.png')}" alt="" /><br />Undo</button>
-				<button class="bigbutton" id="clearcan"><img src="${resource(dir:'images', file:'edit-clear.png')}" alt="" /><br />Clear</button>
-			</g:if>
+			<button class="bigbutton" id="save"><img src="${resource(dir:'images', file:'dialog-yes.png')}" alt="" /><br />Submit Signatures</button>
+			<button class="bigbutton mark" id="pen"><img src="${resource(dir:'images', file:'favicon.ico')}" alt="" width="24" /><br />Pen</button>
+			<button class="bigbutton" id="undo"><img src="${resource(dir:'images', file:'edit-undo.png')}" alt="" /><br />Undo</button>
+			<button class="bigbutton" id="clearcan"><img src="${resource(dir:'images', file:'edit-clear.png')}" alt="" /><br />Clear</button>
 			<button class="bigbutton" id="zoomWidth"><img src="${resource(dir:'images', file:'zoom-fit-width.png')}" alt="" /><br />Zoom Width</button>
 			<button class="bigbutton" id="close"><img src="${resource(dir:'images', file:'document-close.png')}" alt="" /><br />Close</button>
 			<hr />
