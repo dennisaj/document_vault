@@ -10,7 +10,7 @@ $(function () {
 					'<\/button><\/td><\/tr>');
 		},
 		buildDownloadRow: function (file, handler) {
-			return $('<tr><td>' + file.name + '<\/td><\/tr>');
+			return $('<tr><td>' + file.html + '<\/td><\/tr>');
 		},
 		url: document.location.pathname + "/ajaxSave"
 	});

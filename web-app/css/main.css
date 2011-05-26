@@ -91,3 +91,7 @@ th.desc a:after {
 .result .thumb {
 	border: 1px solid #000;
 }
+
+.uploadcomplete img, .notsaved img, .saved img {
+	vertical-align: middle;
+}

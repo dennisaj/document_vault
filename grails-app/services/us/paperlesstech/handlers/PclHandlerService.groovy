@@ -34,13 +34,8 @@ class PclHandlerService extends Handler {
 
 			return pdf
 		} finally {
-			if (pdfFile) {
-				pdfFile.delete()
-			}
-
-			if (pclFile) {
-				pclFile.delete()
-			}
+			pdfFile?.delete()
+			pclFile?.delete()
 		}
 	}
 

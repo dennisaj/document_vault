@@ -51,7 +51,12 @@ class UploadController {
 			def document = uploadService.upload(f.originalFilename, f.bytes, f.contentType, tag ? [tag] : null)
 
 			if (document) {
-				render (text:[name:document.toString(), size:f.bytes.length] as JSON, contentType:"text/plain")
+				def html = g.render(template:"link", model:[name:document.toString(), id:document.id])
+				render (text:[name:document.toString(), size:f.bytes.length, html:html] as JSON, contentType:"text/plain")
+				return
+			} else {
+				def html = g.render(template:"/notsaved", model:[message:g.message(code:"document-vault.error.upload.failure", args:[f.originalFilename])])
+				render (text:[html:html] as JSON, contentType:"text/plain")
 				return
 			}
 		}
