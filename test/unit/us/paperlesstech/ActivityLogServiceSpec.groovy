@@ -17,27 +17,24 @@ class ActivityLogServiceSpec extends UnitSpec {
 
 	def "add log should call methods off the request service"() {
 		when: "Try to save"
-		def activityLog = service.addLog(activityType, document, notes, signatures)
+		def activityLog = service.addLog(params)
 
 		then:
 		1 * request.getHeader("User-Agent") >> userAgent
 		1 * request.getRemoteAddr() >> ip
+		1 * request.getRequestURI() >> uri
 		1 * authenticatedService.authenticatedUser >> currentUser
-		activityLog.activityType == activityType
 		activityLog.userAgent == userAgent
 		activityLog.ip == ip
 		activityLog.user == currentUser
-		activityLog.pagesAffected == "1,2,3"
-		activityLog.document == document
-		activityLog.notes == notes
+		activityLog.uri == uri
+		activityLog.params == params.toString()
 
 		where:
-		activityType = ActivityLog.ActivityType.VIEW
 		userAgent = "FF"
 		ip = "127.0.0.1"
 		currentUser = new User()
-		signatures = [1: 1, 2: 2, 3: 3]
-		document = new Document()
-		notes = "notes"
+		uri = "/document_vault/document/index"
+		params = [param1:["1"], param2:["2"]]
 	}
 }

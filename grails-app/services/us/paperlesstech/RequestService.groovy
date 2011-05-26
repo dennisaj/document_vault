@@ -28,4 +28,12 @@ class RequestService {
 	void set(String entry, Object value) {
 		getRealRequest().setAttribute(entry, value)
 	}
+
+	String getRequestURI() {
+		getRealRequest().requestURI
+	}
+
+	String getRequestURL() {
+		getRealRequest().requestURL
+	}
 }

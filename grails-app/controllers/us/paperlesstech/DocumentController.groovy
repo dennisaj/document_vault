@@ -11,7 +11,6 @@ class DocumentController {
 	// TODO Remove scaffolding
 	def scaffold = true
 
-	def activityLogService
 	def grailsApplication
 	def handlerChain
 	def searchableService
@@ -89,14 +88,12 @@ class DocumentController {
 
 	def show = {
 		def document = Document.get(params.id)
-		activityLogService.addViewLog(document)
 
 		render([view: "edit", model:[document: document]])
 	}
 
 	def edit = {
 		def document = Document.get(params.id)
-		activityLogService.addViewLog(document)
 
 		[document: document]
 	}
@@ -116,7 +113,6 @@ class DocumentController {
 			def signatures = JSON.parse(params.lines).findAll {it.value}
 
 			if (signatures) {
-				activityLogService.addSignLog(document, signatures)
 				handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
 
 				document.save()

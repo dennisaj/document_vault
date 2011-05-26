@@ -6,34 +6,17 @@ class ActivityLogService {
 
 	static transactional = true
 
-	def addViewLog(document) {
-		return addLog(ActivityLog.ActivityType.VIEW, document)
-	}
-
-	def addDeleteLog(document) {
-		return addLog(ActivityLog.ActivityType.DELETE, document)
-	}
-
-	def addEmailLog(document, notes) {
-		return addLog(ActivityLog.ActivityType.EMAIL, document, notes)
-	}
-
-	def addPrintLog(document, notes="") {
-		return addLog(ActivityLog.ActivityType.PRINT, document, notes)
-	}
-
-	def addSignLog(document, signatures, notes="") {
-		return addLog(ActivityLog.ActivityType.SIGN, document, notes, signatures)
-	}
-
-	def addLog(activityType, document, notes="", signatures=[:]) {
-		def activityLog = new ActivityLog(activityType: activityType,
+	def addLog(params=[:]) {
+		def paramsString = params.toString()
+		def uriString = requestService.getRequestURI()
+		paramsString = paramsString.substring(0, Math.min(paramsString.length(), 4095))
+		uriString = uriString.substring(0, Math.min(uriString.length(), 4095))
+		def activityLog = new ActivityLog(
 				userAgent: requestService.getHeader("User-Agent"),
 				ip: requestService.getRemoteAddr(),
 				user: authenticatedService.authenticatedUser,
-				pagesAffected: signatures.keySet().join(','),
-				document: document,
-				notes: notes)
+				params: paramsString,
+				uri: uriString)
 
 		activityLog.save()
 

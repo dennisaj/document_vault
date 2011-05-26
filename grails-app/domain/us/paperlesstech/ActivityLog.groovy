@@ -4,30 +4,19 @@ import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
 @MultiTenant
 class ActivityLog {
-
-	enum ActivityType {
-		DELETE,
-		EMAIL,
-		PRINT,
-		SIGN,
-		VIEW
-	}
-
-	ActivityType activityType
 	Date dateCreated
-	Document document
 	String ip
-	String notes
-	String pagesAffected
+	String params
 	User user
 	String userAgent
+	String uri
 
 	static mapping = {
 	}
 
-    static constraints = {
-		notes blank:true, nullable:true, size:0..2048
-		pagesAffected nullable:true
+	static constraints = {
+		params nullable:true, blank:true, maxSize:4096
 		user nullable:true
-    }
+		uri maxSize:4096
+	}
 }

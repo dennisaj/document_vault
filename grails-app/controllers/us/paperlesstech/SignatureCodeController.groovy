@@ -4,7 +4,6 @@ import grails.converters.JSON
 import us.paperlesstech.handlers.Handler
 
 class SignatureCodeController {
-	def activityLogService
 	def handlerChain
 	def signatureCodeService
 
@@ -34,7 +33,6 @@ class SignatureCodeController {
 				def signatures = JSON.parse(params.lines).findAll {it.value}
 				
 				def notes = "Signed using code " + session.signatureCode
-				activityLogService.addSignLog(document, signatures, notes)
 				handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
 
 				document.signed = true
@@ -75,7 +73,6 @@ class SignatureCodeController {
 		def email = params.email
 
 		if (document && email) {
-			activityLogService.addEmailLog(document, "This document was sent to " + email)
 			signatureCodeService.sendCode document, email
 
 			render([status:"success"] as JSON)

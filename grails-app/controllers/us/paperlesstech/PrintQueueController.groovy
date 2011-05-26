@@ -3,7 +3,6 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class PrintQueueController {
-	def activityLogService
 	def authenticatedService
 
 	// TODO Remove scaffolding
@@ -25,7 +24,6 @@ class PrintQueueController {
 		def document = Document.load(params.documentId)
 
 		if (printer && document) {
-			activityLogService.addPrintLog(document)
 			def queue = new PrintQueue(document:document, printer:printer, user: authenticatedService.authenticatedUser)
 			if (queue.save()) {
 				render([status:"success"] as JSON)
