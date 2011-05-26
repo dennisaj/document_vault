@@ -9,13 +9,14 @@ class Document implements Taggable {
 	static searchable = {
 		only: ["dateCreated", "name", "tags", "searchFields"]
 	}
-	static transients = ["previewImage", "previewImageAsMap", "signed"]
+	static transients = ["previewImage", "previewImageAsMap"]
 	Date dateCreated
 	SortedSet files
 	String name
 	Map otherFields = [:]
 	SortedSet previewImages
 	Map searchFields = [:]
+	boolean signed = false
 
 	static hasMany = [previewImages: PreviewImage, files: DocumentData]
 
@@ -64,11 +65,6 @@ class Document implements Taggable {
 		previewImages?.clear()
 		// TODO Find a way to remove this save
 		save(flush:true)
-	}
-
-	// TODO fix me
-	def signed = {
-		false
 	}
 
 	@Override

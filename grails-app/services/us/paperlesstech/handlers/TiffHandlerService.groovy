@@ -123,10 +123,11 @@ class TiffHandlerService extends Handler {
 		params.setExtraImages(images[1..<data.pages].iterator())
 		params.setCompression(TIFFEncodeParam.COMPRESSION_DEFLATE)
 		encoder.encode(images[0]);
-
+		
 		DocumentData newTiff = new DocumentData(mimeType: data.mimeType, pages: data.pages)
 		newTiff.data = os.toByteArray()
 		d.addToFiles(newTiff)
+		d.signed = true
 		input.documentData = newTiff
 		handlerChain.generatePreview(input)
 	}

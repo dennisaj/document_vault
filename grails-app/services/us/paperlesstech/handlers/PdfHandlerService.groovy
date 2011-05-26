@@ -85,21 +85,21 @@ class PdfHandlerService extends Handler {
 
 	@Override
 	void sign(Map input) {
-		def document = getDocument(input)
-		log.info "Signing the PDF for document ${document}"
+		def d = getDocument(input)
+		log.info "Signing the PDF for document ${d}"
 		def data = getDocumentData(input)
 		def signatures = input.signatures
 
 		assert signatures, "This method requires a map of signatures"
 
-		log.info "Signing the PDF for document ${document}"
+		log.info "Signing the PDF for document ${d}"
 
 		PdfReader pdfReader = new PdfReader(data.data)
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream()
 		PdfStamper pdfStamper = new PdfStamper(pdfReader, output)
 
-		(1..data.pages).each { i ->
+		(1..data.pages).each {i ->
 			def lines = signatures[i.toString()]
 			if (!lines) {
 				return
@@ -122,7 +122,8 @@ class PdfHandlerService extends Handler {
 
 		DocumentData newPdf = new DocumentData(mimeType: data.mimeType, pages: data.pages)
 		newPdf.data = output.toByteArray()
-		document.addToFiles(newPdf)
+		d.addToFiles(newPdf)
+		d.signed = true
 		input.documentData = newPdf
 
 		handlerChain.generatePreview(input)

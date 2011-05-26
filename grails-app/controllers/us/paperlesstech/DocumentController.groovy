@@ -88,12 +88,14 @@ class DocumentController {
 
 	def show = {
 		def document = Document.get(params.id)
+		assert document
 
 		render([view: "edit", model:[document: document]])
 	}
 
 	def edit = {
 		def document = Document.get(params.id)
+		assert document
 
 		[document: document]
 	}
@@ -109,19 +111,16 @@ class DocumentController {
 	def sign = {
 		assert params.lines
 		def document = Document.get(params.id)
-		if (document && !document.signed()) {
-			def signatures = JSON.parse(params.lines).findAll {it.value}
+		def signatures = JSON.parse(params.lines).findAll {it.value}
+		assert document
+		assert signatures
 
-			if (signatures) {
-				handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
+		handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
 
-				document.save()
-			}
+		document.save()
 
-			flash.green = "Signature saved"
-			render ([status:"success"] as JSON)
-		}
-
-		render ([status:"error"] as JSON)
+		flash.green = "Signature saved"
+		
+		render ([status:"success"] as JSON)
 	}
 }

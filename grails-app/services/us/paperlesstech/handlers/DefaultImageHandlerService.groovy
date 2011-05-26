@@ -56,6 +56,7 @@ class DefaultImageHandlerService extends Handler {
 
 		DocumentData newImage = new DocumentData(data: output.toByteArray(), mimeType: data.mimeType, pages: data.pages)
 		d.addToFiles(newImage)
+		d.signed = true
 		input.documentData = newImage
 		handlerChain.generatePreview(input)
 	}
