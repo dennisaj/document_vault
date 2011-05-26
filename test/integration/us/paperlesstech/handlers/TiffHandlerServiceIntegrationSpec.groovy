@@ -19,7 +19,7 @@ class TiffHandlerServiceIntegrationSpec extends IntegrationSpec {
 		tiffData = new DocumentData(mimeType: MimeType.TIFF)
 		tiffData.data = new ClassPathResource("multipage.tif").getFile().getBytes()
 		
-		line = [start:[x:0,y:0], end:[x:100,y:100]]
+		line = [a:[x:0,y:0], b:[x:100,y:100]]
 	}
 
 	def "import tiff file"() {

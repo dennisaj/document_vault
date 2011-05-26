@@ -10,7 +10,7 @@ var Drawing = {
 	isMoving: false,
 	isPainting: false,
 	isZoomedIn: false,
-	LINEBREAK: 'LINEBREAK',
+	LINEBREAK: 'LB',
 	$main : null,
 	minVisible: 150,
 	ORIGIN: {x:0, y:0},
@@ -232,6 +232,10 @@ var Drawing = {
 			}
 		}
 	},
+	_round: function(number, places) {
+		places = places || 1
+		return parseFloat(number.toFixed(places));
+	},
 
 	realSetupCanvas: function(canvas, page) {
 		this.currentPage = page;
@@ -272,13 +276,13 @@ var Drawing = {
 			}
 
 			lines[i] = {
-				start: {
-					x:page.lines[i].start.x * scaleX,
-					y:page.lines[i].start.y * scaleY
+				a: {
+					x:this._round(page.lines[i].start.x * scaleX),
+					y:this._round(page.lines[i].start.y * scaleY)
 				},
-				end: {
-					x:page.lines[i].end.x * scaleX,
-					y:page.lines[i].end.y * scaleY
+				b: {
+					x:this._round(page.lines[i].end.x * scaleX),
+					y:this._round(page.lines[i].end.y * scaleY)
 				}
 			};
 		}

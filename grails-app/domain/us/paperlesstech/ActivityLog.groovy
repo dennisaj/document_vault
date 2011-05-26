@@ -19,4 +19,12 @@ class ActivityLog {
 		user nullable:true
 		uri maxSize:4096
 	}
+
+	def setParams(String params="") {
+		this.@params = params.substring(0, constraints.params.getAppliedConstraint('maxSize').getMaxSize() - 1)
+	}
+
+	def setUri(String uri) {
+		this.@uri = uri.substring(0, constraints.uri.getAppliedConstraint('maxSize').getMaxSize() - 1)
+	}
 }

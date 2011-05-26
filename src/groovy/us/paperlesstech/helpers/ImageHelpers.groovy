@@ -9,7 +9,7 @@ import javax.imageio.ImageIO
 import com.thebuzzmedia.imgscalr.Scalr
 
 class ImageHelpers {
-	static final String LINEBREAK = 'LINEBREAK'
+	static final String LINEBREAK = 'LB'
 
 	/**
 	 * Draw lines on the passed in BufferedImage.
@@ -35,7 +35,7 @@ class ImageHelpers {
 
 		lines.each {
 			if (it != LINEBREAK) {
-				buffer.drawLine(it.start.x as int, it.start.y as int, it.end.x as int, it.end.y as int)
+				buffer.drawLine(it.a.x as int, it.a.y as int, it.b.x as int, it.b.y as int)
 			}
 		}
 

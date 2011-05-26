@@ -13,7 +13,7 @@ import com.itextpdf.text.pdf.PdfStamper
 
 class PdfHandlerService extends Handler {
 	static final handlerFor = [MimeType.PDF]
-	static final LINEBREAK = 'LINEBREAK'
+	static final LINEBREAK = 'LB'
 	static transactional = true
 	def handlerChain
 	def nextService
@@ -111,8 +111,8 @@ class PdfHandlerService extends Handler {
 			content.setLineWidth(0.05f)
 			lines.each {
 				if (it != LINEBREAK) {
-					content.moveTo(it.start.x as float, (psize.height - it.start.y) as float)
-					content.lineTo(it.end.x as float, (psize.height - it.end.y) as float)
+					content.moveTo(it.a.x as float, (psize.height - it.a.y) as float)
+					content.lineTo(it.b.x as float, (psize.height - it.b.y) as float)
 					content.stroke()
 				}
 			}
