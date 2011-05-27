@@ -3,7 +3,7 @@ public class LoggingFilters {
 	def authenticatedService
 
 	def filters = {
-		all(controller:'*', action:'*') {
+		all(controller:'*') {
 			before = {
 				if (authenticatedService.authenticatedUser) {
 					activityLogService.addLog(params)

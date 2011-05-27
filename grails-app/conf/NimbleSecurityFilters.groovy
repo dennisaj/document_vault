@@ -22,36 +22,25 @@ import grails.plugins.nimble.core.AdminsService
  * @author Bradley Beddoes
  */
 public class NimbleSecurityFilters extends grails.plugins.nimble.security.NimbleFilterBase {
+	private static String openControllers = "(auth|logout|account)"
+	def dependsOn = [LoggingFilters]
 
-    def filters = {
+	def filters = {
+		secure(controller: openControllers, invert:true) {
+			before = {
+				accessControl {
+					permission("document:$controllerName")
+				}
+			}
+		}
 
-        // Content requiring users to be authenticated
-        secure(controller: "main") {
-            before = {
-                accessControl {
-                    true
-                }
-            }
-        }
-
-        // Account management requiring authentication
-        accountsecure(controller: "account", action: "(changepassword|updatepassword|changedpassword)") {
-            before = {
-                accessControl {
-                    true
-                }
-            }
-        }
-
-        // This should be extended as the application adds more administrative functionality
-        administration(controller: "(admins|user|group|role)") {
-            before = {
-                accessControl {
-                    role(AdminsService.ADMIN_ROLE)
-                }
-            }
-        }
-
-    }
-
+		// This should be extended as the application adds more administrative functionality
+		administration(controller: "(activityLog|printer|admin|admins|user|group|role)") {
+			before = {
+				accessControl {
+					role(AdminsService.ADMIN_ROLE)
+				}
+			}
+		}
+	}
 }

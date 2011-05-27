@@ -38,15 +38,15 @@ nimble.createPermission = function(ownerID) {
 			<tbody>
 			<tr>
 				<td>
-					<g:select name="first_p" class="easyinput" from="${Group.list()}" optionKey="id" 
+					<g:select name="third_p" class="easyinput" from="${Group.list()}" optionKey="id" 
 							optionValue="${{message(code:'document-vault.label.groupdropdown', args:[it.name])}}" 
 							value="${parent instanceof Group ? parent.id : ''}" 
 							noSelection="['*':message(code:'document-vault.label.allgroups')]" />
 					<strong>:</strong>
-					<g:select name="third_p" class="easyinput" from="${DocumentPermission.values()}" value="${DocumentPermission.View.name().toLowerCase()}"
+					<g:select name="second_p" class="easyinput" from="${DocumentPermission.values()}" value="${DocumentPermission.View.name().toLowerCase()}"
 							optionKey="${{it.name().toLowerCase()}}" 
 							valueMessagePrefix="document-vault.label.documentpermission" />
-					<g:hiddenField name="second_p" value="document" />
+					<g:hiddenField name="first_p" value="document" />
 					<g:hiddenField name="fourth_p" value="*" />
 				</td>
 			</tr>
