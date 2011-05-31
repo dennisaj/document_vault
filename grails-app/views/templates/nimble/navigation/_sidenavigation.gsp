@@ -11,8 +11,8 @@
 					</li>
 				</ul>
 			</g:if>
-			<g:if test="${controllerName == 'user' && actionName in ['show', 'edit', 'changepassword', 'changelocalpassword']}">
-			    <ul>
+			<g:if test="${controllerName == 'user' && actionName in ['show', 'edit', 'update', 'changepassword', 'changelocalpassword']}">
+				<ul>
 					<li>
 						<g:if test="${user?.profile?.fullName}">
 							<g:link controller="user" action="show" id="${user.id}">${user.profile.fullName?.encodeAsHTML()}</g:link>
@@ -61,16 +61,15 @@
 					</li>
 				</ul>
 			</g:if>
-			<g:if test="${controllerName == 'role' && actionName in ['show', 'edit']}">
-			    <ul>
+			<g:if test="${controllerName == 'role' && actionName in ['show', 'edit', 'update']}">
+				<ul>
 					<li>
 						<g:link controller="role" action="show" id="${role.id}">${role.name?.encodeAsHTML()}</g:link>
-				
 						<g:if test="${!role.protect}">
 						<ul>
 							<li>
-						        <g:link controller="role" action="edit" id="${role.id}"><g:message code="nimble.link.edit" /></g:link>
-						    </li>
+								<g:link controller="role" action="edit" id="${role.id}"><g:message code="nimble.link.edit" /></g:link>
+							</li>
 							<li>
 								<n:confirmaction action="document.deleterole.submit();" title="${message(code: 'nimble.template.delete.confirm.title')}" msg="${message(code: 'nimble.role.delete.confirm')}" accept="${message(code: 'nimble.link.accept')}" cancel="${message(code: 'nimble.link.cancel')}" class=""><g:message code="nimble.link.delete" /></n:confirmaction>								
 							</li>
@@ -89,18 +88,18 @@
 					</li>
 				</ul>
 			</g:if>
-			<g:if test="${controllerName == 'group' && actionName in ['show', 'edit']}">
-			    <ul>
+			<g:if test="${controllerName == 'group' && actionName in ['show', 'edit', 'update']}">
+				<ul>
 					<li>
 						<g:link controller="group" action="show" id="${group.id}">${group.name?.encodeAsHTML()}</g:link>
 						<g:if test="${!group.protect}">
 						<ul>
 							<li>
-						        <g:link controller="group" action="edit" id="${group.id}"><g:message code="nimble.link.edit" /></g:link>
-						    </li>
+								<g:link controller="group" action="edit" id="${group.id}"><g:message code="nimble.link.edit" /></g:link>
+							</li>
 							<li>
 								<n:confirmaction action="document.deletegroup.submit();" title="${message(code: 'nimble.template.delete.confirm.title')}" msg="${message(code: 'nimble.group.delete.confirm')}" accept="${message(code: 'nimble.link.accept')}" cancel="${message(code: 'nimble.link.cancel')}" class=""><g:message code="nimble.link.delete" /></n:confirmaction>
-							</li>			
+							</li>
 						</ul>
 						</g:if>
 					</li>
@@ -109,6 +108,40 @@
 		</li>
 		<li>
 			<g:link controller="admins" action="index"><g:message code="nimble.link.admins" /></g:link>
+		</li>
+		<li>
+			<g:link controller="printer" action="list"><g:message code="document-vault.link.printers" /></g:link>
+			<g:if test="${controllerName == 'printer'}">
+				<g:if test="${actionName in ['list', 'create']}">
+				<ul>
+					<li>
+						<g:link controller="printer" action="create"><g:message code="document-vault.link.createprinter" /></g:link>
+					</li>
+				</ul>
+				</g:if>
+				<g:elseif test="${actionName in ['show', 'edit', 'update']}">
+				<ul>
+					<li>
+						<g:link controller="printer" action="edit" id="${printerInstance.id}"><g:message code="nimble.link.edit" /></g:link>
+					</li>
+					<li>
+						<n:confirmaction action="document.deleteprinter.submit();" title="${message(code: 'nimble.template.delete.confirm.title')}" msg="${message(code: 'document-vault.printer.delete.confirm')}" accept="${message(code: 'nimble.link.accept')}" cancel="${message(code: 'nimble.link.cancel')}" class=""><g:message code="nimble.link.delete" /></n:confirmaction>
+					</li>
+				</ul>
+				</g:elseif>
+			</g:if>
+		</li>
+		<li>
+			<g:message code="document-vault.link.reports" />
+			<ul>
+				<li><a href="${createLink(controller: 'activityLog', action: 'list')}"><g:message code="document-vault.link.activitylog" /></a></li>
+			</ul>
+		</li>
+		<li>
+			&nbsp;
+		</li>
+		<li>
+			<g:link controller="document" class="icon icon_arrow_left"><g:message code="document-vault.link.leaveadmin" /></g:link>
 		</li>
 	</ul>
 </div>

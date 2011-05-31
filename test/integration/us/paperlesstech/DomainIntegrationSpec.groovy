@@ -130,10 +130,10 @@ class DomainIntegrationSpec extends IntegrationSpec {
 
 		when:
 		def d = new Document()
-		d.save(failOnErrors:true)
+		def result = d.save(failOnErrors:true)
 
 		then:
-		thrown(grails.validation.ValidationException)
+		!result
 		DocumentData.count() == 2
 		Document.count() == 0
 	}

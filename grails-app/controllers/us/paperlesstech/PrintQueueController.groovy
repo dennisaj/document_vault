@@ -5,9 +5,6 @@ import grails.converters.JSON
 class PrintQueueController {
 	def authenticatedService
 
-	// TODO Remove scaffolding
-	def scaffold = true
-
 	def pop = {
 		def results = PrintQueue.listOrderByDateCreated(max:1, order:"asc")
 		if (results.size() > 0) {

@@ -10,6 +10,8 @@ class Printer {
 	int port
 
 	static constraints = {
+		deviceType blank:false
+		host blank:false
 		name blank:false, unique:"tenantId"
 		port range:0..65535
 	}
