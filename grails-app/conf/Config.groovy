@@ -115,3 +115,17 @@ tenant {
 	domainTenantBeanName = "us.paperlesstech.DomainTenantMap"
 	resolver.request.dns.type = "db"
 }
+
+security {
+	shiro {
+		authc.required = false
+		filter.config = """\
+[filters]
+# HTTP Basic authentication
+authcBasic = org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
+authcBasic.applicationName = Document Vault API
+[urls]
+/api/** = authcBasic
+"""
+	}
+}
