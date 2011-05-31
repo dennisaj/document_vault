@@ -12,7 +12,7 @@ class TagController {
 
 	def create = {
 		if (tagService.createTag(params.name)) {
-			render(template:"/saved", model:[message:"Your tag was saved"])
+			render(template:"/saved", model:[body:{"Your tag was saved"}])
 			return
 		}
 
@@ -22,7 +22,7 @@ class TagController {
 
 	def documentAdd = {
 		if (tagService.addDocumentTag(params.id, params.tag)) {
-			render(template:"/saved", model:[message:"Document(${params.id}) was tagged as '${params.tag}'"])
+			render(template:"/saved", model:[body: {"Document(${params.id}) was tagged as '${params.tag}'"}])
 			return
 		}
 

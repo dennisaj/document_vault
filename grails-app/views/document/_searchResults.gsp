@@ -65,8 +65,11 @@
 					<div>
 						<ul class="taggable hidden" id="tagbox-${it.id}" documentid="${it.id}"></ul>
 					</div>
+					<g:if test="${it.signed}">
+						<div><g:render template="/saved"><g:message code="document-vault.template.document.signed" /></g:render></div>
+					</g:if>
 					<a href="${createLink(action: 'show', id: it.id) }">
-						<img class="thumb" width="400" src="${createLink(action: 'downloadImage', id: it.id) }" alt="Document ${it.id} Page 1" />
+						<img class="thumb" width="400" src="${createLink(action: 'downloadImage', id: it.id)}" alt="Document ${it.id} Page 1" />
 					</a>
 					<div class="triangle-border left-arrow hidden" id="notebox-${it.id}">
 						<span class="noteField" id="note-${it.id}">${it.searchFields['Note']}</span>
