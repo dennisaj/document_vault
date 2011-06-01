@@ -7,8 +7,6 @@ class UploadController {
 	static navigation = [[action: 'index', isVisible: {authService.canUploadAny()}, order: 10, title: 'Upload']]
 
 	def authService
-	def businessLogicService
-	def handlerChain
 	def uploadService
 
 	def index = {
