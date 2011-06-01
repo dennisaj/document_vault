@@ -8,19 +8,18 @@ class UploadService {
 	def authService
 	def handlerChain
 	def businessLogicService
-	def tagService
 
-	Document upload(String name, byte[] data, String contentType, List<String> tags) {
+	Document upload(String name, byte[] data, String contentType) {
 		MimeType mimeType = MimeType.getMimeType(mimeType: contentType, fileName: name)
 
 		if (mimeType) {
-			return upload(name, data, mimeType, tags)
+			return upload(name, data, mimeType)
 		}
 
 		return null
 	}
 
-	Document upload(String name, byte[] data, MimeType mimeType, List<String> tags) {
+	Document upload(String name, byte[] data, MimeType mimeType) {
 		assert authService.canUploadAny()
 
 		def fileGroup = authService?.authenticatedUser?.groups?.find { group ->
@@ -40,13 +39,7 @@ class UploadService {
 			assert document.files.size() == 1
 			document.save()
 
-			tags?.each {
-				tagService.addDocumentTag(document, it)
-			}
-
-			if (businessLogicService.addTags(document)) {
-				document.save()
-			}
+			businessLogicService.addTags(document)
 
 			log.info "Saved document ${document.id}"
 			return document

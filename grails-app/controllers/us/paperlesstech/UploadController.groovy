@@ -4,25 +4,22 @@ import grails.converters.JSON
 
 class UploadController {
 	static allowedMethods = [save: "POST", saveAjax: "POST"]
-	static navigation = [[action: 'index', isVisible: {authService.canUploadAny() }, order: 10, title: 'Upload']]
+	static navigation = [[action: 'index', isVisible: {authService.canUploadAny()}, order: 10, title: 'Upload']]
 
 	def authService
 	def businessLogicService
 	def handlerChain
-	def tagService
 	def uploadService
 
 	def index = {
-		[tag:params.tag, recentTags:tagService.getRecentTags()]
 	}
 
 	def save = {
-		def tag = params.tag?.trim()
 		def green = []
 		def red = []
 		request.getMultiFileMap().each {inputName, files ->
 			files.each {
-				def document = uploadService.upload(it.originalFilename, it.bytes, it.contentType, tag ? [tag] : null)
+				def document = uploadService.upload(it.originalFilename, it.bytes, it.contentType)
 
 				if (document) {
 					green += document
@@ -45,9 +42,8 @@ class UploadController {
 
 	def ajaxSave = {
 		def f = request.getFile('file')
-		def tag = params.tag?.trim()
 		if (!f.empty) {
-			def document = uploadService.upload(f.originalFilename, f.bytes, f.contentType, tag ? [tag] : null)
+			def document = uploadService.upload(f.originalFilename, f.bytes, f.contentType)
 
 			if (document) {
 				def html = g.render(template:"link", model:[name:document.toString(), id:document.id])

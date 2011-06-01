@@ -8,7 +8,7 @@ class UrlMappings {
 		}
 
 		"/"(controller:"home", action:"index")
-		"500"(view:'/error')
+		"500"(view:"/error")
 		"/api/upload/savePcl" {
 			controller = "upload"
 			action = "savePcl"
@@ -57,31 +57,6 @@ class UrlMappings {
 		"/signatureCode/sign/$id/$pageNumber" {
 			controller = "signatureCode"
 			action = "sign"
-		}
-
-		name taggedUpload: "/upload/$tag**" {
-			controller = "upload"
-			action = "index"
-		}
-
-		"/upload/ajaxSave" {
-			controller = "upload"
-			action = "ajaxSave"
-		}
-
-		"/upload/save" {
-			controller = "upload"
-			action = "save"
-		}
-
-		"/upload/$tag**/ajaxSave" {
-			controller = "upload"
-			action = "ajaxSave"
-		}
-
-		"/upload/$tag**/save" {
-			controller = "upload"
-			action = "save"
 		}
 
 		// This parameter has to be called "term" for the autocomplete to work

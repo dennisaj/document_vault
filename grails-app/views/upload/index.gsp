@@ -9,10 +9,6 @@
 		<title> - Upload</title>
 	</head>
 	<body>
-		<g:if test="${tag}">
-			<h3>Uploading to tag group <b>${tag}</b></h3>
-		</g:if>
-		<g:render template="/tag/recentTags" />
 		<form id="file_upload" action="/document_vault/upload/save" method="POST" enctype="multipart/form-data">
 			<input type="file" name="file" multiple>
 			<button>Upload</button>
