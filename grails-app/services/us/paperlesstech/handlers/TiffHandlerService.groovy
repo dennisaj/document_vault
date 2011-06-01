@@ -28,7 +28,6 @@ class TiffHandlerService extends Handler {
 	static final handlerFor = [MimeType.TIFF]
 	static transactional = true
 	def handlerChain
-	def nextService
 
 	@Override
 	void generatePreview(Map input) {

@@ -1,4 +1,5 @@
 // When true, saving a domain object throws an exception on save errors.
+//grails.gorm.failOnError = false
 
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts

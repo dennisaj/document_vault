@@ -2,9 +2,10 @@ package us.paperlesstech.handlers
 
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
-import us.paperlesstech.PreviewImage
 
 class Handler {
+	def authService
+
 	void importFile(Map input) {
 		throw new UnsupportedOperationException("importFile has no handler for ${input.documentData.mimeType}")
 	}
@@ -23,6 +24,7 @@ class Handler {
 
 	def retrievePreview(Map input) {
 		def d = getDocument(input)
+		assert authService.canView(d)
 
 		def page = input.page
 		assert page, "This method requires a page number"
@@ -37,6 +39,7 @@ class Handler {
 
 	def download(Map input) {
 		def d = getDocument(input)
+		assert authService.canView(d)
 		def data = getDocumentData(input)
 
 		def filename = d.toString() +data.mimeType.getDownloadExtension()

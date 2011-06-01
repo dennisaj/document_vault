@@ -2,12 +2,11 @@ package us.paperlesstech
 
 import grails.converters.JSON
 
-import org.apache.shiro.SecurityUtils
-
 class UploadController {
 	static allowedMethods = [save: "POST", saveAjax: "POST"]
-	static navigation = [[action: 'index', isVisible: {SecurityUtils.subject.isPermitted("upload:*")}, order: 10, title: 'Upload']]
+	static navigation = [[action: 'index', isVisible: {authService.canUploadAny() }, order: 10, title: 'Upload']]
 
+	def authService
 	def businessLogicService
 	def handlerChain
 	def tagService
@@ -64,23 +63,23 @@ class UploadController {
 	}
 
 	def savePcl = {
+		boolean success = false
+		def document
+
 		try {
-			Document document = new Document()
-			def documentData = new DocumentData(mimeType: MimeType.PCL, data: params.data)
-			handlerChain.importFile(document: document, documentData: documentData)
+			def now = new Date()
+			def fileName = String.format("%tF %tT.pcl", now, now)
+			document = uploadService.upload(fileName, params.data, MimeType.PCL, null)
+			success = true
+		} catch (Exception e) {
+			log.error("Unable to save uploaded document", e)
+		}
 
-			assert document.files.size() == 1
-			document.save()
-
-			if (businessLogicService.addTags(document)) {
-				document.save()
-			}
-
+		if (success) {
 			response.status = 200
 			render "Document ${document.id} saved\n"
 			log.info "Saved document ${document.id}"
-		} catch (Exception e) {
-			log.error("Unable to save uploaded document", e)
+		} else {
 			response.status = 500
 			render "Error saving file\n"
 		}

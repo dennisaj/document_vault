@@ -1,14 +1,12 @@
 package us.paperlesstech.handlers
 
-import grails.plugin.spock.IntegrationSpec
-
 import org.springframework.core.io.ClassPathResource
-
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
+import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.MimeType
 
-class DefaultImageHandlerServiceIntegrationSpec extends IntegrationSpec {
+class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def defaultImageHandlerService
 	def line
 
@@ -18,7 +16,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends IntegrationSpec {
 
 	def "import image files"() {
 		when:
-			def document = new Document()
+			def document = new Document(group: DomainIntegrationSpec.group)
 			def documentData = new DocumentData(data: new ClassPathResource("test" + mimeType.downloadExtension).getFile().getBytes(), mimeType: mimeType)
 			def input = [document: document, documentData: documentData]
 			defaultImageHandlerService.importFile(input)
@@ -37,7 +35,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends IntegrationSpec {
 		given:
 			def lines = ['1':[line, 'LB'], '2':[line], '4':[line]]
 		when:
-			def document = new Document()
+			def document = new Document(group: DomainIntegrationSpec.group)
 			def documentData = new DocumentData(data: new ClassPathResource("test" + mimeType.downloadExtension).getFile().getBytes(), mimeType: mimeType)
 			def input = [document: document, documentData: documentData]
 

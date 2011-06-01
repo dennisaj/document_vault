@@ -2,12 +2,12 @@ package us.paperlesstech
 
 import grails.converters.JSON
 
-import org.apache.shiro.SecurityUtils
 import org.grails.taggable.Tag
 
 class TagController {
-	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.isPermitted("tag:*")}, order:20, title:"Tags"]]
+	static navigation = [[action:'index', isVisible: {authService.canTagAny()}, order:20, title:"Tags"]]
 
+	def authService
 	def tagService
 
 	def create = {

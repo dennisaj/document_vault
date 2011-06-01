@@ -3,6 +3,7 @@ package us.paperlesstech
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
 import org.grails.taggable.Taggable
+import grails.plugins.nimble.core.Group
 
 @MultiTenant
 class Document implements Taggable {
@@ -12,6 +13,7 @@ class Document implements Taggable {
 	static transients = ["previewImage", "previewImageAsMap"]
 	Date dateCreated
 	SortedSet files
+	Group group
 	String name
 	Map otherFields = [:]
 	SortedSet previewImages
@@ -23,6 +25,7 @@ class Document implements Taggable {
 	static constraints = {
 		// minSize won't fire on the initial save if files is null
 		files(nullable: false, minSize: 1)
+		group(nullable: false)
 		name(nullable: true, blank: true)
 	}
 

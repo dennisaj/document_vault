@@ -7,8 +7,10 @@ import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
+import java.security.DigestInputStream
+import us.paperlesstech.DomainIntegrationSpec
 
-class TiffHandlerServiceIntegrationSpec extends IntegrationSpec {
+class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def tiffHandlerService
 	def tiffDocument
 	def tiffData
@@ -16,6 +18,7 @@ class TiffHandlerServiceIntegrationSpec extends IntegrationSpec {
 
 	def setup() {
 		tiffDocument = new Document()
+		tiffDocument.group = DomainIntegrationSpec.group
 		tiffData = new DocumentData(mimeType: MimeType.TIFF)
 		tiffData.data = new ClassPathResource("multipage.tif").getFile().getBytes()
 		

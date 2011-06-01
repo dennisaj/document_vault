@@ -16,7 +16,6 @@ class PdfHandlerService extends Handler {
 	static final LINEBREAK = 'LB'
 	static transactional = true
 	def handlerChain
-	def nextService
 
 	@Override
 	void generatePreview(Map input) {

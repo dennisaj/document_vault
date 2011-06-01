@@ -7,14 +7,17 @@ import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
+import grails.plugins.nimble.core.Group
+import us.paperlesstech.DomainIntegrationSpec
 
-class PclHandlerServiceIntegrationSpec extends IntegrationSpec {
+class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def handlerChain
 	def document
 	def pclData
 
 	def setup() {
 		document = new Document()
+		document.group = DomainIntegrationSpec.group
 		pclData = new DocumentData(mimeType: MimeType.PCL)
 		pclData.data = new ClassPathResource("dt_combined.pcl").getFile().getBytes()
 	}

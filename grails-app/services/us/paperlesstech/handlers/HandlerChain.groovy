@@ -1,45 +1,57 @@
 package us.paperlesstech.handlers
 
-import java.util.Map
-
 import org.apache.commons.logging.LogFactory
-
-import us.paperlesstech.DocumentData
-import us.paperlesstech.PreviewImage
 
 class HandlerChain extends Handler {
 	org.apache.commons.logging.Log log = LogFactory.getLog(getClass())
-
+	def authService
 	def businessLogicService
 	def handlers
 
 	@Override
 	void importFile(Map input) {
+		assert authService.canUploadAny()
+
 		handle("importFile", input)
 	}
 
 	@Override
 	void generatePreview(Map input) {
+		def document = getDocument(input)
+		assert authService.canSign(document) || authService.canUploadAny()
+
 		handle("generatePreview", input)
 	}
 
 	@Override
 	void print(Map input) {
+		def document = getDocument(input)
+		assert authService.canPrint(document)
+
 		handle("print", input)
 	}
 
 	@Override
 	void sign(Map input) {
+		def document = getDocument(input)
+		assert authService.canSign(document)
+
 		handle("sign", input)
 	}
 
 	@Override
 	def retrievePreview(Map input) {
+		def document = getDocument(input)
+		assert authService.canView(document)
+
 		handle("retrievePreview", input)
 	}
 
 	@Override
 	def download(Map input) {
+		def document = getDocument(input)
+		assert authService.canView(document)
+
 		handle("download", input)
 	}
 

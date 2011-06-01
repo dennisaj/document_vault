@@ -1,17 +1,16 @@
 package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
-import grails.plugins.nimble.core.AuthenticatedService
 import groovy.mock.interceptor.MockFor
 
 class ActivityLogServiceSpec extends UnitSpec {
-	AuthenticatedService authenticatedService = Mock()
+	AuthService authService = Mock()
 	def service = new ActivityLogService()
 	RequestService request = Mock()
 	def activityMock
 
 	def setup() {
-		service.authenticatedService = authenticatedService
+		service.authService = authService
 		service.requestService = request
 		activityMock = mockFor(ActivityLog.class)
 	}
@@ -31,7 +30,7 @@ class ActivityLogServiceSpec extends UnitSpec {
 		1 * request.getHeader("User-Agent") >> userAgent
 		1 * request.getRemoteAddr() >> ip
 		1 * request.getRequestURI() >> uri
-		1 * authenticatedService.authenticatedUser >> currentUser
+		1 * authService.authenticatedUser >> currentUser
 
 		where:
 		userAgent = "FF"

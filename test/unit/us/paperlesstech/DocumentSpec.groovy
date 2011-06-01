@@ -1,6 +1,8 @@
 package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
+import grails.plugins.nimble.core.Group
+import spock.lang.Unroll
 
 class DocumentSpec extends UnitSpec {
 	byte[] rawBytes = new byte[8];
@@ -14,6 +16,7 @@ class DocumentSpec extends UnitSpec {
 
 	}
 
+	@Unroll("saving document with file=#file and group=#group")
 	def "test constraints"() {
 		given:
 		mockDomain(Document)
@@ -21,6 +24,7 @@ class DocumentSpec extends UnitSpec {
 
 		when:
 		def d = new Document()
+		d.group = group
 		if (file)
 			d.addToFiles(file)
 		def result = d.validate()
@@ -29,9 +33,11 @@ class DocumentSpec extends UnitSpec {
 		result == expected
 
 		where:
-		file | expected
-		null | false
-		documentData() | true
+		file           | group       | expected
+		null           | null        | false
+		documentData() | null        | false
+		null           | new Group() | false
+		documentData() | new Group() | true
 	}
 
 	def documentData() {

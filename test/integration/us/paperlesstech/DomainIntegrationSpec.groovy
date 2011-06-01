@@ -1,11 +1,13 @@
 package us.paperlesstech
 
 import grails.plugin.spock.IntegrationSpec
+import grails.plugins.nimble.core.Group
 
 class DomainIntegrationSpec extends IntegrationSpec {
 	def sessionFactory
 	def previewImageData
 	def fileData
+	def group
 	def firstDateCreated = new GregorianCalendar(2011, 1, 1).time
 	def secondDateCreated = new GregorianCalendar(2010, 1, 1).time
 
@@ -14,11 +16,19 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		previewImageData.save()
 		fileData = new DocumentData(mimeType: MimeType.PDF, data: new byte[1], dateCreated: secondDateCreated)
 		fileData.save()
+		group = getGroup()
 	}
-	
+
+	static def getGroup() {
+		def g = new Group(name: "test " + Math.random())
+		g.save()
+		g
+	}
+
 	def getDocument() {
 		def d = new Document()
 		d.addToFiles(fileData)
+		d.group = group
 		d
 	}
 
@@ -129,7 +139,24 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		assert Document.count() == 0
 
 		when:
-		def d = new Document()
+		def d = getDocument()
+		d.files.clear()
+		def result = d.save(failOnErrors:true)
+
+		then:
+		!result
+		DocumentData.count() == 2
+		Document.count() == 0
+	}
+
+	def "you cannot save a document without a group"() {
+		given:
+		assert DocumentData.count() == 2
+		assert Document.count() == 0
+
+		when:
+		def d = getDocument()
+		d.group = null
 		def result = d.save(failOnErrors:true)
 
 		then:
@@ -160,7 +187,8 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		assert Document.count() == 0
 
 		when: "the files are added"
-		def d = new Document()
+		def d = getDocument()
+		d.files.clear()
 		d.addToFiles(previewImageData)
 		d.save()
 		d.addToFiles(fileData)

@@ -15,6 +15,8 @@
  *  limitations under the License.
  */
 import grails.plugins.nimble.core.AdminsService
+import us.paperlesstech.Document
+import grails.util.Environment
 
 /**
  * Filter that works with Nimble security model to protect controllers, actions, views
@@ -24,12 +26,45 @@ import grails.plugins.nimble.core.AdminsService
 public class NimbleSecurityFilters extends grails.plugins.nimble.security.NimbleFilterBase {
 	private static String openControllers = "(auth|logout|account)"
 	def dependsOn = [LoggingFilters]
+	def authService
 
 	def filters = {
-		secure(controller: openControllers, invert:true) {
+		secure(controller: openControllers, invert: true) {
 			before = {
+				def document
+				if (params.documentId) {
+					document = Document.get(params.documentId)
+				}
 				accessControl {
-					permission("document:$controllerName")
+					def action = actionName ?: "index"
+					log.info("user:$authService.authenticatedUser; resource:$controllerName:$action; document:$document")
+					switch (controllerName) {
+						case ["document", "home"]:
+							switch (action) {
+								case ["index", "search", "download", "downloadImage", "image", "edit", "show"]:
+									return document ? authService.canView(document) : authService.canViewAny()
+								case "add":
+									return document ? authService.canTag(document) : authService.canTagAny()
+								case "sign":
+									return document ? authService.canSign(document) : authService.canSignAny()
+								case "saveNote":
+									return document ? authService.canNotes(document) : authService.canNotesAny()
+								default:
+									return false
+							}
+						case "printQueue":
+							return document ? authService.canPrint(document) : authService.canPrintAny()
+						case "tag":
+							return document ? authService.canTag(document) : authService.canTagAny()
+						case "upload":
+							return authService.canUploadAny()
+						case "console":
+							return Environment.current == grails.util.Environment.DEVELOPMENT
+						default:
+							return false
+					}
+
+					return false
 				}
 			}
 		}

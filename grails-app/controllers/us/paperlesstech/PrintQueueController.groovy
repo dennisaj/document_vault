@@ -3,7 +3,7 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class PrintQueueController {
-	def authenticatedService
+	def authService
 
 	def pop = {
 		def results = PrintQueue.listOrderByDateCreated(max:1, order:"asc")
@@ -21,7 +21,7 @@ class PrintQueueController {
 		def document = Document.load(params.documentId)
 
 		if (printer && document) {
-			def queue = new PrintQueue(document:document, printer:printer, user: authenticatedService.authenticatedUser)
+			def queue = new PrintQueue(document:document, printer:printer, user: authService.authenticatedUser)
 			if (queue.save()) {
 				render([status:"success"] as JSON)
 			}

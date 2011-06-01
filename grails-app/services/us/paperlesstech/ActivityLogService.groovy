@@ -1,7 +1,7 @@
 package us.paperlesstech
 
 class ActivityLogService {
-	def authenticatedService
+	def authService
 	def requestService
 
 	static transactional = true
@@ -10,7 +10,7 @@ class ActivityLogService {
 		def activityLog = new ActivityLog(
 				userAgent: requestService.getHeader("User-Agent"),
 				ip: requestService.getRemoteAddr(),
-				user: authenticatedService.authenticatedUser,
+				user: authService.authenticatedUser,
 				// Don't log signature line data
 				params: params.subMap(params.keySet() - ['lines']).toString(),
 				uri: requestService.getRequestURI())

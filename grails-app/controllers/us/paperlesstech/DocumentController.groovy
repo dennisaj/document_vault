@@ -6,7 +6,7 @@ import org.apache.shiro.SecurityUtils
 
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
-	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.isPermitted("document:*")}, order:0, title:'Home']]
+	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.authenticated}, order:0, title:'Home']]
 
 	// TODO Remove scaffolding
 	def scaffold = true

@@ -7,14 +7,16 @@ import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
+import us.paperlesstech.DomainIntegrationSpec
 
-class PdfHandlerServiceIntegrationSpec extends IntegrationSpec {
+class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def pdfHandlerService
 	def document
 	def pdfData
 
 	def setup() {
 		document = new Document()
+		document.group = DomainIntegrationSpec.group
 		pdfData = new DocumentData(mimeType: MimeType.PDF)
 		pdfData.data = new ClassPathResource("2pages.pdf").getFile().getBytes()
 	}

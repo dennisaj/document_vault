@@ -8,7 +8,6 @@ class PclHandlerService extends Handler {
 	static handlerFor = [MimeType.PCL]
 	static transactional = true
 	def handlerChain
-	def nextService
 
 	DocumentData createPdf(DocumentData d) {
 		assert d?.data

@@ -13,7 +13,6 @@ class DefaultImageHandlerService extends Handler {
 	static final handlerFor = [MimeType.BMP, MimeType.GIF, MimeType.JPEG, MimeType.PNG]
 	static transactional = true
 	def handlerChain
-	def nextService
 
 	@Override
 	void generatePreview(Map input) {
