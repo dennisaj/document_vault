@@ -122,6 +122,6 @@ class AuthService extends AuthenticatedService {
 			}
 		}
 
-		return false
+		return subject.isPermitted(wp)
 	}
 }

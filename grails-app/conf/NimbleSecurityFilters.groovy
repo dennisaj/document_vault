@@ -24,12 +24,13 @@ import grails.util.Environment
  * @author Bradley Beddoes
  */
 public class NimbleSecurityFilters extends grails.plugins.nimble.security.NimbleFilterBase {
-	private static String openControllers = "(auth|logout|account)"
+	private static String openControllers = "auth|logout|account"
+	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 	def authService
 
 	def filters = {
-		secure(controller: openControllers, invert: true) {
+		secure(controller: "($openControllers|$adminControllers)", invert: true) {
 			before = {
 				def document
 				if (params.documentId) {
@@ -70,7 +71,7 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 		}
 
 		// This should be extended as the application adds more administrative functionality
-		administration(controller: "(activityLog|printer|admin|admins|user|group|role)") {
+		administration(controller: "($adminControllers)") {
 			before = {
 				accessControl {
 					role(AdminsService.ADMIN_ROLE)
