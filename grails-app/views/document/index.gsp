@@ -15,16 +15,31 @@
 		<g:javascript src="tagging.js" />
 		<g:javascript>
 			$(document).ready(function() {
-				DocumentNote.init({ 'save': '/document_vault/document/saveNote' });
-				Document.init({
-						'email': '/document_vault/signatureCode/send/{0}/{1}',
-						'finish': '/document_vault/document/finish/{0}',
-						'image': '/document_vault/document/image/{0}/{1}',
-						'print': '/document_vault/printQueue/push/{0}/{1}',
-						'sign': '/document_vault/document/sign/{0}/{1}',
-						'finish_redirect': '/document_vault/document/index',
-						'close': '/document_vault/document/index'
+				DocumentNote.init({
+					'save': '${createLink(controller:"document", action:"saveNote")}',
+					'spinner': '${resource(dir:"images", file:"spinner.gif")}'
 				});
+
+				Document.init({
+					'close': '${createLink(controller:"document", action:"index")}',
+					'downloadImage': '${createLink(controller:"document", action:"downloadImage")}/{0}/{1}',
+					'email': '${createLink(controller:"signatureCode", action:"send")}/{0}/{1}',
+					'finish_redirect': '${createLink(controller:"document", action:"index")}',
+					'image': '${createLink(controller:"document", action:"image")}/{0}/{1}',
+					'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}',
+					'sign': '${createLink(controller:"document", action:"sign")}/{0}'
+				});
+
+				Tagging.init({
+					'addTag': '${createLink(controller:"tag", action:"documentAdd")}',
+					'allTagged': '${createLink(controller:"tag", action:"documents")}/{0}',
+					'createTag': '${createLink(controller:"tag", action:"create")}/{0}',
+					'documentList': '${createLink(controller:"tag", action:"documentList")}/{0}',
+					'list': '${createLink(controller:"tag", action:"list")}',
+					'removeTag': '${createLink(controller:"tag", action:"documentRemove")}'
+				});
+
+				Tagging.initDragAndDrop();
 			});
 		</g:javascript>
 	</head>
@@ -66,23 +81,23 @@
 	<%--<g:render template="emailDialog" />--%>
 	<g:render template="/alert" />
 	<jq:jquery>
-			$("#q").focus();
-			$("#search-tabs").tabs();
-			$('#search-tabs').bind('tabsselect', function(event, ui) {
-				if(ui.index == 0) {
-					$("#simpleSearch").val("true")
-				} else {
-					$("#simpleSearch").val("false")
-				}
-			});
-			
-			$("#reset1").add("#reset2").click(function() {
-				window.location.href = "/document_vault/document/index"
-			});
-			
-			$("#advancedSearch").click(function() {
-				$("#advancedPanel").toggle('fast');
-			});
+		$("#q").focus();
+		$("#search-tabs").tabs();
+		$('#search-tabs').bind('tabsselect', function(event, ui) {
+			if(ui.index == 0) {
+				$("#simpleSearch").val("true")
+			} else {
+				$("#simpleSearch").val("false")
+			}
+		});
+		
+		$("#reset1").add("#reset2").click(function() {
+			window.location.href = '${createLink(controller:"document", action:"index")}'
+		});
+		
+		$("#advancedSearch").click(function() {
+			$("#advancedPanel").toggle('fast');
+		});
 	</jq:jquery>
 </body>
 </html>

@@ -1,29 +1,32 @@
 var DocumentNote = {
-	editableOptions: {
-		cancel: 'Cancel',
-		cssclass: 'noteTextarea',
-		indicator: '<img src="/document_vault/images/spinner.gif">',
-		method: 'POST',
-		onblur: 'ignore',
-		placeholder: 'Click here to add a note.',
-		rows: 5,
-		submit: 'OK',
-		tooltip: 'Click to add/edit a note...',
-		type: 'textarea'
-	},
-	
 	urls: {},
 
+	editableOptions: function() {
+		return {
+			cancel: 'Cancel',
+			cssclass: 'noteTextarea',
+			indicator: '<img src="{0}">'.format(this.urls.spinner),
+			method: 'POST',
+			onblur: 'ignore',
+			placeholder: 'Click here to add a note.',
+			rows: 5,
+			submit: 'OK',
+			tooltip: 'Click to add/edit a note...',
+			type: 'textarea'
+		}
+	},
+
 	show: function(id) {
+		var self = this;
 		if (!$('.noteField', id).data('event.editable')) {
 			// If the noteField is not editable, make it editable
-			$('.noteField', id).editable(DocumentNote.urls['save'], DocumentNote.editableOptions);
+			$('.noteField', id).editable(self.urls.save, this.editableOptions());
 		}
 		$(id).toggleClass('hidden');
 	},
 
 	init: function(urls) {
-		DocumentNote.urls = urls || DocumentNote.urls;
-		$('.noteField').editable(DocumentNote.urls['save'], DocumentNote.editableOptions);
+		this.urls = urls || this.urls;
+		$('.noteField').editable(this.urls.save, this.editableOptions());
 	}
 };

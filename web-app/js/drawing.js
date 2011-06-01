@@ -298,11 +298,12 @@ var Drawing = {
 	},
 
 	setupCanvas: function(canvas, page) {
+		var self = this;
 		if (page.background.complete) {
 			this.realSetupCanvas(canvas, page)
 		} else {
 			page.background.onload = function() {
-				Drawing.realSetupCanvas(canvas, page)
+				self.realSetupCanvas(canvas, page)
 			};
 		}
 	},
@@ -340,6 +341,7 @@ var Drawing = {
 
 	// Document functions
 	getPage: function(canvas, documentId, pageNumber) {
+		var self = this;
 		if (pageNumber > this.pageCount) {
 			pageNumber = this.pageCount;
 		} else if (pageNumber < this.FIRST_PAGE) {
@@ -350,21 +352,22 @@ var Drawing = {
 			this.setupCanvas(canvas, this.pages[pageNumber]);
 		} else {
 			Document.getPage(documentId, pageNumber, function(page) {
-				Drawing.pages[page.pageNumber] = page;
-				Drawing.setupCanvas(Drawing.can, Drawing.pages[page.pageNumber]);
+				self.pages[page.pageNumber] = page;
+				self.setupCanvas(self.can, self.pages[page.pageNumber]);
 			});
 		}
 	},
 
 	submitPages: function(documentId) {
+		var self = this;
 		var lines = {}
-		$.each(Drawing.pages, function(index, element) {
-			lines[index] = Drawing.scaleLines(element);
+		$.each(self.pages, function(index, element) {
+			lines[index] = self.scaleLines(element);
 		});
 
 		Document.submitPages(documentId, lines, function() {
 			$('#dialog-message').dialog('close');
-			window.location.href = Drawing.urls['finish_redirect'];
+			window.location.href = self.urls.finish_redirect;
 		});
 	},
 	// !Document functions
@@ -479,7 +482,7 @@ var Drawing = {
 		});
 
 		$('#close').click(function() {
-			window.location.href = self.urls['close'];
+			window.location.href = self.urls.close;
 		});
 
 		$('.arrow a').click(function() {

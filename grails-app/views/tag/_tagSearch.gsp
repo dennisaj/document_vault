@@ -1,5 +1,5 @@
 <h3>Tags:</h3>
-<g:formRemote name="searchForm" url="[action: 'search']" update="results" asynchronous="false" after="Tagging.initDragAndDrop()">
+<g:formRemote name="searchForm" url="[action: 'search']" update="tag-results" asynchronous="false" after="Tagging.initDragAndDrop()">
 	<div id="search">
 		<label for="q">Search</label>
 		<br />
@@ -8,7 +8,7 @@
 	</div>
 </g:formRemote>
 <g:render template="createTag" />
-<div id="results">
+<div id="tag-results">
 	<g:render template="tagSearchResults" />
 </div>
 <hr />

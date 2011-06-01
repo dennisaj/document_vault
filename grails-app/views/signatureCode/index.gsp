@@ -12,11 +12,11 @@
 		<g:javascript>
 			$(document).ready(function() {
 				Drawing.init({
-						'close': '/document_vault/signatureCode/done',
-						'downloadImage': '/document_vault/signatureCode/downloadImage/{0}/{1}',
-						'image': '/document_vault/signatureCode/image/{0}/{1}',
-						'sign': '/document_vault/signatureCode/sign/{0}',
-						'finish_redirect': '/document_vault/signatureCode/done'
+						'close': '${createLink(controller:"signatureCode", action:"done")}',
+						'downloadImage': '${createLink(controller:"signatureCode", action:"downloadImage")}/{0}/{1}',
+						'finish_redirect': '${createLink(controller:"signatureCode", action:"done")}',
+						'image': '${createLink(controller:"signatureCode", action:"image")}/{0}/{1}',
+						'sign': '${createLink(controller:"signatureCode", action:"sign")}/{0}'
 				});
 			});
 		</g:javascript>

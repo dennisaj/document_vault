@@ -1,21 +1,24 @@
 <g:set var="haveResults" value="${documents?.results}" />
 <div id="searchResults" class="span-24 last">
 	<g:if test="${tagSearchResults}">
-	<div id="tag results" class="span-24 last append-bottom">
-		<p>Tags</p>
-		<g:render template="/tag/tagSearchResults" model="${pageScope.variables}"/>
-	</div>
+		<div id="tag-results" class="span-24 last append-bottom">
+			<p>Tags</p>
+			<g:render template="/tag/tagSearchResults" model="${pageScope.variables}" />
+		</div>
+		<div id="allTagged">
+		</div>
+		<g:javascript>Tagging.initDragAndDrop();</g:javascript>
 	</g:if>
 	<div class="span-24 last append-bottom quiet small">
 		<g:if test="${haveResults}">
-      		Showing <strong> ${documents.offset + 1} </strong> - <strong>
+			Showing <strong> ${documents.offset + 1} </strong> - <strong>
 				${documents.results.size() + documents.offset} </strong> of <strong>
 				${documents.total} </strong>
-       		results for <strong> ${queryString} </strong>
+			results for <strong> ${queryString} </strong>
 		</g:if>
 		<g:else>
 			No documents found for <strong>${queryString}</strong>.
-       	</g:else>
+		</g:else>
 		<g:if test="${parseException}">
 			<p>
 				Your query - <strong>${queryString}</strong> - is not valid.

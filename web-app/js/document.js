@@ -3,6 +3,7 @@ var Document = {
 	urls: {},
 
 	_email: function(documentId, email) {
+		var self = this;
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
@@ -16,11 +17,12 @@ var Document = {
 				}
 			},
 			type: 'GET',
-			url: Document.urls['email'].format(documentId, email)
+			url: self.urls.email.format(documentId, email)
 		});
 	},
 
 	_print: function(printerId, documentId) {
+		var self = this;
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
@@ -34,7 +36,7 @@ var Document = {
 				}
 			},
 			type: 'GET',
-			url: Document.urls['print'].format(printerId, documentId)
+			url: self.urls.print.format(printerId, documentId)
 		});
 	},
 
@@ -49,15 +51,16 @@ var Document = {
 	},
 
 	getPage: function(documentId, pageNumber, callback) {
+		var self = this;
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
-			error: Document.ajaxErrorHandler,
+			error: self.ajaxErrorHandler,
 			global: false,
 			success: function(data) {
 				if (data.pageNumber) {
 					var bg = new Image();
-					bg.src = Document.urls['downloadImage'].format(documentId, pageNumber);
+					bg.src = self.urls.downloadImage.format(documentId, pageNumber);
 					if ($.isFunction(callback)) {
 						callback({
 							lines: new Array(),
@@ -70,7 +73,7 @@ var Document = {
 				}
 			},
 			type: 'GET',
-			url: Document.urls['image'].format(documentId, pageNumber)
+			url: self.urls.image.format(documentId, pageNumber)
 		});
 	},
 
@@ -85,11 +88,12 @@ var Document = {
 	},
 
 	submitPages: function(documentId, lines, callback) {
+		var self = this;
 		$.ajax({
 			beforeSend: function() {/* Add throbber */ },
 			complete: function() {/* Remove throbber */ },
 			data: {lines: JSON.stringify(lines)},
-			error: Document.ajaxErrorHandler,
+			error: self.ajaxErrorHandler,
 			global: false,
 			success: function(data) {
 				if ($.isFunction(callback)) {
@@ -97,20 +101,21 @@ var Document = {
 				}
 			},
 			type: 'POST',
-			url: Document.urls['sign'].format(documentId)
+			url: self.urls.sign.format(documentId)
 		});
 	},
 
 	init: function(urls, ajaxErrorHandler) {
-		Document.urls = urls;
-		Document.ajaxErrorHandler = ajaxErrorHandler;
+		var self = this;
+		this.urls = urls;
+		this.ajaxErrorHandler = ajaxErrorHandler;
 
 		$('#printer-select').dialog({
 			autoOpen: false,
 			buttons: {
 				'Print': function() {
 					$(this).dialog('close');
-					Document._print($('#printer').val(), $('#print-documentId').val());
+					self._print($('#printer').val(), $('#print-documentId').val());
 				},
 				'Cancel' :function() {
 					$(this).dialog('close');
@@ -129,7 +134,7 @@ var Document = {
 			buttons: {
 				'Email': function() {
 					$(this).dialog('close');
-					Document._email($('#email-documentId').val(), $('#address').val());
+					self._email($('#email-documentId').val(), $('#address').val());
 				},
 				'Cancel' :function() {
 					$(this).dialog('close');

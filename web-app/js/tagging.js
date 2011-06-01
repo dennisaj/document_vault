@@ -1,24 +1,28 @@
 var Tagging = {
+	urls: {},
 	addTag: function(documentId, tag, callback) {
+		var self = this;
 		callback = callback || function() {};
 		$.ajax({
 			data: {id:documentId, tag:tag},
 			global: false,
 			success: callback,
 			type: 'GET',
-			url: '/document_vault/tag/document/add'
+			url: self.urls.addTag
 		});
 	},
 	create: function(name, callback) {
+		var self = this;
 		$.ajax({
 			data: {id:holder.attr('documentid'), tag:value},
 			global: false,
 			success: callback,
 			type: 'GET',
-			url: '/document_vault/tag/create/' + name
+			url: self.urls.createTag.format(name)
 		});
 	},
 	showAllTagged: function(name, displayId) {
+		var self = this;
 		var $displayId = $(displayId)
 		var spinnerTimeout = null;
 
@@ -46,24 +50,25 @@ var Tagging = {
 				});
 			},
 			type: 'GET',
-			url: '/document_vault/tag/documents/' + name
+			url: self.urls.allTagged.format(name)
 		});
 	},
 	showTagbox: function(boxId) {
+		var self = this;
 		var $boxId = $(boxId);
 		// Delay the initialization of the tagbox until the first time it is shown.
 		if (!$boxId.is('.tagit')) {
 			$boxId.tagit({
-				tagSource: '/document_vault/tag/list',
+				tagSource: self.urls.list,
 				triggerKeys: ['enter', 'comma', 'tab'],
 				initialTags: function(holder) {
-					return '/document_vault/tag/document/list/' + holder.attr('documentId')
+					return self.urls.documentList.format(holder.attr('documentId'))
 				},
 				onAdd: function(holder, value) {
-					Tagging.addTag(holder.attr('documentId'), value);
+					self.addTag(holder.attr('documentId'), value);
 				},
 				onRemove: function(holder, value) {
-					Tagging.removeTag(holder.attr('documentId'), value);
+					self.removeTag(holder.attr('documentId'), value);
 				}
 			});
 		}
@@ -71,6 +76,7 @@ var Tagging = {
 		$boxId.toggleClass('hidden');
 	},
 	removeTag: function(documentId, tag, callback) {
+		var self = this;
 		callback = callback || function() {};
 		$.ajax({
 			data: {id:documentId, tag:tag},
@@ -78,7 +84,7 @@ var Tagging = {
 			global: false,
 			success: callback,
 			type: 'GET',
-			url: '/document_vault/tag/document/remove'
+			url: self.urls.removeTag
 		});
 	},
 	initDragAndDrop: function() {
@@ -92,7 +98,7 @@ var Tagging = {
 			revert: 'invalid'
 		});
 
-		$('.droppable', '#results').droppable({
+		$('.droppable', '#tag-results').droppable({
 			accept: '.draggable',
 			hoverClass: 'active',
 			drop: function(event, ui) {
@@ -119,5 +125,8 @@ var Tagging = {
 				});
 			}
 		});
+	},
+	init: function(urls) {
+		this.urls = urls;
 	}
 };
