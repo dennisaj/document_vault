@@ -58,4 +58,12 @@ class Handler {
 		assert data instanceof DocumentData, "Must pass DocumentData with name documentData"
 		data
 	}
+
+	static void setDocument(Map map, Document document) {
+		map.document = document
+	}
+
+	static void setDocumentData(Map map, DocumentData documentData) {
+		map.documentData = documentData
+	}
 }

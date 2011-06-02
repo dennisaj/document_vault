@@ -1,17 +1,16 @@
-$(function () {
-	$('#file_upload').fileUploadUI({
-		uploadTable: $('#files'),
-		buildUploadRow: function (files, index, handler) {
-			return $('<tr><td>' + files[index].name + '<\/td>' +
-					'<td class="file_upload_progress"><div><\/div><\/td>' +
-					'<td class="file_upload_cancel">' +
-					'<button class="ui-state-default ui-corner-all" title="Cancel">' +
-					'<span class="ui-icon ui-icon-cancel">Cancel<\/span>' +
-					'<\/button><\/td><\/tr>');
-		},
-		buildDownloadRow: function (file, handler) {
-			return $('<tr><td>' + file.html + '<\/td><\/tr>');
-		},
-		url: document.location.pathname + "/ajaxSave"
-	});
-});
+var Upload = {
+	urls: {},
+	init: function(urls) {
+		this.urls = urls;
+
+		$('#fileupload').fileupload({
+			previewFileTypes: /^image\/(gif|jpeg|png|bmp)$/,
+			url: this.urls.upload
+		});
+
+		$('#fileupload .files a:not([target^=_blank])').live('click', function (e) {
+			e.preventDefault();
+			$('<iframe style="display:none;"></iframe>').prop('src', this.href).appendTo('body');
+		});
+	}
+}

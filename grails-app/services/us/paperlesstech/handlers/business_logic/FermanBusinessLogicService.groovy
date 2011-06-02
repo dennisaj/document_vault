@@ -14,21 +14,22 @@ class FermanBusinessLogicService {
 		Other
 	}
 
-	boolean addTags(Document d) {
-		def tagged = false
+	void afterPCLImportFile(Map input) {
+		def d = Handler.getDocument(input)
+		def savedDocument = d.save()
 
-		["RO_Number", "VIN"].each {
-			def value = d.searchField(it)
-			if (value) {
-				log.info "Creating tag $value"
-				tagService.createTag(value)
-				d.addTag(value)
-				log.info "Added tag $value to document $d"
-				tagged = true
+		if (savedDocument) {
+			["RO_Number", "VIN"].each {
+				def value = savedDocument.searchField(it)
+				if (value) {
+					log.info "Creating tag $value"
+					tagService.createTag(value)
+					savedDocument.addTag(value)
+					log.info "Added tag $value to document $d"
+				}
 			}
+			Handler.setDocument(input, savedDocument)
 		}
-
-		tagged
 	}
 
 	void beforePCLImportFile(Map input) {

@@ -1,6 +1,9 @@
 package us.paperlesstech
 
+import us.paperlesstech.helpers.FileHelpers
 import grails.converters.JSON
+import grails.plugins.nimble.core.AdminsService
+import grails.plugins.nimble.core.Group
 
 class UploadController {
 	static allowedMethods = [save: "POST", saveAjax: "POST"]
@@ -10,50 +13,40 @@ class UploadController {
 	def uploadService
 
 	def index = {
-	}
-
-	def save = {
-		def green = []
-		def red = []
-		request.getMultiFileMap().each {inputName, files ->
-			files.each {
-				def document = uploadService.upload(it.originalFilename, it.bytes, it.contentType)
-
-				if (document) {
-					green += document
-				} else {
-					red += it.originalFilename
-				}
-			}
-		}
-
-		if (red) {
-			flash.red = "Document(s) " + red.join(", ") + " could not be saved"
-		}
-
-		if (green) {
-			flash.green = "Document(s) " + green.join(", ") + " were saved"
-		}
-
-		redirect(view:"index")
+		[groups:uploadGroups]
 	}
 
 	def ajaxSave = {
-		def f = request.getFile('file')
-		if (!f.empty) {
-			def document = uploadService.upload(f.originalFilename, f.bytes, f.contentType)
+		params.ajax = true
 
-			if (document) {
-				def html = g.render(template:"link", model:[name:document.toString(), id:document.id])
-				render (text:[name:document.toString(), size:f.bytes.length, html:html] as JSON, contentType:"text/plain")
-				return
-			} else {
-				def html = g.render(template:"/notsaved", model:[message:g.message(code:"document-vault.error.upload.failure", args:[f.originalFilename])])
-				render (text:[html:html] as JSON, contentType:"text/plain")
-				return
+		save(params)
+	}
+
+	def save = {
+		def isAjax = params.ajax || !!request.getHeader('X-REQUESTED-WITH')
+		def results = []
+		def group = Group.get(params.int('group'))
+
+		if (group) {
+			request.getMultiFileMap().each {inputName, files->
+				files.each {
+					def document = uploadService.upload(group, it.originalFilename, it.bytes, it.contentType)
+
+					if (document) {
+						def url = g.createLink(controller:"document", action:"show", id:document.id)
+						results.add([name:document.toString(), size:document.files.first().data.length, url:url])
+					} else {
+						def error = g.message(code:"document-vault.upload.error.unsupportedfile", args:[FileHelpers.getExtension(it.originalFilename)])
+						results.add([name:it.originalFilename, size:0, error:error])
+					}
+				}
 			}
+		} else {
+			def error = g.message(code:"document-vault.upload.error.missinggroup")
+			results.add([name:"", error:error])
 		}
-		render (text:[:] as JSON, contentType:"text/plain")
+
+		isAjax ? render(text:results as JSON, contentType:"text/plain") : chain(action:"index", model:[results:results])
 	}
 
 	def savePcl = {
@@ -63,7 +56,7 @@ class UploadController {
 		try {
 			def now = new Date()
 			def fileName = String.format("%tF %tT.pcl", now, now)
-			document = uploadService.upload(fileName, params.data, MimeType.PCL, null)
+			document = uploadService.upload(uploadGroups.find { it }, fileName, params.data?.bytes, MimeType.PCL)
 			success = true
 		} catch (Exception e) {
 			log.error("Unable to save uploaded document", e)
@@ -76,6 +69,17 @@ class UploadController {
 		} else {
 			response.status = 500
 			render "Error saving file\n"
+		}
+	}
+
+	private Set getUploadGroups() {
+		def user = authService.authenticatedUser
+		def subject = authService.authenticatedSubject
+
+		def groups = Group.list()
+
+		subject.hasRole(AdminsService.ADMIN_ROLE) ? groups : groups?.findAll {
+			authService.canUpload(it)
 		}
 	}
 }

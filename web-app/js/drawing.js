@@ -164,8 +164,7 @@ var Drawing = {
 		if (this.canScroll(newScrollCanX, newScrollCanY)) {
 			this.scrollCanX = newScrollCanX;
 			this.scrollCanY = newScrollCanY;
-			canvas.style.webkitTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
-			canvas.style.MozTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
+			this._transform(canvas, this.scrollCanX, this.scrollCanY);
 		}
 	},
 
@@ -232,10 +231,6 @@ var Drawing = {
 			}
 		}
 	},
-	_round: function(number, places) {
-		places = places || 1
-		return parseFloat(number.toFixed(places));
-	},
 
 	realSetupCanvas: function(canvas, page) {
 		this.currentPage = page;
@@ -258,6 +253,11 @@ var Drawing = {
 
 		this.viewArea(canvas, page, this.ORIGIN, {x:page.background.width, y:page.background.height}, 'width');
 		this.draw(canvas, page);
+	},
+
+	_round: function(number, places) {
+		places = places || 1
+		return parseFloat(number.toFixed(places));
 	},
 
 	scaleLines: function(page) {
@@ -307,6 +307,13 @@ var Drawing = {
 			};
 		}
 	},
+
+	_transform: function(element, x, y) {
+		element.style.webkitTransform = 'translate(' + x + 'px, ' + y + 'px)';
+		element.style.MozTransform = 'translate(' + x + 'px, ' + y + 'px)';
+		element.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+		element.style.OTransform = 'translate(' + x + 'px, ' + y + 'px)';
+	},
 	
 	// Given opposite corners of a rectangle, zoom the screen to that area.
 	viewArea: function(canvas, page, point1, point2, scaleBy, center) {
@@ -329,8 +336,7 @@ var Drawing = {
 		canvas.style.width = this.currentWidth + 'px';
 		canvas.style.height = this.currentHeight + 'px';
 
-		canvas.style.webkitTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
-		canvas.style.MozTransform = 'translate(' + this.scrollCanX + 'px, ' + this.scrollCanY + 'px)';
+		this._transform(canvas, this.scrollCanX, this.scrollCanY);
 	},
 
 	onAjaxError: function(jqXHR, textStatus, errorThrown) {

@@ -10,7 +10,8 @@ class HandlerChain extends Handler {
 
 	@Override
 	void importFile(Map input) {
-		assert authService.canUploadAny()
+		def document = getDocument(input)
+		assert authService.canUpload(document.group)
 
 		handle("importFile", input)
 	}
@@ -18,7 +19,7 @@ class HandlerChain extends Handler {
 	@Override
 	void generatePreview(Map input) {
 		def document = getDocument(input)
-		assert authService.canSign(document) || authService.canUploadAny()
+		assert authService.canUpload(document.group) || authService.canSign(document)
 
 		handle("generatePreview", input)
 	}
@@ -75,10 +76,10 @@ class HandlerChain extends Handler {
 
 		assert handler.respondsTo(methodName)
 		def result = handler."$methodName"(input)
-
-		businessMethod = "after${data.mimeType.toString()}$methodName"
+		
+		businessMethod = "after${data.mimeType.toString()}${methodName.capitalize()}"
 		if (businessLogicService?.metaClass?.respondsTo(businessLogicService, businessMethod)) {
-			log.debug "calling $businessLogicService.$businessMethod"
+			log.error "calling $businessLogicService.$businessMethod"
 			businessLogicService?."$businessMethod"(input)
 		} else {
 			log.debug "$businessLogicService.$businessMethod does not exist"

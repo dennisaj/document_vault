@@ -2,6 +2,7 @@ package us.paperlesstech
 
 import grails.plugins.nimble.auth.WildcardPermission
 import grails.plugins.nimble.core.AuthenticatedService
+import grails.plugins.nimble.core.Group
 
 class AuthService extends AuthenticatedService {
 	static transactional = false
@@ -47,6 +48,10 @@ class AuthService extends AuthenticatedService {
 		isPermissionImplied("document:tag")
 	}
 
+	boolean canUpload(Group group) {
+		isPermissionImplied("document:upload:${group?.id}")
+	}
+
 	boolean canUploadAny() {
 		isPermissionImplied("document:upload")
 	}
@@ -60,6 +65,7 @@ class AuthService extends AuthenticatedService {
 	}
 
 	boolean checkPermission(DocumentPermission permission, Document d) {
+		assert d
 		def subject = testSubject ?: getAuthenticatedSubject()
 
 		if (!subject.authenticated) {

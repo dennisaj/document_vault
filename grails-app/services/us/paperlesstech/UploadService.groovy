@@ -1,5 +1,6 @@
 package us.paperlesstech
 
+import grails.plugins.nimble.core.Group
 import us.paperlesstech.helpers.FileHelpers
 
 class UploadService {
@@ -9,37 +10,28 @@ class UploadService {
 	def handlerChain
 	def businessLogicService
 
-	Document upload(String name, byte[] data, String contentType) {
+	Document upload(Group group, String name, byte[] data, String contentType) {
 		MimeType mimeType = MimeType.getMimeType(mimeType: contentType, fileName: name)
 
 		if (mimeType) {
-			return upload(name, data, mimeType)
+			return upload(group, name, data, mimeType)
 		}
 
 		return null
 	}
 
-	Document upload(String name, byte[] data, MimeType mimeType) {
-		assert authService.canUploadAny()
-
-		def fileGroup = authService?.authenticatedUser?.groups?.find { group ->
-			group.permissions?.find { permission ->
-				permission?.target?.contains("document:upload")
-			}
-		}
-		assert fileGroup
+	Document upload(Group group, String name, byte[] data, MimeType mimeType) {
+		assert authService.canUpload(group)
 
 		try {
 			Document document = new Document()
-			document.group = fileGroup
+			document.group = group
 			document.name = FileHelpers.chopExtension(name)
 			def documentData = new DocumentData(mimeType: mimeType, data: data)
 			handlerChain.importFile(document: document, documentData: documentData)
 
 			assert document.files.size() == 1
 			document.save()
-
-			businessLogicService.addTags(document)
 
 			log.info "Saved document ${document.id}"
 			return document
