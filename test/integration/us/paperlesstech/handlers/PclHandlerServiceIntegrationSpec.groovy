@@ -28,7 +28,7 @@ class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		handlerChain.importFile(input)
 
 		then:
-		document.searchFields.DocumentType == "CustomerHardCopy"
+		document.searchField("DocumentType") == "CustomerHardCopy"
 		document.files.first().pages == 1
 		document.files.first().mimeType == MimeType.PDF
 		document.files.first().data[0..3] == "%PDF".bytes

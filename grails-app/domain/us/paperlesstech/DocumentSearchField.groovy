@@ -1,0 +1,12 @@
+package us.paperlesstech
+
+import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+
+@MultiTenant
+class DocumentSearchField extends DocumentField {
+	String fieldType = "DocumentSearchField"
+
+	static mapping = {
+		discriminator "2"
+	}
+}

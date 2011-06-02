@@ -18,12 +18,12 @@ class FermanBusinessLogicService {
 		def tagged = false
 
 		["RO_Number", "VIN"].each {
-			if (d.searchFields."$it") {
-				def tag = d.searchFields."$it"
-				log.info "Creating tag $tag"
-				tagService.createTag(tag)
-				d.addTag(tag)
-				log.info "Added tag $tag to document $d"
+			def value = d.searchField(it)
+			if (value) {
+				log.info "Creating tag $value"
+				tagService.createTag(value)
+				d.addTag(value)
+				log.info "Added tag $value to document $d"
 				tagged = true
 			}
 		}
@@ -52,7 +52,11 @@ class FermanBusinessLogicService {
 
 		sanitizeAll(m)
 
-		d.searchFields << m
+		m.each { key, value ->
+			if (key && value) {
+				d.searchField(key, value)
+			}
+		}
 
 		log.debug "Imported fields ($m)"
 	}

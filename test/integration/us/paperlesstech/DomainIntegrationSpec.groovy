@@ -34,15 +34,50 @@ class DomainIntegrationSpec extends IntegrationSpec {
 
 	def "can add to document maps"() {
 		given:
-		def d = getDocument()
+		assert Document.count() == 0
+		assert DocumentSearchField.count() == 0
+		assert DocumentOtherField.count() == 0
 
 		when:
-		d.searchFields.field1 = "value1"
-		d.otherFields.field1 = "value2"
+		def d = getDocument()
+		d.searchField("field1", "value1")
+		d.otherField("field1","value2")
+		def result = d.save(failOnErrors: true)
+		d = Document.get(1)
 
 		then: "Adding to the document map it should not throw a NPE"
-		d.searchFields.field1 == "value1"
-		d.otherFields.field1 == "value2"
+		result
+		Document.count() == 1
+		DocumentSearchField.count() == 1
+		DocumentOtherField.count() == 1
+		d.searchField("field1") == "value1"
+		d.otherField("field1") == "value2"
+	}
+
+	def "can update document maps"() {
+		given:
+		assert Document.count() == 0
+		assert DocumentSearchField.count() == 0
+		assert DocumentOtherField.count() == 0
+		def d = getDocument()
+		d.searchField("field1", "value1")
+		d.otherField("field1","value2")
+		assert d.save(failOnErrors: true)
+
+		when:
+		d = Document.get(d.id)
+		d.searchField("field1", "value3")
+		d.otherField("field1","value4")
+		def result = d.save(failOnErrors: true)
+		d = Document.get(d.id)
+
+		then: "Adding to the document map it should not throw a NPE"
+		result
+		Document.count() == 1
+		DocumentSearchField.count() == 1
+		DocumentOtherField.count() == 1
+		d.searchField("field1") == "value3"
+		d.otherField("field1") == "value4"
 	}
 
 	def "you can save a document without a preview image"() {

@@ -16,7 +16,6 @@ class DocumentSpec extends UnitSpec {
 
 	}
 
-	@Unroll("saving document with file=#file and group=#group")
 	def "test constraints"() {
 		given:
 		mockDomain(Document)

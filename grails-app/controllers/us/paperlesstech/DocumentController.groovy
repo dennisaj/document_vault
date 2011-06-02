@@ -13,7 +13,6 @@ class DocumentController {
 
 	def grailsApplication
 	def handlerChain
-	def searchableService
 	def tagService
 
 	def index = {
@@ -51,7 +50,7 @@ class DocumentController {
 
 		if (idRegex.matches() && Document.exists(idRegex[0][1])) {
 			def document = Document.get(idRegex[0][1])
-			document.searchFields['Note'] = params.value
+			document.searchField("Note", params.value)
 			document.save(flush:true)
 
 			render text:params.value, contentType: "text/plain"
