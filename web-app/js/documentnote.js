@@ -16,12 +16,14 @@ var DocumentNote = {
 		}
 	},
 
-	show: function(id) {
+	show: function(id, button) {
 		var self = this;
 		if (!$('.noteField', id).data('event.editable')) {
 			// If the noteField is not editable, make it editable
 			$('.noteField', id).editable(self.urls.save, this.editableOptions());
 		}
+
+		$(button).toggleClass('ui-state-active');
 		$(id).toggleClass('hidden');
 	},
 

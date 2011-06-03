@@ -1,14 +1,12 @@
+<%@page import="us.paperlesstech.MimeType"%>
 <div id="searchResults" class="span-24 last">
 	<g:if test="${tagSearchResults}">
 		<div id="tag-results" class="span-24 last append-bottom">
 			<p>Tags</p>
 			<g:render template="/tag/tagSearchResults" model="${pageScope.variables}"/>
 		</div>
-
-		<div id="allTagged"/>
-		<g:javascript>Tagging.initDragAndDrop();</g:javascript>
 	</g:if>
-	<div class="span-24 last append-bottom quiet small">
+	<div class="span-24 last quiet ui-widget-header ui-corner-top">
 		<g:if test="${!q}">
 			Showing ${max.encodeAsHTML()} most recent documents.
 		</g:if>
@@ -20,81 +18,88 @@
 		</g:if>
 	</div>
 	<g:if test="${documents}">
-		<div class="span-24 last append-bottom">
-			<g:each var="it" in="${documents}" status="index">
-				<div class="result">
-					Document: ${it.id}<br/>
-					Date printed: <g:formatDate date="${it.dateCreated}" format="yyyy-MM-dd hh:mma"/><br/>
+	<div class="span-24 last ui-widget-content ui-corner-bottom">
+		<table id="document-table">
+		<g:each var="it" in="${documents}" status="index">
+			<tr class="result">
+				<td>
+					<img class="thumb" width="80" src="${createLink(action: 'downloadImage', id: it.id)}" alt="Document ${it.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
+				</td>
+				<td>
+					${it.toString()?.encodeAsHTML()}
+					<g:if test="${it.signed}">
+						<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" style="cursor: default" title="<g:message code="document-vault.label.signed" />">
+							<span class="ui-icon ui-icon-circle-check"></span>
+							<span class="ui-button-text"><g:message code="document-vault.label.signed" /></span>
+						</span>
+					</g:if>
+				</td>
+				<td>
+					<g:message code="document-vault.label.added" /> <prettytime:display date="${it.dateCreated}" />
+				</td>
+				<td>
+					<prettysize:display size="${it?.files?.first()?.data?.size()}" abbr="true" format="###0" />
+				</td>
+				<td class="">
+					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.tags" />" onclick="javascript:Tagging.showTagbox('#tagbox-${it.id}', this);">
+						<span class="ui-button-icon-primary ui-icon ui-icon-tag"></span>
+						<span class="ui-button-text"><g:message code="document-vault.label.tags" /></span>
+					</button>
+					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.notes" />" onclick="javascript:DocumentNote.show('#notebox-${it.id}', this);">
+						<span class="ui-button-icon-primary ui-icon ui-icon-comment"></span>
+						<span class="ui-button-text"><g:message code="document-vault.label.notes" /></span>
+					</button>
+					<g:if test="${it.files.first().mimeType == MimeType.PDF }">
+					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.print" />" onclick="javascript:Document.print(${it.id});">
+						<span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
+						<span class="ui-button-text"><g:message code="document-vault.label.print" /></span>
+					</button>
+					</g:if>
+					<a href="${createLink(action: 'download', id: it.id)}">
+						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.download" />">
+							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-s"></span>
+							<span class="ui-button-text"><g:message code="document-vault.label.download" /></span>
+						</button></a>
+					<a href="${createLink(action: 'show', id: it.id)}">
+						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.view" />">
+							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span>
+							<span class="ui-button-text"><g:message code="document-vault.label.view" /></span>
+						</button></a>
+				</td>
+			</tr>
+			<tr id="notebox-${it.id}" class="hidden">
+				<td>
+					<g:message code="document-vault.label.notes" />:
+				</td>
+				<td colspan="4">
+					<span class="noteField" id="note-${it.id}">${it.searchField('Note')}</span>
+				</td>
+			</tr>
+			<tr class="hidden">
+				<td>
+					<g:message code="document-vault.label.tags" />:
+				</td>
+				<td colspan="4">
+					<ul class="taggable" id="tagbox-${it.id}" documentid="${it.id}"></ul>
+				</td>
+			</tr>
+		</g:each>
+		</table>
+	</div>
 
-					<div>
-						<ul class="actions">
-							<li>
-								<a href="${createLink(action: 'show', id: it.id)}">
-									<img src="${resource(dir: 'images', file: 'document-sign.png')}"
-										 alt=""/><br/>View/Sign
-								</a>
-							</li>
-							<li>
-								<a href="${createLink(action: 'download', id: it.id)}">
-									<img src="${resource(dir: 'images', file: 'download.png')}" alt=""/><br/>Download
-								</a>
-							</li>
-							<li>
-								<a href="javascript:Document.print(${it.id});">
-									<img src="${resource(dir: 'images', file: 'document-print.png')}" alt=""/><br/>Print
-								</a>
-							</li>
-							<%--<li>
-							 <a href="javascript:Document.email(${it.id});">
-								 <img src="${resource(dir:'images', file:'mail-send.png')}" alt="" /><br />Email
-							 </a>
-						 </li>--%>
-							<li>
-								<a href="javascript:DocumentNote.show('#notebox-${it.id}');">
-									<img src="${resource(dir: 'images', file: 'note.png')}" alt=""/><br/>Notes
-								</a>
-							</li>
-							<li>
-								<a href="javascript:Tagging.showTagbox('#tagbox-${it.id}');">
-									<img src="${resource(dir: 'images', file: 'list-add.png')}" alt=""/><br/>Tags
-								</a>
-							</li>
-						</ul>
-						<br/><br/><br/>
-
-						<div>
-							<ul class="taggable hidden" id="tagbox-${it.id}" documentid="${it.id}"></ul>
-						</div>
-						<g:if test="${it.signed}">
-							<div><g:render template="/saved"><g:message
-									code="document-vault.template.document.signed"/></g:render></div>
-						</g:if>
-						<a href="${createLink(action: 'show', id: it.id)}">
-							<img class="thumb" width="400" src="${createLink(action: 'downloadImage', id: it.id)}"
-								 alt="Document ${it.id} Page 1"/>
-						</a>
-
-						<div class="triangle-border left-arrow hidden" id="notebox-${it.id}">
-							<span class="noteField" id="note-${it.id}">${it.searchField('Note')}</span>
-						</div>
-					</div>
-				</div>
-			</g:each>
-		</div>
-
-		<div class="paging span-24 last append-bottom">
-			Page: 1
-			<%--
-			<g:set var="totalPages" value="${Math.ceil(documents.total / documents.max)}"/>
-			<g:if test="${totalPages == 1}">
-				<span class="currentStep">1</span>
-			</g:if>
-			<g:else>
-				<g:paginate controller="searchable" action="index"
-							params="[q: queryString]" total="${documents.total}"
-							prev="&lt; previous" next="next &gt;"/>
-			</g:else>
-			--%>
-		</div>
+	<div class="paging span-24 last append-bottom">
+		Page: 1
+		<%--
+		<g:set var="totalPages" value="${Math.ceil(documents.total / documents.max)}"/>
+		<g:if test="${totalPages == 1}">
+			<span class="currentStep">1</span>
+		</g:if>
+		<g:else>
+			<g:paginate controller="searchable" action="index"
+						params="[q: queryString]" total="${documents.total}"
+						prev="&lt; previous" next="next &gt;"/>
+		</g:else>
+		--%>
+	</div>
 	</g:if>
 </div>

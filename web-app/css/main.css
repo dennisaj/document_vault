@@ -90,8 +90,13 @@ th.desc a:after {
 
 .result .thumb {
 	border: 1px solid #000;
+	cursor: pointer;
 }
 
 .uploadcomplete img, .notsaved img, .saved img {
 	vertical-align: middle;
+}
+
+#document-table {
+	margin: 0;
 }

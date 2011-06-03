@@ -61,7 +61,7 @@ var Tagging = {
 			url: self.urls.allTagged.format(name)
 		});
 	},
-	showTagbox: function(boxId) {
+	showTagbox: function(boxId, button) {
 		var self = this;
 		var $boxId = $(boxId);
 		// Delay the initialization of the tagbox until the first time it is shown.
@@ -81,7 +81,8 @@ var Tagging = {
 			});
 		}
 
-		$boxId.toggleClass('hidden');
+		$(button).toggleClass('ui-state-active');
+		$boxId.parent().parents('tr').toggleClass('hidden');
 	},
 	removeTag: function(documentId, tag, callback) {
 		var self = this;

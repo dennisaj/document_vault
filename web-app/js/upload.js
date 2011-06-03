@@ -13,4 +13,4 @@ var Upload = {
 			$('<iframe style="display:none;"></iframe>').prop('src', this.href).appendTo('body');
 		});
 	}
-}
+};

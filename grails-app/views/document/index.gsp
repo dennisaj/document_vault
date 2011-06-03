@@ -13,6 +13,7 @@
 		<g:javascript src="HtmlAlert.js" />
 		<g:javascript src="document.js" />
 		<g:javascript src="tagging.js" />
+		<g:javascript src="previewimage.js" />
 		<g:javascript>
 			$(document).ready(function() {
 				DocumentNote.init({
@@ -36,9 +37,12 @@
 					'createTag': '${createLink(controller:"tag", action:"create")}/{0}',
 					'documentList': '${createLink(controller:"tag", action:"documentList")}/{0}',
 					'list': '${createLink(controller:"tag", action:"list")}',
-					'removeTag': '${createLink(controller:"tag", action:"documentRemove")}',
-					'documentSearch': '${createLink(controller:"document", action:"index")}'
+					'removeTag': '${createLink(controller:"tag", action:"documentRemove")}'
 				}, true);
+
+				$('.thumb').live('click', function(event) {
+					PreviewImage.show(event.target.src);
+				});
 			});
 		</g:javascript>
 	</head>

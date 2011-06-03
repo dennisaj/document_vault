@@ -8,7 +8,7 @@ class PrintQueueController {
 	def pop = {
 		def results = PrintQueue.listOrderByDateCreated(max:1, order:"asc")
 		if (results.size() > 0) {
-			def j = [printer: results[0].printer, document: results[0].document.pdf.data.encodeBase64().toString()]
+			def j = [printer: results[0].printer, document: results[0].document.files.first().data.encodeBase64().toString()]
 			results[0].delete()
 			render (j as JSON)
 		}

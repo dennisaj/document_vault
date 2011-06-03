@@ -300,10 +300,10 @@ var Drawing = {
 	setupCanvas: function(canvas, page) {
 		var self = this;
 		if (page.background.complete) {
-			this.realSetupCanvas(canvas, page)
+			this.realSetupCanvas(canvas, page);
 		} else {
 			page.background.onload = function() {
-				self.realSetupCanvas(canvas, page)
+				self.realSetupCanvas(canvas, page);
 			};
 		}
 	},
