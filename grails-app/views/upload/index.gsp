@@ -7,7 +7,7 @@
 		<g:javascript src="jquery.fileupload.js" />
 		<g:javascript src="jquery.fileupload-ui.js" />
 		<g:javascript src="jquery.iframe-transport.js" />
-		<script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+		<g:javascript src="jquery.tmpl.js" />
 		<g:javascript src="upload.js" />
 		<g:javascript>
 			$(document).ready(function() {

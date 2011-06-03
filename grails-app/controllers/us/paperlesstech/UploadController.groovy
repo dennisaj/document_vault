@@ -2,7 +2,6 @@ package us.paperlesstech
 
 import us.paperlesstech.helpers.FileHelpers
 import grails.converters.JSON
-import grails.plugins.nimble.core.AdminsService
 import grails.plugins.nimble.core.Group
 
 class UploadController {
@@ -13,7 +12,7 @@ class UploadController {
 	def uploadService
 
 	def index = {
-		[groups:uploadGroups]
+		[groups:authService.getGroupsWithPermission(DocumentPermission.Upload)]
 	}
 
 	def ajaxSave = {
@@ -56,7 +55,7 @@ class UploadController {
 		try {
 			def now = new Date()
 			def fileName = String.format("%tF %tT.pcl", now, now)
-			document = uploadService.upload(uploadGroups.find { it }, fileName, params.data?.bytes, MimeType.PCL)
+			document = uploadService.upload(authService.getGroupsWithPermission(DocumentPermission.Upload).find { it }, fileName, params.data?.bytes, MimeType.PCL)
 			success = true
 		} catch (Exception e) {
 			log.error("Unable to save uploaded document", e)
@@ -69,17 +68,6 @@ class UploadController {
 		} else {
 			response.status = 500
 			render "Error saving file\n"
-		}
-	}
-
-	private Set getUploadGroups() {
-		def user = authService.authenticatedUser
-		def subject = authService.authenticatedSubject
-
-		def groups = Group.list()
-
-		subject.hasRole(AdminsService.ADMIN_ROLE) ? groups : groups?.findAll {
-			authService.canUpload(it)
 		}
 	}
 }

@@ -1,5 +1,6 @@
 var Tagging = {
 	urls: {},
+	useDocumentSearch: false,
 	addTag: function(documentId, tag, callback) {
 		var self = this;
 		callback = callback || function() {};
@@ -23,7 +24,14 @@ var Tagging = {
 	},
 	showAllTagged: function(name, displayId) {
 		var self = this;
-		var $displayId = $(displayId)
+
+		if(self.useDocumentSearch) {
+			$("#q").val("tagged " + name);
+			$("#searchForm").submit();
+			return;
+		}
+
+		var $displayId = $(displayId);
 		var spinnerTimeout = null;
 
 		$.ajax({
@@ -126,7 +134,8 @@ var Tagging = {
 			}
 		});
 	},
-	init: function(urls) {
+	init: function(urls, useDocumentSearch) {
 		this.urls = urls;
+		this.useDocumentSearch = useDocumentSearch || false;
 	}
 };

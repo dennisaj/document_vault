@@ -77,9 +77,9 @@ class HandlerChain extends Handler {
 		assert handler.respondsTo(methodName)
 		def result = handler."$methodName"(input)
 		
-		businessMethod = "after${data.mimeType.toString()}${methodName.capitalize()}"
+		businessMethod = businessMethod.replaceFirst("before", "after")
 		if (businessLogicService?.metaClass?.respondsTo(businessLogicService, businessMethod)) {
-			log.error "calling $businessLogicService.$businessMethod"
+			log.debug "calling $businessLogicService.$businessMethod"
 			businessLogicService?."$businessMethod"(input)
 		} else {
 			log.debug "$businessLogicService.$businessMethod does not exist"

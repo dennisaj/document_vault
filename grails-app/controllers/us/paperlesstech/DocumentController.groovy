@@ -8,41 +8,73 @@ class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
 	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.authenticated}, order:0, title:'Home']]
 
-	// TODO Remove scaffolding
-	def scaffold = true
-
+	def authService
 	def grailsApplication
 	def handlerChain
 	def tagService
 
 	def index = {
-		def results = Document.listOrderByDateCreated(max:10, order:"desc")
-		def docCount = Document.count()
+		params.q = params.q?.trim()
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		params.offset = params.offset ? params.int('offset') : 0
+		params.sort = params.sort ?: "dateCreated"
+		params.order = params.order ?: "desc"
 
-		def tagList =  tagService.getRecentTags()
-
-		["tagSearchResults": tagList, "documents": [offset: 0, results: Document.list([max:10, order:'desc', sort:'dateCreated']), total:10, max:10], "queryString": "*"]
-	}
-
-	def search = {
-		def results = [:]
-
-		def q = params?.q?.trim()
-		results.queryString = q
-
-		def tagList = []
-		def terms = q?.tokenize(",").collect { it.trim() }.findAll { it }
-		if (terms?.size()) {
-			tagList = tagService.tagSearch(terms)
-		} else {
-			tagList = tagService.getRecentTags()
+		def tagSearch = false
+		def tag
+		if (params.q?.startsWith("tagged")) {
+			tagSearch = true
+			tag = params.q.substring("tagged".size()).trim()
 		}
 
-		results.tagSearchResults = tagList
+		def terms = params.q?.tokenize(",").collect { it.trim() }.findAll { it }
+		if (tagSearch) {
+			params.tagSearchResults = [tag]
+		} else if (terms?.size()) {
+			params.tagSearchResults = tagService.tagSearch(terms)
+		} else {
+			params.tagSearchResults = tagService.getRecentTags()
+		}
 
-		def docs = Document.findAllByNameIlike("%$q%", [max:10, order:'desc', sort:'dateCreated'])
-		results.documents = [results: docs, offset: 0, total:docs.size(), max:10]
-		render(template:"searchResults", model:results)
+		def allowedGroupIds = authService.getGroupsWithPermission(DocumentPermission.View).collect { it.id } ?: -1L
+		def specificDocs = authService.getIndividualDocumentsWithPermission(DocumentPermission.View) ?: -1L
+
+		if (tagSearch) {
+			params.documents = Document.findAllByTagWithCriteria(tag) {
+				or {
+					inList("id", specificDocs)
+					inList("group.id", allowedGroupIds)
+				}
+				maxResults(params.max)
+				firstResult(params.offset)
+				order(params.sort, params.order)
+			}
+		} else {
+			def c = Document.createCriteria()
+			params.documents = c.listDistinct {
+				or {
+					inList("id", specificDocs)
+					inList("group.id", allowedGroupIds)
+				}
+				if (params.q) {
+					or {
+						ilike("name", "%$params.q%")
+						searchFieldsCollection {
+							ilike("value", "%$params.q%")
+						}
+					}
+				}
+				maxResults(params.max)
+				firstResult(params.offset)
+				order(params.sort, params.order)
+			}
+		}
+
+		if (request.xhr) {
+			render(template: "searchResults", model: params)
+		} else {
+			params
+		}
 	}
 
 	def saveNote = {
