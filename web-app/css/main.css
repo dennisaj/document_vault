@@ -100,3 +100,13 @@ th.desc a:after {
 #document-table {
 	margin: 0;
 }
+
+.ui-state-success {
+	background: #E6EFC2;
+	border: 1px solid #A8D676;
+	color: #264409;
+}
+
+.ui-state-success .ui-icon {
+	background-image: url('../images/ui-icons_91cd51_256x240.png');
+}

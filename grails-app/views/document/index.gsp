@@ -47,7 +47,7 @@
 		</g:javascript>
 	</head>
 <body>
-	<g:formRemote name="searchForm" url="[action: 'index']" update="searchResults">
+	<g:formRemote name="searchForm" url="[action: 'index']" update="resultsHolder">
 		<fieldset class="span-24 last">
 			<legend>Search for a document</legend>
 			<div id="search">
@@ -58,7 +58,9 @@
 			</div>
 		</fieldset>
 	</g:formRemote>
-	<g:render template="searchResults" />
+	<div id="resultsHolder">
+		<g:render template="searchResults" />
+	</div>
 	<g:render template="printerDialog" />
 	<%--<g:render template="emailDialog" />--%>
 	<g:render template="/alert" />

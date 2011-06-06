@@ -159,5 +159,7 @@ class DocumentController {
 		} else {
 			flash.yellow = g.message(code:"document-vault.signature.error.nosignatures")
 		}
+
+		render ([status:"success"] as JSON)
 	}
 }
