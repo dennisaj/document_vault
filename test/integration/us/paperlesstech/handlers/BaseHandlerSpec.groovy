@@ -10,7 +10,11 @@ class BaseHandlerSpec extends IntegrationSpec {
 	def setup() {
 		adminSubject = Mock()
 		adminSubject.authenticated >> true
+		adminSubject.remembered >> true
 		adminSubject.isPermitted(_) >> true
+		authService.metaClass.isLoggedIn = {
+			true
+		}
 		authService.testSubject = adminSubject
 	}
 }

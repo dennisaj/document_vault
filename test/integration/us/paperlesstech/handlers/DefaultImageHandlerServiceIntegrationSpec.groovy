@@ -10,8 +10,10 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def defaultImageHandlerService
 	def line
 
+	@Override
 	def setup() {
 		line = [a:[x:0,y:0], b:[x:100,y:100]]
+		defaultImageHandlerService.authService = authService
 	}
 
 	def "import image files"() {

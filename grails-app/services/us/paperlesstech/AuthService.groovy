@@ -22,7 +22,7 @@ class AuthService extends AuthenticatedService {
 	}
 
 	boolean canNotesAny() {
-		isPermissionImplied("document:sign")
+		isPermissionImplied("document:notes")
 	}
 
 	boolean canPrint(Document d) {
@@ -69,7 +69,7 @@ class AuthService extends AuthenticatedService {
 		assert d
 		def subject = testSubject ?: getAuthenticatedSubject()
 
-		if (!subject.authenticated) {
+		if (!isLoggedIn()) {
 			return false
 		}
 
@@ -82,7 +82,7 @@ class AuthService extends AuthenticatedService {
 		assert g
 		def subject = testSubject ?: getAuthenticatedSubject()
 
-		if (!subject.authenticated) {
+		if (!isLoggedIn()) {
 			return false
 		}
 
@@ -101,7 +101,7 @@ class AuthService extends AuthenticatedService {
 		def user = authenticatedUser
 		def subject = authenticatedSubject
 
-		if (!subject.authenticated) {
+		if (!isLoggedIn()) {
 			return [] as Set
 		}
 
@@ -122,7 +122,7 @@ class AuthService extends AuthenticatedService {
 	Set getIndividualDocumentsWithPermission(DocumentPermission permission) {
 		def subject = authenticatedSubject
 
-		if (!subject.authenticated) {
+		if (!isLoggedIn()) {
 			return [] as Set
 		}
 
@@ -179,7 +179,7 @@ class AuthService extends AuthenticatedService {
 	 */
 	boolean isPermissionImplied(String permission) {
 		def subject = testSubject ?: getAuthenticatedSubject()
-		if (!subject.authenticated) {
+		if (!isLoggedIn()) {
 			return false
 		}
 

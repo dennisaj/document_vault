@@ -6,7 +6,7 @@ import org.apache.shiro.SecurityUtils
 
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
-	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.authenticated}, order:0, title:'Home']]
+	static navigation = [[action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Home']]
 
 	def authService
 	def handlerChain

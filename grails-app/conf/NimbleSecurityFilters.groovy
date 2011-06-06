@@ -36,7 +36,7 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 				if (params.documentId) {
 					document = Document.get(params.documentId)
 				}
-				accessControl {
+				accessControl (auth: false) {
 					def action = actionName ?: "index"
 					log.info("user:$authService.authenticatedUser; resource:$controllerName:$action; document:$document")
 					switch (controllerName) {
