@@ -5,6 +5,7 @@
 		<link href="${resource(dir:'css', file:'tag.css')}" rel="stylesheet" media="screen, projection" />
 		<g:javascript src="jquery.ui.touch-punch.min.js" />
 		<g:javascript src="document/tagging.js" />
+		<g:javascript src="previewimage.js" />
 		<title> - Tag</title>
 		<g:javascript>
 			$(document).ready(function() {
@@ -17,6 +18,10 @@
 					'removeTag': '${createLink(controller:"tag", action:"documentRemove")}'
 				});
 				Tagging.initDragAndDrop();
+
+				$('.thumb').live('click', function(event) {
+					PreviewImage.show(event.target.src);
+				});
 			});
 		</g:javascript>
 	</head>

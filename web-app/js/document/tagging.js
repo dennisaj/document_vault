@@ -103,7 +103,12 @@ var Tagging = {
 		$('.draggable').draggable({
 			containment: 'document',
 			cursor: 'move',
+			cursorAt: {
+				left: 10,
+				top: 50
+			},
 			helper: 'clone',
+			opacity: '.75',
 			revert: 'invalid'
 		});
 

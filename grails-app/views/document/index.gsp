@@ -13,7 +13,7 @@
 		<g:javascript src="HtmlAlert.js" />
 		<g:javascript src="document/document.js" />
 		<g:javascript src="document/tagging.js" />
-		<g:javascript src="document/previewimage.js" />
+		<g:javascript src="previewimage.js" />
 		<g:javascript>
 			$(document).ready(function() {
 				DocumentNote.init({

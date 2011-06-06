@@ -88,7 +88,7 @@ th.desc a:after {
 	display: none !important;
 }
 
-.result .thumb {
+.thumb {
 	border: 1px solid #000;
 	cursor: pointer;
 }
