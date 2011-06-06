@@ -1,0 +1,41 @@
+.arrow {
+	margin: 0;
+	padding: 0;
+	position: fixed;
+	text-align: center;
+	top: 45%;
+	z-index: 10;
+}
+
+.arrow a {
+	-webkit-tap-highlight-color: 0;
+	-webkit-touch-callout: none;
+	color: #000;
+	font-family: HoeflerText-Regular;
+	font-size: 2em;
+	font-weight: bold;
+	padding: 0;
+	text-decoration: none;
+	text-shadow: #fff 0 0 .3em;
+}
+
+.arrow#right-arrow a {
+	margin: 0 .25em 0 .3em;
+}
+
+.arrow#left-arrow a {
+	margin: 0 .25em 0 .3em;
+}
+
+#right-arrow {
+	right: 10px;
+}
+
+#left-arrow {
+	left: 10px;
+}
+
+.disabled {
+	color: #888 !important;
+	cursor: default !important;
+}

@@ -3,20 +3,20 @@
 	<head>
 		<title> - Sign</title>
 		<meta name="layout" content="mobile" />
-		<link href="${resource(dir:'css', file:'drawing.css')}" rel="stylesheet" media="all" />
+		<link href="${resource(dir:'css', file:'document/sign.css')}" rel="stylesheet" media="all" />
 		<jqui:resources theme="ui-lightness" />
 		<g:javascript src="jquery.ba-hashchange.js" />
 		<g:javascript src="HtmlAlert.js" />
-		<g:javascript src="document.js" />
-		<g:javascript src="drawing.js" />
+		<g:javascript src="document/document.js" />
+		<g:javascript src="document/sign.js" />
 		<g:javascript>
 			$(document).ready(function() {
-				Drawing.init({
-						'close': '${createLink(controller:"signatureCode", action:"done")}',
-						'downloadImage': '${createLink(controller:"signatureCode", action:"downloadImage")}/{0}/{1}',
-						'finish_redirect': '${createLink(controller:"signatureCode", action:"done")}',
-						'image': '${createLink(controller:"signatureCode", action:"image")}/{0}/{1}',
-						'sign': '${createLink(controller:"signatureCode", action:"sign")}/{0}'
+				Sign.init({
+					'close': '${createLink(controller:"signatureCode", action:"done")}',
+					'downloadImage': '${createLink(controller:"signatureCode", action:"downloadImage")}/{0}/{1}',
+					'finish_redirect': '${createLink(controller:"signatureCode", action:"done")}',
+					'image': '${createLink(controller:"signatureCode", action:"image")}/{0}/{1}',
+					'sign': '${createLink(controller:"signatureCode", action:"sign")}/{0}'
 				});
 			});
 		</g:javascript>

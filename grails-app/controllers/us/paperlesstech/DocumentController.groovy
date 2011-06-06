@@ -120,13 +120,6 @@ class DocumentController {
 		def document = Document.get(params.long("documentId"))
 		assert document
 
-		render([view: "edit", model:[document: document]])
-	}
-
-	def edit = {
-		def document = Document.get(params.long("documentId"))
-		assert document
-
 		[document: document]
 	}
 
@@ -139,6 +132,13 @@ class DocumentController {
 	}
 
 	def sign = {
+		def document = Document.get(params.long("documentId"))
+		assert document
+
+		[document: document]
+	}
+
+	def submitSignatures = {
 		def document = Document.get(params.long("documentId"))
 		assert document
 

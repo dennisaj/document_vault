@@ -40,7 +40,7 @@
 				<td>
 					<prettysize:display size="${it?.files?.first()?.data?.size()}" abbr="true" format="###0" />
 				</td>
-				<td class="">
+				<td>
 					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.tags" />" onclick="javascript:Tagging.showTagbox('#tagbox-${it.id}', this);">
 						<span class="ui-button-icon-primary ui-icon ui-icon-tag"></span>
 						<span class="ui-button-text"><g:message code="document-vault.label.tags" /></span>
@@ -60,7 +60,7 @@
 							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-s"></span>
 							<span class="ui-button-text"><g:message code="document-vault.label.download" /></span>
 						</button></a>
-					<a href="${createLink(action: 'show', params:[documentId: it.id])}">
+					<a href="${createLink(action: 'sign', params:[documentId: it.id])}">
 						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.view" />">
 							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span>
 							<span class="ui-button-text"><g:message code="document-vault.label.view" /></span>

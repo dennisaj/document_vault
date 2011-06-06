@@ -1,4 +1,4 @@
-var Drawing = {
+var Sign = {
 	//global objects
 	$box: null,
 	can: null,
@@ -80,11 +80,11 @@ var Drawing = {
 	},
 
 	doEnd: function(event) {
-		var isDrawing = $('#pen').is('.on');
+		var isSigning = $('#pen').is('.on');
 		var isHighlighting = $('#highlight').is('.on');
 		$('.arrow').fadeIn('fast');
 
-		if (!isDrawing && !this.isMoving && !isHighlighting) {
+		if (!isSigning && !this.isMoving && !isHighlighting) {
 			var zoomScale = this.ZOOM_SCALE;
 
 			var point = this.scalePoint(this.convertEventToPoint(event));
@@ -113,7 +113,7 @@ var Drawing = {
 
 			this.viewArea(this.can, this.currentPage, zoomStart, zoomEnd, 'width');
 			this.isZoomedIn = !this.isZoomedIn;
-		} else if (isDrawing) {
+		} else if (isSigning) {
 			this.addBreak(this.currentPage);
 		} else if (isHighlighting && this.highlightStart) {
 			this.$box.hide().width(0).height(0);
@@ -129,16 +129,16 @@ var Drawing = {
 	doMove: function(event) {
 		this.isMoving = true;
 		var point = this.convertEventToPoint(event);
-		var isDrawing = $('#pen').is('.on');
+		var isSigning = $('#pen').is('.on');
 		var isHighlighting = $('#highlight').is('.on');
 		if ($('.arrow:visible')) {
 			$('.arrow').fadeOut('fast');
 		}
 
-		if (!isDrawing && !isHighlighting) {
+		if (!isSigning && !isHighlighting) {
 			this.$main.css('cursor', 'move');
 			this.dragCanvas(this.can, this.previousPoint, point);
-		} else if (isDrawing) {
+		} else if (isSigning) {
 			var line = {
 				start: this.scalePoint(this.previousPoint),
 				end: this.scalePoint(point),
@@ -461,7 +461,7 @@ var Drawing = {
 			var css = $("head").children(":last").attr({
 				rel: "stylesheet",
 				type: "text/css",
-				href: "/document_vault/css/iphone.css"
+				href: "/document_vault/css/document/iphone.css"
 			});
 		}
 

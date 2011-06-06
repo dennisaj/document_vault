@@ -4,7 +4,7 @@
 		<jqui:resources theme="ui-lightness" />
 		<link href="${resource(dir:'css', file:'tag.css')}" rel="stylesheet" media="screen, projection" />
 		<g:javascript src="jquery.ui.touch-punch.min.js" />
-		<g:javascript src="tagging.js" />
+		<g:javascript src="document/tagging.js" />
 		<title> - Tag</title>
 		<g:javascript>
 			$(document).ready(function() {

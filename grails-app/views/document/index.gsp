@@ -9,11 +9,11 @@
 		<link href="${resource(dir:'css', file:'tag.css')}" rel="stylesheet" media="screen, projection" />
 		<g:javascript src="jquery.jeditable.min.js" />
 		<g:javascript src="tagit.js" />
-		<g:javascript src="documentnote.js" />
+		<g:javascript src="document/documentnote.js" />
 		<g:javascript src="HtmlAlert.js" />
-		<g:javascript src="document.js" />
-		<g:javascript src="tagging.js" />
-		<g:javascript src="previewimage.js" />
+		<g:javascript src="document/document.js" />
+		<g:javascript src="document/tagging.js" />
+		<g:javascript src="document/previewimage.js" />
 		<g:javascript>
 			$(document).ready(function() {
 				DocumentNote.init({
