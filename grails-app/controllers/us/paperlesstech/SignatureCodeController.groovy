@@ -11,8 +11,8 @@ class SignatureCodeController {
 	}
 
 	def downloadImage = {
-		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
-			def document = Document.get(params.id)
+		if (signatureCodeService.verifySignatureCode(params.long("documentId"), session.signatureCode)) {
+			def document = Document.get(params.long("documentId"))
 			def (filename, data, contentType) = handlerChain.downloadPreview(document: document, documentData: document.files.first(), page: params.pageNumber?.toInteger() ?: 1)
 			response.setContentType(contentType)
 			response.setContentLength(data.length)
@@ -26,8 +26,8 @@ class SignatureCodeController {
 	}
 
 	def sign = {
-		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
-		assert params.lines
+		if (signatureCodeService.verifySignatureCode(params.long("documentId"), session.signatureCode)) {
+			assert params.lines
 			def document = signatureCodeService.getDocument(session.signatureCode)
 			if (document) {
 				def signatures = JSON.parse(params.lines).findAll {it.value}
@@ -47,11 +47,11 @@ class SignatureCodeController {
 	}
 
 	def image = {
-		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
-			def d = Document.get(params.id.toInteger())
+		if (signatureCodeService.verifySignatureCode(params.long("documentId"), session.signatureCode)) {
+			def d = Document.get(params.long("documentId"))
 			assert d
 
-			render(d.previewImageAsMap(params.pageNumber.toInteger()) as JSON)
+			render(d.previewImageAsMap(params.int("pageNumber")) as JSON)
 		}
 
 		render ([status:"error"] as JSON)

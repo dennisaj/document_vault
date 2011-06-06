@@ -92,7 +92,7 @@ class DocumentController {
 	}
 
 	def downloadImage = {
-		def document = Document.get(params.id)
+		def document = Document.get(params.long("documentId"))
 		if (document) {
 			def (filename, data, contentType) = handlerChain.downloadPreview(document: document, page: params.pageNumber?.toInteger() ?: 1)
 			response.setContentType(contentType)
@@ -104,7 +104,7 @@ class DocumentController {
 	}
 
 	def download = {
-		def document = Document.get(params.id)
+		def document = Document.get(params.long("documentId"))
 		if (document) {
 			def (filename, data, contentType) = handlerChain.download(document: document, documentData: document.files.first())
 			response.setContentType(contentType)
@@ -117,21 +117,21 @@ class DocumentController {
 	}
 
 	def show = {
-		def document = Document.get(params.id)
+		def document = Document.get(params.long("documentId"))
 		assert document
 
 		render([view: "edit", model:[document: document]])
 	}
 
 	def edit = {
-		def document = Document.get(params.id)
+		def document = Document.get(params.long("documentId"))
 		assert document
 
 		[document: document]
 	}
 
 	def image = {
-		def d = Document.get(params.id)
+		def d = Document.get(params.long("documentId"))
 		assert d
 
 		def map = d.previewImageAsMap(params.int("pageNumber"))
@@ -139,7 +139,7 @@ class DocumentController {
 	}
 
 	def sign = {
-		def document = Document.get(params.id)
+		def document = Document.get(params.long("documentId"))
 		assert document
 
 		def signatures = JSON.parse(params?.lines).findAll {it.value}

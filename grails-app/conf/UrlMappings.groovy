@@ -14,19 +14,8 @@ class UrlMappings {
 			action = "savePcl"
 		}
 
-		"/document/downloadImage/$id/$pageNumber" {
+		"/document/$action?/$documentId?/$pageNumber?"{
 			controller = "document"
-			action = "downloadImage"
-		}
-
-		"/document/image/$id/$pageNumber" {
-			controller = "document"
-			action = "image"
-		}
-
-		"/document/sign/$id/$pageNumber" {
-			controller = "document"
-			action = "sign"
 		}
 
 		"/printQueue/push/$printerId/$documentId" {
@@ -39,7 +28,7 @@ class UrlMappings {
 			action = "pop"
 		}
 
-		"/signatureCode/downloadImage/$id/$pageNumber" {
+		"/signatureCode/downloadImage/$documentId/$pageNumber" {
 			controller = "signatureCode"
 			action = "downloadImage"
 		}
@@ -49,12 +38,12 @@ class UrlMappings {
 			action = "send"
 		}
 
-		"/signatureCode/image/$id/$pageNumber" {
+		"/signatureCode/image/$documentId/$pageNumber" {
 			controller = "signatureCode"
 			action = "image"
 		}
 
-		"/signatureCode/sign/$id/$pageNumber" {
+		"/signatureCode/sign/$documentId" {
 			controller = "signatureCode"
 			action = "sign"
 		}
@@ -70,7 +59,12 @@ class UrlMappings {
 			action = "create"
 		}
 
-		"/tag/document/list/$id" {
+		"/tag/document/list/$documentId" {
+			controller = "tag"
+			action = "documentList"
+		}
+
+		"/tag/documentList/$documentId" {
 			controller = "tag"
 			action = "documentList"
 		}

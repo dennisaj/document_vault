@@ -23,7 +23,7 @@
 		<g:each var="it" in="${documents}" status="index">
 			<tr class="result">
 				<td>
-					<img class="thumb" width="80" src="${createLink(action: 'downloadImage', id: it.id)}" alt="Document ${it.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
+					<img class="thumb" width="80" src="${createLink(action:'downloadImage', params:[documentId: it.id])}" alt="Document ${it.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
 				</td>
 				<td>
 					${it.toString()?.encodeAsHTML()}
@@ -55,12 +55,12 @@
 						<span class="ui-button-text"><g:message code="document-vault.label.print" /></span>
 					</button>
 					</g:if>
-					<a href="${createLink(action: 'download', id: it.id)}">
+					<a href="${createLink(action: 'download', params:[documentId: it.id])}">
 						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.download" />">
 							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-s"></span>
 							<span class="ui-button-text"><g:message code="document-vault.label.download" /></span>
 						</button></a>
-					<a href="${createLink(action: 'show', id: it.id)}">
+					<a href="${createLink(action: 'show', params:[documentId: it.id])}">
 						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.view" />">
 							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span>
 							<span class="ui-button-text"><g:message code="document-vault.label.view" /></span>

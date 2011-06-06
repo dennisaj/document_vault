@@ -5,7 +5,7 @@ var Tagging = {
 		var self = this;
 		callback = callback || function() {};
 		$.ajax({
-			data: {id:documentId, tag:tag},
+			data: {documentId:documentId, tag:tag},
 			global: false,
 			success: callback,
 			type: 'GET',
@@ -15,7 +15,7 @@ var Tagging = {
 	create: function(name, callback) {
 		var self = this;
 		$.ajax({
-			data: {id:holder.attr('documentid'), tag:value},
+			data: {documentId:holder.attr('documentid'), tag:value},
 			global: false,
 			success: callback,
 			type: 'GET',
@@ -88,7 +88,7 @@ var Tagging = {
 		var self = this;
 		callback = callback || function() {};
 		$.ajax({
-			data: {id:documentId, tag:tag},
+			data: {documentId:documentId, tag:tag},
 			error: function() { },
 			global: false,
 			success: callback,

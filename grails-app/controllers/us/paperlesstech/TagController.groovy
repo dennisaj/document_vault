@@ -21,12 +21,12 @@ class TagController {
 	}
 
 	def documentAdd = {
-		if (tagService.addDocumentTag(params.id, params.tag)) {
-			render(template:"/saved", model:[body: {"Document(${params.id}) was tagged as '${params.tag}'"}])
+		if (tagService.addDocumentTag(params.long("documentId"), params.tag)) {
+			render(template:"/saved", model:[body: {"Document(${params.documentId}) was tagged as '${params.tag}'"}])
 			return
 		}
 
-		render(template:"/notsaved", model:[message:"Document(${params.id}) could not be tagged"])
+		render(template:"/notsaved", model:[message:"Document(${params.documentId}) could not be tagged"])
 		return
 	}
 
@@ -36,13 +36,13 @@ class TagController {
 		response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
 		response.setHeader('Pragma', 'No-cache')
 
-		render (tagService.getDocumentTags(params.id) as JSON)
+		render (tagService.getDocumentTags(params.long("documentId")) as JSON)
 	}
 
 	def documentRemove = {
 		def tag = params.tag?.trim()
 
-		render ([status:tagService.removeDocumentTag(params.id?.trim(), tag) ? "success" : "error"] as JSON)
+		render ([status:tagService.removeDocumentTag(params.long("documentId"), tag) ? "success" : "error"] as JSON)
 	}
 
 	def documents = {

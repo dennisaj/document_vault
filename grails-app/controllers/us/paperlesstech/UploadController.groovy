@@ -32,7 +32,7 @@ class UploadController {
 					def document = uploadService.upload(group, it.originalFilename, it.bytes, it.contentType)
 
 					if (document) {
-						def url = g.createLink(controller:"document", action:"show", id:document.id)
+						def url = g.createLink(controller:"document", action:"show", params:[documentId:document.id])
 						results.add([name:document.toString(), size:document.files.first().data.length, url:url])
 					} else {
 						def error = g.message(code:"document-vault.upload.error.unsupportedfile", args:[FileHelpers.getExtension(it.originalFilename)])

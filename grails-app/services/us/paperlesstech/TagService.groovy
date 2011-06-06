@@ -1,5 +1,7 @@
 package us.paperlesstech
 
+import grails.plugin.multitenant.core.util.TenantUtils;
+
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.taggable.Tag
 
@@ -7,7 +9,7 @@ class TagService {
 
 	static transactional = true
 
-	boolean addDocumentTag(def documentId, tag) {
+	boolean addDocumentTag(long documentId, tag) {
 		return addDocumentTag(Document.get(documentId), tag)
 	}
 
@@ -101,9 +103,10 @@ class TagService {
 	}
 
 	List<Document> untaggedDocuments() {
+		def currentTenant = TenantUtils.currentTenant
 		String findByTagHQL = """
 			SELECT document from Document document
-			WHERE document.id NOT IN(SELECT tagLink.tagRef FROM TagLink tagLink where tagLink.type = 'document' GROUP BY tagLink.tagRef)
+			WHERE document.tenantId = $currentTenant AND document.id NOT IN(SELECT tagLink.tagRef FROM TagLink tagLink where tagLink.type = 'document' GROUP BY tagLink.tagRef)
 			ORDER BY document.id
 		"""
 
