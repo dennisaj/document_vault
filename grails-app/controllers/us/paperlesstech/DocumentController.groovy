@@ -9,7 +9,6 @@ class DocumentController {
 	static navigation = [[action:'index', isVisible: {SecurityUtils.subject.authenticated}, order:0, title:'Home']]
 
 	def authService
-	def grailsApplication
 	def handlerChain
 	def tagService
 
