@@ -132,26 +132,32 @@ class DocumentController {
 	}
 
 	def image = {
-		def d = Document.get(params.id.toInteger())
+		def d = Document.get(params.id)
 		assert d
 
-		def map = d.previewImageAsMap(params.pageNumber.toInteger())
+		def map = d.previewImageAsMap(params.int("pageNumber"))
 		render(map as JSON)
 	}
 
 	def sign = {
-		assert params.lines
 		def document = Document.get(params.id)
-		def signatures = JSON.parse(params.lines).findAll {it.value}
 		assert document
-		assert signatures
 
-		handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
+		def signatures = JSON.parse(params?.lines).findAll {it.value}
 
-		document.save()
+		if (signatures) {
+			handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
+			if (document.save()) {
+				flash.green = g.message(code:"document-vault.signature.success")
+			} else {
+				document.errors.each {
+					log.error "[Document(${document.id})] - " + it
+				}
 
-		flash.green = "Signature saved"
-		
-		render ([status:"success"] as JSON)
+				flash.red = g.message(code:"document-vault.signature.error.failure")
+			}
+		} else {
+			flash.yellow = g.message(code:"document-vault.signature.error.nosignatures")
+		}
 	}
 }
