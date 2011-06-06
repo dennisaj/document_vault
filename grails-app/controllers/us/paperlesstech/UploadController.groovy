@@ -53,15 +53,16 @@ class UploadController {
 		def document
 
 		try {
+			def group = authService.getGroupsWithPermission(DocumentPermission.Upload).find { it }
+			assert group, "The user must be able to upload to at least one group"
 			def now = new Date()
 			def fileName = String.format("%tF %tT.pcl", now, now)
-			document = uploadService.upload(authService.getGroupsWithPermission(DocumentPermission.Upload).find { it }, fileName, params.data?.bytes, MimeType.PCL)
-			success = true
-		} catch (Exception e) {
+			document = uploadService.upload(group, fileName, params.data?.bytes, MimeType.PCL)
+		} catch (Throwable e) {
 			log.error("Unable to save uploaded document", e)
 		}
 
-		if (success) {
+		if (document) {
 			response.status = 200
 			render "Document ${document.id} saved\n"
 			log.info "Saved document ${document.id}"

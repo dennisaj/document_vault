@@ -5,16 +5,21 @@ import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 import us.paperlesstech.handlers.business_logic.FermanBusinessLogicService.FermanDocumentTypes
+import us.paperlesstech.TagService
+import us.paperlesstech.Document
 
 class FermanBusinessLogicServiceSpec extends UnitSpec {
 	FermanBusinessLogicService service
+	TagService tagService = Mock()
 	DocumentData custHardData = new DocumentData(mimeType: MimeType.PCL,
 			data: new ClassPathResource("dt_cust_hard.pcl").getFile().getBytes())
 	DocumentData otherData = new DocumentData(mimeType: MimeType.PCL,
 			data: new ClassPathResource("dt_other.pcl").getFile().getBytes())
 
 	def setup() {
+		mockLogging(FermanBusinessLogicService)
 		service = new FermanBusinessLogicService()
+		service.tagService = tagService
 	}
 
 	def "identifying cust_hard_copy from the pcl"() {
@@ -72,5 +77,25 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		where:
 		singleSlash = "ends with a \\"
 		multipleSlashes = /\one slash \two slash/
+	}
+
+	def "afterPclImportFile should tag the document"() {
+		setup:
+		def tags = []
+		mockDomain(Document)
+		def d = new Document()
+		d.metaClass.save = { d }
+		d.metaClass.addTag = { it -> tags << it }
+		d.searchField("RO_Number", "RO_Number")
+		d.searchField("VIN", "VIN")
+
+		when:
+		service.afterPCLImportFile(document: d)
+
+		then:
+		1 * tagService.createTag("RO_Number")
+		1 * tagService.createTag("VIN")
+		tags[0] == "RO_Number"
+		tags[1] == "VIN"
 	}
 }

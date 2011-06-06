@@ -13,7 +13,7 @@ class SignatureCodeController {
 	def downloadImage = {
 		if (signatureCodeService.verifySignatureCode(params.id, session.signatureCode)) {
 			def document = Document.get(params.id)
-			def (filename, data, contentType) = handlerChain.retrievePreview(document: document, documentData: document.files.first(), page: params.pageNumber?.toInteger() ?: 1)
+			def (filename, data, contentType) = handlerChain.downloadPreview(document: document, documentData: document.files.first(), page: params.pageNumber?.toInteger() ?: 1)
 			response.setContentType(contentType)
 			response.setContentLength(data.length)
 			response.getOutputStream().write(data)

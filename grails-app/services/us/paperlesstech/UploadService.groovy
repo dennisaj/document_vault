@@ -31,7 +31,7 @@ class UploadService {
 			handlerChain.importFile(document: document, documentData: documentData)
 
 			assert document.files.size() == 1
-			document.save()
+			assert document.save(flush: true)
 
 			log.info "Saved document ${document.id}"
 			return document

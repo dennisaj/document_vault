@@ -1,21 +1,11 @@
 package us.paperlesstech
 
-import javax.servlet.http.HttpServletRequest;
-
-import spock.lang.*
-import grails.plugin.spock.*
+import grails.plugin.spock.UnitSpec
+import javax.servlet.http.HttpServletRequest
 
 class RequestServiceSpec extends UnitSpec {
 	RequestService service = new RequestService()
 	HttpServletRequest request = Mock()
-
-	def "should throw an exception when not inside a request"() {
-		when: "Called outside a request"
-		service.realRequest
-
-		then: "An IllegalStateException should be thrown"
-		thrown(IllegalStateException)
-	}
 
 	def "should allow getting like a map"() {
 		given: "a test request object"

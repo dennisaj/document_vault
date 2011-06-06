@@ -10,7 +10,9 @@ class RequestService {
 	def testRequest
 
 	def getRealRequest() {
-		return testRequest ?: ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		def request = testRequest ?: ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		assert request, "A request is required"
+		request
 	}
 
 	Object get(String entry) {

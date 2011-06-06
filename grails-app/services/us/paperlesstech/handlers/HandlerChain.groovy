@@ -41,11 +41,11 @@ class HandlerChain extends Handler {
 	}
 
 	@Override
-	def retrievePreview(Map input) {
+	def downloadPreview(Map input) {
 		def document = getDocument(input)
 		assert authService.canView(document)
 
-		handle("retrievePreview", input)
+		handle("downloadPreview", input)
 	}
 
 	@Override

@@ -94,7 +94,7 @@ class DocumentController {
 	def downloadImage = {
 		def document = Document.get(params.id)
 		if (document) {
-			def (filename, data, contentType) = handlerChain.retrievePreview(document: document, page: params.pageNumber?.toInteger() ?: 1)
+			def (filename, data, contentType) = handlerChain.downloadPreview(document: document, page: params.pageNumber?.toInteger() ?: 1)
 			response.setContentType(contentType)
 			response.setContentLength(data.length)
 			response.getOutputStream().write(data)
