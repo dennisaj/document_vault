@@ -26,6 +26,8 @@ var Show = {
 			$('#right-arrow a button').addClass('ui-state-disabled');
 		}
 
+		$('#page-number').text(this.currentPage.pageNumber + '/' + this.pageCount);
+
 		canvas.html($(page.background).width(Math.min(canvas.width(), page.background.width)));
 	},
 

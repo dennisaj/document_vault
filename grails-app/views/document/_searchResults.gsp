@@ -35,7 +35,7 @@
 					</g:if>
 				</td>
 				<td>
-					<g:message code="document-vault.label.added" /> <prettytime:display date="${it.dateCreated}" />
+					<span title="${it.dateCreated}"><g:message code="document-vault.label.added" /> <prettytime:display date="${it.dateCreated}" /></span>
 				</td>
 				<td>
 					<prettysize:display size="${it?.files?.first()?.data?.size()}" abbr="true" format="###0" />

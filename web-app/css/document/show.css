@@ -39,3 +39,7 @@
 	color: #888 !important;
 	cursor: default !important;
 }
+
+#canvas {
+	border: 1px black solid
+}

@@ -26,19 +26,20 @@
 		<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
 		<input type="hidden" id="documentId" value="${document?.id}" />
 		<hr />
-		<button id="print" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.print" />">
+		<button id="print" class="ui-button ui-widget ui-state-default ui-corner-all labeled-button" title="<g:message code="document-vault.label.print" />">
 			<span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
 			<span class="ui-button-text"><g:message code="document-vault.label.print" /></span>
 		</button>
 		<a href="${createLink(action:'sign', params:[documentId:document?.id])}">
-			<button id="sign" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.sign" />">
+			<button id="sign" class="ui-button ui-widget ui-state-default ui-corner-all labeled-button" title="<g:message code="document-vault.label.sign" />">
 				<span class="ui-button-icon-primary ui-icon ui-icon-pencil"></span>
 				<span class="ui-button-text"><g:message code="document-vault.label.sign" /></span>
 			</button></a>
-		<button id="close" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.close" />">
+		<button id="close" class="ui-button ui-widget ui-state-default ui-corner-all labeled-button" title="<g:message code="document-vault.label.close" />">
 			<span class="ui-button-icon-primary ui-icon ui-icon-circle-close"></span>
 			<span class="ui-button-text"><g:message code="document-vault.label.close" /></span>
 		</button>
+		<h4 id="page-container"><g:message code="document-vault.label.page" />: <span id="page-number"></span></h4>
 		<div id="main">
 			<div id="left-arrow" class="arrow">
 				<a href="#">
