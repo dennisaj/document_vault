@@ -92,6 +92,21 @@ nimble {
 		user = "us.paperlesstech.User"
 		profile = "us.paperlesstech.Profile"
 	}
+
+	tablenames {
+		user = "users"
+		role = "roles"
+		group = "groups"
+		federationprovider = "federation_provider"
+		profilebase = "profile_base"
+		loginrecord = "login_record"
+		details = "details"
+		permission = "permission"
+		levelpermission = "level_permission"
+		url = "url"
+		socialmediaaccount = "social_media_account"
+		socialmediaservice = "social_media_service"
+	}
 }
 
 environments {

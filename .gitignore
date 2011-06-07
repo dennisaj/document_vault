@@ -10,3 +10,4 @@ out/
 devDb.*
 web-app/WEB-INF/classes
 *.log
+.*.swp

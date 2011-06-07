@@ -14,14 +14,14 @@ environments {
     development {
         dataSource {
             loggingSql = true
-            dbCreate = "update" // one of 'create', 'create-drop','update'
+            dbCreate = "none" // one of 'create', 'create-drop','update'
             url = "jdbc:hsqldb:file:devDb;shutdown=true"
         }
     }
     test {
         dataSource {
             loggingSql = true
-            dbCreate = "update"
+            dbCreate = "create-drop"
             url = "jdbc:hsqldb:mem:testDb"
         }
     }
@@ -31,7 +31,7 @@ environments {
             password = "K6mouJjt"
             driverClassName = "com.mysql.jdbc.Driver"
             dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
-            dbCreate = "update"
+            dbCreate = "none"
             url = "jdbc:mysql://localhost/document_vault"
         }
     }
