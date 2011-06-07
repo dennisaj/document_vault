@@ -28,38 +28,52 @@
 		<input type="hidden" id="documentId" value="${document?.id}" />
 		<div id="buttonPanel">
 			<hr />
-			<button class="bigbutton" id="save"><img src="${resource(dir:'images', file:'dialog-yes.png')}" alt="" /><br />Submit Signatures</button>
-			<button class="bigbutton mark" id="pen"><img src="${resource(dir:'images', file:'favicon.ico')}" alt="" width="24" /><br />Pen</button>
-			<button class="bigbutton" id="undo"><img src="${resource(dir:'images', file:'edit-undo.png')}" alt="" /><br />Undo</button>
-			<button class="bigbutton" id="clearcan"><img src="${resource(dir:'images', file:'edit-clear.png')}" alt="" /><br />Clear</button>
-			<button class="bigbutton" id="print"><img src="${resource(dir:'images', file:'document-print.png')}" alt="" /><br />Print</button>
-			<button class="bigbutton" id="zoomWidth"><img src="${resource(dir:'images', file:'zoom-fit-width.png')}" alt="" /><br />Zoom Width</button>
-			<button class="bigbutton" id="close"><img src="${resource(dir:'images', file:'document-close.png')}" alt="" /><br />Close</button>
-			<hr />
+			<button id="save" class="labeled-button" title="<g:message code="document-vault.label.submitsignatures" />">
+				<g:message code="document-vault.label.submitsignatures" />
+			</button>
+			<button id="pen" class="labeled-button mark" title="<g:message code="document-vault.label.pen" />">
+				<g:message code="document-vault.label.pen" />
+			</button>
+			<button id="undo" class="labeled-button" title="<g:message code="document-vault.label.undo" />">
+				<g:message code="document-vault.label.undo" />
+			</button>
+			<button id="clearcan" class="labeled-button" title="<g:message code="document-vault.label.clear" />">
+				<g:message code="document-vault.label.clear" />
+			</button>
+			<button id="print" class="labeled-button" title="<g:message code="document-vault.label.print" />">
+				<g:message code="document-vault.label.print" />
+			</button>
+			<button id="zoomWidth" class="labeled-button" title="<g:message code="document-vault.label.zoomwidth" />">
+				<g:message code="document-vault.label.zoomwidth" />
+			</button>
+			<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
+				<g:message code="document-vault.label.close" />
+			</button>
+			<h4 id="page-container"><g:message code="document-vault.label.page" />: <span id="page-number"></span></h4>
 		</div>
 		<div id="main">
 			<div id="left-arrow" class="arrow">
-				<a href="#">&lt;</a>
+				<a href="#" title="<g:message code="document-vault.label.previouspage" />"><g:message code="document-vault.label.previouspage" /></a>
 			</div>
 			<div id="right-arrow" class="arrow">
-				<a href="#">&gt;</a>
+				<a href="#" title="<g:message code="document-vault.label.nextpage" />"><g:message code="document-vault.label.nextpage" /></a>
 			</div>
 			<canvas id="can" style="border: 1px solid #444;"></canvas>
 		</div>
-		<div id="dialog-message" title="Saving Signatures">
+		<div id="dialog-message" title="<g:message code="document-vault.signature.wait.title" />">
 			<p style="overflow: hidden;">
 				<span class="ui-icon ui-icon-transferthick-e-w" style="float: left; margin: 0 7px 50px 0;"></span>
-				Please wait while the captured signatures are uploaded...
+				<g:message code="document-vault.signature.wait.message" />
 				<img src="${resource(dir:'images',file:'spinner.gif')}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
 			</p>
 		</div>
 		<g:render template="printerDialog" />
 		<%--<g:render template="emailDialog" />--%>
 		<g:render template="/alert" />
-		<div id="confirm-submit" title="Confirm Submit">
+		<div id="confirm-submit" title="<g:message code="document-vault.signature.confirm.title" />">
 			<p>
 				<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>
-				Are you sure you want to want to submit the signature for this document?
+				<g:message code="document-vault.signature.confirm.message" />
 			</p>
 		</div>
 		<div id="box" style="position: absolute;z-index:100"></div>

@@ -80,8 +80,8 @@ var Sign = {
 	},
 
 	doEnd: function(event) {
-		var isSigning = $('#pen').is('.on');
-		var isHighlighting = $('#highlight').is('.on');
+		var isSigning = $('#pen').is('.ui-state-highlight');
+		var isHighlighting = $('#highlight').is('.ui-state-highlight');
 		$('.arrow').fadeIn('fast');
 
 		if (!isSigning && !this.isMoving && !isHighlighting) {
@@ -129,8 +129,8 @@ var Sign = {
 	doMove: function(event) {
 		this.isMoving = true;
 		var point = this.convertEventToPoint(event);
-		var isSigning = $('#pen').is('.on');
-		var isHighlighting = $('#highlight').is('.on');
+		var isSigning = $('#pen').is('.ui-state-highlight');
+		var isHighlighting = $('#highlight').is('.ui-state-highlight');
 		if ($('.arrow:visible')) {
 			$('.arrow').fadeOut('fast');
 		}
@@ -238,18 +238,20 @@ var Sign = {
 		$('#right-arrow a').attr('href', '#' + Math.min(this.pageCount, page.pageNumber + 1));
 		$('#left-arrow a').attr('href', '#' + Math.max(1, page.pageNumber - 1));
 
-		$('.arrow a').removeClass('disabled');
+		$('.arrow a').removeClass('disabled ui-state-disabled');
 
 		if (page.pageNumber == 1) {
-			$('#left-arrow a').addClass('disabled');
+			$('#left-arrow a').addClass('disabled ui-state-disabled');
 		}
 
 		if (page.pageNumber == this.pageCount) {
-			$('#right-arrow a').addClass('disabled');
+			$('#right-arrow a').addClass('disabled ui-state-disabled');
 		}
 
 		canvas.width = page.background.width;
 		canvas.height = page.background.height;
+
+		$('#page-number').text(this.currentPage.pageNumber + '/' + this.pageCount);
 
 		this.viewArea(canvas, page, this.ORIGIN, {x:page.background.width, y:page.background.height}, 'width');
 		this.draw(canvas, page);
@@ -465,12 +467,16 @@ var Sign = {
 			});
 		}
 
-		$('#clearcan').click(function() {
+		$('#clearcan').button({
+			icons: { primary: 'ui-icon-refresh' }
+		}).click(function() {
 			self.currentPage.lines.splice(0, self.currentPage.lines.length);
 			self.draw(self.can, self.currentPage);
 		});
 
-		$('#undo').click(function() {
+		$('#undo').button({
+			icons: { primary: 'ui-icon-arrowreturnthick-1-w' }
+		}).click(function() {
 			var splicePoint = self.currentPage.lines.length;
 			for (var i = self.currentPage.lines.length - 2; i >= 0; i--) {
 				if (self.currentPage.lines[i] == self.LINEBREAK || i == 0) {
@@ -483,12 +489,37 @@ var Sign = {
 			self.draw(self.can, self.currentPage);
 		});
 
-		$('#save').click(function() {
+		$('#pen').button({
+			icons: { primary: 'ui-icon-pencil' }
+		});
+
+		$('#save').button({
+			icons: { primary: 'ui-icon-transferthick-e-w' }
+		}).click(function() {
 			$('#confirm-submit').dialog('open');
 		});
 
-		$('#close').click(function() {
+		$('#close').button({
+			icons: { primary: 'ui-icon-circle-close' }
+		}).click(function() {
 			window.location.href = self.urls.close;
+		});
+
+		$('#zoomWidth').button({
+			icons: { primary: 'ui-icon-arrowthick-2-e-w' }
+		}).click(function() {
+			self.viewArea(self.can, self.currentPage, self.ORIGIN, {x:self.currentPage.background.width, y:self.currentPage.background.height}, 'width');
+			self.isZoomedIn = false;
+		});
+
+		$('#left-arrow a').button({
+			icons: { primary: 'ui-icon-circle-arrow-w' },
+			text: false
+		});
+
+		$('#right-arrow a').button({
+			icons: { primary: 'ui-icon-circle-arrow-e' },
+			text: false
 		});
 
 		$('.arrow a').click(function() {
@@ -512,22 +543,17 @@ var Sign = {
 			}
 		};
 
-		$('#zoomWidth').click(function() {
-			self.viewArea(self.can, self.currentPage, self.ORIGIN, {x:self.currentPage.background.width, y:self.currentPage.background.height}, 'width');
-			self.isZoomedIn = false;
-		});
-
 		$('.mark').click(function(e) {
 			var $this = $(this);
-			var wasOn = $this.is('.on');
+			var wasOn = $this.is('.ui-state-highlight');
 
-			$('.mark').removeClass('on');
+			$('.mark').removeClass('ui-state-highlight');
 
 			if (!wasOn) {
-				$this.toggleClass('on');
+				$this.toggleClass('ui-state-highlight');
 			}
 
-			if ($this.is('.on')) {
+			if ($this.is('.ui-state-highlight')) {
 				self.$main.css('cursor', 'crosshair');
 			} else {
 				self.$main.css('cursor', 'default');
@@ -566,15 +592,20 @@ var Sign = {
 
 		// Setup document
 		Document.init($.extend({}, this.urls), this.onAjaxError);
-		$('#print').click(function() {
+		$('#print').button({
+			icons: { primary: 'ui-icon-print' }
+		}).click(function() {
 			Document.print();
 		});
 
-		$('#email').click(function() {
+		$('#email').button({
+			icons: { primary: 'ui-icon-mail-closed' }
+		}).click(function() {
 			Document.email();
 		});
 
 		// Load the page indicated by the location hash
 		$(window).hashchange();
+
 	}
 };

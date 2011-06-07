@@ -12,3 +12,16 @@
 #description {
 	width: auto !important;
 }
+
+.labeled-button {
+	padding-top: .3em !important;
+}
+
+.labeled-button .ui-button-text {
+	padding: 0 .3em .3em .3em !important;
+}
+
+.labeled-button .ui-icon {
+	margin: 0 auto 0 auto !important;
+	position: static !important;
+}
