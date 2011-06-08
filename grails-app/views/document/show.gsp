@@ -25,35 +25,22 @@
 	<body>
 		<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
 		<input type="hidden" id="documentId" value="${document?.id}" />
-		<hr />
-		<button id="print" class="ui-button ui-widget ui-state-default ui-corner-all labeled-button" title="<g:message code="document-vault.label.print" />">
-			<span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
-			<span class="ui-button-text"><g:message code="document-vault.label.print" /></span>
+		<button id="print" class="labeled-button" title="<g:message code="document-vault.label.print" />">
+			<g:message code="document-vault.label.print" />
 		</button>
-		<a href="${createLink(action:'sign', params:[documentId:document?.id])}">
-			<button id="sign" class="ui-button ui-widget ui-state-default ui-corner-all labeled-button" title="<g:message code="document-vault.label.sign" />">
-				<span class="ui-button-icon-primary ui-icon ui-icon-pencil"></span>
-				<span class="ui-button-text"><g:message code="document-vault.label.sign" /></span>
-			</button></a>
-		<button id="close" class="ui-button ui-widget ui-state-default ui-corner-all labeled-button" title="<g:message code="document-vault.label.close" />">
-			<span class="ui-button-icon-primary ui-icon ui-icon-circle-close"></span>
-			<span class="ui-button-text"><g:message code="document-vault.label.close" /></span>
+		<a id="sign" class="labeled-button" href="${createLink(action:'sign', params:[documentId:document?.id])}" title="<g:message code="document-vault.label.sign" />">
+			<g:message code="document-vault.label.sign" />
+		</a>
+		<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
+			<g:message code="document-vault.label.close" />
 		</button>
 		<h4 id="page-container"><g:message code="document-vault.label.page" />: <span id="page-number"></span></h4>
 		<div id="main">
 			<div id="left-arrow" class="arrow">
-				<a href="#">
-					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.previouspage" />">
-						<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-w"></span>
-						<span class="ui-button-text"><g:message code="document-vault.label.previouspage" /></span>
-					</button></a>
+				<a href="#" title="<g:message code="document-vault.label.previouspage" />"><g:message code="document-vault.label.previouspage" /></a>
 			</div>
 			<div id="right-arrow" class="arrow">
-				<a href="#">
-					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.nextpage" />">
-						<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span>
-						<span class="ui-button-text"><g:message code="document-vault.label.nextpage" /></span>
-					</button></a>
+				<a href="#" title="<g:message code="document-vault.label.nextpage" />"><g:message code="document-vault.label.nextpage" /></a>
 			</div>
 			<div id="canvas"></div>
 		</div>

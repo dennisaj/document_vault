@@ -10,21 +10,9 @@
 .arrow a {
 	-webkit-tap-highlight-color: 0;
 	-webkit-touch-callout: none;
-	color: #000;
-	font-family: HoeflerText-Regular;
 	font-size: 2em;
-	font-weight: bold;
+	margin: 0 .25em 0 .3em;
 	padding: 0;
-	text-decoration: none;
-	text-shadow: #fff 0 0 .3em;
-}
-
-.arrow#right-arrow a {
-	margin: 0 .25em 0 .3em;
-}
-
-.arrow#left-arrow a {
-	margin: 0 .25em 0 .3em;
 }
 
 #right-arrow {

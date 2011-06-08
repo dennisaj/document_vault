@@ -82,13 +82,13 @@ th.desc a:after {
 }
 
 .ui-state-success {
-	background: #E6EFC2;
-	border: 1px solid #A8D676;
-	color: #264409;
+	background: #E6EFC2 !important;
+	border: 1px solid #A8D676 !important;
+	color: #264409 !important;
 }
 
 .ui-state-success .ui-icon {
-	background-image: url('../images/ui-icons_91cd51_256x240.png');
+	background-image: url('../images/ui-icons_91cd51_256x240.png') !important;
 }
 
 .labeled-button {
@@ -96,10 +96,10 @@ th.desc a:after {
 }
 
 .labeled-button .ui-button-text {
-	padding: 0 .3em .3em .3em;
+	padding: 0 .3em .3em .3em !important;
 }
 
 .labeled-button .ui-icon {
-	margin-left: auto;
-	margin-right: auto;
+	margin: 0 auto 0 auto !important;
+	position: static !important;
 }

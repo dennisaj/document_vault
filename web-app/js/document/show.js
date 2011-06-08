@@ -13,17 +13,14 @@ var Show = {
 		$('#right-arrow a').attr('href', '#' + Math.min(this.pageCount, page.pageNumber + 1));
 		$('#left-arrow a').attr('href', '#' + Math.max(1, page.pageNumber - 1));
 
-		$('.arrow a').removeClass('disabled');
-		$('.arrow a button').removeClass('ui-state-disabled');
+		$('.arrow a').removeClass('disabled ui-state-disabled');
 
 		if (page.pageNumber == 1) {
-			$('#left-arrow a').addClass('disabled');
-			$('#left-arrow a button').addClass('ui-state-disabled');
+			$('#left-arrow a').addClass('disabled ui-state-disabled');
 		}
 
 		if (page.pageNumber == this.pageCount) {
-			$('#right-arrow a').addClass('disabled');
-			$('#right-arrow a button').addClass('ui-state-disabled');
+			$('#right-arrow a').addClass('disabled ui-state-disabled');
 		}
 
 		$('#page-number').text(this.currentPage.pageNumber + '/' + this.pageCount);
@@ -76,8 +73,24 @@ var Show = {
 		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
 		this.pages = new Array(this.pageCount + this.FIRST_PAGE);
 
-		$('#close').click(function() {
+		$('#sign').button({
+			icons: { primary: 'ui-icon-pencil' }
+		});
+
+		$('#close').button({
+			icons: { primary: 'ui-icon-circle-close' }
+		}).click(function() {
 			window.location.href = self.urls.close;
+		});
+
+		$('#left-arrow a').button({
+			icons: { primary: 'ui-icon-circle-arrow-w' },
+			text: false
+		});
+
+		$('#right-arrow a').button({
+			icons: { primary: 'ui-icon-circle-arrow-e' },
+			text: false
 		});
 
 		$('.arrow a').click(function() {
@@ -109,11 +122,15 @@ var Show = {
 
 		// Setup document
 		Document.init($.extend({}, this.urls), this.onAjaxError);
-		$('#print').click(function() {
+		$('#print').button({
+			icons: { primary: 'ui-icon-print' }
+		}).click(function() {
 			Document.print();
 		});
 
-		$('#email').click(function() {
+		$('#email').button({
+			icons: { primary: 'ui-icon-mail-closed' }
+		}).click(function() {
 			Document.email();
 		});
 

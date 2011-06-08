@@ -6,7 +6,7 @@ body {
 	font-size: .4em !important;
 }
 
-.bigbutton {
+button {
 	font-size: .5em !important;
 	margin: .1em 0 .1em .1em !important;
 	padding: .1em !important;
@@ -14,8 +14,4 @@ body {
 
 .arrow {
 	top: 55%;
-}
-
-.arrow a {
-	font-size: 2em;
 }
