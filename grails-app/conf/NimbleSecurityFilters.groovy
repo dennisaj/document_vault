@@ -42,7 +42,7 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 					switch (controllerName) {
 						case ["document", "home"]:
 							switch (action) {
-								case ["index", "search", "download", "downloadImage", "image", "show"]:
+								case ["index", "download", "downloadImage", "image", "show"]:
 									return document ? authService.canView(document) : authService.canViewAny()
 								case "add":
 									return document ? authService.canTag(document) : authService.canTagAny()
