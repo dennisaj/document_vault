@@ -10,7 +10,11 @@ class ActivityLogController {
 
 	def list = {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		[activityLogInstanceList: ActivityLog.list(params), activityLogInstanceTotal: ActivityLog.count()]
+		if (params.documentId) {
+			[activityLogInstanceList: ActivityLog.findAllByDocument(params.documentId, params), activityLogInstanceTotal: ActivityLog.countByDocument(params.documentId)]
+		} else {
+			[activityLogInstanceList: ActivityLog.list(params), activityLogInstanceTotal: ActivityLog.count()]
+		}
 	}
 
 	def show = {

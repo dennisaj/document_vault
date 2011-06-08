@@ -13,38 +13,58 @@
 			<table class="datatable">
 				<tbody>
 					<tr class="prop">
-						<td valign="top" class="name"><g:message code="activityLog.id.label" default="Id" /></td>
-						<td valign="top" class="value">${fieldValue(bean: activityLogInstance, field: "id")}</td>
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.id" /></td>
+						<td valign="top" class="value">${activityLogInstance.id}</td>
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name"><g:message code="activityLog.params.label" default="Params" /></td>
-						<td valign="top" class="value">${fieldValue(bean: activityLogInstance, field: "params")}</td>
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.user" /></td>
+						<td valign="top" class="value"><g:link action="show" controller="user" class="button icon icon_user_go" id="${activityLogInstance.user?.id}">${activityLogInstance.user?.username}</g:link></td>
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name"><g:message code="activityLog.user.label" default="User" /></td>
-						<td valign="top" class="value"><g:link action="show" controller="user" class="button icon icon_user_go" id="${activityLogInstance.user?.id}">${activityLogInstance.user?.username?.encodeAsHTML()}</g:link></td>
-					</tr>
-
-					<tr class="prop">
-						<td valign="top" class="name"><g:message code="activityLog.uri.label" default="Uri" /></td>
-						<td valign="top" class="value">${fieldValue(bean: activityLogInstance, field: "uri")}</td>
-					</tr>
-
-					<tr class="prop">
-						<td valign="top" class="name"><g:message code="activityLog.dateCreated.label" default="Date Created" /></td>
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.dateCreated" /></td>
 						<td valign="top" class="value"><g:formatDate date="${activityLogInstance?.dateCreated}" /></td>
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name"><g:message code="activityLog.ip.label" default="Ip" /></td>
-						<td valign="top" class="value">${fieldValue(bean: activityLogInstance, field: "ip")}</td>
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.action" /></td>
+						<td valign="top" class="value">${activityLogInstance.action}</td>
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name"><g:message code="activityLog.userAgent.label" default="User Agent" /></td>
-						<td valign="top" class="value">${fieldValue(bean: activityLogInstance, field: "userAgent")}</td>
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.document" /></td>
+						<td valign="top" class="value"><g:link controller="activityLog" action="list" params="[documentId: activityLogInstance.document]">${activityLogInstance.document}</g:link></td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.pageNumber" /></td>
+						<td valign="top" class="value">${activityLogInstance.pageNumber}</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.uri" /></td>
+						<td valign="top" class="value">${activityLogInstance.uri}</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.params" /></td>
+						<td valign="top" class="value">${activityLogInstance.params}</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.status" /></td>
+						<td valign="top" class="value">${activityLogInstance.status}</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.ip" /></td>
+						<td valign="top" class="value">${activityLogInstance.ip}</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.userAgent" /></td>
+						<td valign="top" class="value">${activityLogInstance.userAgent}</td>
 					</tr>
 				</tbody>
 			</table>

@@ -10,10 +10,12 @@ class PrintQueueController {
 		if (results.size() > 0) {
 			def j = [printer: results[0].printer, document: results[0].document.files.first().data.encodeBase64().toString()]
 			results[0].delete()
-			render (j as JSON)
+			render(j as JSON)
+
+			return
 		}
 
-		render ([:] as JSON)
+		render([:] as JSON)
 	}
 
 	def push = {
@@ -24,6 +26,8 @@ class PrintQueueController {
 			def queue = new PrintQueue(document:document, printer:printer, user: authService.authenticatedUser)
 			if (queue.save()) {
 				render([status:"success"] as JSON)
+
+				return
 			}
 		}
 

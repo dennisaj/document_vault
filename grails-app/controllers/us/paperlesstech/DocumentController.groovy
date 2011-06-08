@@ -95,6 +95,8 @@ class DocumentController {
 			response.setContentType(contentType)
 			response.setContentLength(data.length)
 			response.getOutputStream().write(data)
+
+			return
 		}
 
 		response.status = 404
@@ -108,6 +110,8 @@ class DocumentController {
 			response.setContentLength(data.length)
 			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
 			response.getOutputStream().write(data)
+
+			return
 		}
 
 		response.status = 404

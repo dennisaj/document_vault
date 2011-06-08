@@ -18,8 +18,10 @@ class SignatureCodeController {
 			response.setContentLength(data.length)
 			response.getOutputStream().write(data)
 
-			response.status = 404
+			return
 		}
+
+		response.status = 404
 	}
 
 	def error = {
@@ -39,7 +41,9 @@ class SignatureCodeController {
 				document.save()
 	
 				flash.green = "Signature saved"
-				render ([status:"success"] as JSON)
+				render([status: "success"] as JSON)
+
+				return
 			}
 		}
 
@@ -52,9 +56,10 @@ class SignatureCodeController {
 			assert d
 
 			render(d.previewImageAsMap(params.int("pageNumber")) as JSON)
+			return
 		}
 
-		render ([status:"error"] as JSON)
+		render([status: "error"] as JSON)
 	}
 
 	def index = {
@@ -76,6 +81,8 @@ class SignatureCodeController {
 			signatureCodeService.sendCode document, email
 
 			render([status:"success"] as JSON)
+
+			return
 		}
 
 		render([status:"error"] as JSON)

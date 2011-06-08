@@ -26,6 +26,11 @@ class NimbleUrlMappings {
 			controller = "printer"
 		}
 
+		"/administration/activityLog/list/$documentId?" {
+			controller = "activityLog"
+			action = "list"
+		}
+
 		"/administration/activityLog/$action?/$id?" {
 			controller = "activityLog"
 		}

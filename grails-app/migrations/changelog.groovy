@@ -1045,4 +1045,6 @@ databaseChangeLog = {
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-85") {
 		addForeignKeyConstraint(baseColumnNames: "user_base_id", baseTableName: "users_users", constraintName: "FK_users_users_USER3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
+
+	include file: '20110608_activity_log.groovy'
 }
