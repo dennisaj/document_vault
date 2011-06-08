@@ -42,3 +42,7 @@ grails.project.dependency.resolution = {
 		compile group:'net.java.dev.jai-imageio', name:'jai-imageio-core-standalone', version:'1.2-pre-dr-b04-2010-04-30'
 	}
 }
+
+coverage {
+	exclusions = ["changelog*", "201*_*", "*Config*"]
+}
