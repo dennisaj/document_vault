@@ -2,6 +2,8 @@ public class LoggingFilters {
 	def activityLogService
 	def authenticatedService
 
+	def dependsOn = [TenantFilters]
+
 	def filters = {
 		all(controller:'*') {
 			before = {

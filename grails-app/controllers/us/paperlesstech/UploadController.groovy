@@ -22,7 +22,7 @@ class UploadController {
 	}
 
 	def save = {
-		def isAjax = params.ajax || !!request.getHeader('X-REQUESTED-WITH')
+		def isAjax = params.ajax || request.xhr
 		def results = []
 		def group = Group.get(params.int('group'))
 

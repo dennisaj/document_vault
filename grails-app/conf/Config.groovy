@@ -103,7 +103,7 @@ grails {
 		port = 465
 		username = "donotreply@paperlesstech.us"
 		password = "ZgJ7Gy2W"
-		props = ["mail.smtp.auth":"true", 					   
+		props = ["mail.smtp.auth":"true",
 				"mail.smtp.socketFactory.port":"465",
 				"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
 				"mail.smtp.socketFactory.fallback":"false"]
@@ -123,7 +123,7 @@ security {
 		filter.config = """\
 [filters]
 # HTTP Basic authentication
-authcBasic = org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
+authcBasic = us.paperlesstech.filter.BasicAuthFilter
 authcBasic.applicationName = Document Vault API
 [urls]
 /api/** = authcBasic
