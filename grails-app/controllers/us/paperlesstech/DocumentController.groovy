@@ -2,8 +2,6 @@ package us.paperlesstech
 
 import grails.converters.JSON
 
-import org.apache.shiro.SecurityUtils
-
 class DocumentController {
 	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
 	static navigation = [[action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Home']]
@@ -77,10 +75,9 @@ class DocumentController {
 	}
 
 	def saveNote = {
-		def idRegex = params.id =~ /^.+\-(\d+)$/
-
-		if (idRegex.matches() && Document.exists(idRegex[0][1])) {
-			def document = Document.get(idRegex[0][1])
+		def document = Document.get(params.long('documentId'))
+		if (document) {
+			assert authService.canNotes(document)
 			document.searchField("Note", params.value)
 			document.save(flush:true)
 

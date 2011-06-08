@@ -5,6 +5,7 @@ var DocumentNote = {
 		return {
 			cancel: 'Cancel',
 			cssclass: 'noteTextarea',
+			id: 'documentId',
 			indicator: '<img src="{0}">'.format(this.urls.spinner),
 			method: 'POST',
 			onblur: 'ignore',

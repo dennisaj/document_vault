@@ -72,7 +72,7 @@
 					<g:message code="document-vault.label.notes" />:
 				</td>
 				<td colspan="4">
-					<span class="noteField" id="note-${it.id}">${it.searchField('Note')}</span>
+					<span class="noteField" id="${it.id}">${it.searchField('Note')}</span>
 				</td>
 			</tr>
 			<tr class="hidden">
