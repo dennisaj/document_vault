@@ -1,4 +1,4 @@
-package us.paperlesstech.filter
+package us.paperlesstech.filters
 
 import grails.plugin.multitenant.core.CurrentTenant
 import grails.plugin.multitenant.core.TenantResolver

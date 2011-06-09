@@ -20,14 +20,14 @@
 	<g:if test="${documents}">
 	<div class="span-24 last ui-widget-content ui-corner-bottom">
 		<table id="document-table">
-		<g:each var="it" in="${documents}" status="index">
+		<g:each var="document" in="${documents}" status="index">
 			<tr class="result">
 				<td>
-					<img class="thumb" width="80" src="${createLink(action:'downloadImage', params:[documentId: it.id])}" alt="Document ${it.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
+					<img class="thumb" width="80" src="${createLink(action:'downloadImage', params:[documentId: document.id])}" alt="Document ${document.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
 				</td>
 				<td>
-					${it.toString()?.encodeAsHTML()}
-					<g:if test="${it.signed}">
+					${document.toString()?.encodeAsHTML()}
+					<g:if test="${document.signed}">
 						<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" style="cursor: default" title="<g:message code="document-vault.label.signed" />">
 							<span class="ui-icon ui-icon-pencil"></span>
 							<span class="ui-button-text"><g:message code="document-vault.label.signed" /></span>
@@ -35,54 +35,74 @@
 					</g:if>
 				</td>
 				<td>
-					<span title="${it.dateCreated}"><g:message code="document-vault.label.added" /> <prettytime:display date="${it.dateCreated}" /></span>
+					<span title="${document.dateCreated}"><g:message code="document-vault.label.added" /> <prettytime:display date="${document.dateCreated}" /></span>
 				</td>
 				<td>
-					<prettysize:display size="${it?.files?.first()?.data?.size()}" abbr="true" format="###0" />
+					<prettysize:display size="${document?.files?.first()?.data?.size()}" abbr="true" format="###0" />
 				</td>
 				<td>
-					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.tags" />" onclick="javascript:Tagging.showTagbox('#tagbox-${it.id}', this);">
+					<pt:canTag document="${document}">
+					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.tags" />" onclick="javascript:Tagging.showTagbox('#tagbox-${document.id}', this);">
 						<span class="ui-button-icon-primary ui-icon ui-icon-tag"></span>
 						<span class="ui-button-text"><g:message code="document-vault.label.tags" /></span>
 					</button>
-					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.notes" />" onclick="javascript:DocumentNote.show('#notebox-${it.id}', this);">
+					</pt:canTag>
+					<pt:canNotes document="${document}">
+					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.notes" />" onclick="javascript:DocumentNote.show('#notebox-${document.id}', this);">
 						<span class="ui-button-icon-primary ui-icon ui-icon-note"></span>
 						<span class="ui-button-text"><g:message code="document-vault.label.notes" /></span>
 					</button>
-					<g:if test="${it.files.first().mimeType == MimeType.PDF }">
-					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.print" />" onclick="javascript:Document.print(${it.id});">
+					</pt:canNotes>
+					<g:if test="${document.files.first().mimeType == MimeType.PDF }">
+					<pt:canPrint document="${document}">
+					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.print" />" onclick="javascript:Document.print(${document.id});">
 						<span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
 						<span class="ui-button-text"><g:message code="document-vault.label.print" /></span>
 					</button>
+					</pt:canPrint>
 					</g:if>
-					<a href="${createLink(action: 'download', params:[documentId: it.id])}">
+					<a href="${createLink(action: 'show', params:[documentId: document.id])}" style="text-decoration: none">
+						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.view" />">
+							<span class="ui-button-icon-primary ui-icon ui-icon-zoomin"></span>
+							<span class="ui-button-text"><g:message code="document-vault.label.view" /></span>
+						</button>
+					</a>
+					<a href="${createLink(action: 'download', params:[documentId: document.id])}" style="text-decoration: none">
 						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.download" />">
 							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-s"></span>
 							<span class="ui-button-text"><g:message code="document-vault.label.download" /></span>
-						</button></a>
-					<a href="${createLink(action: 'sign', params:[documentId: it.id])}">
-						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.view" />">
+						</button>
+					</a>
+					<pt:canSign document="${document}">
+					<a href="${createLink(action: 'sign', params:[documentId: document.id])}" style="text-decoration: none">
+						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.sign" />">
 							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span>
-							<span class="ui-button-text"><g:message code="document-vault.label.view" /></span>
-						</button></a>
+							<span class="ui-button-text"><g:message code="document-vault.label.sign" /></span>
+						</button>
+					</a>
+					</pt:canSign>
 				</td>
 			</tr>
-			<tr id="notebox-${it.id}" class="hidden">
+			<pt:canNotes document="${document}">
+			<tr id="notebox-${document.id}" class="hidden">
 				<td>
 					<g:message code="document-vault.label.notes" />:
 				</td>
 				<td colspan="4">
-					<span class="noteField" id="${it.id}">${it.searchField('Note')}</span>
+					<span class="noteField" id="${document.id}">${document.searchField('Note')}</span>
 				</td>
 			</tr>
+			</pt:canNotes>
+			<pt:canTag document="${document}">
 			<tr class="hidden">
 				<td>
 					<g:message code="document-vault.label.tags" />:
 				</td>
 				<td colspan="4">
-					<ul class="taggable" id="tagbox-${it.id}" documentid="${it.id}"></ul>
+					<ul class="taggable" id="tagbox-${document.id}" documentid="${document.id}"></ul>
 				</td>
 			</tr>
+			</pt:canTag>
 		</g:each>
 		</table>
 	</div>

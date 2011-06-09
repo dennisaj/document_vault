@@ -25,12 +25,17 @@
 	<body>
 		<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
 		<input type="hidden" id="documentId" value="${document?.id}" />
+		
+		<pt:canPrint document="${document}">
 		<button id="print" class="labeled-button" title="<g:message code="document-vault.label.print" />">
 			<g:message code="document-vault.label.print" />
 		</button>
+		</pt:canPrint>
+		<pt:canSign document="${document}">
 		<a id="sign" class="labeled-button" href="${createLink(action:'sign', params:[documentId:document?.id])}" title="<g:message code="document-vault.label.sign" />">
 			<g:message code="document-vault.label.sign" />
 		</a>
+		</pt:canSign>
 		<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
 			<g:message code="document-vault.label.close" />
 		</button>

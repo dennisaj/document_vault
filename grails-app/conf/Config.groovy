@@ -123,7 +123,7 @@ security {
 		filter.config = """\
 [filters]
 # HTTP Basic authentication
-authcBasic = us.paperlesstech.filter.BasicAuthFilter
+authcBasic = us.paperlesstech.filters.BasicAuthFilter
 authcBasic.applicationName = Document Vault API
 [urls]
 /api/** = authcBasic
