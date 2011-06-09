@@ -6,8 +6,10 @@
 		<link href="${resource(dir:'css', file:'tagit-simple-blue.css')}" rel="stylesheet" media="screen, projection" />
 		<link href="${resource(dir:'css', file:'tag.css')}" rel="stylesheet" media="screen, projection" />
 		<g:javascript src="jquery.jeditable.min.js" />
+		<g:javascript src="jquery.ba-hashchange.js" />
 		<g:javascript src="tagit.js" />
 		<g:javascript src="document/documentnote.js" />
+		<g:javascript src="document/documentsearch.js" />
 		<g:javascript src="HtmlAlert.js" />
 		<g:javascript src="document/document.js" />
 		<g:javascript src="document/tagging.js" />
@@ -41,18 +43,23 @@
 				$('.thumb').live('click', function(event) {
 					PreviewImage.show(event.target.src);
 				});
+				DocumentSearch.init();
 			});
 		</g:javascript>
 	</head>
 <body>
-	<g:formRemote name="searchForm" url="[action: 'index']" update="resultsHolder">
+	<g:formRemote name="searchForm" url="[action: 'index']" update="resultsHolder" after="DocumentSearch.setHash(\$('#q').val())">
 		<fieldset class="span-24 last">
 			<legend>Search for a document</legend>
 			<div id="search">
 				<label for="q">Search</label><br />
 				<g:textField name="q" value="${q}" class="text" />
-				<input type="submit" name="submit" value="Search" />
-				<input id='reset1' type="reset" name="reset" value="Clear Form" />
+				<button id="sub" type="submit" name="submit">
+					<g:message code="document-vault.label.search" />
+				</button>
+				<button id="reset1" type="reset" name="reset">
+					<g:message code="document-vault.label.clearform" />
+				</button>
 			</div>
 		</fieldset>
 	</g:formRemote>
@@ -62,13 +69,5 @@
 	<g:render template="printerDialog" />
 	<%--<g:render template="emailDialog" />--%>
 	<g:render template="/alert" />
-	<jq:jquery>
-		$("#q").focus();
-
-		$("#reset1").click(function() {
-			$("#q").val("");
-		 	$("#searchForm").submit();
-		});
-	</jq:jquery>
 </body>
 </html>
