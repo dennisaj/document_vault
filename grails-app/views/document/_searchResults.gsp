@@ -46,7 +46,7 @@
 						<span class="ui-button-text"><g:message code="document-vault.label.tags" /></span>
 					</button>
 					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.notes" />" onclick="javascript:DocumentNote.show('#notebox-${it.id}', this);">
-						<span class="ui-button-icon-primary ui-icon ui-icon-comment"></span>
+						<span class="ui-button-icon-primary ui-icon ui-icon-note"></span>
 						<span class="ui-button-text"><g:message code="document-vault.label.notes" /></span>
 					</button>
 					<g:if test="${it.files.first().mimeType == MimeType.PDF }">

@@ -110,7 +110,7 @@ var Document = {
 		this.urls = urls;
 		this.ajaxErrorHandler = ajaxErrorHandler;
 
-		$('#printer-select').dialog({
+		$('#printer-select').removeClass('hidden').dialog({
 			autoOpen: false,
 			buttons: {
 				'Print': function() {

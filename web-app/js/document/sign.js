@@ -528,7 +528,7 @@ var Sign = {
 			}
 		});
 
-		$(window).hashchange(function() {
+		$(window).hashchange(function(event) {
 			var newPage = parseInt(location.hash.substring(1)) || self.FIRST_PAGE;
 
 			if (!self.currentPage || newPage != self.currentPage.pageNumber) {
