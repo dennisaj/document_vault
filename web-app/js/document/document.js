@@ -72,7 +72,7 @@ var Document = {
 					}
 				}
 			},
-			type: 'GET',
+			type: 'POST',
 			url: self.urls.image.format(documentId, pageNumber)
 		});
 	},

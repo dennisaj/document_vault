@@ -41,8 +41,10 @@
 							<span><g:message code="document-vault.label.upload.addfiles" /></span>
 							<input type="file" name="files" multiple>
 						</label>
-						<button type="submit" class="start"><g:message code="document-vault.label.upload.start" /></button>
-						<button type="reset" class="cancel"><g:message code="document-vault.label.upload.cancel" /></button>
+						<span id="action-buttons">
+							<button type="submit" class="start"><g:message code="document-vault.label.upload.start" /></button>
+							<button type="reset" class="cancel"><g:message code="document-vault.label.upload.cancel" /></button>
+						</span>
 					</div>
 				</form>
 				<div class="fileupload-content">
