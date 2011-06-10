@@ -7,6 +7,7 @@ var DocumentNote = {
 			cssclass: 'noteTextarea',
 			id: 'documentId',
 			indicator: '<img src="{0}">'.format(this.urls.spinner),
+			loadurl: this.urls.load,
 			method: 'POST',
 			onblur: 'ignore',
 			placeholder: 'Click here to add a note.',

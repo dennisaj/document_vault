@@ -74,6 +74,19 @@ class DocumentController {
 		}
 	}
 
+	def note = {
+		def document = Document.get(params.long('documentId'))
+		if (document) {
+			assert authService.canNotes(document)
+
+			render text:document.searchField("Note") ?: "", contentType: "text/plain"
+			return
+		}
+
+		render ([status:"error"] as JSON)
+	
+	}
+
 	def saveNote = {
 		def document = Document.get(params.long('documentId'))
 		if (document) {
@@ -81,7 +94,7 @@ class DocumentController {
 			document.searchField("Note", params.value)
 			document.save(flush:true)
 
-			render text:params.value, contentType: "text/plain"
+			render text:params.value?.encodeAsHTML(), contentType: "text/plain"
 			return
 		}
 
