@@ -70,6 +70,7 @@ var Show = {
 		this.urls = urls;
 
 		this.$canvas = $('#canvas')
+		this.$canvas.css('overflow', 'hidden');
 		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
 		this.pages = new Array(this.pageCount + this.FIRST_PAGE);
 

@@ -1,7 +1,16 @@
+<g:if test="${!params.pageNumber || params.int('pageNumber') < 1}">
+	<g:set var="pageNumber" value="${1}" />
+</g:if>
+<g:elseif test="${params.int('pageNumber') > document?.previewImages?.size()}">
+	<g:set var="pageNumber" value="${document?.previewImages?.size()}" />
+</g:elseif>
+<g:else>
+	<g:set var="pageNumber" value="${params.int('pageNumber')}" />
+</g:else>
 <!DOCTYPE html>
 <html>
 	<head>
-		<title> - Show</title>
+		<title> - <g:message code="document-vault.view.document.show.title" /></title>
 		<meta name="layout" content="main" />
 		<link href="${resource(dir:'css', file:'document/show.css')}" rel="stylesheet" media="all" />
 		<jqui:resources theme="ui-lightness" />
@@ -25,7 +34,7 @@
 	<body>
 		<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
 		<input type="hidden" id="documentId" value="${document?.id}" />
-		
+
 		<pt:canPrint document="${document}">
 		<button id="print" class="labeled-button" title="<g:message code="document-vault.label.print" />">
 			<g:message code="document-vault.label.print" />
@@ -39,17 +48,27 @@
 		<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
 			<g:message code="document-vault.label.close" />
 		</button>
-		<h4 id="page-container"><g:message code="document-vault.label.page" />: <span id="page-number"></span></h4>
+		<h4 id="page-container"><g:message code="document-vault.label.page" />: <span id="page-number">${pageNumber}/${document?.previewImages?.size()}</span></h4>
 		<div id="main">
 			<div id="left-arrow" class="arrow">
-				<a href="#" title="<g:message code="document-vault.label.previouspage" />"><g:message code="document-vault.label.previouspage" /></a>
+				<a href="${createLink(action:'show', params:[documentId:document.id, pageNumber:(pageNumber - 1)])}" title="<g:message code="document-vault.label.previouspage" />">
+				&lt; <g:message code="document-vault.label.previouspage" />
+			</a>
 			</div>
 			<div id="right-arrow" class="arrow">
-				<a href="#" title="<g:message code="document-vault.label.nextpage" />"><g:message code="document-vault.label.nextpage" /></a>
+				<a href="${createLink(action:'show', params:[documentId:document.id, pageNumber:(pageNumber + 1)])}" title="<g:message code="document-vault.label.nextpage" />">
+				<g:message code="document-vault.label.nextpage" /> &gt;
+			</a>
 			</div>
-			<div id="canvas"></div>
+			<div id="canvas">
+				<noscript>
+				<img src="${createLink(controller:"document", action:"downloadImage", params:[documentId:document.id, pageNumber:pageNumber])}" />
+				</noscript>
+			</div>
 		</div>
+		<pt:canPrint document="${document}">
 		<g:render template="printerDialog" />
+		</pt:canPrint>
 		<%--<g:render template="emailDialog" />--%>
 		<g:render template="/alert" />
 	</body>
