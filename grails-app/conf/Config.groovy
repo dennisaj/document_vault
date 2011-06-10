@@ -123,10 +123,11 @@ security {
 		filter.config = """\
 [filters]
 # HTTP Basic authentication
-authcBasic = us.paperlesstech.filters.BasicAuthFilter
+multitenant = grails.plugin.multitenant.core.MultiTenantFilter
+authcBasic = org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
 authcBasic.applicationName = Document Vault API
 [urls]
-/api/** = authcBasic
+/api/** = multitenant, authcBasic
 """
 	}
 }
