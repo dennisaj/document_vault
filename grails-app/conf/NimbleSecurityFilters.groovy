@@ -48,7 +48,7 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 									return document ? authService.canTag(document) : authService.canTagAny()
 								case ["sign", "submitSignatures"]:
 									return document ? authService.canSign(document) : authService.canSignAny()
-								case "saveNote":
+								case ["note", "saveNote"]:
 									return document ? authService.canNotes(document) : authService.canNotesAny()
 								default:
 									return false

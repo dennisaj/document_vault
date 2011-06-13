@@ -17,6 +17,7 @@
 		<g:javascript>
 			$(document).ready(function() {
 				DocumentNote.init({
+					'load': '${createLink(controller:"document", action:"note")}',
 					'save': '${createLink(controller:"document", action:"saveNote")}',
 					'spinner': '${resource(dir:"images", file:"spinner.gif")}'
 				});
