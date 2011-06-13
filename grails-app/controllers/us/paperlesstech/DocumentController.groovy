@@ -3,7 +3,7 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class DocumentController {
-	static allowedMethods = [finalize: "GET", image: "GET", savePcl: "POST"]
+	static allowedMethods = [image: "POST", saveNote: "POST", submitSignatures: "POST"]
 	static navigation = [[action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Home']]
 
 	def authService
