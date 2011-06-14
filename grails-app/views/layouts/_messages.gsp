@@ -1,3 +1,4 @@
+<r:use module="jquery-ui"/>
 <g:if test="${flash.red}">
 	<div class="ui-widget">
 		<div class="ui-state-error ui-corner-all" style="margin: 20px 0 20px; padding: 0 .7em; ">

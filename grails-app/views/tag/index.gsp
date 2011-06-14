@@ -1,13 +1,10 @@
 <html>
 	<head>
 		<meta name="layout" content="main" />
-		<jqui:resources theme="ui-lightness" />
-		<link href="${resource(dir:'css', file:'tag.css')}" rel="stylesheet" media="screen, projection" />
-		<g:javascript src="jquery.ui.touch-punch.min.js" />
-		<g:javascript src="document/tagging.js" />
-		<g:javascript src="previewimage.js" />
-		<title> - Tag</title>
-		<g:javascript>
+		<r:require module="dv-ui-tags"/>
+		<r:require module="jquery-touch-punch"/>
+		<r:require module="dv-ui-previewimage"/>
+		<r:script>
 			$(document).ready(function() {
 				Tagging.init({
 					'addTag': '${createLink(controller:"tag", action:"documentAdd")}',
@@ -23,7 +20,8 @@
 					PreviewImage.show(event.target.src);
 				});
 			});
-		</g:javascript>
+		</r:script>
+		<title> - Tag</title>
 	</head>
 	<body>
 		<g:render template="tagSearch" />

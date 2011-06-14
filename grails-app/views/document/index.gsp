@@ -1,20 +1,14 @@
 <html>
 	<head>
 		<meta name="layout" content="main" />
-		<jqui:resources theme="ui-lightness" />
 		<title> - Search</title>
-		<link href="${resource(dir:'css', file:'tagit-simple-blue.css')}" rel="stylesheet" media="screen, projection" />
-		<link href="${resource(dir:'css', file:'tag.css')}" rel="stylesheet" media="screen, projection" />
-		<g:javascript src="jquery.jeditable.min.js" />
-		<g:javascript src="jquery.ba-hashchange.js" />
-		<g:javascript src="tagit.js" />
-		<g:javascript src="document/documentnote.js" />
-		<g:javascript src="document/documentsearch.js" />
-		<g:javascript src="HtmlAlert.js" />
-		<g:javascript src="document/document.js" />
-		<g:javascript src="document/tagging.js" />
-		<g:javascript src="previewimage.js" />
-		<g:javascript>
+		<r:require module='dv-ui'/>
+		<r:require module='dv-ui-tags'/>
+		<r:require module='dv-ui-notes'/>
+		<r:require module='dv-ui-search'/>
+		<r:require module='dv-ui-document'/>
+		<r:require module='dv-ui-previewimage'/>
+		<r:script>
 			$(document).ready(function() {
 				DocumentNote.init({
 					'load': '${createLink(controller:"document", action:"note")}',
@@ -46,7 +40,7 @@
 				});
 				DocumentSearch.init();
 			});
-		</g:javascript>
+		</r:script>
 	</head>
 <body>
 	<g:formRemote name="searchForm" url="[action: 'index']" update="resultsHolder" after="DocumentSearch.setHash(\$('#q').val())">

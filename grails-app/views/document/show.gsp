@@ -12,13 +12,8 @@
 	<head>
 		<title> - <g:message code="document-vault.view.document.show.title" /></title>
 		<meta name="layout" content="main" />
-		<link href="${resource(dir:'css', file:'document/show.css')}" rel="stylesheet" media="all" />
-		<jqui:resources theme="ui-lightness" />
-		<g:javascript src="jquery.ba-hashchange.js" />
-		<g:javascript src="HtmlAlert.js" />
-		<g:javascript src="document/document.js" />
-		<g:javascript src="document/show.js" />
-		<g:javascript>
+		<r:require module="dv-ui-show"/>
+		<r:script>
 			$(document).ready(function() {
 				Show.init({
 					'close': '${createLink(controller:"document", action:"index")}',
@@ -29,7 +24,7 @@
 					'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}'
 				});
 			});
-		</g:javascript>
+		</r:script>
 	</head>
 	<body>
 		<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />

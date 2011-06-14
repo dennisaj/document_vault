@@ -3,13 +3,8 @@
 	<head>
 		<title> - Sign</title>
 		<meta name="layout" content="mobile" />
-		<link href="${resource(dir:'css', file:'document/sign.css')}" rel="stylesheet" media="all" />
-		<jqui:resources theme="ui-lightness" />
-		<g:javascript src="jquery.ba-hashchange.js" />
-		<g:javascript src="HtmlAlert.js" />
-		<g:javascript src="document/document.js" />
-		<g:javascript src="document/sign.js" />
-		<g:javascript>
+		<r:require module="dv-ui-sign"/>
+		<r:script>
 			$(document).ready(function() {
 				Sign.init({
 					'close': '${createLink(controller:"document", action:"index")}',
@@ -21,7 +16,7 @@
 					'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}'
 				});
 			});
-		</g:javascript>
+		</r:script>
 	</head>
 	<body>
 		<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
@@ -68,7 +63,7 @@
 			<p style="overflow: hidden;">
 				<span class="ui-icon ui-icon-transferthick-e-w" style="float: left; margin: 0 7px 50px 0;"></span>
 				<g:message code="document-vault.signature.wait.message" />
-				<img src="${resource(dir:'images',file:'spinner.gif')}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
+				<r:img uri='/images/spinner.gif' alt="${message(code:'spinner.alt',default:'Loading...')}" />
 			</p>
 		</div>
 		<g:render template="printerDialog" />

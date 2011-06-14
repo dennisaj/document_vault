@@ -1,8 +1,28 @@
 <head>
   <meta name="layout" content="${grailsApplication.config.nimble.layout.login}"/>
   <title><g:message code="nimble.template.login.title" /></title>
-  <nh:nimbleui />
-  <nh:login />
+  <r:require module="dv-login"/>
+  <r:script>
+	  // For nimble
+	  window.nimble = window.nimble || {};
+	  var nimble = window.nimble;
+	  nimble.endpoints = nimble.endpoints || {};
+
+	  $(function() {
+		  $(".loginmethod").hide();
+		  $("#loginfacebookcontinue").hide();
+
+		  var active = jQuery.url.param("active")
+		  if (active)
+			  nimble.changeLogin(active);
+		  else
+			  nimble.changeLogin('local');
+
+		  $("#loginlocal").show();
+		  $(".flash").show();
+		  $("#username").focus();
+	  });
+  </r:script>
 </head>
 
 <body>

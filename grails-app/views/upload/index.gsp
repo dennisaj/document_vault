@@ -1,21 +1,14 @@
 <html>
 	<head>
 		<meta name="layout" content="main" />
-		<jqui:resources theme="ui-lightness" />
-		<link href="${resource(dir:'css', file:'jquery.fileupload-ui.css')}" rel="stylesheet" media="screen, projection" />
-		<g:javascript src="jquery.iframe-transport.js" />
-		<g:javascript src="jquery.fileupload.js" />
-		<g:javascript src="jquery.fileupload-ui.js" />
-		<g:javascript src="jquery.iframe-transport.js" />
-		<g:javascript src="jquery.tmpl.js" />
-		<g:javascript src="upload.js" />
-		<g:javascript>
+		<r:require module="dv-ui-upload"/>
+		<r:script>
 			$(document).ready(function() {
 				Upload.init({
 					'upload': '${createLink(controller:"upload", action:"ajaxSave")}'
 				});
 			});
-		</g:javascript>
+		</r:script>
 		<title> - <g:message code="document-vault.label.upload" /></title>
 	</head>
 	<body>

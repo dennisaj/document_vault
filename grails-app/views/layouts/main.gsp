@@ -2,18 +2,14 @@
 <html>
 	<head>
 		<title>Paperless Technologies Document Vault<g:layoutTitle default="" /></title>
-		<link href="${resource(dir:'images',file:'favicon.ico')}" rel="icon" />
-		<link href="${resource(dir:'css',file:'main.css')}" rel="stylesheet" media="screen, projection" />
-		<link href="${resource(dir:'css',file:'navigation.css')}" rel="stylesheet" media="screen, projection" />
-		<blueprint:resources plugins="fancy-type" />
-		<g:javascript library="jquery" plugin="jquery" />
-		<g:javascript src="global.js" />
+		<r:require module="dv-desktop" />
 		<nav:resources override="true" />
 		<g:layoutHead />
+		<r:layoutResources/>
 	</head>
 	<body>
 		<div id="spinner" class="spinner" style="display:none;">
-			<img src="${resource(dir:'images',file:'spinner.gif')}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
+			<r:img uri='/images/spinner.gif' alt="${message(code:'spinner.alt',default:'Loading...')}" />
 		</div>
 		<div class="container">
 			<div id="header" class="span-24 last">
@@ -32,5 +28,6 @@
 			<g:render template="/layouts/messages" />
 			<g:layoutBody />
 		</div>
+		<r:layoutResources/>
 	</body>
 </html>
