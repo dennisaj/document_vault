@@ -14,6 +14,11 @@ class UrlMappings {
 			action = "savePcl"
 		}
 
+		"/document/download/$documentId/$documentDataId" {
+			controller = "document"
+			action = "download"
+		}
+
 		"/document/$action?/$documentId?/$pageNumber?"{
 			controller = "document"
 		}

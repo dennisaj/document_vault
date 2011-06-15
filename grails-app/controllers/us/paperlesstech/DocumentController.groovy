@@ -117,17 +117,19 @@ class DocumentController {
 
 	def download = {
 		def document = Document.get(params.long("documentId"))
-		if (document) {
-			def (filename, data, contentType) = handlerChain.download(document: document, documentData: document.files.first())
-			response.setContentType(contentType)
-			response.setContentLength(data.length)
-			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
-			response.getOutputStream().write(data)
-
+		def documentData = document?.files?.find { it.id == params.long("documentDataId")}
+		if (!document || !documentData) {
+			response.status = 404
 			return
 		}
 
-		response.status = 404
+		cache neverExpires: true
+
+		def (filename, data, contentType) = handlerChain.download(document: document, documentData: documentData)
+		response.setContentType(contentType)
+		response.setContentLength(data.length)
+		response.setHeader("Content-Disposition", "attachment; filename=${filename}")
+		response.getOutputStream().write(data)
 	}
 
 	def show = {

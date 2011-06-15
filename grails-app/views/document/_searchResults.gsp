@@ -67,7 +67,7 @@
 							<span class="ui-button-text"><g:message code="document-vault.label.view" /></span>
 						</button>
 					</a>
-					<a href="${createLink(action: 'download', params:[documentId: document.id])}" style="text-decoration: none">
+					<a href="${createLink(action: 'download', params:[documentId: document.id, documentDataId: document.files.first().id])}" style="text-decoration: none">
 						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.download" />">
 							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-s"></span>
 							<span class="ui-button-text"><g:message code="document-vault.label.download" /></span>
