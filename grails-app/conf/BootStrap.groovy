@@ -1,10 +1,14 @@
+import grails.plugins.nimble.core.Group
+import grails.plugins.nimble.core.Role
 import grails.util.Environment
 
 import us.paperlesstech.DomainTenantMap
 import us.paperlesstech.Printer
+import us.paperlesstech.User
 
 class BootStrap {
 
+	def groupService
 	def tenantService
 
 	def init = { servletContext ->
@@ -21,6 +25,30 @@ class BootStrap {
 				tenantService.initTenant(1) {
 					if (Printer.count() == 0) {
 						new Printer(name:"Recursive", host:"localhost", deviceType:"lj5gray", port:9100).save()
+					}
+
+					if (Group.count() == 0) {
+						groupService.createGroup("test", "test", true)
+					}
+				}
+			}
+		}
+
+		DomainTenantMap.list().each {
+			tenantService.initTenant(it.mappedTenantId) {
+				def signatorRole = Role.findByName(User.SIGNATOR_USER_ROLE)
+				if (!signatorRole) {
+					signatorRole = new Role()
+					signatorRole.description = 'Issued to signator users'
+					signatorRole.name = User.SIGNATOR_USER_ROLE
+					signatorRole.protect = true
+					signatorRole.save()
+
+					if (signatorRole.hasErrors()) {
+						signatorRole.errors.each {
+							log.error it
+						}
+						throw new RuntimeException("Unable to create valid signator role for tenant $it.mappedTenantId")
 					}
 				}
 			}

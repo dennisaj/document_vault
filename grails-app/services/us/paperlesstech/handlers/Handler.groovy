@@ -55,7 +55,7 @@ class Handler {
 	 */
 	def downloadPreview(Map input) {
 		def d = getDocument(input)
-		assert authService.canView(d)
+		assert authService.canView(d) || authService.canSign(d)
 
 		def page = input.page
 		assert page, "This method requires a page number"
@@ -76,7 +76,7 @@ class Handler {
 	 */
 	def download(Map input) {
 		def d = getDocument(input)
-		assert authService.canView(d)
+		assert authService.canView(d) || authService.canSign(d)
 		def data = getDocumentData(input)
 
 		def filename = d.toString() + data.mimeType.getDownloadExtension()

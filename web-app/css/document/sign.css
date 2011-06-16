@@ -30,10 +30,10 @@ div#main {
 	z-index: 1;
 }
 
-div#can {
+canvas#can {
 	-webkit-user-select: none;
 	background: #f0f0f0;
-	border: 1px solid #000;
+	border: 1px solid #444;
 	left: 0;
 	position: absolute;
 	top: 0;
@@ -80,9 +80,46 @@ div#buttonPanel {
 }
 
 #box {
-	cursor: crosshair
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	cursor: crosshair;
+	opacity: .7;
 }
 
 #page-container {
 	border-bottom: 1px #ddd solid
+}
+
+#request-signature {
+	background: #fff;
+	bottom: 0;
+	border-top: 1px black solid;
+	height: auto;
+	left: 0;
+	position: absolute;
+	width: 100%;
+	z-index: 9;
+}
+
+.party:nth-child(even) {
+	background-color: #E5ECF9;
+}
+
+#highlight #sample {
+	background-color: transparent;
+	border: 1px black solid;
+	bottom: 0;
+	display: inline-block;
+	height: 16px;
+	margin-bottom: -4px;
+	position: relative;
+	width: 16px;
+}
+
+#party-container {
+	max-height: 15em;
+	overflow-y: auto;
+}
+
+.party .errors {
+	color: red;
 }

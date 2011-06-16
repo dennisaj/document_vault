@@ -6,7 +6,7 @@
 			<g:render template="/tag/tagSearchResults" model="${pageScope.variables}"/>
 		</div>
 	</g:if>
-	<div class="span-24 last quiet ui-widget-header ui-corner-top">
+	<div class="span-24 last ui-widget-header ui-corner-top">
 		<g:if test="${!q}">
 			Showing ${max.encodeAsHTML()} most recent documents.
 		</g:if>
@@ -26,7 +26,7 @@
 					<img class="thumb" width="80" src="${createLink(action:'downloadImage', params:[documentId: document.id])}" alt="Document ${document.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
 				</td>
 				<td>
-					${document.toString()?.encodeAsHTML()}
+					${document.toString()}
 					<g:if test="${document.signed}">
 						<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" style="cursor: default" title="<g:message code="document-vault.label.signed" />">
 							<span class="ui-icon ui-icon-pencil"></span>

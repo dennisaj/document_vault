@@ -9,4 +9,13 @@ public enum DocumentPermission {
 	Tag,
 	Upload,
 	View
+
+	String getKey() {
+		name()
+	}
+
+	@Override
+	String toString() {
+		name()
+	}
 }

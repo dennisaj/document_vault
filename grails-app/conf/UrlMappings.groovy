@@ -23,6 +23,11 @@ class UrlMappings {
 			controller = "document"
 		}
 
+		"/document/removeParty/$documentId/$partyId"{
+			controller = "document"
+			action = "removeParty"
+		}
+
 		"/printQueue/push/$printerId/$documentId" {
 			controller = "printQueue"
 			action = "push"
@@ -31,26 +36,6 @@ class UrlMappings {
 		"/api/printQueue/get" {
 			controller = "printQueue"
 			action = "pop"
-		}
-
-		"/signatureCode/downloadImage/$documentId/$pageNumber" {
-			controller = "signatureCode"
-			action = "downloadImage"
-		}
-
-		"/signatureCode/send/$documentId/$email" {
-			controller = "signatureCode"
-			action = "send"
-		}
-
-		"/signatureCode/image/$documentId/$pageNumber" {
-			controller = "signatureCode"
-			action = "image"
-		}
-
-		"/signatureCode/sign/$documentId" {
-			controller = "signatureCode"
-			action = "sign"
 		}
 
 		// This parameter has to be called "term" for the autocomplete to work

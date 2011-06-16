@@ -1047,4 +1047,8 @@ databaseChangeLog = {
 	}
 
 	include file: '20110608_activity_log.groovy'
+
+	include file: '20110615_party.groovy'
+
+	include file: '20110616_signature_code_removal.groovy'
 }

@@ -1,13 +1,18 @@
 package us.paperlesstech
 
+import java.util.Map;
+
 import grails.converters.JSON
 
+import org.codehaus.groovy.grails.web.json.JSONObject
+
 class DocumentController {
-	static allowedMethods = [image: "POST", saveNote: "POST", submitSignatures: "POST"]
+	static allowedMethods = [addParty:"POST", image:"POST", removeParty:"POST", saveNote:"POST", submitParties:"POST", submitSignatures:"POST"]
 	static navigation = [[action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Home']]
 
 	def authService
 	def handlerChain
+	def partyService
 	def tagService
 
 	def index = {
@@ -141,9 +146,12 @@ class DocumentController {
 
 	def image = {
 		def d = Document.get(params.long("documentId"))
+		def pageNumber = params.int("pageNumber");
 		assert d
 
-		def map = d.previewImageAsMap(params.int("pageNumber"))
+		def map = d.previewImageAsMap(pageNumber)
+		map.highlights = (authService.canGetSigned(d) || authService.canSign(d) ? d.highlightsAsMap(pageNumber) : [:])
+
 		render(map as JSON)
 	}
 
@@ -151,7 +159,7 @@ class DocumentController {
 		def document = Document.get(params.long("documentId"))
 		assert document
 
-		[document: document]
+		[document: document, parties:Party.findAllByDocument(document), colors:PartyColor.values(), permissions:Party.allowedPermissions]
 	}
 
 	def submitSignatures = {
@@ -176,5 +184,52 @@ class DocumentController {
 		}
 
 		render ([status:"success"] as JSON)
+	}
+
+	def addParty = {
+		render template:"addParty", model:[colors:PartyColor.values(), permissions:Party.allowedPermissions, code:UUID.randomUUID().toString()]
+	}
+
+	def removeParty = {
+		def document = Document.get(params.long("documentId"))
+		def party = Party.get(params.long("partyId"))
+		assert document
+		assert party
+		assert document == party.document
+
+		partyService.removeParty(party)
+	}
+
+	def submitParties = {
+		def document = Document.get(params.long("documentId"))
+		assert document
+		def inParties = JSON.parse(params?.parties)
+
+		def outParties = inParties.collect {inParty->
+			// Remove JSONObject.Null entries
+			// TODO replace with collectEntries with Groovy 1.8.0
+			inParty = [:].putAll(inParty.collect {k,v->
+				if (v == JSONObject.NULL) {
+					v = null
+				}
+
+				new MapEntry(k,v)
+			})
+
+			def outParty = null
+			if (inParty.id) {
+				def party = Party.get(inParty.id as long)
+
+				if (party) {
+					outParty = partyService.updateHighlights(party, inParty.highlights)
+				}
+			} else {
+				outParty = partyService.createParty(document, inParty)
+			}
+
+			outParty
+		}
+
+		render template:"parties", model:[colors:PartyColor.values(), permissions:Party.allowedPermissions, parties:outParties]
 	}
 }

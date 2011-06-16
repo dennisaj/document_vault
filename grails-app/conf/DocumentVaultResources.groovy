@@ -87,6 +87,8 @@ modules = {
 		resource url: '/css/document/sign.css', minify: true, nominify: false
 
 		resource url: '/js/document/sign.js'
+
+		resource url: '/js/document/party.js'
 	}
 
 	'dv-ui-tags' {

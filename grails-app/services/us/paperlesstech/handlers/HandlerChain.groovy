@@ -43,7 +43,7 @@ class HandlerChain extends Handler {
 	@Override
 	def downloadPreview(Map input) {
 		def document = getDocument(input)
-		assert authService.canView(document)
+		assert authService.canView(document) || authService.canSign(document)
 
 		handle("downloadPreview", input)
 	}
@@ -51,7 +51,7 @@ class HandlerChain extends Handler {
 	@Override
 	def download(Map input) {
 		def document = getDocument(input)
-		assert authService.canView(document)
+		assert authService.canView(document) || authService.canSign(document)
 
 		handle("download", input)
 	}

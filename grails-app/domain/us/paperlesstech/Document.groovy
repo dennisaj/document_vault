@@ -10,7 +10,7 @@ class Document implements Taggable {
 	static searchable = {
 		only: ["dateCreated", "name", "tags", "searchFields"]
 	}
-	static transients = ["otherField", "previewImage", "previewImageAsMap", "searchField"]
+	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField"]
 	Date dateCreated
 	SortedSet files
 	Group group
@@ -21,18 +21,36 @@ class Document implements Taggable {
 	static hasMany = [previewImages: PreviewImage,
 			files: DocumentData,
 			searchFieldsCollection: DocumentSearchField,
-			otherFieldsCollection: DocumentOtherField]
+			otherFieldsCollection: DocumentOtherField,
+			parties:Party]
 
 	static constraints = {
 		// minSize won't fire on the initial save if files is null
-		files(nullable: false, minSize: 1)
-		group(nullable: false)
-		name(nullable: true, blank: true)
+		files nullable: false, minSize: 1
+		group nullable: false
+		name nullable: true, blank: true
+		parties nullable: true
 	}
 
 	static mapping = {
 		otherFieldsCollection(cascade: "all, all-delete-orphan")
 		searchFieldsCollection(cascade: "all, all-delete-orphan")
+	}
+	
+	/**
+	* Returns the highlight data for the given page.
+	*
+	* @param pageNumber Retrieve the data for this page
+	*
+	* @return A map of the highlights for all parties on the given page.
+	*/
+	def highlightsAsMap = {int pageNumber ->
+		def m = [:]
+		parties?.each{party->
+			m.(party.id) = party.pageHighlights(pageNumber)
+		}
+
+		m
 	}
 
 	/**
@@ -72,7 +90,7 @@ class Document implements Taggable {
 	}
 
 	/**
-	 * Returns the image data for the given page. The actual image will be base64 encoded.
+	 * Returns the image data for the given page.
 	 *
 	 * @param pageNumber Retrieve the data for this page
 	 *

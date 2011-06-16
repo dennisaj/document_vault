@@ -5,18 +5,17 @@ var Sign = {
 	currentHeight: 0,
 	currentWidth: 0,
 	currentPage: null,
-	FIRST_PAGE: 1,
 	highlightStart: null,
+	highlightOpacity: .7,
 	isMoving: false,
 	isPainting: false,
 	isZoomedIn: false,
 	LINEBREAK: 'LB',
+	lowlightOpacity: .2,
 	$main : null,
 	minVisible: 150,
 	ORIGIN: {x:0, y:0},
 	previousPoint: null,
-	pageCount: 0,
-	pages: null,
 	scale: 1,
 	scrollCanX: 0,
 	scrollCanY: 0,
@@ -31,8 +30,13 @@ var Sign = {
 		}
 	},
 
-	addLine: function(page, line) {
+	_addLine: function(page, line) {
 		page.lines.push(line);
+	},
+
+	_addHighlight: function(page, party, corners) {
+		page.highlights[party] = page.highlights[party] || new Array();
+		page.highlights[party].push(corners);
 	},
 
 	// Make sure at least 150 x 150 pixels of the screen are visible at any time. 
@@ -58,7 +62,7 @@ var Sign = {
 		context.drawImage(page.background, 0, 0, canvas.width, canvas.height);
 	},
 
-	convertEventToPoint: function(touch) {
+	_convertEventToPoint: function(touch) {
 		if (touch) {
 			return {x: touch.pageX, y: touch.pageY};
 		} else {
@@ -66,7 +70,7 @@ var Sign = {
 		}
 	},
 
-	currentCenter: function() {
+	_currentCenter: function() {
 		var upperLeftCorner = $.extend({}, this.ORIGIN);
 		var lowerRightCorner = $.extend({}, this.ORIGIN);
 
@@ -81,18 +85,19 @@ var Sign = {
 
 	doEnd: function(event) {
 		var isSigning = $('#pen').is('.ui-state-highlight');
-		var isHighlighting = $('#highlight').is('.ui-state-highlight');
+		var isHighlighting = Party.isHighlighting();
 		$('.arrow').fadeIn('fast');
 
 		if (!isSigning && !this.isMoving && !isHighlighting) {
+			// Handle click to zoom
 			var zoomScale = this.ZOOM_SCALE;
 
-			var point = this.scalePoint(this.convertEventToPoint(event));
+			var point = this.scalePoint(this._convertEventToPoint(event));
 
 			if (this.isZoomedIn) {
 				zoomScale = this.currentPage.background.width / this.$main.width();
 
-				point = this.currentCenter();
+				point = this._currentCenter();
 			}
 
 			var zoomWidth = zoomScale * this.$main.width();
@@ -116,9 +121,16 @@ var Sign = {
 		} else if (isSigning) {
 			this.addBreak(this.currentPage);
 		} else if (isHighlighting && this.highlightStart) {
-			this.$box.hide().width(0).height(0);
-			this.highlight(this.can, this.currentPage, this.scalePoint(this.highlightStart), this.scalePoint(this.previousPoint));
+			var corners = this._normalizeCorners(this.scalePoint(this.highlightStart), this.scalePoint(this.previousPoint));
+			var party = Party.getSelectedPartyRow().attr('id');
+			var color = Party.getCurrentColor();
+
+			this._addHighlight(this.currentPage, party, corners);
+			this.highlight(this.can, this.currentPage, corners, color);
+
+			// Reset highlighting
 			this.highlightStart = null;
+			this.$box.hide().width(0).height(0);
 		} else {
 			this.$main.css('cursor', 'default');
 		}
@@ -128,9 +140,9 @@ var Sign = {
 
 	doMove: function(event) {
 		this.isMoving = true;
-		var point = this.convertEventToPoint(event);
+		var point = this._convertEventToPoint(event);
 		var isSigning = $('#pen').is('.ui-state-highlight');
-		var isHighlighting = $('#highlight').is('.ui-state-highlight');
+		var isHighlighting = Party.isHighlighting();
 		if ($('.arrow:visible')) {
 			$('.arrow').fadeOut('fast');
 		}
@@ -143,11 +155,14 @@ var Sign = {
 				start: this.scalePoint(this.previousPoint),
 				end: this.scalePoint(point),
 			};
-			this.addLine(this.currentPage, line);
+			this._addLine(this.currentPage, line);
 			this.drawLine(this.can, line);
 		} else if (isHighlighting) {
 			if (!this.highlightStart) {
+				var color = Party.getCurrentColor();
 				this.$box.show();
+				this.$box.css('border', '1px solid ' + color);
+				this.$box.css('background-color', color);
 				this.highlightStart = point;
 			} else {
 				this.drawBox(this.can, this.currentPage, this.highlightStart, point);
@@ -178,6 +193,21 @@ var Sign = {
 			}
 			this.drawLine(canvas, page.lines[i]);
 		}
+
+		// Only draw the highlights when we are requesting signatures
+		if (Party.isRequestingSignatures()) {
+			var activePartyId = Party.getSelectedPartyRow().attr('id');
+
+			for (var party in page.highlights) {
+				// If we are highlighting and this party is the active party or if we are not highlighting, use the dark opacity.
+				// Otherwise use the lighter opacity.
+				var useHighlight = (party == activePartyId || !Party.isHighlighting());
+
+				for (var i = 0; i < page.highlights[party].length; i++) {
+					this.highlight(canvas, page, page.highlights[party][i], Party.getPartyColor(party), useHighlight ? this.highlightOpacity : this.lowlightOpacity);
+				}
+			}
+		}
 	},
 
 	drawLine: function(canvas, line, strokeStyle) {
@@ -194,27 +224,25 @@ var Sign = {
 		context.stroke();
 	},
 
-	drawBox: function(canvas, page, point1, point2, color) {
-		color = color || "rgba(255, 255, 0, 0.7)";
+	drawBox: function(canvas, page, point1, point2) {
 		var corners = this._normalizeCorners(point1, point2);
 
-		this.$box.css('border', '1px solid ' + color);
-		this.$box.css('background', color);
 		this.$box.offset({left:corners.upperLeftCorner.x, top:corners.upperLeftCorner.y});
 		this.$box.width(corners.lowerRightCorner.x - corners.upperLeftCorner.x);
 		this.$box.height(corners.lowerRightCorner.y - corners.upperLeftCorner.y);
 	},
 
-	highlight: function(canvas, page, point1, point2, color) {
-		color = color || "rgba(255, 255, 0, 0.7)";
+	highlight: function(canvas, page, corners, color, opacity) {
+		// If the color isn't set, the highlight will be invisible
+		color = color || "rgba(255, 255, 255, 0)";
+		opacity = opacity || this.highlightOpacity;
 
 		var context = canvas.getContext('2d');
-		var corners = this._normalizeCorners(point1, point2);
 		var width = corners.lowerRightCorner.x - corners.upperLeftCorner.x;
 		var height = corners.lowerRightCorner.y - corners.upperLeftCorner.y;
 
-		this.draw(canvas, page);
 		context.fillStyle = color;
+		context.globalAlpha = opacity;
 		context.fillRect(corners.upperLeftCorner.x, corners.upperLeftCorner.y, width, height);
 	},
 
@@ -235,8 +263,8 @@ var Sign = {
 	realSetupCanvas: function(canvas, page) {
 		this.currentPage = page;
 
-		$('#right-arrow a').attr('href', '#' + Math.min(this.pageCount, page.pageNumber + 1));
-		$('#left-arrow a').attr('href', '#' + Math.max(1, page.pageNumber - 1));
+		$('#right-arrow a').attr('href', '#' + Math.min(Document.pageCount, page.pageNumber + 1));
+		$('#left-arrow a').attr('href', '#' + Math.max(Document.FIRST_PAGE, page.pageNumber - 1));
 
 		$('.arrow a').removeClass('disabled ui-state-disabled');
 
@@ -244,14 +272,14 @@ var Sign = {
 			$('#left-arrow a').addClass('disabled ui-state-disabled');
 		}
 
-		if (page.pageNumber == this.pageCount) {
+		if (page.pageNumber == Document.pageCount) {
 			$('#right-arrow a').addClass('disabled ui-state-disabled');
 		}
 
 		canvas.width = page.background.width;
 		canvas.height = page.background.height;
 
-		$('#page-number').text(this.currentPage.pageNumber + '/' + this.pageCount);
+		$('#page-number').text(this.currentPage.pageNumber + '/' + Document.pageCount);
 
 		this.viewArea(canvas, page, this.ORIGIN, {x:page.background.width, y:page.background.height}, 'width');
 		this.draw(canvas, page);
@@ -262,7 +290,36 @@ var Sign = {
 		return parseFloat(number.toFixed(places));
 	},
 
-	scaleLines: function(page) {
+	_scaleCorners: function(page) {
+		if (!page || !page.highlights) {
+			return {};
+		}
+
+		var scaleX = page.sourceWidth / page.background.width;
+		var scaleY = page.sourceHeight / page.background.height;
+		var scaledPage = {};
+
+		for (var party in page.highlights) {
+			scaledPage[party] = new Array();
+
+			for (var i = 0; i < page.highlights[party].length; i++) {
+				scaledPage[party][i] = {
+					a: {
+						x:this._round(page.highlights[party][i].upperLeftCorner.x * scaleX),
+						y:this._round(page.highlights[party][i].upperLeftCorner.y * scaleY)
+					},
+					b: {
+						x:this._round(page.highlights[party][i].lowerRightCorner.x * scaleX),
+						y:this._round(page.highlights[party][i].lowerRightCorner.y * scaleY)
+					}
+				};
+			}
+		}
+
+		return scaledPage;
+	},
+
+	_scaleLines: function(page) {
 		if (!page || !page.lines || !page.lines.length) {
 			return {};
 		}
@@ -347,38 +404,21 @@ var Sign = {
 		HtmlAlert._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>There was an error communicating with the server. Please try again.</p>');
 	},
 
-	// Document functions
-	getPage: function(canvas, documentId, pageNumber) {
-		var self = this;
-		if (pageNumber > this.pageCount) {
-			pageNumber = this.pageCount;
-		} else if (pageNumber < this.FIRST_PAGE) {
-			pageNumber = this.FIRST_PAGE;
-		}
-
-		if (this.pages[pageNumber]) {
-			this.setupCanvas(canvas, this.pages[pageNumber]);
-		} else {
-			Document.getPage(documentId, pageNumber, function(page) {
-				self.pages[page.pageNumber] = page;
-				self.setupCanvas(self.can, self.pages[page.pageNumber]);
-			});
-		}
-	},
-
-	submitPages: function(documentId) {
+	// document.js functions
+	submitLines: function() {
 		var self = this;
 		var lines = {}
-		$.each(self.pages, function(index, element) {
-			lines[index] = self.scaleLines(element);
+
+		$.each(Document.pages, function(index, element) {
+			lines[index] = self._scaleLines(element);
 		});
 
-		Document.submitPages(documentId, lines, function() {
+		Document.submitLines(lines, function() {
 			$('#dialog-message').dialog('close');
 			window.location.href = self.urls.finish_redirect;
 		});
 	},
-	// !Document functions
+	// !document.js functions
 
 	init: function(urls) {
 		var self = this;
@@ -388,8 +428,6 @@ var Sign = {
 		this.$box = $('#box');
 		this.can = document.getElementById('can');
 		this.previousPoint = this.ORIGIN;
-		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
-		this.pages = new Array(this.pageCount + this.FIRST_PAGE);
 		this.$box.hide();
 
 		if ($.support.touch) {
@@ -397,7 +435,7 @@ var Sign = {
 				if (self.trackingTouchId == null) {
 					self.trackingTouchId = e.touches[0].identifier;
 
-					self.previousPoint = self.convertEventToPoint(e.touches[0]);
+					self.previousPoint = self._convertEventToPoint(e.touches[0]);
 				}
 			};
 
@@ -529,10 +567,12 @@ var Sign = {
 		});
 
 		$(window).hashchange(function(event) {
-			var newPage = parseInt(location.hash.substring(1)) || self.FIRST_PAGE;
+			var newPage = parseInt(location.hash.substring(1)) || Document.FIRST_PAGE;
 
 			if (!self.currentPage || newPage != self.currentPage.pageNumber) {
-				self.getPage(self.can, $('#documentId').val(), newPage);
+				Document.getPage(newPage, function(page) {
+					self.setupCanvas(self.can, page);
+				});
 			}
 		});
 
@@ -579,7 +619,7 @@ var Sign = {
 				'Submit': function() {
 					$(this).dialog('close');
 					$('#dialog-message').dialog('open');
-					self.submitPages($('#documentId').val());
+					self.submitLines();
 				},
 				'Cancel' :function() {
 					$(this).dialog('close');
@@ -590,6 +630,8 @@ var Sign = {
 			resizable: false
 		});
 
+		Party.init($.extend({}, this.urls));
+
 		// Setup document
 		Document.init($.extend({}, this.urls), this.onAjaxError);
 		$('#print').button({
@@ -598,14 +640,7 @@ var Sign = {
 			Document.print();
 		});
 
-		$('#email').button({
-			icons: { primary: 'ui-icon-mail-closed' }
-		}).click(function() {
-			Document.email();
-		});
-
 		// Load the page indicated by the location hash
 		$(window).hashchange();
-
 	}
 };

@@ -2,16 +2,13 @@ var Show = {
 	//global objects
 	$canvas: null,
 	currentPage: null,
-	FIRST_PAGE: 1,
-	pageCount: 0,
-	pages: null,
 	urls: {},
 
 	realSetupCanvas: function(canvas, page) {
 		this.currentPage = page;
 
-		$('#right-arrow a').attr('href', '#' + Math.min(this.pageCount, page.pageNumber + 1));
-		$('#left-arrow a').attr('href', '#' + Math.max(1, page.pageNumber - 1));
+		$('#right-arrow a').attr('href', '#' + Math.min(Document.pageCount, page.pageNumber + 1));
+		$('#left-arrow a').attr('href', '#' + Math.max(Document.FIRST_PAGE, page.pageNumber - 1));
 
 		$('.arrow a').removeClass('disabled ui-state-disabled');
 
@@ -19,11 +16,11 @@ var Show = {
 			$('#left-arrow a').addClass('disabled ui-state-disabled');
 		}
 
-		if (page.pageNumber == this.pageCount) {
+		if (page.pageNumber == Document.pageCount) {
 			$('#right-arrow a').addClass('disabled ui-state-disabled');
 		}
 
-		$('#page-number').text(this.currentPage.pageNumber + '/' + this.pageCount);
+		$('#page-number').text(this.currentPage.pageNumber + '/' + Document.pageCount);
 
 		canvas.html($(page.background).width(Math.min(canvas.width(), page.background.width)));
 	},
@@ -45,34 +42,12 @@ var Show = {
 		HtmlAlert._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>There was an error communicating with the server. Please try again.</p>');
 	},
 
-	// Document functions
-	getPage: function(canvas, documentId, pageNumber) {
-		var self = this;
-		if (pageNumber > this.pageCount) {
-			pageNumber = this.pageCount;
-		} else if (pageNumber < this.FIRST_PAGE) {
-			pageNumber = this.FIRST_PAGE;
-		}
-
-		if (this.pages[pageNumber]) {
-			this.setupCanvas(canvas, this.pages[pageNumber]);
-		} else {
-			Document.getPage(documentId, pageNumber, function(page) {
-				self.pages[page.pageNumber] = page;
-				self.setupCanvas(self.$canvas, self.pages[page.pageNumber]);
-			});
-		}
-	},
-	// !Document functions
-
 	init: function(urls) {
 		var self = this;
 		this.urls = urls;
 
 		this.$canvas = $('#canvas')
 		this.$canvas.css('overflow', 'hidden');
-		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
-		this.pages = new Array(this.pageCount + this.FIRST_PAGE);
 
 		$('#sign').button({
 			icons: { primary: 'ui-icon-pencil' }
@@ -101,10 +76,12 @@ var Show = {
 		});
 
 		$(window).hashchange(function() {
-			var newPage = parseInt(location.hash.substring(1)) || self.FIRST_PAGE;
+			var newPage = parseInt(location.hash.substring(1)) || Document.FIRST_PAGE;
 
 			if (!self.currentPage || newPage != self.currentPage.pageNumber) {
-				self.getPage(self.$canvas, $('#documentId').val(), newPage);
+				Document.getPage(newPage, function(page) {
+					self.setupCanvas(self.$canvas, page);
+				});
 			}
 		});
 
@@ -127,12 +104,6 @@ var Show = {
 			icons: { primary: 'ui-icon-print' }
 		}).click(function() {
 			Document.print();
-		});
-
-		$('#email').button({
-			icons: { primary: 'ui-icon-mail-closed' }
-		}).click(function() {
-			Document.email();
 		});
 
 		// Load the page indicated by the location hash

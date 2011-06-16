@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title> - Sign</title>
+		<title> - <g:message code="document-vault.view.signature.title" /></title>
 		<meta name="layout" content="mobile" />
 		<r:require module="dv-ui-sign"/>
 		<r:script>
@@ -9,9 +9,9 @@
 				Sign.init({
 					'close': '${createLink(controller:"document", action:"index")}',
 					'downloadImage': '${createLink(controller:"document", action:"downloadImage")}/{0}/{1}',
-					'email': '${createLink(controller:"signatureCode", action:"send")}/{0}/{1}',
 					'finish_redirect': '${createLink(controller:"document", action:"index")}',
 					'image': '${createLink(controller:"document", action:"image")}/{0}/{1}',
+					'submitParties': '${createLink(controller:"document", action:"submitParties")}/{0}',
 					'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}',
 					'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}'
 				});
@@ -24,8 +24,8 @@
 		<div id="buttonPanel">
 			<hr />
 			<pt:canSign document="${document}">
-			<button id="save" class="labeled-button" title="<g:message code="document-vault.label.submitsignatures" />">
-				<g:message code="document-vault.label.submitsignatures" />
+			<button id="save" class="labeled-button" title="<g:message code="document-vault.view.signature.submitsignatures" />">
+				<g:message code="document-vault.view.signature.submitsignatures" />
 			</button>
 			<button id="pen" class="labeled-button mark" title="<g:message code="document-vault.label.pen" />">
 				<g:message code="document-vault.label.pen" />
@@ -45,6 +45,20 @@
 			<button id="zoomWidth" class="labeled-button" title="<g:message code="document-vault.label.zoomwidth" />">
 				<g:message code="document-vault.label.zoomwidth" />
 			</button>
+			<g:if test="${pt.canGetSigned(document:document)}">
+			<button id="get-signed" class="labeled-button" title="<g:message code="document-vault.view.signature.requestsignatures" />">
+				<g:message code="document-vault.view.signature.requestsignatures" />
+			</button>
+			<button id="highlight" class="labeled-button mark" title="<g:message code="document-vault.label.highlight" />">
+				<span id="sample"></span>
+				<g:message code="document-vault.label.highlight" />
+			</button>
+			</g:if>
+			<g:elseif test="${pt.canSign(document:document)}">
+			<button id="show-highlights" class="labeled-button" title="<g:message code="document-vault.view.signature.showhighlights" />">
+				<g:message code="document-vault.view.signature.showhighlights" />
+			</button>
+			</g:elseif>
 			<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
 				<g:message code="document-vault.label.close" />
 			</button>
@@ -57,22 +71,24 @@
 			<div id="right-arrow" class="arrow">
 				<a href="#" title="<g:message code="document-vault.label.nextpage" />"><g:message code="document-vault.label.nextpage" /></a>
 			</div>
-			<canvas id="can" style="border: 1px solid #444;"></canvas>
+			<canvas id="can"></canvas>
 		</div>
-		<div id="dialog-message" title="<g:message code="document-vault.signature.wait.title" />">
+		<div id="dialog-message" title="<g:message code="document-vault.view.signature.wait.title" />">
 			<p style="overflow: hidden;">
 				<span class="ui-icon ui-icon-transferthick-e-w" style="float: left; margin: 0 7px 50px 0;"></span>
-				<g:message code="document-vault.signature.wait.message" />
+				<g:message code="document-vault.view.signature.wait.message" />
 				<r:img uri='/images/spinner.gif' alt="${message(code:'spinner.alt',default:'Loading...')}" />
 			</p>
 		</div>
+		<pt:canPrint document="${document}">
 		<g:render template="printerDialog" />
-		<%--<g:render template="emailDialog" />--%>
+		</pt:canPrint>
+		<g:render template="requestSignature" />
 		<g:render template="/alert" />
-		<div id="confirm-submit" title="<g:message code="document-vault.signature.confirm.title" />">
+		<div id="confirm-submit" title="<g:message code="document-vault.view.signature.confirm.title" />">
 			<p>
 				<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>
-				<g:message code="document-vault.signature.confirm.message" />
+				<g:message code="document-vault.view.signature.confirm.message" />
 			</p>
 		</div>
 		<div id="box" style="position: absolute;z-index:100"></div>

@@ -18,7 +18,6 @@
 				Show.init({
 					'close': '${createLink(controller:"document", action:"index")}',
 					'downloadImage': '${createLink(controller:"document", action:"downloadImage")}/{0}/{1}',
-					'email': '${createLink(controller:"signatureCode", action:"send")}/{0}/{1}',
 					'finish_redirect': '${createLink(controller:"document", action:"index")}',
 					'image': '${createLink(controller:"document", action:"image")}/{0}/{1}',
 					'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}'
@@ -64,7 +63,6 @@
 		<pt:canPrint document="${document}">
 		<g:render template="printerDialog" />
 		</pt:canPrint>
-		<%--<g:render template="emailDialog" />--%>
 		<g:render template="/alert" />
 	</body>
 </html>
