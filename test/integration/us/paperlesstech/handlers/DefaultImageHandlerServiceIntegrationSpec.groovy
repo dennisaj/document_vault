@@ -33,7 +33,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			mimeType << [MimeType.PNG, MimeType.JPEG, MimeType.BMP, MimeType.GIF]
 	}
 
-	def "sign image files"() {
+	def "cursiveSign image files"() {
 		given:
 			def lines = ['1':[line, 'LB'], '2':[line], '4':[line]]
 		when:
@@ -44,7 +44,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			defaultImageHandlerService.importFile(input)
 			document = document.save()
 			input = [document: document, documentData: document.files.first(), signatures: lines]
-			defaultImageHandlerService.sign(input)
+			defaultImageHandlerService.cursiveSign(input)
 
 		then:
 			document.files.size() == 2
@@ -55,7 +55,6 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			document.previewImages*.data.pages == [1] * 1
 			document.previewImages*.data.mimeType == [mimeType] * 1
 			document.previewImages*.pageNumber == [1]
-			document.signed == true
 		where:
 			mimeType << [MimeType.PNG, MimeType.JPEG, MimeType.BMP, MimeType.GIF]
 	}

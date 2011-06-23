@@ -10,13 +10,12 @@ class Document implements Taggable {
 	static searchable = {
 		only: ["dateCreated", "name", "tags", "searchFields"]
 	}
-	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField"]
+	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField", "signed"]
 	Date dateCreated
 	SortedSet files
 	Group group
 	String name
 	SortedSet previewImages
-	boolean signed = false
 
 	static hasMany = [previewImages: PreviewImage,
 			files: DocumentData,
@@ -139,6 +138,11 @@ class Document implements Taggable {
 		} else {
 			addToSearchFieldsCollection(new DocumentSearchField(key: key, value: value))
 		}
+	}
+
+	def signed = {
+		def signedList = parties.findAll { it.documentPermission == DocumentPermission.Sign }*.completelySigned()
+		signedList && signedList?.every { it }
 	}
 
 	@Override

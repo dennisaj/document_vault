@@ -27,7 +27,7 @@
 				</td>
 				<td>
 					${document.toString()}
-					<g:if test="${document.signed}">
+					<g:if test="${document.signed()}">
 						<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" style="cursor: default" title="<g:message code="document-vault.label.signed" />">
 							<span class="ui-icon ui-icon-pencil"></span>
 							<span class="ui-button-text"><g:message code="document-vault.label.signed" /></span>

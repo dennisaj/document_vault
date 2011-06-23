@@ -43,6 +43,8 @@ class PartyServiceIntegrationSpec extends IntegrationSpec {
 
 			def party = new Party(document:document, signator:user, color:PartyColor.Red, documentPermission:DocumentPermission.Sign)
 			document.addToParties(party)
+			def highlight = new Highlight(party:party, pageNumber:1)
+			party.highlights = [highlight]
 			party.save(failOnError:true)
 			document.save(failOnError:true)
 

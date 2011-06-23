@@ -1,6 +1,6 @@
 databaseChangeLog = {
 
-	changeSet(author: "seth (generated)", id: "1308167870582-1") {
+	changeSet(author: "seth (generated)", id: "1308779031843-1") {
 		createTable(tableName: "highlight") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "highlightPK")
@@ -9,6 +9,8 @@ databaseChangeLog = {
 			column(name: "version", type: "bigint") {
 				constraints(nullable: "false")
 			}
+
+			column(name: "accepted", type: "timestamp")
 
 			column(name: "lower_rightx", type: "integer") {
 				constraints(nullable: "false")
@@ -44,7 +46,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "seth (generated)", id: "1308167870582-2") {
+	changeSet(author: "seth (generated)", id: "1308779031843-2") {
 		createTable(tableName: "party") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "partyPK")
@@ -76,6 +78,10 @@ databaseChangeLog = {
 
 			column(name: "expiration", type: "timestamp")
 
+			column(name: "rejected", type: "bit") {
+				constraints(nullable: "false")
+			}
+
 			column(name: "sent", type: "bit") {
 				constraints(nullable: "false")
 			}
@@ -87,16 +93,20 @@ databaseChangeLog = {
 			column(name: "tenant_id", type: "integer") {
 				constraints(nullable: "false")
 			}
+
+			column(name: "viewed", type: "bit") {
+				constraints(nullable: "false")
+			}
 		}
 	}
 
-	changeSet(author: "seth (generated)", id: "1308167870582-3") {
+	changeSet(author: "seth (generated)", id: "1308779031843-3") {
 		createIndex(indexName: "unique_party_code", tableName: "party", unique: "true") {
 			column(name: "code")
 		}
 	}
 
-	changeSet(author: "seth (generated)", id: "1308167870582-4") {
+	changeSet(author: "seth (generated)", id: "1308779031843-4") {
 		createIndex(indexName: "unique_document_signator", tableName: "party") {
 			column(name: "document_id")
 
@@ -104,15 +114,15 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "seth (generated)", id: "1308167870582-5") {
+	changeSet(author: "seth (generated)", id: "1308779031843-5") {
 		addForeignKeyConstraint(baseColumnNames: "party_id", baseTableName: "highlight", constraintName: "FK_HIGHLIGHT_PARTY", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "party", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "seth (generated)", id: "1308167870582-6") {
+	changeSet(author: "seth (generated)", id: "1308779031843-6") {
 		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "party", constraintName: "FK_PARTY_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "seth (generated)", id: "1308167870582-7") {
+	changeSet(author: "seth (generated)", id: "1308779031843-7") {
 		addForeignKeyConstraint(baseColumnNames: "signator_id", baseTableName: "party", constraintName: "FK_PARTY_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 }

@@ -24,7 +24,7 @@ import grails.util.Environment
  * @author Bradley Beddoes
  */
 public class NimbleSecurityFilters extends grails.plugins.nimble.security.NimbleFilterBase {
-	private static String openControllers = "auth|logout|account"
+	private static String openControllers = "auth|logout|account|code"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 	def authService
@@ -45,7 +45,7 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 								case ["download", "downloadImage", "image", "show"]:
 									return authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document)
 								case ["index"]:
-									return authService.canViewAny()
+									return authService.canViewAny() || authService.canSignAny()
 								case ["sign"]:
 									return authService.canSign(document) || authService.canGetSigned(document)
 								case ["submitSignatures"]:
@@ -53,6 +53,8 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 								case ["note", "saveNote"]:
 									return authService.canNotes(document)
 								case ["addParty", "submitParties", "removeParty"]:
+									return authService.canGetSigned(document)
+								case "resend":
 									return authService.canGetSigned(document)
 								default:
 									return false

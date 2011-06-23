@@ -8,7 +8,7 @@ import java.util.List
 @MultiTenant
 class Party {
 	static final List allowedPermissions = [DocumentPermission.Sign, DocumentPermission.View]
-	static transients = ["pageHighlights", "resetHighlights"]
+	static transients = ["completelySigned", "pageHighlights", "partiallySigned", "removable", "status", "resetHighlights"]
 
 	String code
 	PartyColor color
@@ -16,7 +16,9 @@ class Party {
 	DocumentPermission documentPermission
 	Date expiration
 	boolean sent = false
+	boolean rejected = false
 	User signator
+	boolean viewed = false
 
 	public Party() {
 		code = UUID.randomUUID().toString()
@@ -31,7 +33,7 @@ class Party {
 		color blank:false, nullable:false
 		documentPermission nullable:false, inList:allowedPermissions
 		expiration nullable:true, validator: {val, obj->
-			if (!val) {
+			if (!val || obj.id) {
 				return true
 			}
 
@@ -40,12 +42,22 @@ class Party {
 
 			(now > val) ? ['validator.pastdate'] : null
 		}
-		highlights nullable:true
+		highlights nullable: true, validator: {val, obj->
+			(!val && obj.documentPermission == DocumentPermission.Sign) ? ['validator.nullwhensign'] : null
+		}
 		signator unique:"document"
+	}
+
+	def completelySigned = {
+		highlights && highlights*.accepted?.every {it}
 	}
 
 	def pageHighlights = {pageNumber->
 		highlights.findAll { it.pageNumber == pageNumber }.collect { it.toMap() }
+	}
+
+	def partiallySigned = {
+		highlights*.accepted?.any {it} && !highlights*.accepted?.every {it}
 	}
 
 	/**
@@ -59,5 +71,31 @@ class Party {
 		highlights?.clear()
 		// TODO Find a way to remove this save
 		save(flush:true)
+	}
+
+	def removable = {
+		!rejected && !partiallySigned() && !completelySigned()
+	}
+
+	def status = {
+		def status = "document-vault.view.party.status.unsaved"
+
+		if (viewed) {
+			status = "document-vault.view.party.status.viewed"
+		} else if (id && !sent) {
+			status = "document-vault.view.party.status.unsent"
+		} else if (sent) {
+			status = "document-vault.view.party.status.sent"
+		}
+
+		if (rejected) {
+			status = "document-vault.view.party.status.rejected"
+		} else if (partiallySigned()) {
+			status = "document-vault.view.party.status.partiallySigned"
+		} else if (completelySigned()) {
+			status = "document-vault.view.party.status.signed"
+		}
+
+		status
 	}
 }

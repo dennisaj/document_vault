@@ -83,7 +83,7 @@ class PdfHandlerService extends Handler {
 	}
 
 	@Override
-	void sign(Map input) {
+	void cursiveSign(Map input) {
 		def d = getDocument(input)
 		log.info "Signing the PDF for document ${d}"
 		def data = getDocumentData(input)
@@ -122,7 +122,6 @@ class PdfHandlerService extends Handler {
 		DocumentData newPdf = new DocumentData(mimeType: data.mimeType, pages: data.pages)
 		newPdf.data = output.toByteArray()
 		d.addToFiles(newPdf)
-		d.signed = true
 		input.documentData = newPdf
 
 		handlerChain.generatePreview(input)

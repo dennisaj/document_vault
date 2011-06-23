@@ -28,6 +28,10 @@
 }
 
 #canvas {
-	border: 1px black solid;
+	padding: 3px;
 	overflow: scroll;
+}
+
+#canvas img {
+	border: 1px black solid;
 }

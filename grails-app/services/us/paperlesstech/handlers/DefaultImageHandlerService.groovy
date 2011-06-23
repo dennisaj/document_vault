@@ -36,7 +36,7 @@ class DefaultImageHandlerService extends Handler {
 	}
 
 	@Override
-	void sign(Map input) {
+	void cursiveSign(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
 		// By default, images only have one page
@@ -55,7 +55,6 @@ class DefaultImageHandlerService extends Handler {
 
 		DocumentData newImage = new DocumentData(data: output.toByteArray(), mimeType: data.mimeType, pages: data.pages)
 		d.addToFiles(newImage)
-		d.signed = true
 		input.documentData = newImage
 		handlerChain.generatePreview(input)
 	}

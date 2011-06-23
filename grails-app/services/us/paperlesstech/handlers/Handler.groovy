@@ -42,8 +42,8 @@ class Handler {
 	 *
 	 * @param input the map to retrieve document and documentData and signatures from
 	 */
-	void sign(Map input) {
-		throw new UnsupportedOperationException("sign has no handler for ${input?.documentData?.mimeType}")
+	void cursiveSign(Map input) {
+		throw new UnsupportedOperationException("cursiveSign has no handler for ${input?.documentData?.mimeType}")
 	}
 
 	/**

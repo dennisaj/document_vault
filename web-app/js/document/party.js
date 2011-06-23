@@ -9,12 +9,25 @@ var Party = {
 
 		$('#party-container').append($data);
 
-		// If this is the only row, select it.
-		if ($('.party', '#party-container').length == 1) {
-			$('[name="selectedParty"]', '#party-container').prop('checked', true);
+		// Always select the new row.
+		$('[name="selectedParty"]', '#party-container').prop('checked', true).change();
+
+		//this._rowChangeCallback({target:$('#' + $data.attr('id'))});
+	},
+
+	_afterRemoveCallback: function($party) {
+		this.refreshHighlightButton();
+		$party.remove();
+
+		if (!this.getSelectedPartyRow().length) {
+			$('[name="selectedParty"]:first').prop('checked', true).change();
 		}
 
-		this._rowChangeCallback({target:$('#' + $data.attr('id'))});
+		Sign.draw(Sign.can, Sign.currentPage());
+	},
+
+	canChangeColor: function($partyRow) {
+		return this._canSign($partyRow) && !$partyRow.children('.permission').prop('disabled')
 	},
 
 	_canSign: function($partyRow) {
@@ -29,16 +42,13 @@ var Party = {
 		return this._getPartyColor(this.getSelectedPartyRow());
 	},
 
-	/**
-	 * This will only get the highlights of the cached pages. If all highlights are needed, call Sign.loadAllPages first.
-	 */
-	_getHighlights: function() {
+	_getUnsavedHighlights: function() {
 		var highlights = {};
 
 		$.each(Document.pages, function(j, page) {
-			if (page && page.highlights) {
+			if (page && page.unsavedHighlights) {
 				var scaledPage = Sign._scaleCorners(page);
-				for (var party in page.highlights) {
+				for (var party in page.unsavedHighlights) {
 					highlights[party] = highlights[party] || new Array();
 					highlights[party][page.pageNumber] = scaledPage[party];
 				}
@@ -49,7 +59,7 @@ var Party = {
 	},
 
 	_getParties: function() {
-		var highlights = this._getHighlights();
+		var highlights = this._getUnsavedHighlights();
 		var parties = new Array();
 
 		$.each($('.party'), function(i, party) {
@@ -130,10 +140,9 @@ var Party = {
 		this.refreshHighlightButton();
 
 		var $party = this._getTargetRow($(event.target));
-		var canSign = this._canSign($party);
 
-		$party.children('.color').prop('disabled', !canSign);
-		Sign.draw(Sign.can, Sign.currentPage);
+		$party.children('.color').prop('disabled', !this.canChangeColor($party));
+		Sign.draw(Sign.can, Sign.currentPage());
 	},
 
 	setupParty: function($party) {
@@ -142,10 +151,44 @@ var Party = {
 			icons: { primary: 'ui-icon-closethick' },
 			text: false
 		}).click(function(event) {
-			$(this).parent().remove();
+			var $party = $(this).parent();
+			var code = $party.attr('id');
+			var partyId = $('#id-' + code).val()
 
-			if (!self.getSelectedPartyRow().length) {
-				$('[name="selectedParty"]:first').prop('checked', true).change();
+			// If partyId is set, this is an existing Party. If not, just remove the row.
+			if (partyId) {
+				$('#party-message').dialog('open');
+
+				Document.removeParty(partyId, function() {
+					$('#party-message').dialog('close');
+					self._afterRemoveCallback($party);
+				});
+			} else {
+				self._afterRemoveCallback($party);
+			}
+		});
+
+		$('button.resend', $party).button({
+			icons: { secondary: 'ui-icon-mail-closed' }
+		}).click(function(event) {
+			var $this = $(this);
+			var $party = $this.parent();
+			var code = $party.attr('id');
+			var partyId = $('#id-' + code).val()
+
+			// If partyId is set, resend. If not, continue.
+			if (partyId) {
+				$this.button('disable');
+				$('#party-message').dialog('open');
+
+				Document.resendCode(partyId, function() {
+					if (arguments[1] == "error") {
+						Document.ajaxErrorHandler.apply(null, arguments);
+					}
+
+					$('#party-message').dialog('close');
+					$this.button('enable');
+				});
 			}
 		});
 
@@ -156,10 +199,10 @@ var Party = {
 
 		$('.color', $party).bind('change keyup', function(event) {
 			self.refreshHighlightButton();
-			Sign.draw(Sign.can, Sign.currentPage);
+			Sign.draw(Sign.can, Sign.currentPage());
 		});
 
-		$party.children('.color').prop('disabled', !this._canSign($party));
+		$party.children('.color').prop('disabled', !this.canChangeColor($party));
 
 		return $party;
 	},
@@ -176,15 +219,17 @@ var Party = {
 	submitParties: function() {
 		var self = this;
 
-		// Load all uncached pages before submitting their highlights aren't lost.
-		Document.loadAllPages(function() {
-			var parties = self._getParties();
+		var parties = self._getParties();
 
-			Document.submitParties(parties, function(data) {
-				$('#dialog-message').dialog('close');
-				$('#party-container').html(data);
-				self.initParties();
-			});
+		Document.submitParties(parties, function(data) {
+			if (arguments[1] == "error") {
+				Document.ajaxErrorHandler.apply(null, arguments);
+			}
+
+			$('#party-message').dialog('close');
+			$('#party-container').html(data);
+			Document.refreshPageCache();
+			self.initParties();
 		});
 	},
 	// !document.js functions
@@ -202,7 +247,7 @@ var Party = {
 		$('#submit-parties').button({
 			icons: { secondary: 'ui-icon-arrowthick-1-e' }
 		}).click(function(event) {
-			$('#dialog-message').dialog('open');
+			$('#party-message').dialog('open');
 			self.submitParties();
 		});
 
@@ -223,7 +268,7 @@ var Party = {
 			icons: { primary: 'ui-icon-flag' }
 		}).button('disable').click(function(event) {
 			// Refresh the canvas when the highlight button is disabled/enabled.
-			Sign.draw(Sign.can, Sign.currentPage);
+			Sign.draw(Sign.can, Sign.currentPage());
 		});
 
 		$('#get-signed').button({
@@ -245,7 +290,7 @@ var Party = {
 				self.refreshHighlightButton();
 			}
 
-			Sign.draw(Sign.can, Sign.currentPage);
+			Sign.draw(Sign.can, Sign.currentPage());
 		});
 
 		$('#show-highlights').button({
@@ -261,7 +306,20 @@ var Party = {
 				$this.addClass('ui-state-highlight');
 			}
 
-			Sign.draw(Sign.can, Sign.currentPage);
+			Sign.draw(Sign.can, Sign.currentPage());
+		});
+
+		$('#party-message').dialog({
+			autoOpen: false,
+			buttons: {},
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			open: function(event, ui) {
+				$(".ui-dialog-titlebar-close", $(this).parent()).hide();
+				$(this).dialog('option', 'buttons', {});
+			},
+			resizable: false
 		});
 
 		this.initParties();

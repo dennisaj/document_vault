@@ -1,14 +1,31 @@
 var Document = {
-	ajaxErrorHandler: function() {},
 	documentId: null,
 	FIRST_PAGE: 1,
 	pageCount: 0,
 	pages: null,
 	urls: {},
 
+	ajaxErrorHandler: function(jqXHR, textStatus, errorThrown) {
+		// TODO: Unify error handling
+		$('#signature-message, #party-message').dialog('close');
+
+		HtmlAlert._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>There was an error communicating with the server. Please try again.</p>');
+	},
+
+	_areAllCachedPagesLoaded: function() {
+		for (var pageNumber = this.FIRST_PAGE; pageNumber <= this.pageCount; pageNumber++) {
+			var page = this.pages[pageNumber];
+			if (page && !page.background.complete) {
+				return false;
+			}
+		}
+
+		return true;
+	},
+
 	_areAllPagesLoaded: function() {
 		for (var pageNumber = this.FIRST_PAGE; pageNumber <= this.pageCount; pageNumber++) {
-			var page = this.pages[pageNumber]
+			var page = this.pages[pageNumber];
 			if (!page || !page.background.complete) {
 				return false;
 			}
@@ -17,11 +34,20 @@ var Document = {
 		return true;
 	},
 
+	_areAnyPagesLoaded: function() {
+		for (var pageNumber = this.FIRST_PAGE; pageNumber <= this.pageCount; pageNumber++) {
+			var page = this.pages[pageNumber];
+			if (page && page.background.complete) {
+				return true;
+			}
+		}
+
+		return false;
+	},
+
 	_print: function(printerId, documentId) {
 		var self = this;
 		$.ajax({
-			beforeSend: function() {/* Add throbber */ },
-			complete: function() {/* Remove throbber */ },
 			error: this.ajaxErrorHandler,
 			global: false,
 			success: function(data) {
@@ -40,6 +66,43 @@ var Document = {
 		return $('#documentId').val();
 	},
 
+	/**
+	 *  Bypass the page cache and load directly from the server.
+	 */
+	_getPage: function(pageNumber, callback) {
+		var self = this;
+
+		$.ajax({
+			error: this.ajaxErrorHandler,
+			global: false,
+			success: function(data) {
+				if (data.pageNumber) {
+					var bg = new Image();
+					bg.src = self.urls.downloadImage.format(self.documentId, pageNumber);
+
+					self.pages[data.pageNumber] = {
+						savedHighlights: data.highlights,
+						unsavedHighlights: {},
+						lines: new Array(),
+						background: bg,
+						pageNumber: data.pageNumber,
+						sourceHeight: data.sourceHeight,
+						sourceWidth: data.sourceWidth
+					};
+
+					if ($.isFunction(callback)) {
+						callback(self.pages[data.pageNumber]);
+					}
+				}
+			},
+			type: 'POST',
+			url: this.urls.image.format(this.documentId, pageNumber)
+		});
+	},
+
+	/**
+	 *  Check the page cache and only load directly from the server if the page is not found.
+	 */
 	getPage: function(pageNumber, callback) {
 		var self = this;
 
@@ -54,38 +117,12 @@ var Document = {
 				callback(this.pages[pageNumber]);
 			}
 		} else {
-			$.ajax({
-				beforeSend: function() {/* Add throbber */ },
-				complete: function() {/* Remove throbber */ },
-				error: this.ajaxErrorHandler,
-				global: false,
-				success: function(data) {
-					if (data.pageNumber) {
-						var bg = new Image();
-						bg.src = self.urls.downloadImage.format(self.documentId, pageNumber);
-
-						self.pages[data.pageNumber] = {
-							highlights: data.highlights,
-							lines: new Array(),
-							background: bg,
-							pageNumber: data.pageNumber,
-							sourceHeight: data.sourceHeight,
-							sourceWidth: data.sourceWidth
-						};
-
-						if ($.isFunction(callback)) {
-							callback(self.pages[data.pageNumber]);
-						}
-					}
-				},
-				type: 'POST',
-				url: this.urls.image.format(this.documentId, pageNumber)
-			});
+			this._getPage(pageNumber, callback);
 		}
 	},
 
 	/**
-	 * Load all pages then perform the callback once the last page is loaded.
+	 * Load all uncached pages then perform the callback once the last page is loaded.
 	 * 
 	 * If all pages are already loaded, perform the callback immediately.
 	 */
@@ -93,7 +130,9 @@ var Document = {
 		var self = this;
 
 		if (self._areAllPagesLoaded()) {
-			callback();
+			if ($.isFunction(callback)) {
+				callback();
+			}
 		} else {
 			for (var pageNumber = this.FIRST_PAGE; pageNumber <= this.pageCount; pageNumber++) {
 				// Skip this page if it has already been loaded
@@ -130,11 +169,61 @@ var Document = {
 		$('#printer-select').dialog('open');
 	},
 
+	refreshPageCache: function(callback) {
+		var self = this;
+
+		if (!this._areAnyPagesLoaded()) {
+			if ($.isFunction(callback)) {
+				callback();
+			}
+		} else {
+			for (var pageNumber = this.FIRST_PAGE; pageNumber <= this.pageCount; pageNumber++) {
+				// Skip this page if it has not already been loaded
+				if (this.pages[pageNumber]) {
+					self._getPage(pageNumber, function(page) {
+						self.pages[page.pageNumber] = page;
+
+						if ($.isFunction(callback)) {
+							if (page.background.complete) {
+								if (self._areAllCachedPagesLoaded()) {
+									callback();
+								}
+							} else {
+								page.background.onload = function() {
+									if (self._areAllCachedPagesLoaded()) {
+										callback();
+									}
+								};
+							}
+						}
+					});
+				}
+			}
+		}
+	},
+
+	removeParty: function(partyId, callback) {
+		var self = this;
+		$.ajax({
+			error: this.ajaxErrorHandler,
+			global: false,
+			success: function(data) {
+				if ($.isFunction(callback)) {
+					callback(data);
+				}
+			},
+			type: 'POST',
+			url: this.urls.removeParty.format(this.documentId, partyId)
+		});
+	},
+
+	resendCode: function(partyId, callback) {
+		$.when($.post(this.urls.resendCode.format(this.documentId, partyId))).always(callback); 
+	},
+
 	submitParties: function(parties, callback) {
 		var self = this;
 		$.ajax({
-			beforeSend: function() {/* Add throbber */ },
-			complete: function() {/* Remove throbber */ },
 			data: {parties: JSON.stringify(parties)},
 			error: this.ajaxErrorHandler,
 			global: false,
@@ -151,8 +240,6 @@ var Document = {
 	submitLines: function(lines, callback) {
 		var self = this;
 		$.ajax({
-			beforeSend: function() {/* Add throbber */ },
-			complete: function() {/* Remove throbber */ },
 			data: {lines: JSON.stringify(lines)},
 			error: this.ajaxErrorHandler,
 			global: false,
@@ -166,14 +253,13 @@ var Document = {
 		});
 	},
 
-	init: function(urls, ajaxErrorHandler) {
+	init: function(urls) {
 		var self = this;
 
 		this.documentId = this.getDocumentId();
 		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
 		this.pages = new Array(this.pageCount + this.FIRST_PAGE);
 		this.urls = urls;
-		this.ajaxErrorHandler = ajaxErrorHandler;
 
 		$('#printer-select').removeClass('hidden').dialog({
 			autoOpen: false,

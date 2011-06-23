@@ -28,6 +28,11 @@ class UrlMappings {
 			action = "removeParty"
 		}
 
+		"/document/resend/$documentId/$partyId" {
+			controller = "document"
+			action = "resend"
+		}
+
 		"/printQueue/push/$printerId/$documentId" {
 			controller = "printQueue"
 			action = "push"
@@ -77,6 +82,11 @@ class UrlMappings {
 		"/tag/documents/$name**" {
 			controller = "tag"
 			action = "documents"
+		}
+
+		"/c/$code" {
+			controller = "code"
+			action = "index"
 		}
 	}
 }

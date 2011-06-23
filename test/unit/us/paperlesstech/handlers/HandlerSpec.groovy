@@ -23,7 +23,7 @@ class HandlerSpec extends UnitSpec {
 		thrown UnsupportedOperationException
 
 		where:
-		method << ["importFile", "generatePreview", "print", "sign"]
+		method << ["importFile", "generatePreview", "print", "cursiveSign"]
 	}
 
 	def "getDocument returns the document from the map"() {

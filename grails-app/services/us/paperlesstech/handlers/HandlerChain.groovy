@@ -33,11 +33,11 @@ class HandlerChain extends Handler {
 	}
 
 	@Override
-	void sign(Map input) {
+	void cursiveSign(Map input) {
 		def document = getDocument(input)
 		assert authService.canSign(document)
 
-		handle("sign", input)
+		handle("cursiveSign", input)
 	}
 
 	@Override

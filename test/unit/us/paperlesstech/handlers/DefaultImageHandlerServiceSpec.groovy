@@ -8,9 +8,9 @@ import us.paperlesstech.DocumentData
 class DefaultImageHandlerServiceSpec extends UnitSpec {
 	def service = new DefaultImageHandlerService()
 
-	def "sign method requires signatureData"() {
+	def "cursiveSign method requires signatureData"() {
 		when:
-			service.sign([document:new Document(), documentData:new DocumentData(), signatures:["1":null]])
+			service.cursiveSign([document:new Document(), documentData:new DocumentData(), signatures:["1":null]])
 		then:
 			thrown(AssertionError)
 	}

@@ -72,7 +72,7 @@ class TiffHandlerService extends Handler {
 	}
 
 	@Override
-	void sign(Map input) {
+	void cursiveSign(Map input) {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
 		def signatureData = input.signatures
@@ -126,7 +126,6 @@ class TiffHandlerService extends Handler {
 		DocumentData newTiff = new DocumentData(mimeType: data.mimeType, pages: data.pages)
 		newTiff.data = os.toByteArray()
 		d.addToFiles(newTiff)
-		d.signed = true
 		input.documentData = newTiff
 		handlerChain.generatePreview(input)
 	}

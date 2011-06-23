@@ -20,6 +20,7 @@ class PartyServiceSpec extends UnitSpec {
 	PartyService service
 	AuthService authService = Mock()
 	GrailsApplication grailsApplication = Mock()
+	HighlightService highlightService = new HighlightService()
 	PermissionService permissionService = Mock()
 	RoleService roleService = Mock()
 	UserService userService = Mock()
@@ -29,9 +30,13 @@ class PartyServiceSpec extends UnitSpec {
 		service = new PartyService()
 		service.authService = authService
 		service.grailsApplication = grailsApplication
+		service.highlightService = highlightService
 		service.permissionService = permissionService
 		service.roleService = roleService
 		service.userService = userService
+		service.metaClass.sendMail = {Closure c->
+			true
+		}
 		
 		def config = new ConfigObject() 
 		config.nimble.passwords.minlength = 8 
@@ -57,7 +62,7 @@ class PartyServiceSpec extends UnitSpec {
 				user
 			}
 
-			1 * authService.canGetSigned(_) >> true
+			2 * authService.canGetSigned(_) >> true
 			1 * permissionService.createPermission(_,_)
 		when:
 			def party = service.createParty(document, input)
@@ -66,7 +71,7 @@ class PartyServiceSpec extends UnitSpec {
 			party.signator == user
 			party.color.name() == input.color
 			party.documentPermission.name() == input.permission
-			party.highlights.size() == Highlight.fromJsonList(party, highlights).size()
+			party.highlights.size() == highlightService.fromJsonList(party, highlights).size()
 	}
 
 	def "createParty should return errors when signator has errors"() {

@@ -34,11 +34,11 @@
 			<g:message code="document-vault.label.print" />
 		</button>
 		</pt:canPrint>
-		<pt:canSign document="${document}">
+		<g:if test="${pt.canSign(document:document) || pt.canGetSigned(document:document)}">
 		<a id="sign" class="labeled-button" href="${createLink(action:'sign', params:[documentId:document?.id])}" title="<g:message code="document-vault.label.sign" />">
 			<g:message code="document-vault.label.sign" />
 		</a>
-		</pt:canSign>
+		</g:if>
 		<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
 			<g:message code="document-vault.label.close" />
 		</button>

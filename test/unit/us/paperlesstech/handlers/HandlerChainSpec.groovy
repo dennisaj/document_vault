@@ -107,12 +107,12 @@ class HandlerChainSpec extends UnitSpec {
 		input == m
 	}
 
-	def "sign fails if the user can't sign the document"() {
+	def "cursiveSign fails if the user can't sign the document"() {
 		given:
 		def d = new Document()
 
 		when:
-		chain.sign(document: d)
+		chain.cursiveSign(document: d)
 
 		then:
 		thrown AssertionError
@@ -128,11 +128,11 @@ class HandlerChainSpec extends UnitSpec {
 		chain.metaClass.handle = { String a, Map b -> methodName = a; input = b }
 
 		when:
-		chain.sign(document: d)
+		chain.cursiveSign(document: d)
 
 		then:
 		1 * authService.canSign(d) >> true
-		methodName == "sign"
+		methodName == "cursiveSign"
 		input == m
 	}
 

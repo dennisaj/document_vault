@@ -131,3 +131,15 @@ authcBasic.applicationName = Document Vault API
 """
 	}
 }
+
+environments {
+	production {
+		server.protocol = "https://"
+	}
+	development {
+		server.protocol = "http://"
+	}
+	test {
+		server.protocol = "http://"
+	}
+}

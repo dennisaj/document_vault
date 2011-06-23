@@ -83,10 +83,6 @@ databaseChangeLog = {
 			}
 
 			column(name: "name", type: "varchar(255)")
-
-			column(name: "signed", type: "bit") {
-				constraints(nullable: "false")
-			}
 		}
 	}
 
@@ -632,34 +628,6 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-28") {
-		createTable(tableName: "signature_code") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "signature_codPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "code", type: "varchar(36)") {
-				constraints(nullable: "false", unique: "true")
-			}
-
-			column(name: "document_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "email", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-29") {
 		createTable(tableName: "tag_links") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
@@ -870,20 +838,6 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-45") {
-		createIndex(indexName: "code_unique_1307406573336", tableName: "signature_code", unique: "true") {
-			column(name: "code")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-46") {
-		createIndex(indexName: "unique_signature_code", tableName: "signature_code") {
-			column(name: "document_id")
-
-			column(name: "email")
-		}
-	}
-
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-47") {
 		createIndex(indexName: "name_unique_1307406573338", tableName: "tags", unique: "true") {
 			column(name: "name")
@@ -1014,10 +968,6 @@ databaseChangeLog = {
 		addForeignKeyConstraint(baseColumnNames: "user_base_id", baseTableName: "roles_users", constraintName: "FK_ROLE_USERS_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-78") {
-		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "signature_code", constraintName: "FK_SIGNATURE_CODE_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
-	}
-
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-79") {
 		addForeignKeyConstraint(baseColumnNames: "tag_id", baseTableName: "tag_links", constraintName: "FK_TAG_LINKS_TAGS", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "tags", referencesUniqueColumn: "false")
 	}
@@ -1048,7 +998,5 @@ databaseChangeLog = {
 
 	include file: '20110608_activity_log.groovy'
 
-	include file: '20110615_party.groovy'
-
-	include file: '20110616_signature_code_removal.groovy'
+	include file: '20110622_party.groovy'
 }

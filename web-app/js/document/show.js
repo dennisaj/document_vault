@@ -36,12 +36,6 @@ var Show = {
 		}
 	},
 
-	onAjaxError: function(jqXHR, textStatus, errorThrown) {
-		$('#dialog-message').dialog('close');
-
-		HtmlAlert._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>There was an error communicating with the server. Please try again.</p>');
-	},
-
 	init: function(urls) {
 		var self = this;
 		this.urls = urls;
@@ -99,7 +93,7 @@ var Show = {
 		});
 
 		// Setup document
-		Document.init($.extend({}, this.urls), this.onAjaxError);
+		Document.init($.extend({}, this.urls));
 		$('#print').button({
 			icons: { primary: 'ui-icon-print' }
 		}).click(function() {

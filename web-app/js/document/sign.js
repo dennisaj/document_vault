@@ -4,7 +4,7 @@ var Sign = {
 	can: null,
 	currentHeight: 0,
 	currentWidth: 0,
-	currentPage: null,
+	currentPageNumber: null,
 	highlightStart: null,
 	highlightOpacity: .7,
 	isMoving: false,
@@ -35,8 +35,8 @@ var Sign = {
 	},
 
 	_addHighlight: function(page, party, corners) {
-		page.highlights[party] = page.highlights[party] || new Array();
-		page.highlights[party].push(corners);
+		page.unsavedHighlights[party] = page.unsavedHighlights[party] || [];
+		page.unsavedHighlights[party].push(corners);
 	},
 
 	// Make sure at least 150 x 150 pixels of the screen are visible at any time. 
@@ -83,6 +83,10 @@ var Sign = {
 		return {x: (upperLeftCorner.x + lowerRightCorner.x) / 2, y: (upperLeftCorner.y + lowerRightCorner.y) / 2};
 	},
 
+	currentPage: function() {
+		return Document.pages[this.currentPageNumber];
+	},
+
 	doEnd: function(event) {
 		var isSigning = $('#pen').is('.ui-state-highlight');
 		var isHighlighting = Party.isHighlighting();
@@ -95,7 +99,7 @@ var Sign = {
 			var point = this.scalePoint(this._convertEventToPoint(event));
 
 			if (this.isZoomedIn) {
-				zoomScale = this.currentPage.background.width / this.$main.width();
+				zoomScale = this.currentPage().background.width / this.$main.width();
 
 				point = this._currentCenter();
 			}
@@ -116,22 +120,22 @@ var Sign = {
 				y: point.y + heightOffset
 			};
 
-			this.viewArea(this.can, this.currentPage, zoomStart, zoomEnd, 'width');
+			this.viewArea(this.can, this.currentPage(), zoomStart, zoomEnd, 'width');
 			this.isZoomedIn = !this.isZoomedIn;
 		} else if (isSigning) {
-			this.addBreak(this.currentPage);
+			this.addBreak(this.currentPage());
 		} else if (isHighlighting && this.highlightStart) {
 			var corners = this._normalizeCorners(this.scalePoint(this.highlightStart), this.scalePoint(this.previousPoint));
 			var party = Party.getSelectedPartyRow().attr('id');
 			var color = Party.getCurrentColor();
 
-			this._addHighlight(this.currentPage, party, corners);
-			this.highlight(this.can, this.currentPage, corners, color);
+			this._addHighlight(this.currentPage(), party, corners);
+			this.highlight(this.can, this.currentPage(), corners, color);
 
 			// Reset highlighting
 			this.highlightStart = null;
 			this.$box.hide().width(0).height(0);
-		} else {
+		} else if (!this.highlightStart) {
 			this.$main.css('cursor', 'default');
 		}
 
@@ -155,7 +159,7 @@ var Sign = {
 				start: this.scalePoint(this.previousPoint),
 				end: this.scalePoint(point),
 			};
-			this._addLine(this.currentPage, line);
+			this._addLine(this.currentPage(), line);
 			this.drawLine(this.can, line);
 		} else if (isHighlighting) {
 			if (!this.highlightStart) {
@@ -165,7 +169,7 @@ var Sign = {
 				this.$box.css('background-color', color);
 				this.highlightStart = point;
 			} else {
-				this.drawBox(this.can, this.currentPage, this.highlightStart, point);
+				this.drawBox(this.can, this.currentPage(), this.highlightStart, point);
 			}
 		}
 
@@ -198,13 +202,19 @@ var Sign = {
 		if (Party.isRequestingSignatures()) {
 			var activePartyId = Party.getSelectedPartyRow().attr('id');
 
-			for (var party in page.highlights) {
+			// Merge saved and unsaved highlights.
+			var highlights = $.extend(true, {}, this.currentPage().savedHighlights);
+			$.each(this.currentPage().unsavedHighlights, function(key, value) { 
+				highlights[key] = $.merge(highlights[key] || [], value);
+			});
+
+			for (var party in highlights) {
 				// If we are highlighting and this party is the active party or if we are not highlighting, use the dark opacity.
 				// Otherwise use the lighter opacity.
 				var useHighlight = (party == activePartyId || !Party.isHighlighting());
 
-				for (var i = 0; i < page.highlights[party].length; i++) {
-					this.highlight(canvas, page, page.highlights[party][i], Party.getPartyColor(party), useHighlight ? this.highlightOpacity : this.lowlightOpacity);
+				for (var i = 0; i < highlights[party].length; i++) {
+					this.highlight(canvas, page, highlights[party][i], Party.getPartyColor(party), useHighlight ? this.highlightOpacity : this.lowlightOpacity);
 				}
 			}
 		}
@@ -261,7 +271,7 @@ var Sign = {
 	},
 
 	realSetupCanvas: function(canvas, page) {
-		this.currentPage = page;
+		this.currentPageNumber = page.pageNumber;
 
 		$('#right-arrow a').attr('href', '#' + Math.min(Document.pageCount, page.pageNumber + 1));
 		$('#left-arrow a').attr('href', '#' + Math.max(Document.FIRST_PAGE, page.pageNumber - 1));
@@ -279,7 +289,7 @@ var Sign = {
 		canvas.width = page.background.width;
 		canvas.height = page.background.height;
 
-		$('#page-number').text(this.currentPage.pageNumber + '/' + Document.pageCount);
+		$('#page-number').text(this.currentPageNumber + '/' + Document.pageCount);
 
 		this.viewArea(canvas, page, this.ORIGIN, {x:page.background.width, y:page.background.height}, 'width');
 		this.draw(canvas, page);
@@ -291,7 +301,7 @@ var Sign = {
 	},
 
 	_scaleCorners: function(page) {
-		if (!page || !page.highlights) {
+		if (!page || !page.unsavedHighlights) {
 			return {};
 		}
 
@@ -299,18 +309,18 @@ var Sign = {
 		var scaleY = page.sourceHeight / page.background.height;
 		var scaledPage = {};
 
-		for (var party in page.highlights) {
-			scaledPage[party] = new Array();
+		for (var party in page.unsavedHighlights) {
+			scaledPage[party] = [];
 
-			for (var i = 0; i < page.highlights[party].length; i++) {
+			for (var i = 0; i < page.unsavedHighlights[party].length; i++) {
 				scaledPage[party][i] = {
 					a: {
-						x:this._round(page.highlights[party][i].upperLeftCorner.x * scaleX),
-						y:this._round(page.highlights[party][i].upperLeftCorner.y * scaleY)
+						x:this._round(page.unsavedHighlights[party][i].upperLeftCorner.x * scaleX),
+						y:this._round(page.unsavedHighlights[party][i].upperLeftCorner.y * scaleY)
 					},
 					b: {
-						x:this._round(page.highlights[party][i].lowerRightCorner.x * scaleX),
-						y:this._round(page.highlights[party][i].lowerRightCorner.y * scaleY)
+						x:this._round(page.unsavedHighlights[party][i].lowerRightCorner.x * scaleX),
+						y:this._round(page.unsavedHighlights[party][i].lowerRightCorner.y * scaleY)
 					}
 				};
 			}
@@ -398,12 +408,6 @@ var Sign = {
 		this._transform(canvas, this.scrollCanX, this.scrollCanY);
 	},
 
-	onAjaxError: function(jqXHR, textStatus, errorThrown) {
-		$('#dialog-message').dialog('close');
-
-		HtmlAlert._alert('An error has occurred', '<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>There was an error communicating with the server. Please try again.</p>');
-	},
-
 	// document.js functions
 	submitLines: function() {
 		var self = this;
@@ -414,7 +418,7 @@ var Sign = {
 		});
 
 		Document.submitLines(lines, function() {
-			$('#dialog-message').dialog('close');
+			$('#signature-message').dialog('close');
 			window.location.href = self.urls.finish_redirect;
 		});
 	},
@@ -508,23 +512,23 @@ var Sign = {
 		$('#clearcan').button({
 			icons: { primary: 'ui-icon-refresh' }
 		}).click(function() {
-			self.currentPage.lines.splice(0, self.currentPage.lines.length);
-			self.draw(self.can, self.currentPage);
+			self.currentPage().lines.splice(0, self.currentPage().lines.length);
+			self.draw(self.can, self.currentPage());
 		});
 
 		$('#undo').button({
 			icons: { primary: 'ui-icon-arrowreturnthick-1-w' }
 		}).click(function() {
-			var splicePoint = self.currentPage.lines.length;
-			for (var i = self.currentPage.lines.length - 2; i >= 0; i--) {
-				if (self.currentPage.lines[i] == self.LINEBREAK || i == 0) {
+			var splicePoint = self.currentPage().lines.length;
+			for (var i = self.currentPage().lines.length - 2; i >= 0; i--) {
+				if (self.currentPage().lines[i] == self.LINEBREAK || i == 0) {
 					splicePoint = i;
 					break;
 				}
 			}
-			self.currentPage.lines.splice(splicePoint, self.currentPage.lines.length);
-			self.addBreak(self.currentPage);
-			self.draw(self.can, self.currentPage);
+			self.currentPage().lines.splice(splicePoint, self.currentPage().lines.length);
+			self.addBreak(self.currentPage());
+			self.draw(self.can, self.currentPage());
 		});
 
 		$('#pen').button({
@@ -546,7 +550,7 @@ var Sign = {
 		$('#zoomWidth').button({
 			icons: { primary: 'ui-icon-arrowthick-2-e-w' }
 		}).click(function() {
-			self.viewArea(self.can, self.currentPage, self.ORIGIN, {x:self.currentPage.background.width, y:self.currentPage.background.height}, 'width');
+			self.viewArea(self.can, self.currentPage(), self.ORIGIN, {x:self.currentPage().background.width, y:self.currentPage().background.height}, 'width');
 			self.isZoomedIn = false;
 		});
 
@@ -569,7 +573,7 @@ var Sign = {
 		$(window).hashchange(function(event) {
 			var newPage = parseInt(location.hash.substring(1)) || Document.FIRST_PAGE;
 
-			if (!self.currentPage || newPage != self.currentPage.pageNumber) {
+			if (!self.currentPage() || newPage != self.currentPageNumber) {
 				Document.getPage(newPage, function(page) {
 					self.setupCanvas(self.can, page);
 				});
@@ -600,7 +604,7 @@ var Sign = {
 			}
 		});
 
-		$('#dialog-message').dialog({
+		$('#signature-message').dialog({
 			autoOpen: false,
 			buttons: {},
 			closeOnEscape: false,
@@ -618,7 +622,7 @@ var Sign = {
 			buttons: {
 				'Submit': function() {
 					$(this).dialog('close');
-					$('#dialog-message').dialog('open');
+					$('#signature-message').dialog('open');
 					self.submitLines();
 				},
 				'Cancel' :function() {
@@ -633,7 +637,7 @@ var Sign = {
 		Party.init($.extend({}, this.urls));
 
 		// Setup document
-		Document.init($.extend({}, this.urls), this.onAjaxError);
+		Document.init($.extend({}, this.urls));
 		$('#print').button({
 			icons: { primary: 'ui-icon-print' }
 		}).click(function() {

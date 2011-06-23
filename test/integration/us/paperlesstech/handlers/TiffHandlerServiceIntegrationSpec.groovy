@@ -40,14 +40,14 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			tiffDocument.previewImages*.pageNumber == 1..6
 	}
 
-	def "sign a tiff"() {
+	def "cursiveSign a tiff"() {
 		given:
 			def lines = ['1':[line, 'LB'], '2':[line], '4':[line]]
 			def input = [document: tiffDocument, documentData: tiffData, signatures: lines]
 		when:
 			tiffHandlerService.importFile(input)
 			tiffDocument.save()
-			tiffHandlerService.sign(input)
+			tiffHandlerService.cursiveSign(input)
 
 		then:
 			tiffDocument.files.size() == 2
@@ -58,6 +58,5 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			tiffDocument.previewImages*.data.pages == [1] * 6
 			tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
 			tiffDocument.previewImages*.pageNumber == 1..6
-			tiffDocument.signed == true
 	}
 }

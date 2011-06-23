@@ -13,6 +13,8 @@
 					'image': '${createLink(controller:"document", action:"image")}/{0}/{1}',
 					'submitParties': '${createLink(controller:"document", action:"submitParties")}/{0}',
 					'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}',
+					'removeParty': '${createLink(controller:"document", action:"removeParty")}/{0}/{1}',
+					'resendCode': '${createLink(controller:"document", action:"resend")}/{0}/{1}',
 					'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}'
 				});
 			});
@@ -73,10 +75,18 @@
 			</div>
 			<canvas id="can"></canvas>
 		</div>
-		<div id="dialog-message" title="<g:message code="document-vault.view.signature.wait.title" />">
+		<div id="signature-message" title="<g:message code="document-vault.view.party.wait.title" />">
 			<p style="overflow: hidden;">
 				<span class="ui-icon ui-icon-transferthick-e-w" style="float: left; margin: 0 7px 50px 0;"></span>
 				<g:message code="document-vault.view.signature.wait.message" />
+				<r:img uri='/images/spinner.gif' alt="${message(code:'spinner.alt',default:'Loading...')}" />
+			</p>
+		</div>
+
+		<div id="party-message" title="<g:message code="document-vault.view.party.wait.title" />">
+			<p style="overflow: hidden;">
+				<span class="ui-icon ui-icon-transferthick-e-w" style="float: left; margin: 0 7px 50px 0;"></span>
+				<g:message code="document-vault.view.party.wait.message" />
 				<r:img uri='/images/spinner.gif' alt="${message(code:'spinner.alt',default:'Loading...')}" />
 			</p>
 		</div>

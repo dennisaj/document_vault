@@ -38,7 +38,7 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		document.previewImage(2).data.mimeType == MimeType.PNG
 	}
 
-	def "sign pdf file"() {
+	def "cursiveSign pdf file"() {
 		given:
 		def lines = ['1': [line, 'LB'], '2': [line], '4': [line]]
 		when:
@@ -50,7 +50,7 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		pdfHandlerService.importFile(input)
 		document = document.save()
 		input = [document: document, documentData: document.files.first(), signatures: lines]
-		pdfHandlerService.sign(input)
+		pdfHandlerService.cursiveSign(input)
 
 		then:
 		document.files.size() == 2
@@ -61,7 +61,6 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		document.previewImages*.data.pages == [1] * 2
 		document.previewImages*.data.mimeType == [MimeType.PNG] * 2
 		document.previewImages*.pageNumber == [1, 2]
-		document.signed == true
 		where:
 		mimeType = MimeType.PDF
 	}

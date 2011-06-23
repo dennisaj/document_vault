@@ -7,7 +7,7 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class DocumentController {
-	static allowedMethods = [addParty:"POST", image:"POST", removeParty:"POST", saveNote:"POST", submitParties:"POST", submitSignatures:"POST"]
+	static allowedMethods = [addParty:"POST", image:"POST", removeParty:"POST", resend:"POST", saveNote:"POST", submitParties:"POST", submitSignatures:"POST"]
 	static navigation = [[action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Home']]
 
 	def authService
@@ -169,8 +169,8 @@ class DocumentController {
 		def signatures = JSON.parse(params?.lines).findAll {it.value}
 
 		if (signatures) {
-			handlerChain.sign(document: document, documentData: document.files.first(), signatures:signatures)
-			if (document.save()) {
+			document = partyService.cursiveSign(document, signatures)
+			if (!document.hasErrors()) {
 				flash.green = g.message(code:"document-vault.signature.success")
 			} else {
 				document.errors.each {
@@ -186,8 +186,12 @@ class DocumentController {
 		render ([status:"success"] as JSON)
 	}
 
+	// TODO: Move functions to party controller
 	def addParty = {
-		render template:"addParty", model:[colors:PartyColor.values(), permissions:Party.allowedPermissions, code:UUID.randomUUID().toString()]
+		def document = Document.get(params.long("documentId"))
+		assert document
+
+		render template:"party", model:[document:document, colors:PartyColor.values(), permissions:Party.allowedPermissions, party:new Party()]
 	}
 
 	def removeParty = {
@@ -198,6 +202,8 @@ class DocumentController {
 		assert document == party.document
 
 		partyService.removeParty(party)
+
+		render ([status:"success"] as JSON)
 	}
 
 	def submitParties = {
@@ -230,6 +236,20 @@ class DocumentController {
 			outParty
 		}
 
-		render template:"parties", model:[colors:PartyColor.values(), permissions:Party.allowedPermissions, parties:outParties]
+		render template:"parties", model:[colors:PartyColor.values(), document:document, permissions:Party.allowedPermissions, parties:outParties]
+	}
+
+	def resend = {
+		assert params.documentId
+		assert params.partyId
+
+		def document = Document.get(params.long("documentId"))
+		def party = Party.get(params.long("partyId"))
+
+		assert document == party.document
+
+		partyService.sendCode(party)
+
+		render([status:"success"] as JSON)
 	}
 }
