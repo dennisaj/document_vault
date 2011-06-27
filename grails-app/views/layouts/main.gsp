@@ -18,7 +18,7 @@
 					<h3 class="alt">Electronic document storage and signature solutions.</h3>
 				</div>
 				<div class="span-8 last" style="text-align: right">
-					<n:isLoggedIn>You are logged in as <n:principal />.</n:isLoggedIn>
+					<pt:isLoggedIn>You are logged in as <pt:username />.</pt:isLoggedIn>
 				</div>
 			</div>
 			<hr />

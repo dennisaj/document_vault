@@ -7,6 +7,16 @@ class AuthTagLib {
 
 	def authService
 
+	def isLoggedIn = {attrs, body ->
+		if (authService.isLoggedIn()) {
+			out << body()
+		}
+	}
+
+	def username = {attrs, body ->
+		out << authService.authenticatedUser?.username
+	}
+
 	/**
 	 * 
 	 * @return

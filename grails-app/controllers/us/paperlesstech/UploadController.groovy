@@ -49,7 +49,6 @@ class UploadController {
 	}
 
 	def savePcl = {
-		boolean success = false
 		def document
 
 		try {

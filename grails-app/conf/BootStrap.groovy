@@ -25,7 +25,7 @@ class BootStrap {
 
 					tenantService.initTenant(1) {
 						if (Printer.count() == 0) {
-							new Printer(name:"Recursive", host:"localhost", deviceType:"lj5gray", port:9100).save()
+							new Printer(name:"LaserJet 5", host:"192.168.40.200", deviceType:"lj5gray", port:9100).save()
 						}
 
 						if (Group.count() == 0) {

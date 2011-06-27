@@ -16,7 +16,6 @@
  */
 import grails.plugins.nimble.core.AdminsService
 import us.paperlesstech.Document
-import grails.util.Environment
 
 /**
  * Filter that works with Nimble security model to protect controllers, actions, views
@@ -66,7 +65,7 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 						case "upload":
 							return authService.canUploadAny()
 						case "console":
-							return Environment.current == grails.util.Environment.DEVELOPMENT
+							return grails.util.Environment.current == grails.util.Environment.DEVELOPMENT
 						default:
 							return false
 					}
@@ -84,5 +83,10 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 				}
 			}
 		}
+	}
+
+	def onUnauthorized(subject, filter) {
+		filter.response.status = 403
+		filter.render view:"/unauthorized"
 	}
 }
