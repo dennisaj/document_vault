@@ -66,7 +66,7 @@ nimble {
 	}
 
 	messaging {
-		enabled = false
+		enabled = true
 		
 		registration {
 			subject = "Your new account is ready!"
@@ -80,6 +80,7 @@ nimble {
 			host = "smtp.gmail.com"
 			port = 465
 			username = "donotreply@paperlesstech.us"
+			from = "Paperless Tech <donotreply@paperlesstech.us>"
 			password = "ZgJ7Gy2W"
 			props = ["mail.smtp.auth":"true",
 					"mail.smtp.socketFactory.port":"465",

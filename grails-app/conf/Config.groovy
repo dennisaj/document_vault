@@ -110,7 +110,7 @@ grails {
 	}
 }
 
-grails.mail.default.from="donotreply@paperlesstech.us"
+grails.mail.default.from = "Paperless Tech <donotreply@paperlesstech.us>"
 
 tenant {
 	domainTenantBeanName = "us.paperlesstech.DomainTenantMap"
