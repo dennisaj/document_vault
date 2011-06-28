@@ -23,7 +23,6 @@ class FermanBusinessLogicService {
 				def value = savedDocument.searchField(it)
 				if (value) {
 					log.info "Creating tag $value"
-					tagService.createTag(value)
 					savedDocument.addTag(value)
 					log.info "Added tag $value to document $d"
 				}

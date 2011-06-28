@@ -11,7 +11,7 @@ class TagController {
 	def tagService
 
 	def create = {
-		if (tagService.createTag(params.name)) {
+		if (!tagService.createTag(params.name).hasErrors()) {
 			render(template:"/saved", model:[body:{"Your tag was saved"}])
 			return
 		}

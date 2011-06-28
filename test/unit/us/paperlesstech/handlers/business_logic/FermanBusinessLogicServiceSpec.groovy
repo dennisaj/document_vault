@@ -93,8 +93,6 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		service.afterPCLImportFile(document: d)
 
 		then:
-		1 * tagService.createTag("RO_Number")
-		1 * tagService.createTag("VIN")
 		tags[0] == "RO_Number"
 		tags[1] == "VIN"
 	}

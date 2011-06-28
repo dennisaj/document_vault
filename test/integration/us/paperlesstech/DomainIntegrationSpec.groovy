@@ -42,7 +42,7 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		def d = getDocument()
 		d.searchField("field1", "value1")
 		d.otherField("field1","value2")
-		def result = d.save(failOnErrors: true)
+		def result = d.save(failOnError: true)
 		d = Document.get(1)
 
 		then: "Adding to the document map it should not throw a NPE"
@@ -62,13 +62,13 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		def d = getDocument()
 		d.searchField("field1", "value1")
 		d.otherField("field1","value2")
-		assert d.save(failOnErrors: true)
+		assert d.save(failOnError: true)
 
 		when:
 		d = Document.get(d.id)
 		d.searchField("field1", "value3")
 		d.otherField("field1","value4")
-		def result = d.save(failOnErrors: true)
+		def result = d.save(failOnError: true)
 		d = Document.get(d.id)
 
 		then: "Adding to the document map it should not throw a NPE"
@@ -176,10 +176,11 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		when:
 		def d = getDocument()
 		d.files.clear()
-		def result = d.save(failOnErrors:true)
+		def result = d.save()
 
 		then:
 		!result
+		d.errors.getFieldError("files")
 		DocumentData.count() == 2
 		Document.count() == 0
 	}
@@ -192,10 +193,11 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		when:
 		def d = getDocument()
 		d.group = null
-		def result = d.save(failOnErrors:true)
+		def result = d.save()
 
 		then:
 		!result
+		d.errors.getFieldError("group")
 		DocumentData.count() == 2
 		Document.count() == 0
 	}
@@ -207,7 +209,7 @@ class DomainIntegrationSpec extends IntegrationSpec {
 
 		when:
 		def d = getDocument()
-		d.save(failOnErrors:true)
+		d.save(failOnError:true)
 		assert Document.count() == 1
 		d.delete()
 

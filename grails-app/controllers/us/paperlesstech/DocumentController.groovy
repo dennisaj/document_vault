@@ -99,7 +99,7 @@ class DocumentController {
 			document.searchField("Note", params.value)
 			document.save(flush:true)
 
-			render text:params.value?.encodeAsHTML(), contentType: "text/plain"
+			render text:document.searchField("Note")?.encodeAsHTML(), contentType: "text/plain"
 			return
 		}
 

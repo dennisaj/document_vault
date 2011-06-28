@@ -34,8 +34,7 @@ class ActivityLogService {
 				status: status,
 				uri: requestService.getRequestURI())
 
-		activityLog.save()
-
-		return activityLog
+		def savedLog = activityLog.save()
+		return savedLog ?: activityLog
 	}
 }

@@ -39,20 +39,19 @@ class TagService {
 		return clean
 	}
 
-	boolean createTag(name) {
+	/**
+	 * This method will create a new tag that has not been assigned to any rows.
+	 *
+	 * This method should only be called if you don't plan on assigning this tag to any rows immediately.
+	 * Otherwise, use the injected addTag method for the row you are tagging. 
+	 *
+	 * @return The saved tag or a tag containing errors
+	 */
+	Tag createTag(name) {
 		def tag = new Tag(name:sanitize(name))
 
-		if (tag.validate()) {
-			try {
-				tag.save(flush:true)
-				return true
-			} catch (Exception e) {
-				log.error("Could note add tag '${name}'", e)
-				return false
-			}
-		}
-
-		return false
+		def savedTag = tag.save()
+		return savedTag ?: tag
 	}
 
 	/**

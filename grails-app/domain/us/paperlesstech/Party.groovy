@@ -70,7 +70,7 @@ class Party {
 
 		highlights?.clear()
 		// TODO Find a way to remove this save
-		save(flush:true)
+		save(flush:true, failOnError: true)
 	}
 
 	def removable = {

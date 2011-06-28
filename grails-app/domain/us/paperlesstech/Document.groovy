@@ -112,7 +112,7 @@ class Document implements Taggable {
 
 		previewImages?.clear()
 		// TODO Find a way to remove this save
-		save(flush:true)
+		save(flush:true, failOnError: true)
 	}
 
 	/**
