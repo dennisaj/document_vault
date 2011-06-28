@@ -91,7 +91,7 @@ class Party {
 		if (rejected) {
 			status = "document-vault.view.party.status.rejected"
 		} else if (partiallySigned()) {
-			status = "document-vault.view.party.status.partiallySigned"
+			status = "document-vault.view.party.status.partiallysigned"
 		} else if (completelySigned()) {
 			status = "document-vault.view.party.status.signed"
 		}

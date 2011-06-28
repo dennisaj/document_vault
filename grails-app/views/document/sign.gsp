@@ -95,12 +95,20 @@
 		</pt:canPrint>
 		<g:render template="requestSignature" />
 		<g:render template="/alert" />
-		<div id="confirm-submit" title="<g:message code="document-vault.view.signature.confirm.title" />">
+		<div id="confirm-submit" title="<g:message code="document-vault.view.signature.confirmsubmit.title" />">
 			<p>
 				<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>
-				<g:message code="document-vault.view.signature.confirm.message" />
+				<g:message code="document-vault.view.signature.confirmsubmit.message" />
 			</p>
 		</div>
+		<pt:canGetSigned document="${document}">
+		<div id="confirm-remove" title="<g:message code="document-vault.view.signature.confirmremove.title" />">
+			<p>
+				<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>
+				<g:message code="document-vault.view.signature.confirmremove.message" />
+			</p>
+		</div>
+		</pt:canGetSigned>
 		<div id="box" style="position: absolute;z-index:100"></div>
 	</body>
 </html>

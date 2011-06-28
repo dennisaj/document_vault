@@ -88,7 +88,7 @@ class PartySpec extends UnitSpec {
 		where:
 			params << [[completelySigned:false, partiallySigned:true], [completelySigned:true, partiallySigned:false]]
 			expectedStatus <<
-				["document-vault.view.party.status.partiallySigned",
+				["document-vault.view.party.status.partiallysigned",
 				"document-vault.view.party.status.signed"]
 	}
 

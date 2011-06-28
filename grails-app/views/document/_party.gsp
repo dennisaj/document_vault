@@ -18,7 +18,7 @@
 	<g:select disabled="${disabled}" name="permissionSelect" class="permission" id="permission-${code}" from="${permissions}" optionKey="key" value="${party?.documentPermission?.name()}" />
 
 	<g:if test="${pt.canGetSigned(document:document)}">
-		<g:if test="${party?.id && !party.completelySigned()}">
+		<g:if test="${party?.id && party?.signator?.profile?.email && !party.completelySigned()}">
 			<button class="resend" id="resend-${code}" title="<g:message code="document-vault.view.party.resend" />">
 				<g:message code="document-vault.view.party.resend" />
 			</button>
