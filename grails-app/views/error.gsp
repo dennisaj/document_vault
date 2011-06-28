@@ -13,7 +13,7 @@
 		<g:if test="${grails.util.Environment.current == grails.util.Environment.DEVELOPMENT}">
 			<br />
 			<h2>Error Details</h2>
-			<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'.encodeAsHTML()}<br/>
+			<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
 			<div class="message">
 				
 				<strong>Servlet:</strong> ${request.'javax.servlet.error.servlet_name'}<br/>

@@ -134,12 +134,15 @@ authcBasic.applicationName = Document Vault API
 
 environments {
 	production {
+		timing.enabled = true
 		server.protocol = "https://"
 	}
 	development {
+		timing.enabled = true
 		server.protocol = "http://"
 	}
 	test {
+		timing.enabled = true
 		server.protocol = "http://"
 	}
 }

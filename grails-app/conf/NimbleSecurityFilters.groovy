@@ -23,7 +23,7 @@ import us.paperlesstech.Document
  * @author Bradley Beddoes
  */
 public class NimbleSecurityFilters extends grails.plugins.nimble.security.NimbleFilterBase {
-	private static String openControllers = "auth|logout|account|code"
+	private static String openControllers = "auth|logout|account|code|errors"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 	def authService
@@ -42,19 +42,19 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 						case ["document", "home"]:
 							switch (action) {
 								case ["download", "downloadImage", "image", "show"]:
-									return authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document)
+									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
 								case ["index"]:
 									return authService.canViewAny() || authService.canSignAny()
 								case ["sign"]:
-									return authService.canSign(document) || authService.canGetSigned(document)
+									return document && (authService.canSign(document) || authService.canGetSigned(document))
 								case ["submitSignatures"]:
-									return authService.canSign(document)
+									return document && (authService.canSign(document))
 								case ["note", "saveNote"]:
-									return authService.canNotes(document)
+									return document && (authService.canNotes(document))
 								case ["addParty", "submitParties", "removeParty"]:
-									return authService.canGetSigned(document)
+									return document && (authService.canGetSigned(document))
 								case "resend":
-									return authService.canGetSigned(document)
+									return document && (authService.canGetSigned(document))
 								default:
 									return false
 							}
