@@ -151,21 +151,8 @@ var Party = {
 			icons: { primary: 'ui-icon-closethick' },
 			text: false
 		}).click(function(event) {
-			var $party = $(this).parent();
-			var code = $party.attr('id');
-			var partyId = $('#id-' + code).val()
-
-			// If partyId is set, this is an existing Party. If not, just remove the row.
-			if (partyId) {
-				$('#party-message').dialog('open');
-
-				Document.removeParty(partyId, function() {
-					$('#party-message').dialog('close');
-					self._afterRemoveCallback($party);
-				});
-			} else {
-				self._afterRemoveCallback($party);
-			}
+			$('#confirm-remove').data().dialog['$party'] = $(this).parent();
+			$('#confirm-remove').dialog('open');
 		});
 
 		$('button.resend', $party).button({
@@ -319,6 +306,36 @@ var Party = {
 				$(".ui-dialog-titlebar-close", $(this).parent()).hide();
 				$(this).dialog('option', 'buttons', {});
 			},
+			resizable: false
+		});
+
+		$('#confirm-remove').dialog({
+			autoOpen: false,
+			buttons: {// TODO i18n
+				'Remove': function(event) {
+					$(this).dialog('close');
+					var $party = $('#confirm-remove').data().dialog.$party;
+					var code = $party.attr('id');
+					var partyId = $('#id-' + code).val()
+
+					// If partyId is set, this is an existing Party. If not, just remove the row.
+					if (partyId) {
+						$('#party-message').dialog('open');
+
+						Document.removeParty(partyId, function() {
+							$('#party-message').dialog('close');
+							self._afterRemoveCallback($party);
+						});
+					} else {
+						self._afterRemoveCallback($party);
+					}
+				},// TODO i18n
+				'Cancel' :function() {
+					$(this).dialog('close');
+				}
+			},
+			draggable: false,
+			modal: true,
 			resizable: false
 		});
 
