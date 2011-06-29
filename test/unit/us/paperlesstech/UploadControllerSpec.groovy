@@ -22,7 +22,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.savePcl()
 
 		then:
-		1 * authService.getGroupsWithPermission(DocumentPermission.Upload) >> null
+		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> null
 		mockResponse.status == 500
 	}
 
@@ -45,7 +45,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.savePcl()
 
 		then:
-		1 * authService.getGroupsWithPermission(DocumentPermission.Upload) >> ([new Group()] as Set)
+		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> ([new Group()] as Set)
 		1 * uploadService.upload(_, _, _, _) >> doc
 		mockResponse.status == 200
 		mockResponse.contentAsString.contains("42")
@@ -56,7 +56,7 @@ class UploadControllerSpec extends ControllerSpec {
 		def model = controller.index()
 
 		then:
-		1 * authService.getGroupsWithPermission(DocumentPermission.Upload) >> groups
+		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> groups
 		model == [groups: groups]
 
 		where:

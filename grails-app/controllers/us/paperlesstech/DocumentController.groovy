@@ -38,8 +38,8 @@ class DocumentController {
 			params.tagSearchResults = tagService.getRecentTags()
 		}
 
-		def allowedGroupIds = authService.getGroupsWithPermission(DocumentPermission.View).collect { it.id } ?: -1L
-		def specificDocs = authService.getIndividualDocumentsWithPermission(DocumentPermission.View) ?: -1L
+		def allowedGroupIds = authService.getGroupsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]).collect { it.id } ?: -1L
+		def specificDocs = authService.getIndividualDocumentsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]) ?: -1L
 
 		if (tagSearch) {
 			params.documents = Document.findAllByTagWithCriteria(tag) {

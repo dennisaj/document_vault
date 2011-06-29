@@ -36,7 +36,7 @@ class PartyServiceIntegrationSpec extends IntegrationSpec {
 			def user = new User(username:"user", profile:new Profile())
 			user.save()
 
-			def permission = new Permission(owner:user, type:Permission.defaultPerm, target:"document:Sign:*:${document.id}", managed:true)
+			def permission = new Permission(owner:user, type:Permission.defaultPerm, target:"document:sign:*:${document.id}", managed:true)
 			user.addToPermissions(permission)
 			permission.save(failOnError:true)
 			user.save(failOnError:true)

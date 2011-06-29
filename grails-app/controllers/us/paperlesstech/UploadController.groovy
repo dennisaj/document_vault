@@ -12,7 +12,7 @@ class UploadController {
 	def uploadService
 
 	def index = {
-		[groups:authService.getGroupsWithPermission(DocumentPermission.Upload)]
+		[groups:authService.getGroupsWithPermission([DocumentPermission.Upload])]
 	}
 
 	def ajaxSave = {
@@ -52,7 +52,7 @@ class UploadController {
 		def document
 
 		try {
-			def group = authService.getGroupsWithPermission(DocumentPermission.Upload).find { it }
+			def group = authService.getGroupsWithPermission([DocumentPermission.Upload]).find { it }
 			assert group, "The user must be able to upload to at least one group"
 			def now = new Date()
 			def fileName = String.format("%tF %tT.pcl", now, now)

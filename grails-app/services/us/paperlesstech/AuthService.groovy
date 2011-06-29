@@ -97,7 +97,7 @@ class AuthService extends AuthenticatedService {
 	 * @param permission The permission to test
 	 * @return The set of all groups where the user can perform the indicated permission
 	 */
-	Set getGroupsWithPermission(DocumentPermission permission) {
+	Set getGroupsWithPermission(List<DocumentPermission> permissions) {
 		def user = authenticatedUser
 		def subject = authenticatedSubject
 
@@ -108,18 +108,20 @@ class AuthService extends AuthenticatedService {
 		def groups = Group.list()
 
 		subject.hasRole(AdminsService.ADMIN_ROLE) ? groups : groups?.findAll {
-			checkPermission(permission, it)
+			permissions.any {permission->
+				checkPermission(permission, it)
+			}
 		}
 	}
 
 	/**
 	 * This is for getting the documents the user has one off permissions for.  For example this isn't for seeing if
-	 * the user has document:view:1:* it is for collecting the 5 in document:view:1:5
+	 * the user has document:view:1:* it is for collecting the 5 in document:view:1:5 or document:view:*:5
 	 *
 	 * @param permission The permission to test
 	 * @return The set of all document ids where the user has specific permission to perform the indicated permission
 	 */
-	Set getIndividualDocumentsWithPermission(DocumentPermission permission) {
+	Set getIndividualDocumentsWithPermission(List<DocumentPermission> permissions) {
 		def subject = authenticatedSubject
 
 		if (!isLoggedIn()) {
@@ -131,8 +133,8 @@ class AuthService extends AuthenticatedService {
 			return true
 		}
 
-		String pString = permission.name().toLowerCase()
-		def matcher = ~/document:$pString:\d+:(\d+)/
+		String pString = permissions*.name().join("|").toLowerCase()
+		def matcher = ~/(?i)document:(?:$pString):(?:\d+|\*):(\d+)/
 		def match
 		def matches = [] as Set
 

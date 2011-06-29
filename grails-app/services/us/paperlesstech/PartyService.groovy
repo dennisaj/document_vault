@@ -53,7 +53,7 @@ class PartyService {
 		}
 
 		if (!party.signator.hasErrors() && !party.hasErrors()) {
-			Permission profileEdit = new Permission(managed:true, type: Permission.defaultPerm, target:"document:${party.documentPermission}:*:${document.id}")
+			Permission profileEdit = new Permission(managed:true, type: Permission.defaultPerm, target:"document:${party.documentPermission.name().toLowerCase()}:*:${document.id}")
 			permissionService.createPermission(profileEdit, party.signator)
 			def savedParty = party.save()
 			if (savedParty) {
@@ -197,7 +197,7 @@ class PartyService {
 		def savedDocument = document.save()
 		if (savedDocument) {
 			def signator = party.signator
-			def target = "document:${party.documentPermission}:*:${savedDocument.id}"
+			def target = "document:${party.documentPermission.name().toLowerCase()}:*:${savedDocument.id}"
 
 			party.delete(flush:true)
 
