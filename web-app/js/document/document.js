@@ -210,23 +210,18 @@ var Document = {
 		}
 	},
 
-	removeParty: function(partyId, callback) {
-		var self = this;
-		$.ajax({
-			error: this.ajaxErrorHandler,
-			global: false,
-			success: function(data) {
-				if ($.isFunction(callback)) {
-					callback(data);
-				}
-			},
-			type: 'POST',
-			url: this.urls.removeParty.format(this.documentId, partyId)
-		});
+	/**
+	 * Returns a deferred object to which callbacks can be attached.
+	 */
+	removeParty: function(partyId) {
+		return $.when($.post(this.urls.removeParty.format(this.documentId, partyId))).fail(this.ajaxErrorHandler);
 	},
 
-	resendCode: function(partyId, callback) {
-		$.when($.post(this.urls.resendCode.format(this.documentId, partyId))).always(callback); 
+	/**
+	 * Returns a deferred object to which callbacks can be attached.
+	 */
+	resendCode: function(partyId) {
+		return $.when($.post(this.urls.resendCode.format(this.documentId, partyId))).fail(this.ajaxErrorHandler); 
 	},
 
 	_scaleHighlights: function(page) {
@@ -254,36 +249,18 @@ var Document = {
 		return scaledHighlights;
 	},
 
-	submitParties: function(parties, callback) {
-		var self = this;
-		$.ajax({
-			data: {parties: JSON.stringify(parties)},
-			error: this.ajaxErrorHandler,
-			global: false,
-			success: function(data) {
-				if ($.isFunction(callback)) {
-					callback(data);
-				}
-			},
-			type: 'POST',
-			url: this.urls.submitParties.format(this.documentId)
-		});
+	/**
+	 * Returns a deferred object to which callbacks can be attached.
+	 */
+	submitParties: function(parties) {
+		return $.when($.post(this.urls.submitParties.format(this.documentId), {parties: JSON.stringify(parties)})).fail(this.ajaxErrorHandler);
 	},
 
+	/**
+	 * Returns a deferred object to which callbacks can be attached.
+	 */
 	submitLines: function(lines, callback) {
-		var self = this;
-		$.ajax({
-			data: {lines: JSON.stringify(lines)},
-			error: this.ajaxErrorHandler,
-			global: false,
-			success: function(data) {
-				if ($.isFunction(callback)) {
-					callback();
-				}
-			},
-			type: 'POST',
-			url: this.urls.sign.format(this.documentId)
-		});
+		return $.when($.post(this.urls.sign.format(this.documentId), {lines: JSON.stringify(lines)})).fail(this.ajaxErrorHandler);
 	},
 
 	init: function(urls) {

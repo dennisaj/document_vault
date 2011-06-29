@@ -168,11 +168,7 @@ var Party = {
 				$this.button('disable');
 				$('#party-message').dialog('open');
 
-				Document.resendCode(partyId, function() {
-					if (arguments[1] == "error") {
-						Document.ajaxErrorHandler.apply(null, arguments);
-					}
-
+				Document.resendCode(partyId).always(function() {
 					$('#party-message').dialog('close');
 					$this.button('enable');
 				});
@@ -208,11 +204,7 @@ var Party = {
 
 		var parties = self._getParties();
 
-		Document.submitParties(parties, function(data) {
-			if (arguments[1] == "error") {
-				Document.ajaxErrorHandler.apply(null, arguments);
-			}
-
+		Document.submitParties(parties).then(function(data) {
 			$('#party-message').dialog('close');
 			$('#party-container').html(data);
 			Document.refreshPageCache();
@@ -267,12 +259,12 @@ var Party = {
 			if (wasOn) {
 				$('#request-signature').slideUp();
 				$this.removeClass('ui-state-highlight');
-				$('#pen').button('enable');
+				$('#pen, #save').button('enable');
 				self.stopHighlighting().button('disable');
 			} else {
 				$('#request-signature').slideDown();
 				$this.addClass('ui-state-highlight');
-				$('#pen').removeClass('ui-state-highlight').button('disable');
+				$('#pen, #save').removeClass('ui-state-highlight').button('disable');
 				$('#highlight').button('enable');
 				self.refreshHighlightButton();
 			}
@@ -322,7 +314,7 @@ var Party = {
 					if (partyId) {
 						$('#party-message').dialog('open');
 
-						Document.removeParty(partyId, function() {
+						Document.removeParty(partyId).then(function() {
 							$('#party-message').dialog('close');
 							self._afterRemoveCallback($party);
 						});
