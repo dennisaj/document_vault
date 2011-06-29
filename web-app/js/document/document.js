@@ -80,9 +80,20 @@ var Document = {
 					var bg = new Image();
 					bg.src = self.urls.downloadImage.format(self.documentId, pageNumber);
 
+					// If the page already exists, preserve the unsaved highlights of new parties.
+					// This prevents highlights from being lost when there is an error saving a new party.
+					var unsavedHighlights = {}
+					if (self.pages[data.pageNumber]) {
+						$.each(self.pages[data.pageNumber].unsavedHighlights, function(key, value) { 
+							if (key.match(/^[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/i)) {
+								unsavedHighlights[key] = value;
+							}
+						});
+					}
+
 					self.pages[data.pageNumber] = {
 						savedHighlights: data.highlights,
-						unsavedHighlights: {},
+						unsavedHighlights: unsavedHighlights,
 						lines: new Array(),
 						background: bg,
 						pageNumber: data.pageNumber,

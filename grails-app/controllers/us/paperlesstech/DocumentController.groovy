@@ -231,6 +231,11 @@ class DocumentController {
 				}
 			} else {
 				outParty = partyService.createParty(document, inParty)
+				if (outParty.hasErrors() || outParty.signator.hasErrors()) {
+					// If there was an error, use the existing code. 
+					// This ensures that the unsaved clientside highlights won't disappear. 
+					outParty.code = inParty.code
+				}
 			}
 
 			outParty

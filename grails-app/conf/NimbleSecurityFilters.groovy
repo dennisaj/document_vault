@@ -23,7 +23,7 @@ import us.paperlesstech.Document
  * @author Bradley Beddoes
  */
 public class NimbleSecurityFilters extends grails.plugins.nimble.security.NimbleFilterBase {
-	private static String openControllers = "auth|logout|account|code|errors"
+	private static String openControllers = "auth|logout|account|code"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 	def authService

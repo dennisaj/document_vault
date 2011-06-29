@@ -77,7 +77,7 @@ var Party = {
 					});
 				} else {
 					parties.push({
-						id: partyId,
+						code: code,
 						fullName: $('#fullName-' + code).val(),
 						email: $('#email-' + code).val(),
 						expiration: $('#expiration-' + code).val(),
