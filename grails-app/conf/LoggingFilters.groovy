@@ -5,14 +5,18 @@ public class LoggingFilters {
 	def activityLogService
 	def authService
 
-	def dependsOn = [TenantFilters]
+	def dependsOn = [TimingFilters, TenantFilters]
 
 	def filters = {
 		all(controller: '*') {
-			afterView = {
+			afterView = {Exception e->
+				if (e) {
+					log.error(e, e)
+				}
+
 				if (authService.isLoggedIn()) {
 					ResponseWrapper ptResp = ResponseWrapperFilter.getResponseWrapper(response)
-					def status = ptResp.getPTStatus() ?: 200
+					def status = ptResp?.getPTStatus() ?: 200
 					def logParams = params.clone()
 					if (actionName == "downloadImage" && !logParams.pageNumber) {
 						logParams.pageNumber = 1
