@@ -417,7 +417,7 @@ var Sign = {
 			lines[index] = self._scaleLines(element);
 		});
 
-		Document.submitLines(lines, function() {
+		Document.submitLines(lines).then(function() {
 			$('#signature-message').dialog('close');
 			window.location.href = self.urls.finish_redirect;
 		});
