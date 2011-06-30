@@ -1,10 +1,13 @@
 package us.paperlesstech
 
-import java.util.Map;
-
 import grails.converters.JSON
 
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
+import org.hibernate.sql.JoinFragment
 
 class DocumentController {
 	static allowedMethods = [addParty:"POST", image:"POST", removeParty:"POST", resend:"POST", saveNote:"POST", submitParties:"POST", submitSignatures:"POST"]
@@ -13,9 +16,14 @@ class DocumentController {
 	def authService
 	def handlerChain
 	def partyService
+	def sessionFactory
 	def tagService
 
 	def index = {
+		def documentResults = []
+		def documentTotal = 0
+		def tagSearchResults = []
+
 		params.q = params.q?.trim()
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		params.offset = params.offset ? params.int('offset') : 0
@@ -31,18 +39,18 @@ class DocumentController {
 
 		def terms = params.q?.tokenize(",").collect { it.trim() }.findAll { it }
 		if (tagSearch) {
-			params.tagSearchResults = [tag]
+			tagSearchResults = [tag]
 		} else if (terms?.size()) {
-			params.tagSearchResults = tagService.tagSearch(terms)
+			tagSearchResults = tagService.tagSearch(terms)
 		} else {
-			params.tagSearchResults = tagService.getRecentTags()
+			tagSearchResults = tagService.getRecentTags()
 		}
 
 		def allowedGroupIds = authService.getGroupsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]).collect { it.id } ?: -1L
 		def specificDocs = authService.getIndividualDocumentsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]) ?: -1L
 
 		if (tagSearch) {
-			params.documents = Document.findAllByTagWithCriteria(tag) {
+			documentResults += Document.findAllByTagWithCriteria(tag) {
 				or {
 					inList("id", specificDocs)
 					inList("group.id", allowedGroupIds)
@@ -52,30 +60,33 @@ class DocumentController {
 				order(params.sort, params.order)
 			}
 		} else {
+			DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Document.class)
+				.createAlias("searchFieldsCollection", "sfc", JoinFragment.LEFT_OUTER_JOIN)
+				.setProjection(Projections.distinct(Projections.id()))
+				.add(Restrictions.or(Restrictions.in("id", specificDocs), Restrictions.in("group.id", allowedGroupIds)))
+			if (params.q) {
+				detachedCriteria.add(Restrictions.or(Restrictions.ilike("name", "%$params.q%"), Restrictions.ilike("sfc.value", "%$params.q%")))
+			}
+
+			documentTotal = Document.createCriteria().count {
+				addToCriteria(Subqueries.propertyIn("id", detachedCriteria))
+			}
+
 			def c = Document.createCriteria()
-			params.documents = c.listDistinct {
-				or {
-					inList("id", specificDocs)
-					inList("group.id", allowedGroupIds)
-				}
-				if (params.q) {
-					or {
-						ilike("name", "%$params.q%")
-						searchFieldsCollection {
-							ilike("value", "%$params.q%")
-						}
-					}
-				}
+
+			documentResults += c.list {
+				addToCriteria(Subqueries.propertyIn("id", detachedCriteria))
 				maxResults(params.max)
 				firstResult(params.offset)
 				order(params.sort, params.order)
 			}
 		}
 
+		def model = [tagSearchResults:tagSearchResults, documentResults:documentResults, documentTotal:documentTotal]
 		if (request.xhr) {
-			render(template: "searchResults", model: params)
+			render(template: "searchResults", model: model)
 		} else {
-			params
+			model
 		}
 	}
 

@@ -7,20 +7,20 @@
 		</div>
 	</g:if>
 	<div class="span-24 last ui-widget-header ui-corner-top">
-		<g:if test="${!q}">
-			Showing ${max.encodeAsHTML()} most recent documents.
+		<g:if test="${!params.q}">
+			<g:message code="document-vault.view.document.search.recent" args="[params.max.encodeAsHTML()]" />
 		</g:if>
-		<g:if test="${q && documents}">
-			Showing results for <strong>${q.encodeAsHTML()}</strong>
+		<g:if test="${params.q && documentResults}">
+			<g:message code="document-vault.view.document.search.results" args="[params.q.encodeAsHTML()]" />
 		</g:if>
-		<g:if test="${q && !documents}">
-			No documents found for <strong>${q.encodeAsHTML()}</strong>.
+		<g:if test="${params.q && !documentResults}">
+			<g:message code="document-vault.view.document.search.noresults" args="[params.q.encodeAsHTML()]" />
 		</g:if>
 	</div>
-	<g:if test="${documents}">
+	<g:if test="${documentResults}">
 	<div class="span-24 last ui-widget-content ui-corner-bottom">
 		<table id="document-table">
-		<g:each var="document" in="${documents}" status="index">
+		<g:each var="document" in="${documentResults}" status="index">
 			<tr class="result">
 				<td>
 					<img class="thumb" width="80" src="${createLink(action:'downloadImage', params:[documentId: document.id])}" alt="Document ${document.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
@@ -107,19 +107,10 @@
 		</table>
 	</div>
 
-	<div class="paging span-24 last append-bottom">
-		Page: 1
-		<%--
-		<g:set var="totalPages" value="${Math.ceil(documents.total / documents.max)}"/>
-		<g:if test="${totalPages == 1}">
-			<span class="currentStep">1</span>
+		<g:if test="${params.q}">
+		<div class="paginateButtons paging span-24 last append-bottom">
+			<g:paginate params="${params}" total="${documentTotal}" />
+		</div>
 		</g:if>
-		<g:else>
-			<g:paginate controller="searchable" action="index"
-						params="[q: queryString]" total="${documents.total}"
-						prev="&lt; previous" next="next &gt;"/>
-		</g:else>
-		--%>
-	</div>
 	</g:if>
 </div>

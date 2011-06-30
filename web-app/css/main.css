@@ -2,6 +2,10 @@ body {
 	font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif !important;
 }
 
+div.paginateButtons {
+	margin: 1.5em 0 1.5em 0;
+}
+
 div.paginateButtons a {
 	background: #F6A828;
 	border: 1px;
@@ -17,11 +21,15 @@ div.paginateButtons a:hover {
 }
 
 .nextLink:after {
-	content: ' \00BB'
+	content: ' \00BB';
+	font-size: 1.5em;
+	font-weight: bold;
 }
 
 .prevLink:before {
-	content: '\00AB '
+	content: '\00AB ';
+	font-size: 1.5em;
+	font-weight: bold;
 }
 
 div.paginateButtons .currentStep {
