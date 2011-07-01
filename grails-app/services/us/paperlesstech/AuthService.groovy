@@ -1,12 +1,17 @@
 package us.paperlesstech
 
 import grails.plugins.nimble.auth.WildcardPermission
+import grails.plugins.nimble.core.AdminsService
 import grails.plugins.nimble.core.AuthenticatedService
 import grails.plugins.nimble.core.Group
-import grails.plugins.nimble.core.AdminsService
+
+import java.util.concurrent.ConcurrentHashMap
 
 class AuthService extends AuthenticatedService {
+	static scope = "request"
 	static transactional = false
+	
+	Map permissionsCache = [implied:[:], permitted: [:]] as ConcurrentHashMap
 	def testSubject
 
 	boolean canDelete(Document d) {
@@ -73,9 +78,9 @@ class AuthService extends AuthenticatedService {
 			return false
 		}
 
-		String pString = permission.name().toLowerCase()
+		String pString = "document:${permission.name().toLowerCase()}:${d.group.id}:${d.id}"
 
-		subject.isPermitted("document:$pString:${d.group.id}:${d.id}")
+		checkPermission(subject, pString)
 	}
 
 	boolean checkPermission(DocumentPermission permission, Group g) {
@@ -86,9 +91,21 @@ class AuthService extends AuthenticatedService {
 			return false
 		}
 
-		String pString = permission.name().toLowerCase()
+		String pString = "document:${permission.name().toLowerCase()}:${g.id}"
 
-		subject.isPermitted("document:$pString:${g.id}")
+		checkPermission(subject, pString)
+	}
+
+	boolean checkPermission(def subject, String permission) {
+		def permitted = permissionsCache.permitted[permission]
+		if (permitted == null) {
+			permitted = subject.isPermitted(permission)
+
+			// The parentheses around permission are required so that the value of the string is used as the key
+			permissionsCache.permitted << [(permission):permitted]
+		}
+
+		permitted
 	}
 
 	/**
@@ -107,9 +124,9 @@ class AuthService extends AuthenticatedService {
 
 		def groups = Group.list()
 
-		subject.hasRole(AdminsService.ADMIN_ROLE) ? groups : groups?.findAll {
+		subject.hasRole(AdminsService.ADMIN_ROLE) ? groups : groups?.findAll {group->
 			permissions.any {permission->
-				checkPermission(permission, it)
+				checkPermission(permission, group)
 			}
 		}
 	}
@@ -185,6 +202,11 @@ class AuthService extends AuthenticatedService {
 			return false
 		}
 
+		def permitted = permissionsCache.implied[permission]
+		if (permitted != null) {
+			return permitted
+		}
+
 		if (testSubject) {
 			// TODO add better testing for roles
 			return true
@@ -195,6 +217,7 @@ class AuthService extends AuthenticatedService {
 		def user = authenticatedUser
 		for (p in user.permissions) {
 			if (wp.implies(new WildcardPermission(p.target))) {
+				permissionsCache.implied << [(permission):true]
 				return true
 			}
 		}
@@ -202,6 +225,7 @@ class AuthService extends AuthenticatedService {
 		for (role in user.roles) {
 			for (p in role.permissions) {
 				if (wp.implies(new WildcardPermission(p.target))) {
+					permissionsCache.implied << [(permission):true]
 					return true
 				}
 			}
@@ -211,6 +235,7 @@ class AuthService extends AuthenticatedService {
 			for (role in group.roles) {
 				for (p in role.permissions) {
 					if (wp.implies(new WildcardPermission(p.target))) {
+						permissionsCache.implied << [(permission):true]
 						return true
 					}
 				}
@@ -218,11 +243,12 @@ class AuthService extends AuthenticatedService {
 
 			for (p in group.permissions) {
 				if (wp.implies(new WildcardPermission(p.target))) {
+					permissionsCache.implied << [(permission):true]
 					return true
 				}
 			}
 		}
-
-		return subject.isPermitted(wp)
+		
+		return checkPermission(subject, permission)
 	}
 }

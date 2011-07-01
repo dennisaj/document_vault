@@ -26,7 +26,7 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 	private static String openControllers = "auth|logout|account|code"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
-	def authService
+	def authServiceProxy
 
 	def filters = {
 		secure(controller: "($openControllers|$adminControllers)", invert: true) {
@@ -37,33 +37,33 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 				}
 				accessControl (auth: false) {
 					def action = actionName ?: "index"
-					log.info("user:$authService.authenticatedUser; resource:$controllerName:$action; document:$document")
+					log.info("user:$authServiceProxy.authenticatedUser; resource:$controllerName:$action; document:$document")
 					switch (controllerName) {
 						case ["document", "home"]:
 							switch (action) {
 								case ["download", "downloadImage", "image", "show"]:
-									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
+									return document && (authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document) || authServiceProxy.canView(document))
 								case ["index"]:
-									return authService.canViewAny() || authService.canSignAny()
+									return authServiceProxy.canViewAny() || authServiceProxy.canSignAny()
 								case ["sign"]:
-									return document && (authService.canSign(document) || authService.canGetSigned(document))
+									return document && (authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document))
 								case ["submitSignatures"]:
-									return document && (authService.canSign(document))
+									return document && (authServiceProxy.canSign(document))
 								case ["note", "saveNote"]:
-									return document && (authService.canNotes(document))
+									return document && (authServiceProxy.canNotes(document))
 								case ["addParty", "submitParties", "removeParty"]:
-									return document && (authService.canGetSigned(document))
+									return document && (authServiceProxy.canGetSigned(document))
 								case "resend":
-									return document && (authService.canGetSigned(document))
+									return document && (authServiceProxy.canGetSigned(document))
 								default:
 									return false
 							}
 						case "printQueue":
-							return document ? authService.canPrint(document) : authService.canPrintAny()
+							return document ? authServiceProxy.canPrint(document) : authServiceProxy.canPrintAny()
 						case "tag":
-							return document ? authService.canTag(document) : authService.canTagAny()
+							return document ? authServiceProxy.canTag(document) : authServiceProxy.canTagAny()
 						case "upload":
-							return authService.canUploadAny()
+							return authServiceProxy.canUploadAny()
 						case "console":
 							return grails.util.Environment.current == grails.util.Environment.DEVELOPMENT
 						default:

@@ -11,7 +11,7 @@ class PartyService {
 	static final List validChars = ["abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "123457890", '!@#$%&+=-']
 	static transactional = true
 
-	def authService
+	def authServiceProxy
 	def grailsApplication
 	def handlerChain
 	def highlightService
@@ -27,7 +27,7 @@ class PartyService {
 	 * @return The Party object, with errors populated if any occur.
 	 */
 	Party createParty(Document document, Map p) {
-		assert authService.canGetSigned(document)
+		assert authServiceProxy.canGetSigned(document)
 
 		def dateParseError = false
 		def party = new Party()
@@ -79,9 +79,9 @@ class PartyService {
 	Document cursiveSign(Document document, Map signatures) {
 		assert document
 		assert signatures
-		assert authService.canSign(document)
+		assert authServiceProxy.canSign(document)
 
-		def user = authService.authenticatedUser
+		def user = authServiceProxy.authenticatedUser
 		Party party = document.parties.find { it.signator == user }
 
 		if (!party) {
@@ -124,7 +124,7 @@ class PartyService {
 	 */
 	Party markAccepted(Party party) {
 		assert party
-		assert authService.canSign(party.document) || authService.canGetSigned(party.document)
+		assert authServiceProxy.canSign(party.document) || authServiceProxy.canGetSigned(party.document)
 
 		if (!party.rejected) {
 			party.highlights = party.highlights.collect {highlight->
@@ -147,7 +147,7 @@ class PartyService {
 	 */
 	Party markRejected(Party party) {
 		assert party
-		assert authService.canSign(party.document) || authService.canGetSigned(party.document)
+		assert authServiceProxy.canSign(party.document) || authServiceProxy.canGetSigned(party.document)
 
 		party.rejected = true
 		def savedParty = party.save()
@@ -170,7 +170,7 @@ class PartyService {
 	 */
 	Party markViewed(Party party) {
 		assert party
-		assert authService.canSign(party.document) || authService.canGetSigned(party.document)
+		assert authServiceProxy.canSign(party.document) || authServiceProxy.canGetSigned(party.document)
 
 		party.viewed = true
 		def savedParty = party.save()
@@ -188,7 +188,7 @@ class PartyService {
 	 */
 	void removeParty(Party party) {
 		assert party
-		assert authService.canGetSigned(party.document)
+		assert authServiceProxy.canGetSigned(party.document)
 		assert party.removable()
 
 		def document = party.document
@@ -225,7 +225,7 @@ class PartyService {
 	 */
 	Party sendCode(Party party) {
 		assert party
-		assert authService.canGetSigned(party.document)
+		assert authServiceProxy.canGetSigned(party.document)
 
 		sendMail {
 			to party.signator.profile.email
@@ -254,7 +254,7 @@ class PartyService {
 	 */
 	Party updateHighlights(Party party, List jsonHighlights) {
 		assert party
-		assert authService.canGetSigned(party.document)
+		assert authServiceProxy.canGetSigned(party.document)
 
 		highlightService.fromJsonList(party, jsonHighlights)?.each {highlight->
 			party.addToHighlights(highlight)

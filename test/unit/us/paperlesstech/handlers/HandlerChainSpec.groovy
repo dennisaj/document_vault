@@ -11,7 +11,7 @@ class HandlerChainSpec extends UnitSpec {
 
 	def setup() {
 		chain = new HandlerChain()
-		chain.authService = authService
+		chain.authServiceProxy = authService
 	}
 
 	def "importFile fails if the user can't upload to the document group"() {

@@ -12,7 +12,7 @@ class HandlerSpec extends UnitSpec {
 	def handler = new Handler()
 
 	def setup() {
-		handler.authService = authService
+		handler.authServiceProxy = authService
 	}
 
 	def "expected to be overloaded methods should throw an exception"() {

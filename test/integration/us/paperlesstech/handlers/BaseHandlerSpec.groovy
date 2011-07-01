@@ -4,7 +4,7 @@ import grails.plugin.spock.IntegrationSpec
 import org.apache.shiro.subject.Subject
 
 class BaseHandlerSpec extends IntegrationSpec {
-	def authService
+	def authServiceProxy
 	Subject adminSubject = Mock()
 
 	def setup() {
@@ -12,9 +12,9 @@ class BaseHandlerSpec extends IntegrationSpec {
 		adminSubject.authenticated >> true
 		adminSubject.remembered >> true
 		adminSubject.isPermitted(_) >> true
-		authService.metaClass.isLoggedIn = {
+		authServiceProxy.metaClass.isLoggedIn = {
 			true
 		}
-		authService.testSubject = adminSubject
+		authServiceProxy.testSubject = adminSubject
 	}
 }

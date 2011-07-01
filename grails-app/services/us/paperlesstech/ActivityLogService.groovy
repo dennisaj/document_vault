@@ -1,7 +1,7 @@
 package us.paperlesstech
 
 class ActivityLogService {
-	def authService
+	def authServiceProxy
 	def requestService
 
 	static transactional = false
@@ -28,7 +28,7 @@ class ActivityLogService {
 				document: documentId,
 				userAgent: requestService.getHeader("User-Agent"),
 				ip: requestService.getRemoteAddr(),
-				user: authService.authenticatedUser,
+				user: authServiceProxy.authenticatedUser,
 				pageNumber: pageNumber,
 				params: params.toString(),
 				status: status,

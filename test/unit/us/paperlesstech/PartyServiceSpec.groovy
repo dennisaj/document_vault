@@ -28,7 +28,7 @@ class PartyServiceSpec extends UnitSpec {
 	def setup() {
 		mockLogging(PartyService)
 		service = new PartyService()
-		service.authService = authService
+		service.authServiceProxy = authService
 		service.grailsApplication = grailsApplication
 		service.highlightService = highlightService
 		service.permissionService = permissionService

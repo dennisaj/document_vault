@@ -1,4 +1,14 @@
 beans = {
+	authService(us.paperlesstech.AuthService) { bean ->
+		bean.autowire = 'byName'
+		bean.scope = 'request'
+	}
+
+	authServiceProxy(org.springframework.aop.scope.ScopedProxyFactoryBean){
+		targetBeanName = 'authService'
+		proxyTargetClass = true
+	}
+
 	businessLogicService(us.paperlesstech.handlers.business_logic.FermanBusinessLogicService) { bean ->
 		bean.autowire = 'byName'
 	}

@@ -4,14 +4,13 @@ import org.apache.commons.logging.LogFactory
 
 class HandlerChain extends Handler {
 	org.apache.commons.logging.Log log = LogFactory.getLog(getClass())
-	def authService
 	def businessLogicService
 	def handlers
 
 	@Override
 	void importFile(Map input) {
 		def document = getDocument(input)
-		assert authService.canUpload(document.group)
+		assert authServiceProxy.canUpload(document.group)
 
 		handle("importFile", input)
 	}
@@ -19,7 +18,7 @@ class HandlerChain extends Handler {
 	@Override
 	void generatePreview(Map input) {
 		def document = getDocument(input)
-		assert authService.canUpload(document.group) || authService.canSign(document)
+		assert authServiceProxy.canUpload(document.group) || authServiceProxy.canSign(document)
 
 		handle("generatePreview", input)
 	}
@@ -27,7 +26,7 @@ class HandlerChain extends Handler {
 	@Override
 	void print(Map input) {
 		def document = getDocument(input)
-		assert authService.canPrint(document)
+		assert authServiceProxy.canPrint(document)
 
 		handle("print", input)
 	}
@@ -35,7 +34,7 @@ class HandlerChain extends Handler {
 	@Override
 	void cursiveSign(Map input) {
 		def document = getDocument(input)
-		assert authService.canSign(document)
+		assert authServiceProxy.canSign(document)
 
 		handle("cursiveSign", input)
 	}
@@ -43,7 +42,7 @@ class HandlerChain extends Handler {
 	@Override
 	def downloadPreview(Map input) {
 		def document = getDocument(input)
-		assert authService.canView(document) || authService.canSign(document)
+		assert authServiceProxy.canView(document) || authServiceProxy.canSign(document)
 
 		handle("downloadPreview", input)
 	}
@@ -51,7 +50,7 @@ class HandlerChain extends Handler {
 	@Override
 	def download(Map input) {
 		def document = getDocument(input)
-		assert authService.canView(document) || authService.canSign(document)
+		assert authServiceProxy.canView(document) || authServiceProxy.canSign(document)
 
 		handle("download", input)
 	}

@@ -11,7 +11,7 @@ class ActivityLogServiceSpec extends UnitSpec {
 	def activityMock
 
 	def setup() {
-		service.authService = authService
+		service.authServiceProxy = authService
 		service.requestService = request
 		activityMock = mockFor(ActivityLog.class)
 	}

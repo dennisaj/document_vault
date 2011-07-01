@@ -4,7 +4,7 @@ import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 
 class Handler {
-	def authService
+	def authServiceProxy
 
 	/**
 	 * Imports the document in the map.  This includes generating previews.  documentData and the perviews will be
@@ -55,7 +55,7 @@ class Handler {
 	 */
 	def downloadPreview(Map input) {
 		def d = getDocument(input)
-		assert authService.canView(d) || authService.canSign(d)
+		assert authServiceProxy.canView(d) || authServiceProxy.canSign(d)
 
 		def page = input.page
 		assert page, "This method requires a page number"
@@ -76,7 +76,7 @@ class Handler {
 	 */
 	def download(Map input) {
 		def d = getDocument(input)
-		assert authService.canView(d) || authService.canSign(d)
+		assert authServiceProxy.canView(d) || authServiceProxy.canSign(d)
 		def data = getDocumentData(input)
 
 		def filename = d.toString() + data.mimeType.getDownloadExtension()

@@ -3,16 +3,15 @@ package us.paperlesstech
 import grails.plugin.spock.*
 import grails.plugins.nimble.core.Group
 import grails.plugins.nimble.core.Permission
-import grails.plugins.nimble.core.PermissionService
 import spock.lang.*
 
 class PartyServiceIntegrationSpec extends IntegrationSpec {
 	def partyService
 	def fileData
-	AuthService authService = Mock()
+	AuthService authServiceMock = Mock()
 
 	def setup() {
-		partyService.authService = authService
+		partyService.authServiceProxy = authServiceMock
 		fileData = new DocumentData(mimeType: MimeType.PDF, data: new byte[1], dateCreated: new Date())
 	}
 
@@ -48,7 +47,7 @@ class PartyServiceIntegrationSpec extends IntegrationSpec {
 			party.save(failOnError:true)
 			document.save(failOnError:true)
 
-			1 * authService.canGetSigned(document) >> true
+			1 * authServiceMock.canGetSigned(document) >> true
 		when:
 			def savedParty = partyService.removeParty(party)
 		then:
