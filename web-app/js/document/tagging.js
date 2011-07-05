@@ -25,7 +25,7 @@ var Tagging = {
 	showAllTagged: function(name, displayId) {
 		var self = this;
 
-		if(self.useDocumentSearch) {
+		if (self.useDocumentSearch) {
 			$("#q").val("tagged " + name);
 			$("#searchForm").submit();
 			return;
@@ -143,5 +143,9 @@ var Tagging = {
 	init: function(urls, useDocumentSearch) {
 		this.urls = urls;
 		this.useDocumentSearch = useDocumentSearch || false;
+
+		$('#tag-search-submit').button({
+			icons: { primary: 'ui-icon-search' }
+		});
 	}
 };

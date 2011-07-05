@@ -42,7 +42,7 @@ class HandlerChain extends Handler {
 	@Override
 	def downloadPreview(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canView(document) || authServiceProxy.canSign(document)
+		assert authServiceProxy.canTag(document) || authServiceProxy.canView(document) || authServiceProxy.canSign(document)
 
 		handle("downloadPreview", input)
 	}

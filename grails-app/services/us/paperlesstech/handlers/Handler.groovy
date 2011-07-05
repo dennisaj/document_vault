@@ -55,7 +55,7 @@ class Handler {
 	 */
 	def downloadPreview(Map input) {
 		def d = getDocument(input)
-		assert authServiceProxy.canView(d) || authServiceProxy.canSign(d)
+		assert authServiceProxy.canTag(d) || authServiceProxy.canView(d) || authServiceProxy.canSign(d)
 
 		def page = input.page
 		assert page, "This method requires a page number"

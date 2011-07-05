@@ -1,13 +1,19 @@
 package us.paperlesstech
 
-import grails.plugin.multitenant.core.util.TenantUtils;
-
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.taggable.Tag
+import org.grails.taggable.TagLink
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
+import org.hibernate.sql.JoinFragment
 
 class TagService {
 
 	static transactional = true
+
+	def authServiceProxy
 
 	boolean addDocumentTag(long documentId, tag) {
 		return addDocumentTag(Document.get(documentId), tag)
@@ -72,6 +78,18 @@ class TagService {
 		return Tag.list([max:5, sort:'id', order:'desc'])
 	}
 
+	List findAllByTag(String name) {
+		def allowedGroupIds = authServiceProxy.getGroupsWithPermission([DocumentPermission.Tag]).collect { it.id } ?: -1L
+		def specificDocs = authServiceProxy.getIndividualDocumentsWithPermission([DocumentPermission.Tag]) ?: -1L
+
+		Document.findAllByTagWithCriteria(name) {
+			or {
+				inList("id", specificDocs)
+				inList("group.id", allowedGroupIds)
+			}
+		}
+	}
+
 	boolean removeDocumentTag(def documentId, tag) {
 		return removeDocumentTag(Document.get(documentId), tag)
 	}
@@ -102,13 +120,20 @@ class TagService {
 	}
 
 	List<Document> untaggedDocuments() {
-		def currentTenant = TenantUtils.currentTenant
-		String findByTagHQL = """
-			SELECT document from Document document
-			WHERE document.tenantId = $currentTenant AND document.id NOT IN(SELECT tagLink.tagRef FROM TagLink tagLink where tagLink.type = 'document' GROUP BY tagLink.tagRef)
-			ORDER BY document.id
-		"""
+		def c = Document.createCriteria()
+		def allowedGroupIds = authServiceProxy.getGroupsWithPermission([DocumentPermission.Tag]).collect { it.id } ?: -1L
+		def specificDocs = authServiceProxy.getIndividualDocumentsWithPermission([DocumentPermission.Tag]) ?: -1L
 
-		return Document.executeQuery(findByTagHQL)
+		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(TagLink.class)
+				.add(Restrictions.eq("type", "document"))
+				.setProjection(Projections.groupProperty("tagRef"))
+
+		c.list {
+			addToCriteria(Subqueries.propertyNotIn("id", detachedCriteria))
+			or {
+				inList("id", specificDocs)
+				inList("group.id", allowedGroupIds)
+			}
+		}
 	}
 }

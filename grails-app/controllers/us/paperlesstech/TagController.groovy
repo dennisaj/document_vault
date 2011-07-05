@@ -12,27 +12,27 @@ class TagController {
 
 	def create = {
 		if (!tagService.createTag(params.name).hasErrors()) {
-			render(template:"/saved", model:[body:{"Your tag was saved"}])
+			render(template:"/saved", model:[body:{g.message(code:"document-vault.tag.saved")}])
 			return
 		}
 
-		render(template:"/notsaved", model:[message:"Your tag could not be saved"])
+		render(template:"/notsaved", model:[message:g.message(code:"document-vault.tag.notsaved")])
 		return
 	}
 
 	def documentAdd = {
 		if (tagService.addDocumentTag(params.long("documentId"), params.tag)) {
-			render(template:"/saved", model:[body: {"Document(${params.documentId}) was tagged as '${params.tag}'"}])
+			render(template:"/saved", model:[body: {g.message(code:"document-vault.tag.document.tagged", args:[params.documentId, params.tag])}])
 			return
 		}
 
-		render(template:"/notsaved", model:[message:"Document(${params.documentId}) could not be tagged"])
+		render(template:"/notsaved", model:[message:g.message(code:"document-vault.tag.document.nottagged", args:[params.documentId])])
 		return
 	}
 
 	def documentList = {
 		// IE caches GET requests. These lines prevent that
-		response.setHeader('Last-Modified', '${now}')
+		response.setHeader('Last-Modified', "${now}")
 		response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
 		response.setHeader('Pragma', 'No-cache')
 
@@ -48,7 +48,7 @@ class TagController {
 	def documents = {
 		def name = params.name?.trim()
 		if (name) {
-			render(template:"allTagged", model:[documents:Document.findAllByTag(name), tag:name])
+			render(template:"allTagged", model:[documents:tagService.findAllByTag(name), tag:name])
 		} else {
 			render(template:"untagged", model:[untagged:tagService.untaggedDocuments()])
 		}

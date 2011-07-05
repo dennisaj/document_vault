@@ -1,10 +1,12 @@
-<h3>Tags:</h3>
+<h3><g:message code="document-vault.label.tags" />:</h3>
 <g:formRemote name="searchForm" url="[action: 'search']" update="tag-results" asynchronous="false" after="Tagging.initDragAndDrop()">
 	<div id="search">
-		<label for="q">Search</label>
+		<label for="q"><g:message code="document-vault.label.search" /></label>
 		<br />
 		<input type="text" class="text" name="q" id="q" />
-		<input type="submit" name="submit" value="Search" />
+		<button type="submit" name="submit" id="tag-search-submit">
+			<g:message code="document-vault.label.search" />
+		</button>
 	</div>
 </g:formRemote>
 <g:render template="createTag" />

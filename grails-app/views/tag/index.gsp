@@ -21,7 +21,7 @@
 				});
 			});
 		</r:script>
-		<title> - Tag</title>
+		<title> - <g:message code="document-vault.view.tag.title" /></title>
 	</head>
 	<body>
 		<g:render template="tagSearch" />

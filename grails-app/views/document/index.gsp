@@ -46,7 +46,7 @@
 		<fieldset class="span-24 last">
 			<legend>Search for a document</legend>
 			<div id="search">
-				<label for="q">Search</label><br />
+				<label for="q"><g:message code="document-vault.label.search" /></label><br />
 				<g:textField name="q" value="${q}" class="text" />
 				<button id="sub" type="submit" name="submit">
 					<g:message code="document-vault.label.search" />
