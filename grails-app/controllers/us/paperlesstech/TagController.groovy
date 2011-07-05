@@ -32,7 +32,7 @@ class TagController {
 
 	def documentList = {
 		// IE caches GET requests. These lines prevent that
-		response.setHeader('Last-Modified', "${now}")
+		response.setHeader('Last-Modified', "${new Date()}")
 		response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
 		response.setHeader('Pragma', 'No-cache')
 
