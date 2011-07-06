@@ -4,11 +4,13 @@ import grails.converters.JSON
 
 class PrintQueueController {
 	def authService
+	def fileService
 
 	def pop = {
 		def results = PrintQueue.listOrderByDateCreated(max:1, order:"asc")
 		if (results.size() > 0) {
-			def j = [printer: results[0].printer, document: results[0].document.files.first().data.encodeBase64().toString()]
+			String printData = fileService.getBytes(results[0].document.files.first()).encodeBase64().toString()
+			def j = [printer: results[0].printer, document: printData]
 			results[0].delete()
 			render(j as JSON)
 

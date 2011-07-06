@@ -21,7 +21,9 @@ class DefaultImageHandlerService extends Handler {
 
 		d.resetPreviewImages()
 
-		def (width, height) = ImageHelpers.getDimensions(data.data)
+		def (width, height) = fileService.withInputStream(data) { is ->
+			ImageHelpers.getDimensions(is)
+		}
 		PreviewImage image = new PreviewImage(data: data, height: height, pageNumber: 1, width: width)
 		d.addToPreviewImages(image)
 	}
@@ -33,6 +35,9 @@ class DefaultImageHandlerService extends Handler {
 
 		d.addToFiles(data)
 		handlerChain.generatePreview(input)
+
+		assert d.files.size() == 1
+		assert d.previewImages.size() == 1
 	}
 
 	@Override
@@ -46,14 +51,17 @@ class DefaultImageHandlerService extends Handler {
 
 		log.info "Updating the images for document ${d}"
 
-		Image original = ImageIO.read(new ByteArrayInputStream(data.data))
+		Image original
+		fileService.withInputStream(data) { is ->
+			original = ImageIO.read(is)
+		}
 
 		ImageHelpers.drawLines(original, signatureData)
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream()
 		ImageIO.write(original, data.mimeType.toString().toLowerCase(), output)
 
-		DocumentData newImage = new DocumentData(data: output.toByteArray(), mimeType: data.mimeType, pages: data.pages)
+		DocumentData newImage = fileService.createDocumentData(bytes: output.toByteArray(), mimeType: data.mimeType, pages: data.pages)
 		d.addToFiles(newImage)
 		input.documentData = newImage
 		handlerChain.generatePreview(input)

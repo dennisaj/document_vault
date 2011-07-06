@@ -6,13 +6,17 @@ import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 import us.paperlesstech.PreviewImage
+import us.paperlesstech.FileService
+import javax.print.DocFlavor.INPUT_STREAM
 
 class HandlerSpec extends UnitSpec {
 	def authService = Mock(AuthService)
 	def handler = new Handler()
+	FileService fileService = Mock()
 
 	def setup() {
 		handler.authServiceProxy = authService
+		handler.fileService = fileService
 	}
 
 	def "expected to be overloaded methods should throw an exception"() {
@@ -128,22 +132,25 @@ class HandlerSpec extends UnitSpec {
 		new DocumentData() | null
 	}
 
-	def "download should return a triple of the file data"() {
+	def "download should return a quad of the file data"() {
 		given:
-		def data = new byte[1]
 		def d = new Document(name: "file")
 		authService.canView(d) >> true
-		def dd = new DocumentData(mimeType: mimeType, data: data)
+		def dd = new DocumentData(mimeType: mimeType, fileSize: fileSize)
+		def is = Mock(InputStream)
 
 		when:
 		def result = handler.download(document: d, documentData: dd)
 
 		then:
+		1 * fileService.getInputStream(dd) >> is
 		result[0] == "file.pdf"
-		result[1] == data
+		result[1] == is
 		result[2] == mimeType.downloadContentType
+		result[3] == fileSize
 
 		where:
+		fileSize = 42
 		mimeType = MimeType.PDF
 	}
 
@@ -160,13 +167,13 @@ class HandlerSpec extends UnitSpec {
 		thrown AssertionError
 	}
 
-	def "downloadPreview should return a triple of the preview file data"() {
+	def "downloadPreview should return a quad of the preview file data"() {
 		given:
 		mockDomain(Document)
-		def data = new byte[1]
 		def d = new Document(name: "file")
 		authService.canView(d) >> true
-		def dd = new DocumentData(mimeType: mimeType, data: data)
+		def is = Mock(InputStream)
+		def dd = new DocumentData(mimeType: mimeType, fileSize: fileSize)
 		def pi = new PreviewImage(pageNumber: pageNumber, data: dd)
 		d.addToPreviewImages(pi)
 
@@ -174,11 +181,14 @@ class HandlerSpec extends UnitSpec {
 		def result = handler.downloadPreview(document: d, page: pageNumber)
 
 		then:
+		1 * fileService.getInputStream(dd) >> is
 		result[0] == "file - page($pageNumber).png"
-		result[1] == data
+		result[1] == is
 		result[2] == mimeType.downloadContentType
+		result[3] == fileSize
 
 		where:
+		fileSize = 42
 		pageNumber = 2
 		mimeType = MimeType.PNG
 	}

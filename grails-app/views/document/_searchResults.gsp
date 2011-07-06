@@ -38,7 +38,7 @@
 					<span title="${document.dateCreated}"><g:message code="document-vault.label.added" /> <prettytime:display date="${document.dateCreated}" /></span>
 				</td>
 				<td>
-					<prettysize:display size="${document?.files?.first()?.data?.size()}" abbr="true" format="###0" />
+					<prettysize:display size="${document?.files?.first()?.fileSize}" abbr="true" format="###0" />
 				</td>
 				<td>
 					<pt:canTag document="${document}">

@@ -3,11 +3,10 @@ package us.paperlesstech.handlers.business_logic
 import us.paperlesstech.DocumentData
 import us.paperlesstech.handlers.Handler
 import us.paperlesstech.handlers.PclHandlerService
-import us.paperlesstech.Document
 
 class FermanBusinessLogicService {
 	static transactional = true
-	def tagService
+	PclHandlerService pclHandlerService
 
 	enum FermanDocumentTypes {
 		CustomerHardCopy,
@@ -62,9 +61,7 @@ class FermanBusinessLogicService {
 	}
 
 	public FermanDocumentTypes getDocumentType(DocumentData dd) {
-		assert dd?.data
-
-		String data = PclHandlerService.pclToString(dd, false)
+		String data = pclHandlerService.pclToString(dd, false)
 
 		FermanDocumentTypes type = FermanDocumentTypes.Other
 		if (data.contains("&f20901y")) {
@@ -84,7 +81,7 @@ class FermanBusinessLogicService {
 	}
 
 	Map parseCustomerHardCopy(DocumentData dd) {
-		String data = PclHandlerService.pclToString(dd)
+		String data = pclHandlerService.pclToString(dd)
 		def lines = data.split(/\r\n|\n/).toList()
 
 		lines = lines.reverse()
@@ -160,7 +157,7 @@ class FermanBusinessLogicService {
 	}
 
 	String parseOther(DocumentData dd) {
-		String data = PclHandlerService.pclToString(dd)
+		String data = pclHandlerService.pclToString(dd)
 
 		def m = data =~ /(?m)(\S+)/
 		def lines = m*.getAt(1)

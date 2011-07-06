@@ -2,12 +2,12 @@ package us.paperlesstech.handlers
 
 import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.Document
-import us.paperlesstech.DocumentData
 import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.MimeType
 
 class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def defaultImageHandlerService
+	def fileService
 	def line
 
 	@Override
@@ -19,7 +19,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def "import image files"() {
 		when:
 			def document = new Document(group: DomainIntegrationSpec.group)
-			def documentData = new DocumentData(data: new ClassPathResource("test" + mimeType.downloadExtension).getFile().getBytes(), mimeType: mimeType)
+			def documentData = fileService.createDocumentData(file: new ClassPathResource("test" + mimeType.downloadExtension).getFile(), mimeType: mimeType)
 			def input = [document: document, documentData: documentData]
 			defaultImageHandlerService.importFile(input)
 		then:
@@ -38,7 +38,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			def lines = ['1':[line, 'LB'], '2':[line], '4':[line]]
 		when:
 			def document = new Document(group: DomainIntegrationSpec.group)
-			def documentData = new DocumentData(data: new ClassPathResource("test" + mimeType.downloadExtension).getFile().getBytes(), mimeType: mimeType)
+			def documentData = fileService.createDocumentData(file: new ClassPathResource("test" + mimeType.downloadExtension).getFile(), mimeType: mimeType)
 			def input = [document: document, documentData: documentData]
 
 			defaultImageHandlerService.importFile(input)
@@ -50,7 +50,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			document.files.size() == 2
 			document.files.first().pages == 1
 			document.files.first().mimeType == mimeType
-			document.files.first().data != document.files.last().data
+			document.files.first().fileKey != document.files.last().fileKey
 			document.previewImages.size() == 1
 			document.previewImages*.data.pages == [1] * 1
 			document.previewImages*.data.mimeType == [mimeType] * 1

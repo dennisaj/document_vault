@@ -40,6 +40,7 @@ grails.project.dependency.resolution = {
 		compile group:'com.thebuzzmedia', name:'imgscalr-lib', version:'3.1'
 		compile group:'com.sun.media', name:'jai-codec', version:'1.1.3'
 		compile group:'net.java.dev.jai-imageio', name:'jai-imageio-core-standalone', version:'1.2-pre-dr-b04-2010-04-30'
+		compile group:'com.amazonaws', name:'aws-java-sdk', version:'1.2.2'
 	}
 }
 

@@ -32,7 +32,7 @@ environments {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
             dbCreate = "none"
-            url = "jdbc:mysql://localhost/document_vault"
+            url = "jdbc:mysql://document-vault-test.cyafcveui3rr.us-east-1.rds.amazonaws.com/document_vault"
         }
     }
 }

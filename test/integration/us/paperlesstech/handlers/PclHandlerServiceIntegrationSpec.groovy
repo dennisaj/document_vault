@@ -11,6 +11,7 @@ import grails.plugins.nimble.core.Group
 import us.paperlesstech.DomainIntegrationSpec
 
 class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
+	def fileService
 	def handlerChain
 	def document
 	def pclData
@@ -18,8 +19,7 @@ class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def setup() {
 		document = new Document()
 		document.group = DomainIntegrationSpec.group
-		pclData = new DocumentData(mimeType: MimeType.PCL)
-		pclData.data = new ClassPathResource("dt_combined.pcl").getFile().getBytes()
+		pclData = fileService.createDocumentData(mimeType: MimeType.PCL, file: new ClassPathResource("dt_combined.pcl").getFile())
 	}
 
 	def "import ferman pcl file"() {
@@ -31,7 +31,9 @@ class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		document.searchField("DocumentType") == "CustomerHardCopy"
 		document.files.first().pages == 1
 		document.files.first().mimeType == MimeType.PDF
-		document.files.first().data[0..3] == "%PDF".bytes
+		document.files.last().mimeType == MimeType.PCL
+		document.files.first().fileKey != document.files.last().fileKey
+		fileService.getBytes(document.files.first())[0..3] == "%PDF".bytes
 		document.previewImages.size() == 1
 		document.previewImage(1).data.pages == 1
 		document.previewImage(1).data.mimeType == MimeType.PNG

@@ -5,16 +5,7 @@ import grails.plugins.nimble.core.Group
 import spock.lang.Unroll
 
 class DocumentSpec extends UnitSpec {
-	byte[] rawBytes = new byte[8];
-	String encodedBytes = null
-
-	def setup() {
-		"CAFEBABE".eachWithIndex { it, idx ->
-			rawBytes[idx] = Byte.decode("#$it")
-		}
-		encodedBytes = rawBytes.encodeBase64().toString()
-
-	}
+	def setup() {}
 
 	def "test constraints"() {
 		given:
@@ -40,7 +31,7 @@ class DocumentSpec extends UnitSpec {
 	}
 
 	def documentData() {
-		new DocumentData(mimeType: MimeType.PDF, data: new byte[1])
+		new DocumentData(mimeType: MimeType.PDF, fileSize: 1, fileKey: "asdf")
 	}
 
 
@@ -48,7 +39,7 @@ class DocumentSpec extends UnitSpec {
 		given: "A document with images"
 		mockDomain(Document)
 		def doc = new Document()
-		DocumentData dd = new DocumentData(data: rawBytes)
+		DocumentData dd = documentData()
 		doc.addToPreviewImages(new PreviewImage(data: dd,
 				pageNumber: pageNumber,
 				height: height,
@@ -72,7 +63,7 @@ class DocumentSpec extends UnitSpec {
 		given: "A document with images"
 		mockDomain(Document)
 		def doc = new Document()
-		DocumentData dd = new DocumentData(data: rawBytes)
+		DocumentData dd = documentData()
 		doc.addToPreviewImages(new PreviewImage(data: dd,
 				pageNumber: pageNumber,
 				height: height,

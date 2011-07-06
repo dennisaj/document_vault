@@ -1,27 +1,23 @@
 package us.paperlesstech.handlers
 
-import grails.plugin.spock.IntegrationSpec
-
 import org.springframework.core.io.ClassPathResource
-
 import us.paperlesstech.Document
-import us.paperlesstech.DocumentData
-import us.paperlesstech.MimeType
 import us.paperlesstech.DomainIntegrationSpec
+import us.paperlesstech.MimeType
 
 class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
+	def fileService
 	def pdfHandlerService
 	def document
 	def pdfData
-	def line =  [a:[x:0,y:0], b:[x:100,y:100]]
+	def line = [a: [x: 0, y: 0], b: [x: 100, y: 100]]
 
 	@Override
 	def setup() {
 		pdfHandlerService.authServiceProxy = authServiceProxy
 		document = new Document()
 		document.group = DomainIntegrationSpec.group
-		pdfData = new DocumentData(mimeType: MimeType.PDF)
-		pdfData.data = new ClassPathResource("2pages.pdf").getFile().getBytes()
+		pdfData = fileService.createDocumentData(mimeType: MimeType.PDF, file: new ClassPathResource("2pages.pdf").getFile())
 	}
 
 	def "import pdf file"() {
@@ -32,7 +28,7 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		then:
 		document.files.first().pages == 2
 		document.files.first().mimeType == MimeType.PDF
-		document.files.first().data == pdfData.data
+		document.files.first().fileKey == pdfData.fileKey
 		document.previewImages.size() == 2
 		document.previewImage(1).data.pages == 1
 		document.previewImage(1).data.mimeType == MimeType.PNG
@@ -45,9 +41,7 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		def lines = ['1': [line, 'LB'], '2': [line], '4': [line]]
 		when:
 		def document = new Document(group: DomainIntegrationSpec.group)
-		def documentData = new DocumentData(data: new ClassPathResource("2pages.pdf").getFile().getBytes(),
-				mimeType: mimeType)
-		def input = [document: document, documentData: documentData]
+		def input = [document: document, documentData: pdfData]
 
 		pdfHandlerService.importFile(input)
 		document = document.save()
@@ -58,7 +52,7 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		document.files.size() == 2
 		document.files.first().pages == 2
 		document.files.first().mimeType == mimeType
-		document.files.first().data != document.files.last().data
+		document.files.first().fileKey != document.files.last().fileKey
 		document.previewImages.size() == 2
 		document.previewImages*.data.pages == [1] * 2
 		document.previewImages*.data.mimeType == [MimeType.PNG] * 2

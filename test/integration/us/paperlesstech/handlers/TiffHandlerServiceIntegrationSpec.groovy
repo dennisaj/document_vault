@@ -1,16 +1,12 @@
 package us.paperlesstech.handlers
 
-import grails.plugin.spock.IntegrationSpec
-
 import org.springframework.core.io.ClassPathResource
-
 import us.paperlesstech.Document
-import us.paperlesstech.DocumentData
-import us.paperlesstech.MimeType
-import java.security.DigestInputStream
 import us.paperlesstech.DomainIntegrationSpec
+import us.paperlesstech.MimeType
 
 class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
+	def fileService
 	def tiffHandlerService
 	def tiffDocument
 	def tiffData
@@ -19,44 +15,43 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def setup() {
 		tiffDocument = new Document()
 		tiffDocument.group = DomainIntegrationSpec.group
-		tiffData = new DocumentData(mimeType: MimeType.TIFF)
-		tiffData.data = new ClassPathResource("multipage.tif").getFile().getBytes()
-		
-		line = [a:[x:0,y:0], b:[x:100,y:100]]
+		tiffData = fileService.createDocumentData(mimeType: MimeType.TIFF, file: new ClassPathResource("multipage.tif").getFile())
+
+		line = [a: [x: 0, y: 0], b: [x: 100, y: 100]]
 	}
 
 	def "import tiff file"() {
 		def input = [document: tiffDocument, documentData: tiffData]
 		when:
-			tiffHandlerService.importFile(input)
+		tiffHandlerService.importFile(input)
 
 		then:
-			tiffDocument.files.first().pages == 6
-			tiffDocument.files.first().mimeType == MimeType.TIFF
-			tiffDocument.files.first().data == tiffData.data
-			tiffDocument.previewImages.size() == 6
-			tiffDocument.previewImages*.data.pages == [1] * 6
-			tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
-			tiffDocument.previewImages*.pageNumber == 1..6
+		tiffDocument.files.first().pages == 6
+		tiffDocument.files.first().mimeType == MimeType.TIFF
+		tiffDocument.files.first().fileKey == tiffData.fileKey
+		tiffDocument.previewImages.size() == 6
+		tiffDocument.previewImages*.data.pages == [1] * 6
+		tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
+		tiffDocument.previewImages*.pageNumber == 1..6
 	}
 
 	def "cursiveSign a tiff"() {
 		given:
-			def lines = ['1':[line, 'LB'], '2':[line], '4':[line]]
-			def input = [document: tiffDocument, documentData: tiffData, signatures: lines]
+		def lines = ['1': [line, 'LB'], '2': [line], '4': [line]]
+		def input = [document: tiffDocument, documentData: tiffData, signatures: lines]
 		when:
-			tiffHandlerService.importFile(input)
-			tiffDocument.save()
-			tiffHandlerService.cursiveSign(input)
+		tiffHandlerService.importFile(input)
+		tiffDocument.save()
+		tiffHandlerService.cursiveSign(input)
 
 		then:
-			tiffDocument.files.size() == 2
-			tiffDocument.files.first().pages == 6
-			tiffDocument.files.first().mimeType == MimeType.TIFF
-			tiffDocument.files.first().data != tiffDocument.files.last().data
-			tiffDocument.previewImages.size() == 6
-			tiffDocument.previewImages*.data.pages == [1] * 6
-			tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
-			tiffDocument.previewImages*.pageNumber == 1..6
+		tiffDocument.files.size() == 2
+		tiffDocument.files.first().pages == 6
+		tiffDocument.files.first().mimeType == MimeType.TIFF
+		tiffDocument.files.first().fileKey != tiffDocument.files.last().fileKey
+		tiffDocument.previewImages.size() == 6
+		tiffDocument.previewImages*.data.pages == [1] * 6
+		tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
+		tiffDocument.previewImages*.pageNumber == 1..6
 	}
 }

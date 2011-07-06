@@ -7,30 +7,36 @@ class UploadService {
 	static transactional = true
 
 	def authService
-	def handlerChain
 	def businessLogicService
+	def fileService
+	def handlerChain
 
-	Document upload(Group group, String name, byte[] data, String contentType) {
+	Document uploadInputStream(InputStream is, Group group, String name, String contentType) {
 		MimeType mimeType = MimeType.getMimeType(mimeType: contentType, fileName: name)
 
 		if (mimeType) {
-			return upload(group, name, data, mimeType)
+			def documentData = fileService.createDocumentData(mimeType: mimeType, inputStream: is)
+			return uploadDocumentData(documentData, group, name, mimeType)
 		}
 
 		return null
 	}
 
-	Document upload(Group group, String name, byte[] data, MimeType mimeType) {
+	Document uploadByteArray(byte[] data, Group group, String name, MimeType mimeType) {
+		def documentData = fileService.createDocumentData(mimeType: mimeType, bytes: data)
+		return uploadDocumentData(documentData, group, name, mimeType)
+	}
+
+	Document uploadDocumentData(DocumentData documentData, Group group, String name, MimeType mimeType) {
 		assert authService.canUpload(group)
+		assert documentData
+		assert mimeType
 
 		try {
 			Document document = new Document()
 			document.group = group
 			document.name = FileHelpers.chopExtension(name)
-			def documentData = new DocumentData(mimeType: mimeType, data: data)
 			handlerChain.importFile(document: document, documentData: documentData)
-
-			assert document.files.size() == 1
 			assert document.save(flush: true)
 
 			log.info "Saved document ${document.id}"

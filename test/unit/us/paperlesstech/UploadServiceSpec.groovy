@@ -7,61 +7,87 @@ import us.paperlesstech.handlers.HandlerChain
 class UploadServiceSpec extends UnitSpec {
 	UploadService service
 	AuthService authService = Mock()
+	FileService fileService = Mock()
 	HandlerChain handlerChain = Mock()
 
 	def setup() {
 		mockLogging(UploadService)
 		service = new UploadService()
 		service.authService = authService
+		service.fileService = fileService
 		service.handlerChain = handlerChain
 	}
 
-	def "upload only works if it has a mimeType"() {
+	def "uploadInputStream only works if it has a mimeType"() {
 		expect:
-		service.upload(new Group(), "file with no ext", null, "unknown content type") == null
+		service.uploadInputStream(null, new Group(), "file with no ext", "unknown content type") == null
 	}
 
-	def "upload that finds the mimeType should pass it through"() {
+	def "uploadInputStream should pass through mimeType"() {
 		given:
-		Document d = new Document()
-		service.metaClass.upload = { Group group, String name, byte[] data, MimeType mimeType -> d }
+		def d = new Document()
+		service.metaClass.uploadDocumentData = { DocumentData dd, Group group, String name, MimeType mimeType -> d }
 
-		expect:
-		service.upload(new Group(), "file.pdf", null, "application/pdf") == d
+		when:
+		def result = service.uploadInputStream(null as InputStream, new Group(), "file.pdf", "application/pdf")
+
+		then:
+		1 * fileService.createDocumentData(_) >> new DocumentData()
+		result == d
 	}
 
-	def "upload verifies the user can upload"() {
+	def "uploadByteArray should create a DocumentData to pass through"() {
+		given:
+		def d = new Document()
+		def documentData = new DocumentData()
+		service.metaClass.uploadDocumentData = { DocumentData dd, Group group, String name, MimeType mimeType ->
+			if (dd == documentData) {
+				return d
+			}
+		}
+
+		when:
+		def result = service.uploadByteArray(null as byte[], new Group(), "file.pdf", MimeType.PDF)
+
+		then:
+		1 * fileService.createDocumentData(_) >> documentData
+		result == d
+	}
+
+	def "uploadDocumentData verifies the user can upload"() {
 		given:
 		def group = new Group()
 
 		when:
-		service.upload(group, "file.pdf", null, MimeType.PDF)
+		service.uploadDocumentData(null as DocumentData, group, "file.pdf", MimeType.PDF)
 
 		then:
 		thrown AssertionError
 		1 * authService.canUpload(group) >> false
 	}
 
-	def "upload doesn't return the document on error"() {
+	def "uploadDocumentData doesn't return the document on error"() {
 		given:
 		def group = new Group()
+		def dd = new DocumentData()
 
 		when:
-		service.upload(group, "file.pdf", null, MimeType.PDF) == null
+		service.uploadDocumentData(dd, group, "file.pdf", MimeType.PDF) == null
 
 		then:
 		1 * authService.canUpload(group) >> true
 		1 * handlerChain.importFile(_) >> { throw new RuntimeException("Error") }
 	}
 
-	def "upload imports and saves the passed document"() {
+	def "uploadDocumentData imports and saves the passed document"() {
 		given:
 		mockDomain(Document)
 		def group = new Group()
+		def dd = new DocumentData()
 		def capturedDoc
 
 		when:
-		def returnedDoc = service.upload(group, "file.pdf", null, MimeType.PDF)
+		def returnedDoc = service.uploadDocumentData(dd, group, "file.pdf", MimeType.PDF)
 
 		then:
 		1 * authService.canUpload(group) >> true

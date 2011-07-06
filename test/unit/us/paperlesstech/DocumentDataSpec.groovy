@@ -9,17 +9,13 @@ class DocumentDataSpec extends UnitSpec {
 		mockForConstraintsTests(DocumentData)
 
 		when:
-		def bd = new DocumentData(mimeType: mimeType, data: data)
-		def result = bd.validate()
+		def dd = new DocumentData()
+		def result = dd.validate()
 
 		then:
-		result == expected
-
-		where:
-		mimeType	| data			| expected
-		null		| null			| false
-		PDF 		| null			| false
-		null 		| new byte[1]	| false
-		PDF 		| new byte[1]	| true
+		result == false
+		dd.errors.hasFieldErrors("fileKey")
+		dd.errors.hasFieldErrors("fileSize")
+		dd.errors.hasFieldErrors("mimeType")
     }
 }

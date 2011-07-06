@@ -37,7 +37,8 @@ class TiffHandlerService extends Handler {
 		d.resetPreviewImages()
 
 		TIFFDecodeParam param = null
-		SeekableStream s = new ByteArraySeekableStream(data.data)
+		byte[] bytes = fileService.getBytes(data)
+		SeekableStream s = new ByteArraySeekableStream(bytes)
 		ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param)
 
 		(1..data.pages).each { i ->
@@ -47,8 +48,8 @@ class TiffHandlerService extends Handler {
 	
 			ImageIO.write(original, "png", os)
 
-			def (width, height) = ImageHelpers.getDimensions(data.data)
-			DocumentData newPng = new DocumentData(data: os.toByteArray(), mimeType: MimeType.PNG)
+			def (width, height) =  ImageHelpers.getDimensions(new ByteArrayInputStream(bytes))
+			DocumentData newPng = fileService.createDocumentData(bytes: os.toByteArray(), mimeType: MimeType.PNG)
 			PreviewImage image = new PreviewImage(data: newPng, height: height, pageNumber: i, width: width)
 			d.addToPreviewImages(image)
 		}
@@ -62,13 +63,16 @@ class TiffHandlerService extends Handler {
 		def data = getDocumentData(input)
 
 		TIFFDecodeParam param = null
-		SeekableStream s = new ByteArraySeekableStream(data.data)
+		SeekableStream s = new ByteArraySeekableStream(fileService.getBytes(data))
 		ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param)
 
 		data.pages = dec.getNumPages()
 
 		d.addToFiles(data)
 		handlerChain.generatePreview(input)
+
+		assert d.files.size() == 1
+		assert d.previewImages.size() == d.files.first().pages
 	}
 
 	@Override
@@ -82,7 +86,7 @@ class TiffHandlerService extends Handler {
 		log.info "Updating the images for document ${d}"
 
 		TIFFDecodeParam param = null
-		SeekableStream s = new ByteArraySeekableStream(data.data)
+		SeekableStream s = new ByteArraySeekableStream(fileService.getBytes(data))
 		ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param)
 
 		def images = []
@@ -123,8 +127,7 @@ class TiffHandlerService extends Handler {
 		params.setCompression(TIFFEncodeParam.COMPRESSION_DEFLATE)
 		encoder.encode(images[0]);
 		
-		DocumentData newTiff = new DocumentData(mimeType: data.mimeType, pages: data.pages)
-		newTiff.data = os.toByteArray()
+		DocumentData newTiff = fileService.createDocumentData(bytes: os.toByteArray(), mimeType: data.mimeType, pages: data.pages)
 		d.addToFiles(newTiff)
 		input.documentData = newTiff
 		handlerChain.generatePreview(input)

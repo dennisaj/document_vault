@@ -1,19 +1,21 @@
 import grails.plugins.nimble.core.Group
 import grails.plugins.nimble.core.Role
-import grails.util.Environment
 
 import us.paperlesstech.DomainTenantMap
 import us.paperlesstech.Printer
 import us.paperlesstech.User
 
 class BootStrap {
-
+	def grailsApplication
 	def groupService
 	def tenantService
 
 	def init = { servletContext ->
 		assert new File("/usr/local/bin/pcl6")?.canExecute(), "Cannot execute /usr/local/bin/pcl6"
 		assert new File("/usr/local/bin/gs")?.canExecute(), "Cannot execute /usr/local/bin/gs"
+		assert new File(grailsApplication.config.document_vault.files.cache)?.isDirectory(), "Cache isn't a directory"
+		assert new File(grailsApplication.config.document_vault.files.cache)?.canWrite(), "Can't write to cache"
+		assert new File(grailsApplication.config.document_vault.files.cache)?.canRead(), "Can't read from cache"
 
 		// Disable JAI native acceleration layer
 		System.setProperty('com.sun.media.jai.disableMediaLib', 'true')

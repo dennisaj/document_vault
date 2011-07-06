@@ -41,18 +41,16 @@ class ImageHelpers {
 
 		buffer.dispose()
 	}
-	
+
 	/**
-	 * Returns the width and height of the given image
+	 * Returns the width and height of the given image.  NOTE: The passed InputStream will NOT be closed
 	 *
 	 * @param input the image to parse
 	 *
 	 * @return The width and height of the image in a list
 	 */
-	static def getDimensions(byte[] input) {
-		def is = new ByteArrayInputStream(input)
+	static def getDimensions(InputStream is) {
 		def original = ImageIO.read(is)
-		is.close()
 
 		[original.width, original.height]
 	}

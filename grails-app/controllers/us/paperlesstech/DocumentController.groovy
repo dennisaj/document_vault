@@ -119,16 +119,17 @@ class DocumentController {
 
 	def downloadImage = {
 		def document = Document.get(params.long("documentId"))
-		if (document) {
-			def (filename, data, contentType) = handlerChain.downloadPreview(document: document, page: params.pageNumber?.toInteger() ?: 1)
-			response.setContentType(contentType)
-			response.setContentLength(data.length)
-			response.getOutputStream().write(data)
-
+		if (!document) {
+			response.status = 404
 			return
 		}
 
-		response.status = 404
+		def (filename, is, contentType, length) = handlerChain.downloadPreview(document: document, page: params.pageNumber?.toInteger() ?: 1)
+		is.withStream {
+			response.setContentType(contentType)
+			response.setContentLength(length)
+			response.getOutputStream() << is
+		}
 	}
 
 	def download = {
@@ -141,11 +142,13 @@ class DocumentController {
 
 		cache neverExpires: true
 
-		def (filename, data, contentType) = handlerChain.download(document: document, documentData: documentData)
-		response.setContentType(contentType)
-		response.setContentLength(data.length)
-		response.setHeader("Content-Disposition", "attachment; filename=${filename}")
-		response.getOutputStream().write(data)
+		def (filename, is, contentType, length) = handlerChain.download(document: document, documentData: documentData)
+		is.withStream {
+			response.setContentType(contentType)
+			response.setContentLength(length)
+			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
+			response.getOutputStream() << is
+		}
 	}
 
 	def show = {

@@ -5,6 +5,7 @@ import us.paperlesstech.DocumentData
 
 class Handler {
 	def authServiceProxy
+	def fileService
 
 	/**
 	 * Imports the document in the map.  This includes generating previews.  documentData and the perviews will be
@@ -47,11 +48,11 @@ class Handler {
 	}
 
 	/**
-	 * Returns a triple of the preview image to be downloaded to the client.
+	 * Returns a quad of the preview image to be downloaded to the client. NOTE: The returned InputStream must be
+	 * closed by the caller.
 	 *
 	 * @param input a map that must contain document and page
-	 *
-	 * @return The preview image from the given document for the passed page number
+	 * @return a quad of (documentFilename, document data as an Input Stream, document mimetype, and content length
 	 */
 	def downloadPreview(Map input) {
 		def d = getDocument(input)
@@ -65,14 +66,16 @@ class Handler {
 
 		def filename = "${d.toString()} - page($page)${d.previewImage(page).data.mimeType.getDownloadExtension()}"
 
-		[filename, previewImage.data.data, previewImage.data.mimeType.downloadContentType]
+		[filename, fileService.getInputStream(previewImage.data), previewImage.data.mimeType.downloadContentType,
+				previewImage.data.fileSize]
 	}
 
 	/**
-	 * Returns a triple of the document to be downloaded to the client.
+	 * Returns a quad of the document to be downloaded to the client. NOTE: The returned InputStream must be closed
+	 * by the caller.
 	 *
 	 * @param input a map that must contain document and documentData to be downloaded
-	 * @return a triple of (documentFilename, document binary data (byte[]), and document mimetype
+	 * @return a quad of (documentFilename, document data as an Input Stream, document mimetype, and content length
 	 */
 	def download(Map input) {
 		def d = getDocument(input)
@@ -81,7 +84,7 @@ class Handler {
 
 		def filename = d.toString() + data.mimeType.getDownloadExtension()
 
-		[filename, data.data, data.mimeType.downloadContentType]
+		[filename, fileService.getInputStream(data), data.mimeType.downloadContentType, data.fileSize]
 	}
 
 	/**

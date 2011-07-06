@@ -12,9 +12,11 @@ class DomainIntegrationSpec extends IntegrationSpec {
 	def secondDateCreated = new GregorianCalendar(2010, 1, 1).time
 
 	def setup() {
-		previewImageData = new DocumentData(mimeType: MimeType.PDF, data: new byte[1], dateCreated: firstDateCreated)
+		previewImageData = new DocumentData(mimeType: MimeType.PDF, fileKey: "previewImageDataKey", fileSize: 1,
+				dateCreated: firstDateCreated)
 		previewImageData.save()
-		fileData = new DocumentData(mimeType: MimeType.PDF, data: new byte[1], dateCreated: secondDateCreated)
+		fileData = new DocumentData(mimeType: MimeType.PDF, fileKey: "fileDataKey", fileSize: 1,
+				dateCreated: secondDateCreated)
 		fileData.save()
 		group = getGroup()
 	}

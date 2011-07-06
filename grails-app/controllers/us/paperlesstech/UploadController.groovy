@@ -28,15 +28,19 @@ class UploadController {
 
 		if (group) {
 			request.getMultiFileMap().each {inputName, files->
-				files.each {
-					def document = uploadService.upload(group, it.originalFilename, it.bytes, it.contentType)
+				files.each { mpf ->
+					def is = mpf.inputStream
+					is.withStream {
+						def document = uploadService.uploadInputStream(is, group, mpf.originalFilename, mpf.contentType)
 
-					if (document) {
-						def url = g.createLink(controller:"document", action:"show", params:[documentId:document.id])
-						results.add([name:document.toString(), size:document.files.first().data.length, url:url])
-					} else {
-						def error = g.message(code:"document-vault.upload.error.unsupportedfile", args:[FileHelpers.getExtension(it.originalFilename)])
-						results.add([name:it.originalFilename, size:0, error:error])
+						if (document) {
+							def url = g.createLink(controller:"document", action:"show", params:[documentId:document.id])
+							results.add([name:document.toString(), size:document.files.first().fileSize, url:url])
+						} else {
+							def error = g.message(code:"document-vault.upload.error.unsupportedfile", args:[FileHelpers.getExtension(mpf.originalFilename)])
+							results.add([name:mpf.originalFilename, size:0, error:error])
+						}
+
 					}
 				}
 			}
@@ -56,7 +60,7 @@ class UploadController {
 			assert group, "The user must be able to upload to at least one group"
 			def now = new Date()
 			def fileName = String.format("%tF %tT.pcl", now, now)
-			document = uploadService.upload(group, fileName, params.data?.bytes, MimeType.PCL)
+			document = uploadService.uploadByteArray(params.data?.bytes, group, fileName, MimeType.PCL)
 		} catch (Throwable e) {
 			log.error("Unable to save uploaded document", e)
 		}

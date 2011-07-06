@@ -24,6 +24,6 @@ class PreviewImageSpec extends UnitSpec {
 	}
 
 	def documentData() {
-		return new DocumentData(mimeType:MimeType.PDF, data:new byte[1])
+		return new DocumentData(mimeType:MimeType.PDF, fileSize: 2, fileKey: "key")
 	}
 }

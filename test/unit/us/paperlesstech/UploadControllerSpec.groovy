@@ -13,6 +13,7 @@ class UploadControllerSpec extends ControllerSpec {
 	def setup() {
 		testFile.metaClass.getOriginalFilename = { "originalName.pcl" }
 		testFile.metaClass.getContentType = { "application/pcl" }
+		testFile.metaClass.getInputStream = { Mock(InputStream) }
 		controller.authService = authService
 		controller.uploadService = uploadService
 	}
@@ -32,7 +33,7 @@ class UploadControllerSpec extends ControllerSpec {
 
 		then:
 		authService.getGroupsWithPermission(DocumentPermission.Upload) >> ([new Group()] as Set)
-		uploadService.upload(_, _, _, _) >> [null, { throw new RuntimeException("boom") }]
+		uploadService.uploadByteArray(_, _, _, _) >> [null, { throw new RuntimeException("boom") }]
 		mockResponse.status == 500
 	}
 
@@ -46,7 +47,7 @@ class UploadControllerSpec extends ControllerSpec {
 
 		then:
 		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> ([new Group()] as Set)
-		1 * uploadService.upload(_, _, _, _) >> doc
+		1 * uploadService.uploadByteArray(_, _, _, _) >> doc
 		mockResponse.status == 200
 		mockResponse.contentAsString.contains("42")
 	}
@@ -117,7 +118,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.save()
 
 		then:
-		1 * uploadService.upload(group, _, _, _) >> null
+		1 * uploadService.uploadInputStream(_, group, _, _) >> null
 		if (ajax) {
 			def json = JSON.parse(mockResponse.contentAsString)
 			assert json.size() == 1
@@ -141,7 +142,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.params.ajax = ajax
 		controller.metaClass.createLink = { "mooLink" }
 		mockRequest.metaClass.getMultiFileMap = { ["testFiles": [testFile]]}
-		def dd = new DocumentData(data:testFile.getBytes())
+		def dd = new DocumentData(fileSize: fileSize)
 		mockDomain(Document)
 		def d = new Document(name: "docName")
 		d.addToFiles(dd)
@@ -151,7 +152,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.save()
 
 		then:
-		1 * uploadService.upload(group, _, _, _) >> d
+		1 * uploadService.uploadInputStream(_, group, _, _) >> d
 		if (ajax) {
 			def json = JSON.parse(mockResponse.contentAsString)
 			assert json.size() == 1
@@ -163,10 +164,11 @@ class UploadControllerSpec extends ControllerSpec {
 		}
 		!resultMap.error
 		resultMap.name == "docName"
-		resultMap.size == testFile.size()
+		resultMap.size == fileSize
 		resultMap.url == "mooLink"
 
 		where:
 		ajax << [true, false]
+		fileSize << [42, 24]
 	}
 }

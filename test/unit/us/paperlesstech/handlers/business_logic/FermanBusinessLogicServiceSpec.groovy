@@ -2,39 +2,50 @@ package us.paperlesstech.handlers.business_logic
 
 import grails.plugin.spock.UnitSpec
 import org.springframework.core.io.ClassPathResource
-import us.paperlesstech.DocumentData
-import us.paperlesstech.MimeType
-import us.paperlesstech.handlers.business_logic.FermanBusinessLogicService.FermanDocumentTypes
-import us.paperlesstech.TagService
 import us.paperlesstech.Document
+import us.paperlesstech.DocumentData
+import us.paperlesstech.handlers.PclHandlerService
+import us.paperlesstech.handlers.business_logic.FermanBusinessLogicService.FermanDocumentTypes
 
 class FermanBusinessLogicServiceSpec extends UnitSpec {
 	FermanBusinessLogicService service
-	TagService tagService = Mock()
-	DocumentData custHardData = new DocumentData(mimeType: MimeType.PCL,
-			data: new ClassPathResource("dt_cust_hard.pcl").getFile().getBytes())
-	DocumentData otherData = new DocumentData(mimeType: MimeType.PCL,
-			data: new ClassPathResource("dt_other.pcl").getFile().getBytes())
+	PclHandlerService pclHandlerService = Mock()
+	String custHardText
+	String otherText
 
 	def setup() {
 		mockLogging(FermanBusinessLogicService)
 		service = new FermanBusinessLogicService()
-		service.tagService = tagService
+		service.pclHandlerService = pclHandlerService
+
+		custHardText = new ClassPathResource("dt_cust_hard.pcl").file.text
+		custHardText = custHardText.substring(custHardText.indexOf("\n\n"))
+
+		otherText = new ClassPathResource("dt_other.pcl").file.text
+		otherText = otherText.substring(otherText.indexOf("\n\n"))
 	}
 
 	def "identifying cust_hard_copy from the pcl"() {
+		given:
+		DocumentData dd = new DocumentData()
+
 		when: "When we lookup with a PCL with the CUST_HARD_COPY identifier in it"
-		def type = service.getDocumentType(custHardData)
+		def type = service.getDocumentType(dd)
 
 		then: "The response should identify this as CUSTOMER_HARD_COPY"
+		1 * pclHandlerService.pclToString(dd, false) >> new ClassPathResource("dt_cust_hard.pcl").file.text
 		type == FermanDocumentTypes.CustomerHardCopy
 	}
 
 	def "parsing cust_hard_copy pcl"() {
+		given:
+		DocumentData dd = new DocumentData()
+
 		when: "The document is parsed"
-		def m = service.parseCustomerHardCopy(custHardData)
+		def m = service.parseCustomerHardCopy(dd)
 
 		then: "All of the following fields should be parsed out"
+		1 * pclHandlerService.pclToString(dd) >> custHardText
 		"4/29/10" == m["RO_Open_Date"]
 		"6001001/1" == m["RO_Number"]
 		"15:54" == m["Time_Received"]
@@ -58,11 +69,16 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		"123XX" == m["License_Number"]
 	}
 
-
 	def "parsing unknown should split the words in the document"() {
-		expect: "A document with an unknown type should split the document on words"
-		service.parseOther(otherData).split("\n") == ["Regular", "data1", "go3s,", "here", "and", "can", "span",
-				"multiple", "lines."]
+		given:
+		DocumentData dd = new DocumentData()
+
+		when: "A document with an unknown type should split the document on words"
+		def result = service.parseOther(dd).split("\n")
+
+		then:
+		1 * pclHandlerService.pclToString(dd) >> otherText
+		result == ["Regular", "data1", "go3s,", "here", "and", "can", "span", "multiple", "lines."]
 	}
 
 	def "should sanitize strings"() {

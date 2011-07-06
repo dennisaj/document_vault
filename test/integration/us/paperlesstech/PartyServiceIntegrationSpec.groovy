@@ -8,11 +8,12 @@ import spock.lang.*
 class PartyServiceIntegrationSpec extends IntegrationSpec {
 	def partyService
 	def fileData
+	def fileService
 	AuthService authServiceMock = Mock()
 
 	def setup() {
 		partyService.authServiceProxy = authServiceMock
-		fileData = new DocumentData(mimeType: MimeType.PDF, data: new byte[1], dateCreated: new Date())
+		fileData = fileService.createDocumentData(mimeType: MimeType.PDF, bytes: new byte[1], dateCreated: new Date())
 	}
 
 	static def getGroup() {

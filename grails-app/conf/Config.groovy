@@ -55,12 +55,15 @@ grails.spring.bean.packages = []
 // set per-environment serverURL stem for creating absolute links
 environments {
     production {
+		grails.plugin.databasemigration.updateOnStart = true
         grails.serverURL = "http://www.changeme.com"
     }
     development {
+		grails.plugin.databasemigration.updateOnStart = false
         grails.serverURL = "http://localhost:8080/${appName}"
     }
     test {
+		grails.plugin.databasemigration.updateOnStart = false
         grails.serverURL = "http://localhost:8080/${appName}"
     }
 
@@ -134,15 +137,28 @@ authcBasic.applicationName = Document Vault API
 
 environments {
 	production {
-		timing.enabled = true
-		server.protocol = "https://"
+		document_vault.timing.enabled = true
+		document_vault.files.cache = "/var/cache/document_vault/files"
 	}
 	development {
-		timing.enabled = true
-		server.protocol = "http://"
+		document_vault.timing.enabled = true
+		document_vault.files.cache = "/tmp"
 	}
 	test {
-		timing.enabled = true
-		server.protocol = "http://"
+		document_vault.timing.enabled = true
+		document_vault.files.cache = "/tmp"
+	}
+}
+
+document_vault {
+	aws {
+		credentials {
+			accessKey = "AKIAJV54QXJFWZEJO5AA"
+			secretKey = "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"
+		}
+		s3 {
+			bucket = "pt_docvault_dev"
+			cachePath = "/dv/cache"
+		}
 	}
 }
