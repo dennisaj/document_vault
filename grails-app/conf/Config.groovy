@@ -56,6 +56,7 @@ grails.spring.bean.packages = []
 environments {
     production {
 		grails.plugin.databasemigration.updateOnStart = true
+		grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']
         grails.serverURL = "http://www.changeme.com"
     }
     development {
