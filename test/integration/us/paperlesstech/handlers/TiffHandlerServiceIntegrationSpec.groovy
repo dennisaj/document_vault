@@ -2,6 +2,7 @@ package us.paperlesstech.handlers
 
 import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.Document
+import us.paperlesstech.DocumentData
 import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.MimeType
 
@@ -9,26 +10,26 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def fileService
 	def tiffHandlerService
 	def tiffDocument
-	def tiffData
+	def tiffDocumentData
+	def tiffBytes = new ClassPathResource("multipage.tif").getFile().bytes
 	def line
 
 	def setup() {
 		tiffDocument = new Document()
 		tiffDocument.group = DomainIntegrationSpec.group
-		tiffData = fileService.createDocumentData(mimeType: MimeType.TIFF, file: new ClassPathResource("multipage.tif").getFile())
+		tiffDocumentData = new DocumentData(mimeType: MimeType.TIFF)
 
 		line = [a: [x: 0, y: 0], b: [x: 100, y: 100]]
 	}
 
 	def "import tiff file"() {
-		def input = [document: tiffDocument, documentData: tiffData]
+		def input = [document: tiffDocument, documentData: tiffDocumentData, bytes: tiffBytes]
 		when:
 		tiffHandlerService.importFile(input)
 
 		then:
 		tiffDocument.files.first().pages == 6
 		tiffDocument.files.first().mimeType == MimeType.TIFF
-		tiffDocument.files.first().fileKey == tiffData.fileKey
 		tiffDocument.previewImages.size() == 6
 		tiffDocument.previewImages*.data.pages == [1] * 6
 		tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
@@ -38,11 +39,10 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def "cursiveSign a tiff"() {
 		given:
 		def lines = ['1': [line, 'LB'], '2': [line], '4': [line]]
-		def input = [document: tiffDocument, documentData: tiffData, signatures: lines]
 		when:
-		tiffHandlerService.importFile(input)
+		tiffHandlerService.importFile(document: tiffDocument, documentData: tiffDocumentData, bytes: tiffBytes)
 		tiffDocument.save()
-		tiffHandlerService.cursiveSign(input)
+		tiffHandlerService.cursiveSign(document: tiffDocument, documentData: tiffDocument.files.first(), signatures: lines)
 
 		then:
 		tiffDocument.files.size() == 2

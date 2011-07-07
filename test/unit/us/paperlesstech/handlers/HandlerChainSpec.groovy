@@ -31,18 +31,31 @@ class HandlerChainSpec extends UnitSpec {
 		given:
 		def d = new Document()
 		d.group = new Group()
-		def m = [document: d]
+		def bytes = new byte[1]
+		def m = [document: d, bytes: bytes]
 		def methodName
 		def input
 		chain.metaClass.handle = { String a, Map b -> methodName = a; input = b }
 
 		when:
-		chain.importFile(document: d)
+		chain.importFile(document: d, bytes: bytes)
 
 		then:
 		1 * authService.canUpload(d.group) >> true
 		methodName == "importFile"
 		input == m
+	}
+
+	def "importFile fails when there is no byte[]"() {
+		given:
+		def d = new Document()
+
+		when:
+		chain.importFile(document: d)
+
+		then:
+		thrown AssertionError
+		1 * authService.canUpload(d.group) >> true
 	}
 
 	def "generatePreview fails if the user can't upload to the document group and can't sign the document"() {

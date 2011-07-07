@@ -33,8 +33,11 @@ class DefaultImageHandlerService extends Handler {
 		def d = getDocument(input)
 		def data = getDocumentData(input)
 
+		data = fileService.createDocumentData(mimeType: data.mimeType, bytes: input.bytes)
 		d.addToFiles(data)
-		handlerChain.generatePreview(input)
+		input.bytes = null
+
+		handlerChain.generatePreview(document: d, documentData: data)
 
 		assert d.files.size() == 1
 		assert d.previewImages.size() == 1

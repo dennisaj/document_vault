@@ -4,12 +4,14 @@ import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.Document
 import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.MimeType
+import us.paperlesstech.DocumentData
 
 class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def fileService
 	def pdfHandlerService
 	def document
-	def pdfData
+	def pdfDocumentData
+	def pdfBytes = new ClassPathResource("2pages.pdf").getFile().bytes
 	def line = [a: [x: 0, y: 0], b: [x: 100, y: 100]]
 
 	@Override
@@ -17,18 +19,17 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		pdfHandlerService.authServiceProxy = authServiceProxy
 		document = new Document()
 		document.group = DomainIntegrationSpec.group
-		pdfData = fileService.createDocumentData(mimeType: MimeType.PDF, file: new ClassPathResource("2pages.pdf").getFile())
+		pdfDocumentData = new DocumentData(mimeType: MimeType.PDF)
 	}
 
 	def "import pdf file"() {
-		def input = [document: document, documentData: pdfData]
+		def input = [document: document, documentData: pdfDocumentData, bytes: pdfBytes]
 		when:
 		pdfHandlerService.importFile(input)
 
 		then:
 		document.files.first().pages == 2
 		document.files.first().mimeType == MimeType.PDF
-		document.files.first().fileKey == pdfData.fileKey
 		document.previewImages.size() == 2
 		document.previewImage(1).data.pages == 1
 		document.previewImage(1).data.mimeType == MimeType.PNG
@@ -41,7 +42,7 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		def lines = ['1': [line, 'LB'], '2': [line], '4': [line]]
 		when:
 		def document = new Document(group: DomainIntegrationSpec.group)
-		def input = [document: document, documentData: pdfData]
+		def input = [document: document, documentData: pdfDocumentData, bytes: pdfBytes]
 
 		pdfHandlerService.importFile(input)
 		document = document.save()

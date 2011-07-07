@@ -42,7 +42,6 @@ class FileService implements InitializingBean {
 	 * 		bytes: If present the byte[] to use for the data.
 	 * 		mimeType: The mimeType of the data. (required)
 	 * 		pages: The number of pages of the data, defaults to 1.
-	 * 		dateCreated: The date to use for the document data, defaults to now.
 	 * @return
 	 */
 	DocumentData createDocumentData(Map args) {
@@ -52,7 +51,6 @@ class FileService implements InitializingBean {
 		MimeType mimeType = args.mimeType
 		assert mimeType
 		int pages = args.pages ?: 1
-		Date dateCreated = args.dateCreated ?: new Date()
 		assert file || bytes || inputStream
 
 		if (file) {
@@ -92,8 +90,8 @@ class FileService implements InitializingBean {
 
 		// We set the date when creating the DocumentData rather than on insert to prevent ordering problems
 		// with two documents being added to the file at the same time, like on PCL import
-		dd = new DocumentData(mimeType: mimeType, fileKey: fileKey, fileSize: fileSize, pages: pages, dateCreated: dateCreated)
-		dd
+		dd = new DocumentData(mimeType: mimeType, fileKey: fileKey, fileSize: fileSize, pages: pages)
+		dd.save(failOnError: true, flush: true)
 	}
 
 	private File createFileConcurrently(File protectedFile, Closure closure) {

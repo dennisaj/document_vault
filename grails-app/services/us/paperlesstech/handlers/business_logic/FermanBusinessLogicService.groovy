@@ -1,6 +1,5 @@
 package us.paperlesstech.handlers.business_logic
 
-import us.paperlesstech.DocumentData
 import us.paperlesstech.handlers.Handler
 import us.paperlesstech.handlers.PclHandlerService
 
@@ -32,17 +31,16 @@ class FermanBusinessLogicService {
 
 	void beforePCLImportFile(Map input) {
 		def d = Handler.getDocument(input)
-		def data = Handler.getDocumentData(input)
 
-		FermanDocumentTypes t = getDocumentType(data)
+		FermanDocumentTypes t = getDocumentType(input.bytes)
 
 		def m = [:]
 		switch (t) {
 			case FermanDocumentTypes.Other:
-				m.raw = parseOther(data)
+				m.raw = parseOther(input.bytes)
 				break
 			case FermanDocumentTypes.CustomerHardCopy:
-				m = parseCustomerHardCopy(data)
+				m = parseCustomerHardCopy(input.bytes)
 				break
 			default:
 				throw new IllegalArgumentException("Unknown type: $t")
@@ -60,8 +58,8 @@ class FermanBusinessLogicService {
 		log.debug "Imported fields ($m)"
 	}
 
-	public FermanDocumentTypes getDocumentType(DocumentData dd) {
-		String data = pclHandlerService.pclToString(dd, false)
+	public FermanDocumentTypes getDocumentType(byte[] bytes) {
+		String data = pclHandlerService.pclToString(bytes, false)
 
 		FermanDocumentTypes type = FermanDocumentTypes.Other
 		if (data.contains("&f20901y")) {
@@ -80,8 +78,8 @@ class FermanBusinessLogicService {
 		return line[start..<Math.min(end + 1, length)].trim()
 	}
 
-	Map parseCustomerHardCopy(DocumentData dd) {
-		String data = pclHandlerService.pclToString(dd)
+	Map parseCustomerHardCopy(byte[] bytes) {
+		String data = pclHandlerService.pclToString(bytes)
 		def lines = data.split(/\r\n|\n/).toList()
 
 		lines = lines.reverse()
@@ -156,8 +154,8 @@ class FermanBusinessLogicService {
 		m
 	}
 
-	String parseOther(DocumentData dd) {
-		String data = pclHandlerService.pclToString(dd)
+	String parseOther(byte[] bytes) {
+		String data = pclHandlerService.pclToString(bytes)
 
 		def m = data =~ /(?m)(\S+)/
 		def lines = m*.getAt(1)

@@ -26,40 +26,21 @@ class UploadServiceSpec extends UnitSpec {
 	def "uploadInputStream should pass through mimeType"() {
 		given:
 		def d = new Document()
-		service.metaClass.uploadDocumentData = { DocumentData dd, Group group, String name, MimeType mimeType -> d }
+		service.metaClass.uploadDocument = { byte[] bytes, Group group, String name, MimeType mimeType -> d }
 
 		when:
 		def result = service.uploadInputStream(null as InputStream, new Group(), "file.pdf", "application/pdf")
 
 		then:
-		1 * fileService.createDocumentData(_) >> new DocumentData()
 		result == d
 	}
 
-	def "uploadByteArray should create a DocumentData to pass through"() {
-		given:
-		def d = new Document()
-		def documentData = new DocumentData()
-		service.metaClass.uploadDocumentData = { DocumentData dd, Group group, String name, MimeType mimeType ->
-			if (dd == documentData) {
-				return d
-			}
-		}
-
-		when:
-		def result = service.uploadByteArray(null as byte[], new Group(), "file.pdf", MimeType.PDF)
-
-		then:
-		1 * fileService.createDocumentData(_) >> documentData
-		result == d
-	}
-
-	def "uploadDocumentData verifies the user can upload"() {
+	def "uploadDocument verifies the user can upload"() {
 		given:
 		def group = new Group()
 
 		when:
-		service.uploadDocumentData(null as DocumentData, group, "file.pdf", MimeType.PDF)
+		service.uploadDocument(null as byte[], group, "file.pdf", MimeType.PDF)
 
 		then:
 		thrown AssertionError
@@ -69,10 +50,10 @@ class UploadServiceSpec extends UnitSpec {
 	def "uploadDocumentData doesn't return the document on error"() {
 		given:
 		def group = new Group()
-		def dd = new DocumentData()
+		def bytes = new byte[1]
 
 		when:
-		service.uploadDocumentData(dd, group, "file.pdf", MimeType.PDF) == null
+		service.uploadDocument(bytes, group, "file.pdf", MimeType.PDF) == null
 
 		then:
 		1 * authService.canUpload(group) >> true
@@ -83,11 +64,11 @@ class UploadServiceSpec extends UnitSpec {
 		given:
 		mockDomain(Document)
 		def group = new Group()
-		def dd = new DocumentData()
+		def bytes = new byte[1]
 		def capturedDoc
 
 		when:
-		def returnedDoc = service.uploadDocumentData(dd, group, "file.pdf", MimeType.PDF)
+		def returnedDoc = service.uploadDocument(bytes, group, "file.pdf", MimeType.PDF)
 
 		then:
 		1 * authService.canUpload(group) >> true

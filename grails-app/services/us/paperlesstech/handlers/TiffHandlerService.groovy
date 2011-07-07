@@ -60,16 +60,18 @@ class TiffHandlerService extends Handler {
 	@Override
 	void importFile(Map input) {
 		def d = getDocument(input)
-		def data = getDocumentData(input)
 
 		TIFFDecodeParam param = null
-		SeekableStream s = new ByteArraySeekableStream(fileService.getBytes(data))
+		SeekableStream s = new ByteArraySeekableStream(input.bytes)
 		ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param)
 
-		data.pages = dec.getNumPages()
+		int pages = dec.getNumPages()
 
+		def data = fileService.createDocumentData(mimeType: MimeType.TIFF, bytes: input.bytes, pages: pages)
 		d.addToFiles(data)
-		handlerChain.generatePreview(input)
+		input.bytes = null
+
+		handlerChain.generatePreview(document: d, documentData: data)
 
 		assert d.files.size() == 1
 		assert d.previewImages.size() == d.files.first().pages

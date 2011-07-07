@@ -27,25 +27,25 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 
 	def "identifying cust_hard_copy from the pcl"() {
 		given:
-		DocumentData dd = new DocumentData()
+		byte[] bytes = new byte[1]
 
 		when: "When we lookup with a PCL with the CUST_HARD_COPY identifier in it"
-		def type = service.getDocumentType(dd)
+		def type = service.getDocumentType(bytes)
 
 		then: "The response should identify this as CUSTOMER_HARD_COPY"
-		1 * pclHandlerService.pclToString(dd, false) >> new ClassPathResource("dt_cust_hard.pcl").file.text
+		1 * pclHandlerService.pclToString(bytes, false) >> new ClassPathResource("dt_cust_hard.pcl").file.text
 		type == FermanDocumentTypes.CustomerHardCopy
 	}
 
 	def "parsing cust_hard_copy pcl"() {
 		given:
-		DocumentData dd = new DocumentData()
+		byte[] bytes = new byte[1]
 
 		when: "The document is parsed"
-		def m = service.parseCustomerHardCopy(dd)
+		def m = service.parseCustomerHardCopy(bytes)
 
 		then: "All of the following fields should be parsed out"
-		1 * pclHandlerService.pclToString(dd) >> custHardText
+		1 * pclHandlerService.pclToString(bytes) >> custHardText
 		"4/29/10" == m["RO_Open_Date"]
 		"6001001/1" == m["RO_Number"]
 		"15:54" == m["Time_Received"]
@@ -71,13 +71,13 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 
 	def "parsing unknown should split the words in the document"() {
 		given:
-		DocumentData dd = new DocumentData()
+		byte[] bytes
 
 		when: "A document with an unknown type should split the document on words"
-		def result = service.parseOther(dd).split("\n")
+		def result = service.parseOther(bytes).split("\n")
 
 		then:
-		1 * pclHandlerService.pclToString(dd) >> otherText
+		1 * pclHandlerService.pclToString(bytes) >> otherText
 		result == ["Regular", "data1", "go3s,", "here", "and", "can", "span", "multiple", "lines."]
 	}
 

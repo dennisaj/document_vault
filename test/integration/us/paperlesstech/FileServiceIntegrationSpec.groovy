@@ -27,32 +27,31 @@ class FileServiceIntegrationSpec extends IntegrationSpec {
 		testBytes = randomText.bytes
 	}
 
-	@Unroll("testing fileService with #bytes | #file | #inputStream | #mimeType | #pages | #dateCreated")
+	@Unroll("testing fileService with #bytes | #file | #inputStream | #mimeType | #pages")
 	def "test fileService"() {
 		when:
 		def dd = null
 		def exception = false
 		try {
 			dd = fileService.createDocumentData(bytes: bytes, file: file, inputStream: inputStream,
-					mimeType: mimeType, pages: pages, dateCreated: dateCreated)
+					mimeType: mimeType, pages: pages)
 		} catch (Exception e) {
 			exception = true
 		}
 
 		then:
-		verifyCreatedDocument(dd, mimeType, pages, dateCreated)
+		verifyCreatedDocument(dd, mimeType, pages)
 
 		where:
-		bytes     | file     | inputStream     | mimeType     | pages | dateCreated
-		testBytes | null     | null            | MimeType.PCL | 2     | new GregorianCalendar(2011, 7, 5).time
-		null      | testFile | null            | MimeType.PCL | 2     | new GregorianCalendar(2011, 7, 5).time
-		null      | null     | testInputStream | MimeType.PCL | 2     | new GregorianCalendar(2011, 7, 5).time
+		bytes     | file     | inputStream     | mimeType     | pages
+		testBytes | null     | null            | MimeType.PCL | 2
+		null      | testFile | null            | MimeType.PCL | 2
+		null      | null     | testInputStream | MimeType.PCL | 2
 	}
 
-	void verifyCreatedDocument(DocumentData dd, MimeType mimeType, int pages, Date dateCreated) {
+	void verifyCreatedDocument(DocumentData dd, MimeType mimeType, int pages) {
 		assert dd.mimeType == mimeType
 		assert dd.pages == pages
-		assert dd.dateCreated == dateCreated
 		assert dd.fileKey
 		assert dd.fileSize == randomText.length()
 		assert fileService.getBytes(dd) == randomText.bytes

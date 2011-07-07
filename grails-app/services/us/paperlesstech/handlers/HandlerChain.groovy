@@ -11,6 +11,8 @@ class HandlerChain extends Handler {
 	void importFile(Map input) {
 		def document = getDocument(input)
 		assert authServiceProxy.canUpload(document.group)
+		byte[] bytes = input.bytes
+		assert bytes, "Data is required for import"
 
 		handle("importFile", input)
 	}

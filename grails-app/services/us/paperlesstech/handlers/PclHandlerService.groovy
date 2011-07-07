@@ -8,7 +8,7 @@ class PclHandlerService extends Handler {
 	static transactional = true
 	def handlerChain
 
-	DocumentData createPdf(DocumentData d) {
+	byte[] createPdf(DocumentData d) {
 		assert d.mimeType == MimeType.PCL
 
 		String pclFile = fileService.getAbsolutePath(d)
@@ -24,9 +24,7 @@ class PclHandlerService extends Handler {
 				throw new RuntimeException("Unable to process file for document ${d.id} - PCL to PDF conversion failed")
 			}
 
-			DocumentData pdf = fileService.createDocumentData(mimeType: MimeType.PDF, file: pdfFile)
-
-			return pdf
+			return pdfFile.bytes
 		} finally {
 			pdfFile?.delete()
 		}
@@ -35,19 +33,20 @@ class PclHandlerService extends Handler {
 	@Override
 	void importFile(Map input) {
 		def d = getDocument(input)
-		def data = getDocumentData(input)
 
+		def data = fileService.createDocumentData(mimeType: MimeType.PCL, bytes: input.bytes)
 		d.addToFiles(data)
-		DocumentData pdf = createPdf(data)
-		d.addToFiles(pdf)
-		handlerChain.importFile(document: d, documentData: pdf)
+
+		input.bytes = createPdf(data)
+		handlerChain.importFile(document: d, documentData: new DocumentData(mimeType: MimeType.PDF), bytes: input.bytes)
+		input.bytes = null
 
 		assert d.files.size() == 2
 		assert d.previewImages.size() == d.files.first().pages
 	}
 
-	String pclToString(DocumentData data, boolean skipPclHeader = true) {
-		String text = fileService.getText(data)
+	String pclToString(byte[] bytes, boolean skipPclHeader = true) {
+		String text = new String(bytes)
 
 		// The text starts after the first double blank line
 		if (skipPclHeader) {

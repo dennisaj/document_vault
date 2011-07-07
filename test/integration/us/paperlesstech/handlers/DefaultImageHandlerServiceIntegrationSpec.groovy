@@ -4,6 +4,7 @@ import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.Document
 import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.MimeType
+import us.paperlesstech.DocumentData
 
 class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def defaultImageHandlerService
@@ -19,8 +20,9 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def "import image files"() {
 		when:
 			def document = new Document(group: DomainIntegrationSpec.group)
-			def documentData = fileService.createDocumentData(file: new ClassPathResource("test" + mimeType.downloadExtension).getFile(), mimeType: mimeType)
-			def input = [document: document, documentData: documentData]
+			def documentData = new DocumentData(mimeType: mimeType)
+			def bytes = new ClassPathResource("test" + mimeType.downloadExtension).getFile().bytes
+			def input = [document: document, documentData: documentData, bytes: bytes]
 			defaultImageHandlerService.importFile(input)
 		then:
 			document.files.first().pages == 1
@@ -38,8 +40,9 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			def lines = ['1':[line, 'LB'], '2':[line], '4':[line]]
 		when:
 			def document = new Document(group: DomainIntegrationSpec.group)
-			def documentData = fileService.createDocumentData(file: new ClassPathResource("test" + mimeType.downloadExtension).getFile(), mimeType: mimeType)
-			def input = [document: document, documentData: documentData]
+			def documentData = new DocumentData(mimeType: mimeType)
+			def bytes = new ClassPathResource("test" + mimeType.downloadExtension).getFile().bytes
+			def input = [document: document, documentData: documentData, bytes: bytes]
 
 			defaultImageHandlerService.importFile(input)
 			document = document.save()

@@ -15,28 +15,22 @@ class UploadService {
 		MimeType mimeType = MimeType.getMimeType(mimeType: contentType, fileName: name)
 
 		if (mimeType) {
-			def documentData = fileService.createDocumentData(mimeType: mimeType, inputStream: is)
-			return uploadDocumentData(documentData, group, name, mimeType)
+			return uploadDocument(is?.bytes, group, name, mimeType)
 		}
 
 		return null
 	}
 
-	Document uploadByteArray(byte[] data, Group group, String name, MimeType mimeType) {
-		def documentData = fileService.createDocumentData(mimeType: mimeType, bytes: data)
-		return uploadDocumentData(documentData, group, name, mimeType)
-	}
-
-	Document uploadDocumentData(DocumentData documentData, Group group, String name, MimeType mimeType) {
+	Document uploadDocument(byte[] data, Group group, String name, MimeType mimeType) {
 		assert authService.canUpload(group)
-		assert documentData
+		assert data
 		assert mimeType
 
 		try {
 			Document document = new Document()
 			document.group = group
 			document.name = FileHelpers.chopExtension(name)
-			handlerChain.importFile(document: document, documentData: documentData)
+			handlerChain.importFile(document: document, documentData: new DocumentData(mimeType: mimeType), bytes: data)
 			assert document.save(flush: true)
 
 			log.info "Saved document ${document.id}"

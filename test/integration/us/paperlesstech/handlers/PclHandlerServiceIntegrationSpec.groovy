@@ -1,31 +1,30 @@
 package us.paperlesstech.handlers
 
-import grails.plugin.spock.IntegrationSpec
-
 import org.springframework.core.io.ClassPathResource
 
 import us.paperlesstech.Document
-import us.paperlesstech.DocumentData
+
 import us.paperlesstech.MimeType
-import grails.plugins.nimble.core.Group
+
 import us.paperlesstech.DomainIntegrationSpec
+import us.paperlesstech.DocumentData
 
 class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def fileService
 	def handlerChain
 	def document
-	def pclData
+	def pclDocumentData
+	def pclBytes = new ClassPathResource("dt_combined.pcl").getFile().bytes
 
 	def setup() {
 		document = new Document()
 		document.group = DomainIntegrationSpec.group
-		pclData = fileService.createDocumentData(mimeType: MimeType.PCL, file: new ClassPathResource("dt_combined.pcl").getFile())
+		pclDocumentData = new DocumentData(mimeType: MimeType.PCL)
 	}
 
 	def "import ferman pcl file"() {
-		def input = [document: document, documentData: pclData]
 		when:
-		handlerChain.importFile(input)
+		handlerChain.importFile(document: document, documentData: pclDocumentData, bytes: pclBytes)
 
 		then:
 		document.searchField("DocumentType") == "CustomerHardCopy"

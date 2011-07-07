@@ -66,18 +66,21 @@ class PdfHandlerService extends Handler {
 	@Override
 	void importFile(Map input) {
 		def d = getDocument(input)
-		def data = getDocumentData(input)
 
+		int pages
 		PdfReader pdfReader
 		try {
-			pdfReader = new PdfReader(fileService.getAbsolutePath(data))
-			data.pages = pdfReader.getNumberOfPages()
-			d.addToFiles(data)
+			pdfReader = new PdfReader(input.bytes)
+			pages = pdfReader.getNumberOfPages()
 		} finally {
 			pdfReader?.close()
 		}
 
-		handlerChain.generatePreview(input)
+		def data = fileService.createDocumentData(mimeType: MimeType.PDF, bytes: input.bytes, pages: pages)
+		d.addToFiles(data)
+		input.bytes = null
+
+		handlerChain.generatePreview(document: d, documentData: data)
 
 		assert d.files.size() >= 1
 		assert d.previewImages.size() == d.files.first().pages
