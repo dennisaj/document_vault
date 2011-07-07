@@ -33,6 +33,18 @@ databaseChangeLog = {
 			column(name: "user_agent", type: "varchar(255)") {
 				constraints(nullable: "false")
 			}
+
+			column(name: "action", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "document", type: "varchar(255)")
+
+			column(name: "page_number", type: "varchar(255)")
+
+			column(name: "status", type: "integer") {
+				constraints(nullable: "false")
+			}
 		}
 	}
 
@@ -112,7 +124,11 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "data", type: "varbinary(20971520)") {
+			column(name: "file_key", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "file_size", type: "integer") {
 				constraints(nullable: "false")
 			}
 		}
@@ -146,13 +162,9 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "key", type: "varchar(255)")
+			column(name: "_key", type: "varchar(255)")
 
-			column(name: "value", type: "varchar(4096)")
-		}
-
-		modifySql() {
-			replace(replace: '"value"', with: "value")
+			column(name: "_value", type: "varchar(4096)")
 		}
 	}
 
@@ -174,13 +186,9 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "key", type: "varchar(255)")
+			column(name: "_key", type: "varchar(255)")
 
-			column(name: "value", type: "varchar(4096)")
-		}
-
-		modifySql() {
-			replace(replace: '"value"', with: "value")
+			column(name: "_value", type: "varchar(4096)")
 		}
 	}
 
@@ -770,6 +778,106 @@ databaseChangeLog = {
 		}
 	}
 
+	changeSet(author: "seth (generated)", id: "1308779031843-1") {
+		createTable(tableName: "highlight") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "highlightPK")
+			}
+
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "accepted", type: "timestamp")
+
+			column(name: "lower_rightx", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "lower_righty", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "page_number", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "party_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "required", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "upper_leftx", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "upper_lefty", type: "integer") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "seth (generated)", id: "1308779031843-2") {
+		createTable(tableName: "party") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "partyPK")
+			}
+
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "code", type: "varchar(255)") {
+				constraints(nullable: "false", unique: "true")
+			}
+
+			column(name: "color", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "date_created", type: "timestamp") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "document_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "document_permission", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "expiration", type: "timestamp")
+
+			column(name: "rejected", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "sent", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "signator_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "viewed", type: "bit") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-35") {
 		addPrimaryKey(columnNames: "group_id, role_id", tableName: "groups_roles")
 	}
@@ -786,7 +894,7 @@ databaseChangeLog = {
 		createIndex(indexName: "unique_document_other_fields", tableName: "document_other_field") {
 			column(name: "document_id")
 
-			column(name: "key")
+			column(name: "_key")
 		}
 	}
 
@@ -794,7 +902,7 @@ databaseChangeLog = {
 		createIndex(indexName: "unique_document_search_fields", tableName: "document_search_field") {
 			column(name: "document_id")
 
-			column(name: "key")
+			column(name: "_key")
 		}
 	}
 
@@ -839,7 +947,7 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-47") {
-		createIndex(indexName: "name_unique_1307406573338", tableName: "tags", unique: "true") {
+		createIndex(indexName: "unique_tag_name", tableName: "tags", unique: "true") {
 			column(name: "name")
 		}
 	}
@@ -849,6 +957,32 @@ databaseChangeLog = {
 			column(name: "tenant_id")
 
 			column(name: "username")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1309894626393-3") {
+		createIndex(indexName: "file_key_unique_idx", tableName: "document_data", unique: "true") {
+			column(name: "file_key")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1307560218168-1") {
+		createIndex(indexName: "activity_log_document_idx", tableName: "activity_log") {
+			column(name: "document")
+		}
+	}
+
+	changeSet(author: "seth (generated)", id: "1308779031843-3") {
+		createIndex(indexName: "unique_party_code", tableName: "party", unique: "true") {
+			column(name: "code")
+		}
+	}
+
+	changeSet(author: "seth (generated)", id: "1308779031843-4") {
+		createIndex(indexName: "unique_document_signator", tableName: "party") {
+			column(name: "document_id")
+
+			column(name: "signator_id")
 		}
 	}
 
@@ -996,9 +1130,15 @@ databaseChangeLog = {
 		addForeignKeyConstraint(baseColumnNames: "user_base_id", baseTableName: "users_users", constraintName: "FK_users_users_USER3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
-	include file: '20110608_activity_log.groovy'
+	changeSet(author: "seth (generated)", id: "1308779031843-5") {
+		addForeignKeyConstraint(baseColumnNames: "party_id", baseTableName: "highlight", constraintName: "FK_HIGHLIGHT_PARTY", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "party", referencesUniqueColumn: "false")
+	}
 
-	include file: '20110622_party.groovy'
+	changeSet(author: "seth (generated)", id: "1308779031843-6") {
+		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "party", constraintName: "FK_PARTY_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
+	}
 
-	include file: '20110705_document_data.groovy'
+	changeSet(author: "seth (generated)", id: "1308779031843-7") {
+		addForeignKeyConstraint(baseColumnNames: "signator_id", baseTableName: "party", constraintName: "FK_PARTY_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	}
 }

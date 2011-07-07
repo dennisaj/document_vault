@@ -14,6 +14,8 @@ abstract class DocumentField {
 	}
 
 	static mapping = {
+		key column:"_key"
+		value column:"_value"
 		tablePerHierarchy(false)
 	}
 
