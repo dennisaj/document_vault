@@ -22,7 +22,7 @@ class DefaultImageHandlerService extends Handler {
 		d.resetPreviewImages()
 
 		def (width, height) = fileService.withInputStream(data) { is ->
-			ImageHelpers.getDimensions(is)
+			ImageHelpers.getDimensions(is, data.mimeType)
 		}
 		PreviewImage image = new PreviewImage(data: data, height: height, pageNumber: 1, width: width)
 		d.addToPreviewImages(image)

@@ -45,11 +45,12 @@ class TiffHandlerService extends Handler {
 			ByteArrayOutputStream os = new ByteArrayOutputStream()
 			// TIFF images are 0 indexed
 			RenderedImage original = dec.decodeAsRenderedImage(i - 1)
-	
+
 			ImageIO.write(original, "png", os)
 
-			def (width, height) =  ImageHelpers.getDimensions(new ByteArrayInputStream(bytes))
-			DocumentData newPng = fileService.createDocumentData(bytes: os.toByteArray(), mimeType: MimeType.PNG)
+			byte[] pngBytes = os.toByteArray()
+			def (width, height) =  ImageHelpers.getDimensions(new ByteArrayInputStream(pngBytes), MimeType.PNG)
+			DocumentData newPng = fileService.createDocumentData(bytes: pngBytes, mimeType: MimeType.PNG)
 			PreviewImage image = new PreviewImage(data: newPng, height: height, pageNumber: i, width: width)
 			d.addToPreviewImages(image)
 		}

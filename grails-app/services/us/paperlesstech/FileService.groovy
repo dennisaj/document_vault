@@ -152,7 +152,7 @@ class FileService implements InitializingBean {
 	/**
 	 * Returns an InputStream of the file represented by the passed document data. NOTE: the caller must close this.
 	 *
-	 * @param documentData Looks up the file reprsented by this object
+	 * @param documentData Looks up the file represented by this object
 	 *
 	 * @return A BufferedInputStream from the represented file
 	 */

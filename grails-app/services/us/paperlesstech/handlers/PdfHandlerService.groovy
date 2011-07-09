@@ -1,14 +1,14 @@
 package us.paperlesstech.handlers
 
-import com.itextpdf.text.Rectangle
-import com.itextpdf.text.pdf.PdfContentByte
-import com.itextpdf.text.pdf.PdfReader
-import com.itextpdf.text.pdf.PdfStamper
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 import us.paperlesstech.PreviewImage
 import us.paperlesstech.helpers.FileHelpers
-import us.paperlesstech.helpers.ImageHelpers
+
+import com.itextpdf.text.Rectangle
+import com.itextpdf.text.pdf.PdfContentByte
+import com.itextpdf.text.pdf.PdfReader
+import com.itextpdf.text.pdf.PdfStamper
 
 class PdfHandlerService extends Handler {
 	static final handlerFor = [MimeType.PDF]
@@ -44,14 +44,19 @@ class PdfHandlerService extends Handler {
 				Rectangle psize = pdfReader.getPageSize(page)
 
 				PreviewImage i = new PreviewImage(pageNumber: page, width: psize.getWidth(), height: psize.getHeight())
-				def bytes = ImageHelpers.scaleImage(f.getBytes(), i.width * 2, i.height * 2)
-				i.data = fileService.createDocumentData(mimeType: MimeType.PNG, bytes: bytes)
+				i.data = fileService.createDocumentData(mimeType: MimeType.PNG, bytes: f.getBytes())
 				d.addToPreviewImages(i)
 			}
 
 			assert d.previewImages.size() > 0
 		} finally {
 			pdfReader?.close()
+
+			File basefile = new File("${baseName}.png")
+			if (basefile.exists()) {
+				basefile.delete()
+			}
+
 			(1..d.files.first().pages).each { page ->
 				File f = new File("${baseName}-${page}.png")
 				if (f.exists()) {

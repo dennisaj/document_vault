@@ -5,8 +5,11 @@ import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 
 import javax.imageio.ImageIO
+import javax.imageio.ImageReader
+import javax.imageio.stream.ImageInputStream
+import javax.imageio.stream.MemoryCacheImageInputStream
 
-import com.thebuzzmedia.imgscalr.Scalr
+import us.paperlesstech.MimeType
 
 class ImageHelpers {
 	static final String LINEBREAK = 'LB'
@@ -17,13 +20,13 @@ class ImageHelpers {
 	 * @param lines A list of maps. The maps should be formatted as
 	 * <pre>
 	 * 		line = {
-	 * 			start: {
-	 * 				x: a,
-	 * 				y: b
+	 * 			a: {
+	 * 				x: Integer,
+	 * 				y: Integer
 	 * 			},
-	 * 			end: {
-	 * 				x: c,
-	 * 				y: d
+	 * 			b: {
+	 * 				x: Integer,
+	 * 				y: Integer
 	 * 			}
 	 * 		}
 	 * </pre>		
@@ -45,40 +48,29 @@ class ImageHelpers {
 	/**
 	 * Returns the width and height of the given image.  NOTE: The passed InputStream will NOT be closed
 	 *
-	 * @param input the image to parse
+	 * @param is InputStream of the image to parse
+	 * @param mimeType mimeType of the InputStream
 	 *
 	 * @return The width and height of the image in a list
 	 */
-	static def getDimensions(InputStream is) {
-		def original = ImageIO.read(is)
+	static def getDimensions(InputStream is, MimeType mimeType) {
+		String suffix = mimeType.downloadExtension.substring(1)
+		Iterator<ImageReader> iter = ImageIO.getImageReadersBySuffix(suffix)
 
-		[original.width, original.height]
-	}
+		if (iter.hasNext()) {
+			ImageReader reader = iter.next()
+			ImageInputStream iis = new MemoryCacheImageInputStream(is)
 
-	/**
-	 * Scales the image to the given size
-	 *
-	 * @param input A byte array which should be an image format recognized by Java.
-	 *
-	 * @param finalWidth The width of the image after scaling
-	 * @param finalHeight The height of the image after scaling
-	 * @param outputFormat The format of the resulting image, defaults to PNG.
-	 *
-	 * @return A byte[] of the image scaled to the given size
-	 */
-	static byte[] scaleImage(byte[] input, int finalWidth, int finalHeight, String outputFormat = "png") {
-		def is = new ByteArrayInputStream(input)
-		def original = ImageIO.read(is)
-		is.close()
+			try {
+				reader.setInput(iis)
+				int width = reader.getWidth(reader.getMinIndex())
+				int height = reader.getHeight(reader.getMinIndex())
 
-		def scaled = Scalr.resize(original, com.thebuzzmedia.imgscalr.Scalr.Method.QUALITY, finalWidth, finalHeight)
-
-		ByteArrayOutputStream output = new ByteArrayOutputStream()
-		ImageIO.write(scaled, outputFormat, output)
-
-		byte[] bytes = output.toByteArray()
-		output.close()
-
-		bytes
+				return [width, height]
+			} finally {
+				iis?.close()
+				reader?.dispose()
+			}
+		}
 	}
 }
