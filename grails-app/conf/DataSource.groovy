@@ -28,11 +28,11 @@ environments {
     production {
         dataSource {
             username = "document_vault"
-            password = "K6mouJjt"
+            password = ""
+			url = ""
             driverClassName = "com.mysql.jdbc.Driver"
             dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
             dbCreate = "none"
-            url = "jdbc:mysql://document-vault-test.cyafcveui3rr.us-east-1.rds.amazonaws.com/document_vault"
         }
     }
 }
