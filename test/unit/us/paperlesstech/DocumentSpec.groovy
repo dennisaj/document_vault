@@ -42,8 +42,8 @@ class DocumentSpec extends UnitSpec {
 		DocumentData dd = documentData()
 		doc.addToPreviewImages(new PreviewImage(data: dd,
 				pageNumber: pageNumber,
-				height: height,
-				width: width))
+				sourceHeight: height,
+				sourceWidth: width))
 
 		when: "Map is called"
 		def m = doc.previewImageAsMap(pageNumber)
@@ -66,8 +66,8 @@ class DocumentSpec extends UnitSpec {
 		DocumentData dd = documentData()
 		doc.addToPreviewImages(new PreviewImage(data: dd,
 				pageNumber: pageNumber,
-				height: height,
-				width: width))
+				sourceHeight: height,
+				sourceWidth: width))
 
 		expect:
 		doc.previewImage(5).pageNumber == pageNumber

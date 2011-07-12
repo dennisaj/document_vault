@@ -51,7 +51,7 @@ class TiffHandlerService extends Handler {
 			byte[] pngBytes = os.toByteArray()
 			def (width, height) =  ImageHelpers.getDimensions(new ByteArrayInputStream(pngBytes), MimeType.PNG)
 			DocumentData newPng = fileService.createDocumentData(bytes: pngBytes, mimeType: MimeType.PNG)
-			PreviewImage image = new PreviewImage(data: newPng, height: height, pageNumber: i, width: width)
+			PreviewImage image = new PreviewImage(data: newPng, sourceHeight: height, pageNumber: i, sourceWidth: width)
 			d.addToPreviewImages(image)
 		}
 

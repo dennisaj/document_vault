@@ -8,9 +8,9 @@ class PreviewImage implements Cloneable, Comparable {
 	static transients = ["imageAsMap"]
 	DocumentData data
 	Date dateCreated
-	int height
 	int pageNumber
-	int width
+	int sourceHeight
+	int sourceWidth
 
 	static constraints = {
 		data(nullable: false)
@@ -23,7 +23,7 @@ class PreviewImage implements Cloneable, Comparable {
 
 	@Override
 	protected Object clone() {
-		new PreviewImage(data: data.clone(), height: height, pageNumber: pageNumber, width: width)
+		new PreviewImage(data: data.clone(), sourceHeight: sourceHeight, pageNumber: pageNumber, sourceWidth: sourceWidth)
 	}
 
 	@Override
@@ -32,7 +32,7 @@ class PreviewImage implements Cloneable, Comparable {
 	}
 
 	public Map getImageAsMap() {
-		[pageNumber: pageNumber, sourceHeight: height, sourceWidth: width]
+		[pageNumber: pageNumber, sourceHeight: sourceHeight, sourceWidth: sourceWidth]
 	}
 	
 	@Override

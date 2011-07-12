@@ -120,8 +120,8 @@ class DomainIntegrationSpec extends IntegrationSpec {
 
 		when:
 		def d = getDocument()
-		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1, height: 1))
-		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1, height: 2))
+		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1, sourceHeight: 1))
+		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1, sourceHeight: 2))
 		d.save(failOnError: true)
 
 		// TODO this test is broken, saving with duplicate page numbers silently ignores the second page number
@@ -130,7 +130,7 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		d.errors.allErrors.size() == 0
 		PreviewImage.count() == 1
 		Document.count() == 1
-		Document.get(d.id).previewImages*.height == [1]
+		Document.get(d.id).previewImages*.sourceHeight == [1]
 	}
 
 	def "preview images are sorted by pageNumber"() {
@@ -161,13 +161,13 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1, height: 1))
 		d.save()
 		d = Document.get(d.id)
-		d.previewImage(1).height = 2
+		d.previewImage(1).sourceHeight = 2
 		d.save()
 
 		then:
 		PreviewImage.count() == 1
 		Document.count() == 1
-		Document.get(d.id).previewImages*.height == [2]
+		Document.get(d.id).previewImages*.sourceHeight == [2]
 	}
 
 	def "you cannot save a document without at least one file"() {

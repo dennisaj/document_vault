@@ -43,7 +43,7 @@ class PdfHandlerService extends Handler {
 
 				Rectangle psize = pdfReader.getPageSize(page)
 
-				PreviewImage i = new PreviewImage(pageNumber: page, width: psize.getWidth(), height: psize.getHeight())
+				PreviewImage i = new PreviewImage(pageNumber: page, sourceWidth: psize.getWidth(), sourceHeight: psize.getHeight())
 				i.data = fileService.createDocumentData(mimeType: MimeType.PNG, bytes: f.getBytes())
 				d.addToPreviewImages(i)
 			}

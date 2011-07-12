@@ -472,7 +472,7 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "height", type: "integer") {
+			column(name: "source_height", type: "integer") {
 				constraints(nullable: "false")
 			}
 
@@ -480,7 +480,7 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "width", type: "integer") {
+			column(name: "source_width", type: "integer") {
 				constraints(nullable: "false")
 			}
 		}
