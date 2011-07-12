@@ -9,9 +9,14 @@
 //                             "file:${userHome}/.grails/${appName}-config.properties",
 //                             "file:${userHome}/.grails/${appName}-config.groovy"]
 
-// if(System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
+grails.config.locations = []
+if (System.properties["document_vault.config.location"]) {
+	grails.config.locations << "file:" + System.properties["document_vault.config.location"]
+}
+
+if (System.properties["document_vault.init.location"]) {
+	grails.config.locations << "file:" + System.properties["document_vault.init.location"]
+}
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
@@ -78,7 +83,19 @@ log4j = {
     //appenders {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
-    info   'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+	environments {
+		production {
+			appenders {
+				rollingFile name: "dv_appender", file: "/var/log/jetty/document_vault.log"
+			}
+
+			root {
+				info 'dv_appender'
+			}
+		}
+	}
+
+	info   'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
            'grails.app',
 		   'us.paperlesstech',
 		   'paperlesstech'

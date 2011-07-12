@@ -4,6 +4,7 @@ import grails.plugins.nimble.core.Role
 import us.paperlesstech.DomainTenantMap
 import us.paperlesstech.Printer
 import us.paperlesstech.User
+import grails.util.Environment
 
 class BootStrap {
 	def grailsApplication
@@ -20,39 +21,47 @@ class BootStrap {
 		// Disable JAI native acceleration layer
 		System.setProperty('com.sun.media.jai.disableMediaLib', 'true')
 
-		environments {
-			development {
-				if (DomainTenantMap.count() == 0) {
-					new DomainTenantMap(domainName:"localhost", mappedTenantId:1, name:"default").save()
+		// Perform any custom initialization
+		def dvInit = grailsApplication.config.document_vault.init
+		if (dvInit) {
+			log.info("Performing custom bootstrapping")
+			dvInit.delegate = delegate
+			dvInit.call(servletContext)
+		} else {
+			log.info("no custom bootstrapping")
+		}
 
-					tenantService.initTenant(1) {
-						if (Printer.count() == 0) {
-							new Printer(name:"LaserJet 5", host:"192.168.40.200", deviceType:"lj5gray", port:9100).save()
-						}
+		if (Environment.currentEnvironment == Environment.DEVELOPMENT) {
+			if (DomainTenantMap.count() == 0) {
+				new DomainTenantMap(domainName:"localhost", mappedTenantId:1, name:"default").save()
 
-						if (Group.count() == 0) {
-							groupService.createGroup("test", "test", true)
-						}
+				tenantService.initTenant(1) {
+					if (Printer.count() == 0) {
+						new Printer(name:"LaserJet 5", host:"192.168.40.200", deviceType:"lj5gray", port:9100).save()
+					}
+
+					if (Group.count() == 0) {
+						groupService.createGroup("test", "test", true)
 					}
 				}
+			}
+		}
 
-				DomainTenantMap.list().each {
-					tenantService.initTenant(it.mappedTenantId) {
-						def signatorRole = Role.findByName(User.SIGNATOR_USER_ROLE)
-						if (!signatorRole) {
-							signatorRole = new Role()
-							signatorRole.description = 'Issued to signator users'
-							signatorRole.name = User.SIGNATOR_USER_ROLE
-							signatorRole.protect = true
-							signatorRole.save()
+		DomainTenantMap.list().each {
+			tenantService.initTenant(it.mappedTenantId) {
+				def signatorRole = Role.findByName(User.SIGNATOR_USER_ROLE)
+				if (!signatorRole) {
+					signatorRole = new Role()
+					signatorRole.description = 'Issued to signator users'
+					signatorRole.name = User.SIGNATOR_USER_ROLE
+					signatorRole.protect = true
+					signatorRole.save()
 
-							if (signatorRole.hasErrors()) {
-								signatorRole.errors.each {
-									log.error it
-								}
-								throw new RuntimeException("Unable to create valid signator role for tenant $it.mappedTenantId")
-							}
+					if (signatorRole.hasErrors()) {
+						signatorRole.errors.each {
+							log.error it
 						}
+						throw new RuntimeException("Unable to create valid signator role for tenant $it.mappedTenantId")
 					}
 				}
 			}
