@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap
 class AuthService extends AuthenticatedService {
 	static scope = "request"
 	static transactional = false
-	
+
 	Map permissionsCache = [implied:[:], permitted: [:]] as ConcurrentHashMap
 	def testSubject
 
@@ -19,7 +19,7 @@ class AuthService extends AuthenticatedService {
 	}
 
 	boolean canGetSigned(Document d) {
-		checkPermission(DocumentPermission.GetSigned, d)
+		grailsApplication.config.document_vault.remoteSigning.enabled && checkPermission(DocumentPermission.GetSigned, d)
 	}
 
 	boolean canNotes(Document d) {
@@ -248,7 +248,7 @@ class AuthService extends AuthenticatedService {
 				}
 			}
 		}
-		
+
 		return checkPermission(subject, permission)
 	}
 }

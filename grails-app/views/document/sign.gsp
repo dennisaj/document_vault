@@ -56,7 +56,7 @@
 				<g:message code="document-vault.label.highlight" />
 			</button>
 			</g:if>
-			<g:elseif test="${pt.canSign(document:document)}">
+			<g:elseif test="${!parties.empty && pt.canSign(document:document)}">
 			<button id="show-highlights" class="labeled-button" title="<g:message code="document-vault.view.signature.showhighlights" />">
 				<g:message code="document-vault.view.signature.showhighlights" />
 			</button>

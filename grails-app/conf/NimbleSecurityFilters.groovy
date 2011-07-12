@@ -26,9 +26,19 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 	private static String openControllers = "auth|logout|account|code"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
+
 	def authServiceProxy
+	def grailsApplication
 
 	def filters = {
+		remoteSigning(controller: "code") {
+			before = {
+				if (!grailsApplication.config.document_vault.remoteSigning.enabled) {
+					response.sendError(403)
+				}
+			}
+		}
+
 		secure(controller: "($openControllers|$adminControllers)", invert: true) {
 			before = {
 				def document
