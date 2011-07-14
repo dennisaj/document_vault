@@ -62,7 +62,7 @@ class FermanBusinessLogicService {
 		String data = pclHandlerService.pclToString(bytes, false)
 
 		FermanDocumentTypes type = FermanDocumentTypes.Other
-		if (data.contains("&f20901y")) {
+		if (data.contains("&f20901y") || data.contains("&f20913y")) {
 			type = FermanDocumentTypes.CustomerHardCopy
 		}
 

@@ -4,14 +4,19 @@ import java.awt.Image
 
 import javax.imageio.ImageIO
 
+import org.springframework.core.io.ClassPathResource
+
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 import us.paperlesstech.PreviewImage
+import us.paperlesstech.helpers.FileHelpers
 import us.paperlesstech.helpers.ImageHelpers
 
 class DefaultImageHandlerService extends Handler {
 	static final handlerFor = [MimeType.BMP, MimeType.GIF, MimeType.JPEG, MimeType.PNG]
 	static transactional = true
+	static imagethumbnail = new ClassPathResource("scripts/imagethumbnail.sh").file.absolutePath
+	
 	def handlerChain
 
 	@Override
@@ -24,7 +29,27 @@ class DefaultImageHandlerService extends Handler {
 		def (width, height) = fileService.withInputStream(data) { is ->
 			ImageHelpers.getDimensions(is, data.mimeType)
 		}
+
+		String imagePath = fileService.getAbsolutePath(data)
+		String baseName = FileHelpers.chopExtension(imagePath)
+
+		def cmd = """/bin/bash $imagethumbnail $imagePath"""
+		log.debug "PreviewImage create - $cmd"
+		def proc = cmd.execute()
+		proc.waitFor()
+
+		if (proc.exitValue()) {
+			throw new RuntimeException("""Unable to generate preview for document ${d.id} - PDF to PNG conversion failed. Command: $cmd""")
+		}
+
+		File thumbnail = new File("$baseName-thumbnail.png")
+		assert thumbnail.canRead(), "Didn't generate thumbnail for $d"
+
+		byte[] thumbnailBytes = thumbnail.bytes
+		thumbnail.delete()
+
 		PreviewImage image = new PreviewImage(data: data, sourceHeight: height, pageNumber: 1, sourceWidth: width)
+		image.thumbnail = fileService.createDocumentData(mimeType:MimeType.PNG, bytes:thumbnailBytes)
 		d.addToPreviewImages(image)
 	}
 

@@ -8,6 +8,9 @@ class LogoutController {
 	def authService
 
 	def index = {
-		redirect controller: "auth", action: "logout"
+		// Using the full URL because the load balancer is messing up redirects in production
+		def url = g.createLink(absolute:true, controller:'auth',action:'logout')
+
+		redirect(url: url)
 	}
 }

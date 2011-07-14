@@ -23,7 +23,9 @@
 		<g:each var="document" in="${documentResults}" status="index">
 			<tr class="result">
 				<td>
-					<img class="thumb" width="80" src="${createLink(action:'downloadImage', params:[documentId: document.id])}" alt="Document ${document.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
+					<a class="thumb" href="${createLink(action:'downloadImage', params:[documentId: document.id, pageNumber:1])}">
+						<img src="${createLink(action:'thumbnail', params:[documentId: document.id, pageNumber:1, documentDataId:document.previewImage(1).thumbnail.id])}" alt="Document ${document.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
+					</a>
 				</td>
 				<td>
 					${document.toString()}

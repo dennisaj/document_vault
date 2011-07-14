@@ -11,14 +11,17 @@ class PreviewImage implements Cloneable, Comparable {
 	int pageNumber
 	int sourceHeight
 	int sourceWidth
+	DocumentData thumbnail
 
 	static constraints = {
-		data(nullable: false)
-		pageNumber(unique: "document", min: 1, max: 10000)
+		data nullable: false
+		pageNumber unique: "document", min: 1, max: 10000
+		thumbnail nullable: false
 	}
 
 	static mapping = {
-		data(nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh, evict")
+		data nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh, evict"
+		thumbnail nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh, evict"
 	}
 
 	@Override

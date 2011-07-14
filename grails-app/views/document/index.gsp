@@ -35,7 +35,8 @@
 				}, true);
 
 				$('.thumb').live('click', function(event) {
-					PreviewImage.show(event.target.src);
+					PreviewImage.show(event.currentTarget.href);
+					return false;
 				});
 				DocumentSearch.init();
 			});

@@ -182,7 +182,7 @@ class HandlerSpec extends UnitSpec {
 
 		then:
 		1 * fileService.getInputStream(dd) >> is
-		result[0] == "file - page($pageNumber).png"
+		result[0] == "file-page($pageNumber).png"
 		result[1] == is
 		result[2] == mimeType.downloadContentType
 		result[3] == fileSize

@@ -158,16 +158,19 @@ environments {
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/var/cache/document_vault/files"
+		document_vault.forceSSL = true
 	}
 	development {
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp"
+		document_vault.forceSSL = false
 	}
 	test {
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp"
+		document_vault.forceSSL = false
 	}
 }
 

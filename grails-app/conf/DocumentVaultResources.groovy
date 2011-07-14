@@ -15,7 +15,7 @@ modules = {
 			resource id: 'js', url:'https://ajax.googleapis.com/ajax/libs/jqueryui/'+jquiver+'/jquery-ui.min.js'
 		}
 		'jquery-theme' {
-			resource id: 'theme', url:'http://ajax.googleapis.com/ajax/libs/jqueryui/'+jquiver+'/themes/ui-lightness/jquery-ui.css'
+			resource id: 'theme', url:'https://ajax.googleapis.com/ajax/libs/jqueryui/'+jquiver+'/themes/ui-lightness/jquery-ui.css'
 		}
 	}
 

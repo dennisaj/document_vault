@@ -46,7 +46,7 @@ class HandlerChainSpec extends UnitSpec {
 		input == m
 	}
 
-	def "importFile fails when there is no byte[]"() {
+	def "importFile fails when there is no byte array"() {
 		given:
 		def d = new Document()
 

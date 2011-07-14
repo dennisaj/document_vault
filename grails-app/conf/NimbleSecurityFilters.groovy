@@ -23,7 +23,7 @@ import us.paperlesstech.Document
  * @author Bradley Beddoes
  */
 public class NimbleSecurityFilters extends grails.plugins.nimble.security.NimbleFilterBase {
-	private static String openControllers = "auth|logout|account|code"
+	private static String openControllers = "auth|logout|account|code|home"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 
@@ -49,11 +49,11 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 					def action = actionName ?: "index"
 					log.info("user:$authServiceProxy.authenticatedUser; resource:$controllerName:$action; document:$document")
 					switch (controllerName) {
-						case ["document", "home"]:
+						case ["document"]:
 							switch (action) {
 								case ["download", "image", "show"]:
 									return document && (authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document) || authServiceProxy.canView(document))
-								case ["downloadImage"]:
+								case ["downloadImage", "thumbnail"]:
 									return document && (authServiceProxy.canTag(document) || authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document) || authServiceProxy.canView(document))
 								case ["index"]:
 									return authServiceProxy.canViewAny() || authServiceProxy.canSignAny()

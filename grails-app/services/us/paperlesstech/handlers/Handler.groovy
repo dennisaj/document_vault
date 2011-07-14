@@ -64,10 +64,32 @@ class Handler {
 		def previewImage = d.previewImage(page)
 		assert previewImage, "No preview image exists for page '$page'"
 
-		def filename = "${d.toString()} - page($page)${d.previewImage(page).data.mimeType.getDownloadExtension()}"
+		def filename = "${d.toString()}-page($page)${d.previewImage(page).data.mimeType.getDownloadExtension()}"
 
 		[filename, fileService.getInputStream(previewImage.data), previewImage.data.mimeType.downloadContentType,
 				previewImage.data.fileSize]
+	}
+
+	/**
+	 * Returns a quad of the thumbnail image to be downloaded to the client. NOTE: The returned InputStream must be
+	 * closed by the caller.
+	 *
+	 * @param input a map that must contain document and page
+	 * @return a quad of (documentFilename, document data as an Input Stream, document mimetype, and content length
+	 */
+	def downloadThumbnail(Map input) {
+		def d = getDocument(input)
+		assert authServiceProxy.canTag(d) || authServiceProxy.canView(d) || authServiceProxy.canSign(d)
+
+		def page = input.page
+		assert page, "This method requires a page number"
+
+		def previewImage = d.previewImage(page)
+		assert previewImage, "No preview image exists for page '$page'"
+
+		def filename = "${d.toString()}-page($page)-thumbnail-${d.previewImage(page).thumbnail.mimeType.getDownloadExtension()}"
+
+		[filename, fileService.getInputStream(previewImage.thumbnail), previewImage.thumbnail.mimeType.downloadContentType, previewImage.thumbnail.fileSize]
 	}
 
 	/**

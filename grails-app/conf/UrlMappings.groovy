@@ -19,6 +19,11 @@ class UrlMappings {
 			action = "download"
 		}
 
+		"/document/thumbnail/$documentId/$pageNumber/$documentDataId" {
+			controller = "document"
+			action = "thumbnail"
+		}
+
 		"/document/$action?/$documentId?/$pageNumber?"{
 			controller = "document"
 		}

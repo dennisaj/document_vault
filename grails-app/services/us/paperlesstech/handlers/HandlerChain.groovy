@@ -50,6 +50,14 @@ class HandlerChain extends Handler {
 	}
 
 	@Override
+	def downloadThumbnail(Map input) {
+		def document = getDocument(input)
+		assert authServiceProxy.canTag(document) || authServiceProxy.canView(document) || authServiceProxy.canSign(document)
+
+		handle("downloadThumbnail", input)
+	}
+
+	@Override
 	def download(Map input) {
 		def document = getDocument(input)
 		assert authServiceProxy.canView(document) || authServiceProxy.canSign(document)

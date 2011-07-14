@@ -1,5 +1,7 @@
 package us.paperlesstech.handlers
 
+import org.springframework.core.io.ClassPathResource
+
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 import us.paperlesstech.PreviewImage
@@ -13,7 +15,9 @@ import com.itextpdf.text.pdf.PdfStamper
 class PdfHandlerService extends Handler {
 	static final handlerFor = [MimeType.PDF]
 	static final LINEBREAK = 'LB'
+	static pdf2png = new ClassPathResource("scripts/pdf2png.sh").file.absolutePath
 	static transactional = true
+
 	def handlerChain
 
 	@Override
@@ -23,28 +27,31 @@ class PdfHandlerService extends Handler {
 		def data = getDocumentData(input)
 
 		String pdfPath = fileService.getAbsolutePath(data)
-		String baseName = FileHelpers.chopExtension(File.createTempFile("pdf2png", ".png").getAbsolutePath(), ".png")
+		String baseName = FileHelpers.chopExtension(pdfPath, ".pdf")
 
 		PdfReader pdfReader
 		try {
-			def cmd = """/usr/local/bin/gs -sDEVICE=png16m -r300 -dNOPAUSE -dBATCH -dSAFER -sOutputFile=${baseName}-%d.png ${pdfPath}"""
-			log.debug "PreviewImage create - ${cmd}"
+			def cmd = """/bin/bash $pdf2png $pdfPath"""
+			log.debug "PreviewImage create - $cmd"
 			def proc = cmd.execute()
 			proc.waitFor()
 			if (proc.exitValue()) {
-				throw new RuntimeException("""Unable to generate preview for document ${d.id} - PDF to PNG conversion failed""")
+				throw new RuntimeException("""Unable to generate preview for document ${d.id} - PDF to PNG conversion failed. Command: '$cmd'""")
 			}
 
 			d.resetPreviewImages()
 			pdfReader = new PdfReader(pdfPath)
 			(1..d.files.first().pages).each { page ->
 				File f = new File("${baseName}-${page}.png")
+				File thumbnail = new File("${baseName}-${page}-thumbnail.png")
 				assert f.canRead(), "Didn't generate page $page from the PDF for document $d"
+				assert thumbnail.canRead(), "Didn't generate thumbnail for page $page from the PDF for document $d"
 
 				Rectangle psize = pdfReader.getPageSize(page)
 
 				PreviewImage i = new PreviewImage(pageNumber: page, sourceWidth: psize.getWidth(), sourceHeight: psize.getHeight())
-				i.data = fileService.createDocumentData(mimeType: MimeType.PNG, bytes: f.getBytes())
+				i.data = fileService.createDocumentData(mimeType: MimeType.PNG, bytes: f.bytes)
+				i.thumbnail = fileService.createDocumentData(mimeType:MimeType.PNG, bytes:thumbnail.bytes)
 				d.addToPreviewImages(i)
 			}
 
@@ -59,8 +66,13 @@ class PdfHandlerService extends Handler {
 
 			(1..d.files.first().pages).each { page ->
 				File f = new File("${baseName}-${page}.png")
+				File thumbnail = new File("${baseName}-${page}-thumbnail.png")
 				if (f.exists()) {
 					f.delete()
+				}
+
+				if (thumbnail.exists()) {
+					thumbnail.delete()
 				}
 			}
 		}

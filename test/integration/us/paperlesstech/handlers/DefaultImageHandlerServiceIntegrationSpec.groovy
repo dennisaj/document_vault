@@ -17,6 +17,11 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		defaultImageHandlerService.authServiceProxy = authServiceProxy
 	}
 
+	def "imagethumbnail should be set"() {
+		expect:
+			DefaultImageHandlerService.imagethumbnail
+	}
+
 	def "import image files"() {
 		when:
 			def document = new Document(group: DomainIntegrationSpec.group)
@@ -31,6 +36,8 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			document.previewImage(1).data.id == document.files.first().id
 			document.previewImage(1).data.pages == 1
 			document.previewImage(1).data.mimeType == mimeType
+			document.previewImage(1).thumbnail.pages == 1
+			document.previewImage(1).thumbnail.mimeType == MimeType.PNG
 		where:
 			mimeType << [MimeType.PNG, MimeType.JPEG, MimeType.BMP, MimeType.GIF]
 	}
@@ -57,6 +64,8 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 			document.previewImages.size() == 1
 			document.previewImages*.data.pages == [1] * 1
 			document.previewImages*.data.mimeType == [mimeType] * 1
+			document.previewImages*.thumbnail.pages == [1] * 1
+			document.previewImages*.thumbnail.mimeType == [MimeType.PNG] * 1
 			document.previewImages*.pageNumber == [1]
 		where:
 			mimeType << [MimeType.PNG, MimeType.JPEG, MimeType.BMP, MimeType.GIF]

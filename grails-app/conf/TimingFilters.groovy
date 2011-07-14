@@ -1,4 +1,5 @@
 public class TimingFilters {
+	def dependsOn = [SslFilters]
 	def grailsApplication
 
 	def filters = {

@@ -22,6 +22,11 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		pdfDocumentData = new DocumentData(mimeType: MimeType.PDF)
 	}
 
+	def "pdf2png should be set"() {
+		expect:
+			PdfHandlerService.pdf2png
+	}
+
 	def "import pdf file"() {
 		def input = [document: document, documentData: pdfDocumentData, bytes: pdfBytes]
 		when:
@@ -35,6 +40,10 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		document.previewImage(1).data.mimeType == MimeType.PNG
 		document.previewImage(2).data.pages == 1
 		document.previewImage(2).data.mimeType == MimeType.PNG
+		document.previewImage(1).thumbnail.pages == 1
+		document.previewImage(1).thumbnail.mimeType == MimeType.PNG
+		document.previewImage(2).thumbnail.pages == 1
+		document.previewImage(2).thumbnail.mimeType == MimeType.PNG
 	}
 
 	def "cursiveSign pdf file"() {
@@ -57,6 +66,8 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		document.previewImages.size() == 2
 		document.previewImages*.data.pages == [1] * 2
 		document.previewImages*.data.mimeType == [MimeType.PNG] * 2
+		document.previewImages*.thumbnail.pages == [1] * 2
+		document.previewImages*.thumbnail.mimeType == [MimeType.PNG] * 2
 		document.previewImages*.pageNumber == [1, 2]
 		where:
 		mimeType = MimeType.PDF

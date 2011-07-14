@@ -483,6 +483,10 @@ databaseChangeLog = {
 			column(name: "source_width", type: "integer") {
 				constraints(nullable: "false")
 			}
+
+			column(name: "thumbnail_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
 		}
 	}
 
@@ -1140,5 +1144,9 @@ databaseChangeLog = {
 
 	changeSet(author: "seth (generated)", id: "1308779031843-7") {
 		addForeignKeyConstraint(baseColumnNames: "signator_id", baseTableName: "party", constraintName: "FK_PARTY_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	}
+
+	changeSet(author: "smiller (generated)", id: "1310613985698-3") {
+		addForeignKeyConstraint(baseColumnNames: "thumbnail_id", baseTableName: "preview_image", constraintName: "FK_PREVIEW_IMAGE_THUMBNAIL", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
 	}
 }

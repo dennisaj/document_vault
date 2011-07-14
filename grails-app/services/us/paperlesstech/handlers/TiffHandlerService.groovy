@@ -11,9 +11,12 @@ import javax.media.jai.NullOpImage
 import javax.media.jai.OpImage
 import javax.media.jai.PlanarImage
 
+import org.springframework.core.io.ClassPathResource
+
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 import us.paperlesstech.PreviewImage
+import us.paperlesstech.helpers.FileHelpers
 import us.paperlesstech.helpers.ImageHelpers
 
 import com.sun.media.jai.codec.ByteArraySeekableStream
@@ -27,6 +30,8 @@ import com.sun.media.jai.codec.TIFFEncodeParam
 class TiffHandlerService extends Handler {
 	static final handlerFor = [MimeType.TIFF]
 	static transactional = true
+	static imagethumbnail = new ClassPathResource("scripts/imagethumbnail.sh").file.absolutePath
+
 	def handlerChain
 
 	@Override
@@ -49,9 +54,32 @@ class TiffHandlerService extends Handler {
 			ImageIO.write(original, "png", os)
 
 			byte[] pngBytes = os.toByteArray()
+			
 			def (width, height) =  ImageHelpers.getDimensions(new ByteArrayInputStream(pngBytes), MimeType.PNG)
 			DocumentData newPng = fileService.createDocumentData(bytes: pngBytes, mimeType: MimeType.PNG)
+
+			String imagePath = fileService.getAbsolutePath(newPng)
+			String baseName = FileHelpers.chopExtension(imagePath)
+
+			// TODO: An optimization would be to convert all pages to thumbnails at one time instead of one at a time.
+			def cmd = """/bin/bash $imagethumbnail $imagePath"""
+			log.debug "PreviewImage create - $cmd"
+			def proc = cmd.execute()
+			proc.waitFor()
+
+			if (proc.exitValue()) {
+				throw new RuntimeException("""Unable to generate preview for document ${d.id} - PDF to PNG conversion failed. Command: $cmd""")
+			}
+
+			File thumbnail = new File("$baseName-thumbnail.png")
+			assert thumbnail.canRead(), "Didn't generate thumbnail for $d"
+
+			byte[] thumbnailBytes = thumbnail.bytes
+			thumbnail.delete()
+
 			PreviewImage image = new PreviewImage(data: newPng, sourceHeight: height, pageNumber: i, sourceWidth: width)
+			image.thumbnail = fileService.createDocumentData(mimeType:MimeType.PNG, bytes:thumbnailBytes)
+
 			d.addToPreviewImages(image)
 		}
 

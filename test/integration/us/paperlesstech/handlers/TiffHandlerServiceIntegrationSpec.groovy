@@ -22,6 +22,11 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		line = [a: [x: 0, y: 0], b: [x: 100, y: 100]]
 	}
 
+	def "imagethumbnail should be set"() {
+		expect:
+			TiffHandlerService.imagethumbnail
+	}
+
 	def "import tiff file"() {
 		def input = [document: tiffDocument, documentData: tiffDocumentData, bytes: tiffBytes]
 		when:
@@ -33,6 +38,8 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		tiffDocument.previewImages.size() == 6
 		tiffDocument.previewImages*.data.pages == [1] * 6
 		tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
+		tiffDocument.previewImages*.thumbnail.pages == [1] * 6
+		tiffDocument.previewImages*.thumbnail.mimeType == [MimeType.PNG] * 6
 		tiffDocument.previewImages*.pageNumber == 1..6
 	}
 
@@ -52,6 +59,8 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 		tiffDocument.previewImages.size() == 6
 		tiffDocument.previewImages*.data.pages == [1] * 6
 		tiffDocument.previewImages*.data.mimeType == [MimeType.PNG] * 6
+		tiffDocument.previewImages*.thumbnail.pages == [1] * 6
+		tiffDocument.previewImages*.thumbnail.mimeType == [MimeType.PNG] * 6
 		tiffDocument.previewImages*.pageNumber == 1..6
 	}
 }

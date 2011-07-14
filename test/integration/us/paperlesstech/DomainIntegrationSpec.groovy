@@ -104,7 +104,7 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		when:
 		def d = getDocument()
 		d.save()
-		def i = new PreviewImage(data: previewImageData, pageNumber:1)
+		def i = new PreviewImage(data: previewImageData, thumbnail: previewImageData, pageNumber:1)
 		d.addToPreviewImages(i)
 		d.save()
 
@@ -120,8 +120,8 @@ class DomainIntegrationSpec extends IntegrationSpec {
 
 		when:
 		def d = getDocument()
-		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1, sourceHeight: 1))
-		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1, sourceHeight: 2))
+		d.addToPreviewImages(new PreviewImage(data: previewImageData, thumbnail: previewImageData, pageNumber:1, sourceHeight: 1))
+		d.addToPreviewImages(new PreviewImage(data: previewImageData, thumbnail: previewImageData, pageNumber:1, sourceHeight: 2))
 		d.save(failOnError: true)
 
 		// TODO this test is broken, saving with duplicate page numbers silently ignores the second page number
@@ -140,9 +140,9 @@ class DomainIntegrationSpec extends IntegrationSpec {
 
 		when:
 		def d = getDocument()
-		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:2))
-		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:3))
-		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1))
+		d.addToPreviewImages(new PreviewImage(data: previewImageData, thumbnail: previewImageData, pageNumber:2))
+		d.addToPreviewImages(new PreviewImage(data: previewImageData, thumbnail: previewImageData, pageNumber:3))
+		d.addToPreviewImages(new PreviewImage(data: previewImageData, thumbnail: previewImageData, pageNumber:1))
 		d.save()
 
 		then:
@@ -158,7 +158,7 @@ class DomainIntegrationSpec extends IntegrationSpec {
 
 		when:
 		def d = getDocument()
-		d.addToPreviewImages(new PreviewImage(data: previewImageData, pageNumber:1, height: 1))
+		d.addToPreviewImages(new PreviewImage(data: previewImageData, thumbnail: previewImageData, pageNumber:1, height: 1))
 		d.save()
 		d = Document.get(d.id)
 		d.previewImage(1).sourceHeight = 2

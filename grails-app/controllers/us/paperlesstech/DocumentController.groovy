@@ -151,6 +151,25 @@ class DocumentController {
 		}
 	}
 
+	def thumbnail = {
+		def document = Document.get(params.long("documentId"))
+		def documentData = document?.previewImages?.find { it.thumbnail.id == params.long("documentDataId")}
+		if (!document || !documentData) {
+			response.status = 404
+			return
+		}
+
+		cache neverExpires: true
+
+		def (filename, is, contentType, length) = handlerChain.downloadThumbnail(document: document, page: params.pageNumber?.toInteger() ?: 1)
+		is.withStream {
+			response.setContentType(contentType)
+			response.setContentLength(length)
+			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
+			response.getOutputStream() << is
+		}
+	}
+
 	def show = {
 		def document = Document.get(params.long("documentId"))
 		assert document

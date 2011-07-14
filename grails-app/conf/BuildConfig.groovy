@@ -10,9 +10,8 @@ grails.project.dependency.resolution = {
 	}
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 	repositories {
-		grailsPlugins()
-		grailsHome()
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release-local"
+		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-snapshot-local"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-release-local"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/remote-repos"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release"
@@ -24,10 +23,15 @@ grails.project.dependency.resolution = {
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/jboss/"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/mygrid/"
 		grailsRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins.grails.org"
+		grailsPlugins()
+		grailsHome()
 		grailsCentral()
 
 		// uncomment the below to enable remote dependency resolution
 		// from public Maven repositories
+		//mavenRepo "http://maven.itextpdf.com/"
+		//mavenRepo "http://repository.jboss.org/nexus/content/groups/public-jboss/"
+		//mavenRepo "http://www.mygrid.org.uk/maven/repository/"
 		//mavenLocal()
 		//mavenCentral()
 		//mavenRepo "http://snapshots.repository.codehaus.org"
@@ -35,6 +39,7 @@ grails.project.dependency.resolution = {
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
+		compile group:'us.paperlesstech', name:'flea', version:'0.9.1'
 		compile group:'com.itextpdf', name:'itextpdf', version:'5.0.6'
 		runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'
 		compile group:'com.sun.media', name:'jai-codec', version:'1.1.3'
