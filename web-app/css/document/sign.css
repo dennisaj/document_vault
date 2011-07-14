@@ -61,9 +61,8 @@ div#buttonPanel {
 .arrow a {
 	-webkit-tap-highlight-color: 0;
 	-webkit-touch-callout: none;
-	font-size: 2em;
 	margin: 0 .25em 0 .3em;
-	padding: 0;
+	padding: .8em;
 }
 
 #right-arrow {
