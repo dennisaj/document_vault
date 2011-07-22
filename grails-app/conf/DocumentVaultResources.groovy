@@ -77,7 +77,6 @@ modules = {
 		dependsOn 'dv-ui-document'
 
 		resource url: '/css/document/show.css', minify: true, nominify: false
-
 		resource url: '/js/document/show.js'
 	}
 
@@ -85,9 +84,9 @@ modules = {
 		dependsOn 'dv-ui-document'
 
 		resource url: '/css/document/sign.css', minify: true, nominify: false
-
+		resource url: '/js/document/draw.js'
+		resource url: '/js/document/signbox.js'
 		resource url: '/js/document/sign.js'
-
 		resource url: '/js/document/party.js'
 	}
 
@@ -96,11 +95,8 @@ modules = {
 
 		resource url: '/css/tagit-simple-blue.css', minify: true, nominify: false
 		resource url: '/css/tag.css', minify: true, nominify: false
-
-
 		resource url: '/js/tagit.js'
 		resource url: '/js/document/tagging.js'
-
 		// TODO i18n text
 		resource url: '/images/tag-blue-delete.png', attrs: [alt:'Delete Tag'], disposition: 'inline'
 	}
@@ -152,7 +148,6 @@ modules = {
 		dependsOn 'dv-ui', 'jquery-template'
 
 		resource url: '/css/jquery.fileupload-ui.css', minify: true, nominify: false
-
 		resource url: '/js/jquery.iframe-transport.js', minify: true, nominify: false
 		resource url: '/js/jquery.fileupload.js', minify: true, nominify: false
 		resource url: '/js/jquery.fileupload-ui.js', minify: true, nominify: false

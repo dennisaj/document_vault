@@ -794,11 +794,11 @@ databaseChangeLog = {
 
 			column(name: "accepted", type: "timestamp")
 
-			column(name: "lower_rightx", type: "integer") {
+			column(name: "_left", type: "integer") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "lower_righty", type: "integer") {
+			column(name: "top", type: "integer") {
 				constraints(nullable: "false")
 			}
 
@@ -818,11 +818,11 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "upper_leftx", type: "integer") {
+			column(name: "width", type: "integer") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "upper_lefty", type: "integer") {
+			column(name: "height", type: "integer") {
 				constraints(nullable: "false")
 			}
 		}

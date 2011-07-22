@@ -9,13 +9,13 @@ import spock.lang.*
 class HighlightSpec extends UnitSpec {
 	def "test toMap"() {
 		given:
-			def h = new Highlight(lowerRightX: 10, lowerRightY:20, upperLeftX:30, upperLeftY:40)
+			def h = new Highlight(height: 10, _left:20, width:30, top:40)
 		when:
 			def m = h.toMap()
 		then:
-			m.lowerRightCorner.x == h.lowerRightX
-			m.lowerRightCorner.y == h.lowerRightY 
-			m.upperLeftCorner.x == h.upperLeftX
-			m.upperLeftCorner.y == h.upperLeftY
+			m.height == h.height
+			m.left == h._left
+			m.width == h.width
+			m.top == h.top
 	}
 }

@@ -55,7 +55,7 @@ class PartyServiceSpec extends UnitSpec {
 			mockDomain(User)
 			def user = new User(id:1)
 			def document = new Document(id:1)
-			def highlights = [JSONObject.NULL, [[a:[x:10, y:20], b:[x:30, y:40]], JSONObject.NULL]]
+			def highlights = [JSONObject.NULL, [[left:10, top:20, width:30, height:40], JSONObject.NULL]]
 			def input = [fullName:"fullName", email:"email@email.com", color:PartyColor.Red.name(), permission:DocumentPermission.Sign.name(), highlights:highlights]
 
 			service.metaClass.getSignator = {String a, String b->
@@ -81,7 +81,7 @@ class PartyServiceSpec extends UnitSpec {
 			mockDomain(User)
 			def user = new User(id:1)
 			def document = new Document(id:1)
-			def highlights = [JSONObject.NULL, [[a:[x:10, y:20], b:[x:30, y:40]], JSONObject.NULL]]
+			def highlights = [JSONObject.NULL, [[left:10, top:20, width:30, height:40], JSONObject.NULL]]
 			def input = [fullName:"fullName", email:"email@email.com", color:PartyColor.Red.name(), permission:DocumentPermission.Sign.name(), highlights:highlights]
 
 			service.metaClass.getSignator = {String a, String b->
@@ -103,7 +103,7 @@ class PartyServiceSpec extends UnitSpec {
 			mockDomain(User)
 			def user = new User(id:1)
 			def document = new Document(id:1)
-			def highlights = [JSONObject.NULL, [[a:[x:10, y:20], b:[x:30, y:40]], JSONObject.NULL]]
+			def highlights = [JSONObject.NULL, [[left:10, top:20, width:30, height:40], JSONObject.NULL]]
 			def input = [fullName:"fullName", email:"email@email.com", highlights:highlights, expiration:"bad date"]
 
 			service.metaClass.getSignator = {String a, String b->

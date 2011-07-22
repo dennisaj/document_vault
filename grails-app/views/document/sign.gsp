@@ -44,9 +44,6 @@
 				<g:message code="document-vault.label.print" />
 			</button>
 			</pt:canPrint>
-			<button id="zoomWidth" class="labeled-button" title="<g:message code="document-vault.label.zoomwidth" />">
-				<g:message code="document-vault.label.zoomwidth" />
-			</button>
 			<g:if test="${pt.canGetSigned(document:document)}">
 			<button id="get-signed" class="labeled-button" title="<g:message code="document-vault.view.signature.requestsignatures" />">
 				<g:message code="document-vault.view.signature.requestsignatures" />
@@ -56,7 +53,7 @@
 				<g:message code="document-vault.label.highlight" />
 			</button>
 			</g:if>
-			<g:elseif test="${!parties.empty && pt.canSign(document:document)}">
+			<g:elseif test="${grailsApplication.config.document_vault.remoteSigning.enabled && !parties.empty && pt.canSign(document:document)}">
 			<button id="show-highlights" class="labeled-button" title="<g:message code="document-vault.view.signature.showhighlights" />">
 				<g:message code="document-vault.view.signature.showhighlights" />
 			</button>
@@ -74,6 +71,15 @@
 				<a href="#" title="<g:message code="document-vault.label.nextpage" />"><g:message code="document-vault.label.nextpage" /></a>
 			</div>
 			<canvas id="can"></canvas>
+		</div>
+		<div id="slider-container">
+			<button id="zoom-out" title="<g:message code="document-vault.label.zoomout" />">
+				<g:message code="document-vault.label.zoomout" />
+			</button>
+			<div id="slider"></div>
+			<button id="zoom-in" title="<g:message code="document-vault.label.zoomin" />">
+				<g:message code="document-vault.label.zoomin" />
+			</button>
 		</div>
 		<div id="signature-message" title="<g:message code="document-vault.view.party.wait.title" />">
 			<p style="overflow: hidden;">

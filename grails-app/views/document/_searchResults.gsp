@@ -109,10 +109,8 @@
 		</table>
 	</div>
 
-		<g:if test="${params.q}">
-		<div class="paginateButtons paging span-24 last append-bottom">
-			<g:paginate params="${params}" total="${documentTotal}" />
-		</div>
-		</g:if>
+	<div class="paginateButtons paging span-24 last append-bottom">
+		<g:paginate params="${params}" total="${documentTotal}" />
+	</div>
 	</g:if>
 </div>

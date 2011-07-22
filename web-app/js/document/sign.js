@@ -6,12 +6,8 @@ var Sign = {
 	currentWidth: 0,
 	currentPageNumber: null,
 	highlightStart: null,
-	highlightOpacity: .7,
 	isMoving: false,
-	isPainting: false,
-	isZoomedIn: false,
-	LINEBREAK: 'LB',
-	lowlightOpacity: .2,
+	isMouseDown: false,
 	$main : null,
 	minVisible: 150,
 	ORIGIN: {x:0, y:0},
@@ -20,24 +16,9 @@ var Sign = {
 	scrollCanX: 0,
 	scrollCanY: 0,
 	trackingTouchId: null,
+	tapAndHoldTimeout: null,
+	tapAndHoldDuration: 500,
 	urls: {},
-	ZOOM_SCALE: .3,
-
-	addBreak: function(page) {
-		// Don't add consecutive LINEBREAKs
-		if (page.lines[page.lines.length - 1] != this.LINEBREAK) {
-			page.lines.push(this.LINEBREAK);
-		}
-	},
-
-	_addLine: function(page, line) {
-		page.lines.push(line);
-	},
-
-	_addHighlight: function(page, party, corners) {
-		page.unsavedHighlights[party] = page.unsavedHighlights[party] || [];
-		page.unsavedHighlights[party].push(corners);
-	},
 
 	// Make sure at least 150 x 150 pixels of the screen are visible at any time. 
 	canScroll: function(x, y) {
@@ -54,14 +35,6 @@ var Sign = {
 		return true;
 	},
 
-	clearCanvas: function(canvas, page) {
-		var context = canvas.getContext('2d');
-
-		context.clearRect(0, 0, canvas.width, canvas.height);
-		canvas.width = canvas.width;
-		context.drawImage(page.background, 0, 0, canvas.width, canvas.height);
-	},
-
 	_convertEventToPoint: function(touch) {
 		if (touch) {
 			return {x: touch.pageX, y: touch.pageY};
@@ -71,66 +44,61 @@ var Sign = {
 	},
 
 	_currentCenter: function() {
-		var upperLeftCorner = $.extend({}, this.ORIGIN);
-		var lowerRightCorner = $.extend({}, this.ORIGIN);
+		var left = 0;
+		var top = 0;
+		var width = 0;
+		var height = 0;
 
-		upperLeftCorner.x = -this.scrollCanX / this.scale
-		upperLeftCorner.y = -this.scrollCanY / this.scale;
+		left = -this.scrollCanX / this.scale
+		top = -this.scrollCanY / this.scale;
 
-		lowerRightCorner.x = upperLeftCorner.x + (this.$main.width() / this.scale);
-		lowerRightCorner.y = upperLeftCorner.y + (this.$main.height() / this.scale);
+		width = left + (this.$main.width() / this.scale);
+		height = top + (this.$main.height() / this.scale);
 
-		return {x: (upperLeftCorner.x + lowerRightCorner.x) / 2, y: (upperLeftCorner.y + lowerRightCorner.y) / 2};
+		return {x: (left + width) / 2, y: (top + height) / 2};
 	},
 
 	currentPage: function() {
 		return Document.pages[this.currentPageNumber];
 	},
 
-	doEnd: function(event) {
+	doEnd: function(event, canvas, page) {
+		clearTimeout(this.tapAndHoldTimeout);
+
 		var isSigning = $('#pen').is('.ui-state-highlight');
 		var isHighlighting = Party.isHighlighting();
 		$('.arrow').fadeIn('fast');
 
 		if (!isSigning && !this.isMoving && !isHighlighting) {
-			// Handle click to zoom
-			var zoomScale = this.ZOOM_SCALE;
+			var party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
+			var color = Party.getCurrentColor() || SignBox.partyColor;
+			var point = this._scalePoint(this._convertEventToPoint(event));
+			var insideHighlight = Draw.isPointInsideAnyBox(point, page.unsavedHighlights[party]);
 
-			var point = this.scalePoint(this._convertEventToPoint(event));
+			if (insideHighlight) {
+				SignBox.signBox(canvas, page, insideHighlight);
+			} else {
+				var boxWidth = (canvas.width * SignBox.widthScale);
+				var boxHeight = boxWidth * SignBox.heightScale;
+				var corners = {
+					left: point.x - SignBox.touchOffset,
+					top: point.y - boxHeight + SignBox.touchOffset,
+					width: boxWidth,
+					height: boxHeight
+				}
 
-			if (this.isZoomedIn) {
-				zoomScale = this.currentPage().background.width / this.$main.width();
-
-				point = this._currentCenter();
+				Draw.addHighlight(page, party, corners);
+				Draw.highlight(canvas, page, corners, color);
 			}
-
-			var zoomWidth = zoomScale * this.$main.width();
-			var widthOffset = zoomWidth / 2;
-
-			var zoomHeight = zoomScale * this.$main.height();
-			var heightOffset = zoomHeight / 2;
-
-			var zoomStart = {
-				x: point.x - widthOffset,
-				y: point.y - heightOffset
-			};
-
-			var zoomEnd = {
-				x: point.x + widthOffset, 
-				y: point.y + heightOffset
-			};
-
-			this.viewArea(this.can, this.currentPage(), zoomStart, zoomEnd, 'width');
-			this.isZoomedIn = !this.isZoomedIn;
 		} else if (isSigning) {
-			this.addBreak(this.currentPage());
+			Draw.addBreak(page);
 		} else if (isHighlighting && this.highlightStart) {
-			var corners = this._normalizeCorners(this.scalePoint(this.highlightStart), this.scalePoint(this.previousPoint));
+			var corners = Draw.normalizeCorners(this._scalePoint(this.highlightStart), this._scalePoint(this.previousPoint));
 			var party = Party.getSelectedPartyRow().attr('id');
 			var color = Party.getCurrentColor();
 
-			this._addHighlight(this.currentPage(), party, corners);
-			this.highlight(this.can, this.currentPage(), corners, color);
+			Draw.addHighlight(page, party, corners);
+			Draw.highlight(canvas, page, corners, color);
 
 			// Reset highlighting
 			this.highlightStart = null;
@@ -142,7 +110,9 @@ var Sign = {
 		this.isMoving = false;
 	},
 
-	doMove: function(event) {
+	doMove: function(event, canvas, page) {
+		clearTimeout(this.tapAndHoldTimeout);
+
 		this.isMoving = true;
 		var point = this._convertEventToPoint(event);
 		var isSigning = $('#pen').is('.ui-state-highlight');
@@ -153,14 +123,14 @@ var Sign = {
 
 		if (!isSigning && !isHighlighting) {
 			this.$main.css('cursor', 'move');
-			this.dragCanvas(this.can, this.previousPoint, point);
+			this.dragCanvas(canvas, this.previousPoint, point);
 		} else if (isSigning) {
 			var line = {
-				start: this.scalePoint(this.previousPoint),
-				end: this.scalePoint(point),
+				start: this._scalePoint(this.previousPoint),
+				end: this._scalePoint(point),
 			};
-			this._addLine(this.currentPage(), line);
-			this.drawLine(this.can, line);
+			Draw.addLine(page, line);
+			Draw.drawLine(canvas, line);
 		} else if (isHighlighting) {
 			if (!this.highlightStart) {
 				var color = Party.getCurrentColor();
@@ -169,11 +139,34 @@ var Sign = {
 				this.$box.css('background-color', color);
 				this.highlightStart = point;
 			} else {
-				this.drawBox(this.can, this.currentPage(), this.highlightStart, point);
+				this.drawBox(canvas, page, this.highlightStart, point);
 			}
 		}
 
 		this.previousPoint = point;
+	},
+
+	doStart: function(event, canvas, page) {
+		var self = this;
+
+		/**
+		 * If the user taps/clicks and holds, see if they are over a highlight and then delete it.
+		 */
+		this.tapAndHoldTimeout = setTimeout(function() {
+			self.isMouseDown = false;
+			self.trackingTouchId = null;
+
+			var party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
+			var color = Party.getCurrentColor() || SignBox.partyColor;
+			var point = self._scalePoint(self.previousPoint);
+			var highlight = Draw.isPointInsideAnyBox(point, page.unsavedHighlights[party]);
+
+			if (highlight) {
+				var index = page.unsavedHighlights[party].indexOf(highlight);
+				page.unsavedHighlights[party].splice(index, 1);
+				Draw.draw(canvas, page);
+			}
+		}, self.tapAndHoldDuration);
 	},
 
 	dragCanvas: function(canvas, oldPoint, newPoint) {
@@ -187,90 +180,15 @@ var Sign = {
 		}
 	},
 
-	// Rename me
-	draw: function(canvas, page) {
-		this.clearCanvas(canvas, page);
-
-		for (var i = 0; i < page.lines.length; i++) {
-			if (page.lines[i] == this.LINEBREAK) {
-				continue;
-			}
-			this.drawLine(canvas, page.lines[i]);
-		}
-
-		// Only draw the highlights when we are requesting signatures
-		if (Party.isRequestingSignatures()) {
-			var activePartyId = Party.getSelectedPartyRow().attr('id');
-
-			// Merge saved and unsaved highlights.
-			var highlights = $.extend(true, {}, this.currentPage().savedHighlights);
-			$.each(this.currentPage().unsavedHighlights, function(key, value) { 
-				highlights[key] = $.merge(highlights[key] || [], value);
-			});
-
-			for (var party in highlights) {
-				// If we are highlighting and this party is the active party or if we are not highlighting, use the dark opacity.
-				// Otherwise use the lighter opacity.
-				var useHighlight = (party == activePartyId || !Party.isHighlighting());
-
-				for (var i = 0; i < highlights[party].length; i++) {
-					this.highlight(canvas, page, highlights[party][i], Party.getPartyColor(party), useHighlight ? this.highlightOpacity : this.lowlightOpacity);
-				}
-			}
-		}
-	},
-
-	drawLine: function(canvas, line, strokeStyle) {
-		var context = canvas.getContext('2d');
-		strokeStyle = strokeStyle || 'rgba(0, 128, 0, 1)';
-
-		context.strokeStyle = strokeStyle;
-		context.lineJoin = 'round';
-		context.lineWidth = 1.5;
-		context.beginPath();
-		context.moveTo(line.start.x, line.start.y);
-		context.lineTo(line.end.x, line.end.y);
-		context.closePath();
-		context.stroke();
-	},
-
 	drawBox: function(canvas, page, point1, point2) {
-		var corners = this._normalizeCorners(point1, point2);
+		var corners = Draw.normalizeCorners(point1, point2);
 
-		this.$box.offset({left:corners.upperLeftCorner.x, top:corners.upperLeftCorner.y});
-		this.$box.width(corners.lowerRightCorner.x - corners.upperLeftCorner.x);
-		this.$box.height(corners.lowerRightCorner.y - corners.upperLeftCorner.y);
+		this.$box.offset({left:corners.left, top:corners.top});
+		this.$box.width(corners.width);
+		this.$box.height(corners.height);
 	},
 
-	highlight: function(canvas, page, corners, color, opacity) {
-		// If the color isn't set, the highlight will be invisible
-		color = color || "rgba(255, 255, 255, 0)";
-		opacity = opacity || this.highlightOpacity;
-
-		var context = canvas.getContext('2d');
-		var width = corners.lowerRightCorner.x - corners.upperLeftCorner.x;
-		var height = corners.lowerRightCorner.y - corners.upperLeftCorner.y;
-
-		context.fillStyle = color;
-		context.globalAlpha = opacity;
-		context.fillRect(corners.upperLeftCorner.x, corners.upperLeftCorner.y, width, height);
-	},
-
-	_normalizeCorners: function(point1, point2) {
-		return {
-			upperLeftCorner: {
-				x: Math.min(point1.x, point2.x), 
-				y: Math.min(point1.y, point2.y)
-			},
-
-			lowerRightCorner: {
-				x: Math.max(point1.x, point2.x), 
-				y: Math.max(point1.y, point2.y)
-			}
-		}
-	},
-
-	realSetupCanvas: function(canvas, page) {
+	_realSetupCanvas: function(canvas, page) {
 		this.currentPageNumber = page.pageNumber;
 
 		$('#right-arrow a').attr('href', '#' + Math.min(Document.pageCount, page.pageNumber + 1));
@@ -291,13 +209,14 @@ var Sign = {
 
 		$('#page-number').text(this.currentPageNumber + '/' + Document.pageCount);
 
-		this.viewArea(canvas, page, this.ORIGIN, {x:page.background.width, y:page.background.height}, 'width');
-		this.draw(canvas, page);
-	},
-
-	_round: function(number, places) {
-		places = places || 1
-		return parseFloat(number.toFixed(places));
+		this._zoomEvent(canvas, page, $('#slider').slider('value'));
+		var $canvas = $(canvas);
+		var headerHeight = $('.container').height() + $('#buttonPanel').height();
+		// center the canvas.
+		this.dragCanvas(canvas,
+				{x: this.scrollCanX, y: this.scrollCanY},
+				{x: (this.$main.width() - $canvas.width()) / 2, y: headerHeight});
+		Draw.draw(canvas, page);
 	},
 
 	_scaleCorners: function(page) {
@@ -314,14 +233,10 @@ var Sign = {
 
 			for (var i = 0; i < page.unsavedHighlights[party].length; i++) {
 				scaledPage[party][i] = {
-					a: {
-						x:this._round(page.unsavedHighlights[party][i].upperLeftCorner.x * scaleX),
-						y:this._round(page.unsavedHighlights[party][i].upperLeftCorner.y * scaleY)
-					},
-					b: {
-						x:this._round(page.unsavedHighlights[party][i].lowerRightCorner.x * scaleX),
-						y:this._round(page.unsavedHighlights[party][i].lowerRightCorner.y * scaleY)
-					}
+					height: round(page.unsavedHighlights[party][i].height * scaleY),
+					left: round(page.unsavedHighlights[party][i].left * scaleX),
+					width: round(page.unsavedHighlights[party][i].width * scaleX),
+					top: round(page.unsavedHighlights[party][i].top * scaleY)
 				};
 			}
 		}
@@ -339,19 +254,19 @@ var Sign = {
 		var lines = [];
 
 		for (var i = 0; i < page.lines.length; i++) {
-			if (page.lines[i] == this.LINEBREAK) {
-				lines[i] = this.LINEBREAK;
+			if (page.lines[i] == Draw.LINEBREAK) {
+				lines[i] = Draw.LINEBREAK;
 				continue;
 			}
 
 			lines[i] = {
 				a: {
-					x:this._round(page.lines[i].start.x * scaleX),
-					y:this._round(page.lines[i].start.y * scaleY)
+					x: round(page.lines[i].start.x * scaleX),
+					y: round(page.lines[i].start.y * scaleY)
 				},
 				b: {
-					x:this._round(page.lines[i].end.x * scaleX),
-					y:this._round(page.lines[i].end.y * scaleY)
+					x: round(page.lines[i].end.x * scaleX),
+					y: round(page.lines[i].end.y * scaleY)
 				}
 			};
 		}
@@ -359,20 +274,21 @@ var Sign = {
 		return lines;
 	},
 
-	scalePoint: function(point) {
+	_scalePoint: function(point, offset) {
+		offset = offset || {left: this.scrollCanX, top: this.scrollCanY}
 		return {
-			x: (point.x - this.scrollCanX) / this.scale, 
-			y: (point.y - this.scrollCanY) / this.scale
+			x: (point.x - offset.left) / this.scale,
+			y: (point.y - offset.top) / this.scale
 		}
 	},
 
 	setupCanvas: function(canvas, page) {
 		var self = this;
 		if (page.background.complete) {
-			this.realSetupCanvas(canvas, page);
+			this._realSetupCanvas(canvas, page);
 		} else {
 			page.background.addEventListener('load', function() {
-				self.realSetupCanvas(canvas, page);
+				self._realSetupCanvas(canvas, page);
 			}, false);
 		}
 	},
@@ -383,13 +299,13 @@ var Sign = {
 		element.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
 		element.style.OTransform = 'translate(' + x + 'px, ' + y + 'px)';
 	},
-	
+
 	// Given opposite corners of a rectangle, zoom the screen to that area.
 	viewArea: function(canvas, page, point1, point2, scaleBy, center) {
-		var corners = this._normalizeCorners(point1, point2);
+		var corners = Draw.normalizeCorners(point1, point2);
 
-		var newWidth = corners.lowerRightCorner.x - corners.upperLeftCorner.x;
-		var newHeight = corners.lowerRightCorner.y - corners.upperLeftCorner.y;
+		var newWidth = corners.width;
+		var newHeight = corners.height;
 
 		if (scaleBy == 'width') {
 			this.scale = this.$main.width() / newWidth;
@@ -397,8 +313,8 @@ var Sign = {
 			this.scale = this.$main.height() / newHeight;
 		}
 
-		this.scrollCanX = -corners.upperLeftCorner.x * this.scale;
-		this.scrollCanY = -corners.upperLeftCorner.y * this.scale;
+		this.scrollCanX = -corners.left * this.scale;
+		this.scrollCanY = -corners.top * this.scale;
 
 		this.currentWidth = page.background.width * this.scale;
 		this.currentHeight = page.background.height * this.scale;
@@ -406,6 +322,30 @@ var Sign = {
 		canvas.style.height = this.currentHeight + 'px';
 
 		this._transform(canvas, this.scrollCanX, this.scrollCanY);
+	},
+
+	_zoomEvent: function(canvas, page, zoom) {
+		var zoomScale = 1 / zoom;
+
+		var point = this._currentCenter();
+
+		var zoomWidth = zoomScale * this.$main.width();
+		var widthOffset = zoomWidth / 2;
+
+		var zoomHeight = zoomScale * this.$main.height();
+		var heightOffset = zoomHeight / 2;
+
+		var zoomStart = {
+			x: point.x - widthOffset,
+			y: point.y - heightOffset
+		};
+
+		var zoomEnd = {
+			x: point.x + widthOffset,
+			y: point.y + heightOffset
+		};
+
+		this.viewArea(canvas, page, zoomStart, zoomEnd, 'width');
 	},
 
 	// document.js functions
@@ -431,33 +371,38 @@ var Sign = {
 		this.$main = $('#main');
 		this.$box = $('#box');
 		this.can = document.getElementById('can');
+		var $can = $(this.can);
 		this.previousPoint = this.ORIGIN;
 		this.$box.hide();
+		var eventType = $.support.touch ? 'touchend' : 'click'
 
 		if ($.support.touch) {
-			this.can.ontouchstart = function(e) {
+			$can.bind('touchstart', function(event) {
 				if (self.trackingTouchId == null) {
-					self.trackingTouchId = e.touches[0].identifier;
+					var e = event.originalEvent;
+					var touch = e.targetTouches[0];
 
-					self.previousPoint = self._convertEventToPoint(e.touches[0]);
+					self.trackingTouchId = touch.identifier;
+					self.previousPoint = self._convertEventToPoint(touch);
+					self.doStart(e, self.can, self.currentPage());
 				}
-			};
-
-			this.can.ontouchmove = function(e) {
+			}).bind('touchmove', function(event) {
+				var e = event.originalEvent;
 				var currentTouch = null;
+
 				for (var i = 0; i < e.touches.length; i++) {
 					if (self.trackingTouchId == e.touches[i].identifier) {
 						currentTouch = e.touches[i];
 					}
 				}
-	
-				if (currentTouch) {
-					self.doMove(currentTouch);
-				}
-			};
 
-			this.can.ontouchend = function(e) {
+				if (currentTouch) {
+					self.doMove(currentTouch, self.can, self.currentPage());
+				}
+			}).bind('touchend touchcancel', function(event) {
+				var e = event.originalEvent;
 				var currentTouch = null;
+
 				for (var i = 0; i < e.changedTouches.length; i++) {
 					if (self.trackingTouchId == e.changedTouches[i].identifier) {
 						currentTouch = e.changedTouches[i];
@@ -466,69 +411,63 @@ var Sign = {
 
 				if (currentTouch) {
 					self.trackingTouchId = null;
-					self.doEnd(currentTouch);
+					self.doEnd(currentTouch, self.can, self.currentPage());
 				}
-			};
+			});
 		} else {
-			$('#can').mousedown(function(e) {
+			$can.mousedown(function(e) {
 				if (e.which == 1) {
-					self.isPainting = true;
-					self.previousPoint = {x: e.pageX, y: e.pageY};
+					self.isMouseDown = true;
+					self.previousPoint = self._convertEventToPoint(e);
+
+					self.doStart(e, self.can, self.currentPage());
 				}
 			});
 
 			$('#can, #box').mousemove(function(e) {
-				if (self.isPainting) {
-					self.doMove(e);
+				if (self.isMouseDown) {
+					self.doMove(e, self.can, self.currentPage());
+				}
+			}).mouseup(function(e) {
+				if (self.isMouseDown) {
+					self.doEnd(e, self.can, self.currentPage());
+					self.isMouseDown = false;
 				}
 			});
 
-			$('#can, #box').mouseup(function(e) {
-				if (self.isPainting) {
-					self.doEnd(e);
-					self.isPainting = false;
-				}
-			});
-
-			$('#can').mouseleave(function(e) {
-				if (e.toElement.id != 'box' && self.isPainting) {
-					self.doEnd(e);
-					self.isPainting = false;
+			$can.mouseleave(function(e) {
+				if (e.toElement && e.toElement.id != 'box' && self.isMouseDown) {
+					self.doEnd(e, self.can, self.currentPage());
+					self.isMouseDown = false;
 				}
 			});
 		}
 
 		if (navigator.userAgent.match(/iphone|android/i)) {
 			$('h1', '#header').slideUp('fast');
-			$("head").append("<link>");
+			$('head').append('<link>');
 			// TODO: Replace this with grails browser detection
-			var css = $("head").children(":last").attr({
-				rel: "stylesheet",
-				type: "text/css",
-				href: "/document_vault/css/document/iphone.css"
+			var css = $('head').children(':last').attr({
+				rel: 'stylesheet',
+				type: 'text/css',
+				href: '/document_vault/css/document/iphone.css'
 			});
 		}
 
 		$('#clearcan').button({
 			icons: { primary: 'ui-icon-refresh' }
-		}).click(function() {
-			self.currentPage().lines.splice(0, self.currentPage().lines.length);
-			self.draw(self.can, self.currentPage());
+		}).bind(eventType, function(event) {
+			var page = self.currentPage();
+
+			page.lines.splice(0, page.lines.length);
+			page.unsavedHighlights[SignBox.partyName] = [];
+			Draw.draw(self.can, page);
 		});
 
 		$('#undo').button({
 			icons: { primary: 'ui-icon-arrowreturnthick-1-w' }
-		}).click(function() {
-			var splicePoint = self.currentPage().lines.length;
-			for (var i = self.currentPage().lines.length - 2; i >= 0; i--) {
-				if (self.currentPage().lines[i] == self.LINEBREAK || i == 0) {
-					splicePoint = i;
-					break;
-				}
-			}
-			self.currentPage().lines.splice(splicePoint, self.currentPage().lines.length);
-			self.addBreak(self.currentPage());
-			self.draw(self.can, self.currentPage());
+		}).bind(eventType, function(event) {
+			Draw.undo(self.can, self.currentPage());
 		});
 
 		$('#pen').button({
@@ -537,21 +476,14 @@ var Sign = {
 
 		$('#save').button({
 			icons: { primary: 'ui-icon-transferthick-e-w' }
-		}).click(function() {
+		}).bind(eventType, function(event) {
 			$('#confirm-submit').dialog('open');
 		});
 
 		$('#close').button({
 			icons: { primary: 'ui-icon-circle-close' }
-		}).click(function() {
+		}).bind(eventType, function(event) {
 			window.location.href = self.urls.close;
-		});
-
-		$('#zoomWidth').button({
-			icons: { primary: 'ui-icon-arrowthick-2-e-w' }
-		}).click(function() {
-			self.viewArea(self.can, self.currentPage(), self.ORIGIN, {x:self.currentPage().background.width, y:self.currentPage().background.height}, 'width');
-			self.isZoomedIn = false;
 		});
 
 		$('#left-arrow a').button({
@@ -564,7 +496,7 @@ var Sign = {
 			text: false
 		});
 
-		$('.arrow a').click(function() {
+		$('.arrow a').bind(eventType, function(event) {
 			if ($(this).is('.disabled')) {
 				return false;
 			}
@@ -582,9 +514,6 @@ var Sign = {
 
 		window.onorientationchange = function() {
 			window.scrollTo(0, 1);
-			if (!self.isZoomedIn) {
-				$('#zoomWidth').click();
-			}
 		};
 
 		$('.mark').click(function(e) {
@@ -611,7 +540,7 @@ var Sign = {
 			draggable: false,
 			modal: true,
 			open: function(event, ui) {
-				$(".ui-dialog-titlebar-close", $(this).parent()).hide();
+				$('.ui-dialog-titlebar-close', $(this).parent()).hide();
 				$(this).dialog('option', 'buttons', {});
 			},
 			resizable: false
@@ -640,11 +569,45 @@ var Sign = {
 		Document.init($.extend({}, this.urls));
 		$('#print').button({
 			icons: { primary: 'ui-icon-print' }
-		}).click(function() {
+		}).bind(eventType, function(event) {
 			Document.print();
+		});
+
+		$('#slider').slider({
+			min: .5,
+			max: 2,
+			change: function(event, ui) {
+				self._zoomEvent(self.can, self.currentPage(), ui.value);
+			},
+			step: .25,
+			value: .5
+		});
+
+		$('#zoom-in').button({
+			icons: { primary: 'ui-icon-zoomin' },
+			text: false
+		}).bind(eventType, function(event) {
+			var $slider = $('#slider');
+			var value = $slider.slider('value');
+			var step = $slider.slider('option', 'step');
+
+			$slider.slider('value', value + step);
+		});
+
+		$('#zoom-out').button({
+			icons: { primary: 'ui-icon-zoomout' },
+			text: false
+		}).bind(eventType, function(event) {
+			var $slider = $('#slider');
+			var value = $slider.slider('value');
+			var step = $slider.slider('option', 'step');
+
+			$slider.slider('value', value - step);
 		});
 
 		// Load the page indicated by the location hash
 		$(window).hashchange();
+
+		SignBox.init(this);
 	}
 };

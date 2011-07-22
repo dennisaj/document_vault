@@ -101,7 +101,7 @@ var Party = {
 	},
 
 	getSelectedPartyRow: function() {
-		return $('[name="selectedParty"]:checked', '#party-container').parent();
+		return $('[name="selectedParty"]:checked:visible', '#party-container').parent();
 	},
 
 	_getTargetRow: function($target) {

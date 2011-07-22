@@ -19,7 +19,7 @@ class HighlightServiceSpec extends UnitSpec {
 	def "test fromJsonList"() {
 		given:
 			def party = new Party(id:1)
-			def l = [JSONObject.NULL, [[a:[x:10, y:20], b:[x:30, y:40]], JSONObject.NULL, null], JSONObject.NULL, [JSONObject.NULL, [a:[x:50, y:60], b:[x:70, y:80]], null]]
+			def l = [JSONObject.NULL, [[left:10, top:20, width:30, height:40], JSONObject.NULL, null], JSONObject.NULL, [JSONObject.NULL, [left:50, top:60, width:70, height:80], null]]
 		when:
 			def out = service.fromJsonList(party, l)
 		then:
@@ -27,28 +27,28 @@ class HighlightServiceSpec extends UnitSpec {
 
 			out[0].pageNumber == 1
 			out[0].party == party
-			out[0].lowerRightX == l[1][0].b.x
-			out[0].lowerRightY == l[1][0].b.y
-			out[0].upperLeftX == l[1][0].a.x
-			out[0].upperLeftY == l[1][0].a.y
+			out[0]._left == l[1][0].left
+			out[0].top == l[1][0].top
+			out[0].width == l[1][0].width
+			out[0].height == l[1][0].height
 
 			out[1].pageNumber == 3
 			out[1].party == party
-			out[1].lowerRightX == l[3][1].b.x
-			out[1].lowerRightY == l[3][1].b.y
-			out[1].upperLeftX == l[3][1].a.x
-			out[1].upperLeftY == l[3][1].a.y
+			out[1]._left == l[3][1].left
+			out[1].top == l[3][1].top
+			out[1].width == l[3][1].width
+			out[1].height == l[3][1].height
 	}
 
 	def "test fromMap"() {
 		given:
-			def m = [a:[x:10, y:20], b:[x:30, y:40]]
+			def m = [left:1, top:2, width:3, height:4]
 		when:
 			def h = service.fromMap(m)
 		then:
-			h.lowerRightX == m.b.x
-			h.lowerRightY == m.b.y
-			h.upperLeftX == m.a.x
-			h.upperLeftY == m.a.y
+			h._left == m.left
+			h.top == m.top
+			h.width == m.width
+			h.height == m.height
 	}
 }

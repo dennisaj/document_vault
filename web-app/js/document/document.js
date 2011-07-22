@@ -245,14 +245,10 @@ var Document = {
 			scaledHighlights[partyId] = [];
 			$.each(highlights, function(index, highlight) {
 				scaledHighlights[partyId][index] = {
-					upperLeftCorner: {
-						x:Sign._round(highlight.upperLeftCorner.x * scaleX),
-						y:Sign._round(highlight.upperLeftCorner.y * scaleY)
-					},
-					lowerRightCorner: {
-						x:Sign._round(highlight.lowerRightCorner.x * scaleX),
-						y:Sign._round(highlight.lowerRightCorner.y * scaleY)
-					}
+					height: round(highlight.height * scaleY),
+					left: round(highlight.left * scaleX),
+					width: round(highlight.width * scaleX),
+					top: round(highlight.top * scaleY)
 				};
 			});
 		});
@@ -293,8 +289,6 @@ var Document = {
 					$(this).dialog('close');
 				}
 			},
-			closeOnEscape: false,
-			draggable: false,
 			modal: true,
 			open: function(event, ui) {},
 			resizable: false,

@@ -20,16 +20,11 @@
 		</div>
 		<div class="container">
 			<div id="header" class="span-24 last">
-		  		<h1>Paperless Technologies Document Vault</h1>
-				<div class="last" style="text-align: right">
-					<!--<shiro:isLoggedIn>
-						<a href="${createLink(controller: 'auth', action: 'signOut')}">Logout</a>
-					</shiro:isLoggedIn>-->
-				</div>
+				<h1>Paperless Technologies Document Vault</h1>
 			</div>
 		</div>
-   		<g:render template="/layouts/messages" />
+		<g:render template="/layouts/messages" />
 		<g:layoutBody />
-	   <r:layoutResources/>
+		<r:layoutResources/>
 	</body>
 </html>

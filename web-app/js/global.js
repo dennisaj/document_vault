@@ -4,6 +4,11 @@ String.prototype.format = function () {
 	return this.replace(/\{(\d+)\}/g, function (m, n) { return args[n]; });
 };
 
+function round(number, places) {
+	places = places || 1
+	return parseFloat(number.toFixed(places));
+}
+
 $.extend({
 	htmlEncode: function(value) {
 		return $('<div/>').text(value).html();

@@ -122,3 +122,24 @@ div#buttonPanel {
 .party .errors {
 	color: red;
 }
+
+#slider {
+	display: inline-block;
+	margin-bottom: auto;
+	margin-left: .5em;
+	margin-right: .5em;
+	margin-top: auto;
+	width: 12em;
+}
+
+#slider-container {
+	position: absolute;
+	right: 2em;
+	top: 10em;
+	z-index: 11;
+}
+
+.ui-dialog, .ui-widget-overlay {
+	-webkit-tap-highlight-color: 0;
+	-webkit-touch-callout: none;
+}

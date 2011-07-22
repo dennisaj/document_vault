@@ -1,3 +1,4 @@
+
 var PreviewImage = {
 	show: function(uri) {
 		$('body').append('<div id="preview"></div>');
@@ -16,7 +17,6 @@ var PreviewImage = {
 					$imageDialog.dialog('close');
 				});
 			},
-			position: 'center',
 			resizable: false,
 			width: 'auto'
 		});
@@ -25,7 +25,10 @@ var PreviewImage = {
 		image.src = uri;
 
 		var load = function() {
-			$imageDialog.html($(image).width(Math.min(600, image.width))).dialog('option', 'position', 'center');
+			$imageDialog.html($(image).width(Math.min(600, image.width)));
+
+			// Tiny timeout before re-centering to help out Chrome.
+			setTimeout(function() {$imageDialog.dialog('option', 'position', 'center')}, 2);
 		};
 
 		if (image.complete) {
