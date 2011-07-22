@@ -47,6 +47,12 @@ class BootStrap {
 					}
 				}
 			}
+
+			String ip = InetAddress.getLocalHost().getHostAddress()
+			def tenant = DomainTenantMap.findByDomainName(ip)
+			if (!tenant) {
+				new DomainTenantMap(domainName: ip, mappedTenantId: 1, name: "default").save()
+			}
 		}
 
 		DomainTenantMap.list().each {
