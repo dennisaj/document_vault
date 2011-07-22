@@ -31,16 +31,17 @@ class UploadController {
 				files.each { mpf ->
 					def is = mpf.inputStream
 					is.withStream {
-						def document = uploadService.uploadInputStream(is, group, mpf.originalFilename, mpf.contentType)
+						def documents = uploadService.uploadInputStream(is, group, mpf.originalFilename, mpf.contentType)
 
-						if (document) {
-							def url = g.createLink(controller:"document", action:"show", params:[documentId:document.id])
-							results.add([name:document.toString(), size:document.files.first().fileSize, url:url])
+						if (documents) {
+							documents.each { document ->
+								def url = g.createLink(controller:"document", action:"show", params:[documentId:document.id])
+								results.add([name:document.toString(), size:document.files.first().fileSize, url:url])
+							}
 						} else {
 							def error = g.message(code:"document-vault.upload.error.unsupportedfile", args:[FileHelpers.getExtension(mpf.originalFilename)])
 							results.add([name:mpf.originalFilename, size:0, error:error])
 						}
-
 					}
 				}
 			}
@@ -53,22 +54,24 @@ class UploadController {
 	}
 
 	def savePcl = {
-		def document
+		def documents
 
 		try {
 			def group = authService.getGroupsWithPermission([DocumentPermission.Upload]).find { it }
 			assert group, "The user must be able to upload to at least one group"
 			def now = new Date()
 			def fileName = String.format("%tF %tT.pcl", now, now)
-			document = uploadService.uploadDocument(params.data?.bytes, group, fileName, MimeType.PCL)
+			documents = uploadService.uploadDocument(params.data?.bytes, group, fileName, MimeType.PCL)
 		} catch (Throwable e) {
 			log.error("Unable to save uploaded document", e)
 		}
 
-		if (document) {
+		if (documents) {
 			response.status = 200
-			render "Document ${document.id} saved\n"
-			log.info "Saved document ${document.id}"
+			documents.each { document ->
+				render "Document ${document.id} saved\n"
+				log.info "Saved document ${document.id}"
+			}
 		} else {
 			response.status = 500
 			render "Error saving file\n"

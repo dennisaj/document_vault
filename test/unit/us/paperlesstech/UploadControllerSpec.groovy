@@ -47,7 +47,7 @@ class UploadControllerSpec extends ControllerSpec {
 
 		then:
 		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> ([new Group()] as Set)
-		1 * uploadService.uploadDocument(_, _, _, _) >> doc
+		1 * uploadService.uploadDocument(_, _, _, _) >> [doc]
 		mockResponse.status == 200
 		mockResponse.contentAsString.contains("42")
 	}
@@ -152,7 +152,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.save()
 
 		then:
-		1 * uploadService.uploadInputStream(_, group, _, _) >> d
+		1 * uploadService.uploadInputStream(_, group, _, _) >> [d]
 		if (ajax) {
 			def json = JSON.parse(mockResponse.contentAsString)
 			assert json.size() == 1

@@ -2,6 +2,8 @@ package us.paperlesstech
 
 import grails.plugins.nimble.core.Group
 import us.paperlesstech.helpers.FileHelpers
+import us.paperlesstech.helpers.PclInfo
+import us.paperlesstech.helpers.PclDocument
 
 class UploadService {
 	static transactional = true
@@ -11,7 +13,7 @@ class UploadService {
 	def fileService
 	def handlerChain
 
-	Document uploadInputStream(InputStream is, Group group, String name, String contentType) {
+	List<Document> uploadInputStream(InputStream is, Group group, String name, String contentType) {
 		MimeType mimeType = MimeType.getMimeType(mimeType: contentType, fileName: name)
 
 		if (mimeType) {
@@ -21,20 +23,35 @@ class UploadService {
 		return null
 	}
 
-	Document uploadDocument(byte[] data, Group group, String name, MimeType mimeType) {
+	List<Document> uploadDocument(byte[] data, Group group, String name, MimeType mimeType) {
 		assert authService.canUpload(group)
 		assert data
 		assert mimeType
+		def pclInfo
 
-		try {
+		def save = { PclDocument pclDocument ->
 			Document document = new Document()
 			document.group = group
 			document.name = FileHelpers.chopExtension(name)
-			handlerChain.importFile(document: document, documentData: new DocumentData(mimeType: mimeType), bytes: data)
+			handlerChain.importFile(document: document, documentData: new DocumentData(mimeType: mimeType), bytes: data,
+					pclDocument: pclDocument)
 			assert document.save(flush: true)
 
 			log.info "Saved document ${document.id}"
 			return document
+		}
+
+		try {
+			if (mimeType == MimeType.PCL) {
+				pclInfo = new PclInfo()
+				pclInfo.parse(data: data)
+
+				return pclInfo.documents.collect { pclDocument ->
+					save.call(pclDocument)
+				}
+			} else {
+				return [save.call()]
+			}
 		} catch (Exception e) {
 			log.error("Unable to save uploaded document", e)
 		}

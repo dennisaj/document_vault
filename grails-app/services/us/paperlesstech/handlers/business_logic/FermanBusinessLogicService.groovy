@@ -2,14 +2,29 @@ package us.paperlesstech.handlers.business_logic
 
 import us.paperlesstech.handlers.Handler
 import us.paperlesstech.handlers.PclHandlerService
+import us.paperlesstech.helpers.PclDocument
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import us.paperlesstech.TagService
 
 class FermanBusinessLogicService {
 	static transactional = true
 	PclHandlerService pclHandlerService
+	TagService tagService
 
 	enum FermanDocumentTypes {
-		CustomerHardCopy,
-		Other
+		CustomerHardCopy(~/20901|20913/),
+		Other(null)
+
+		private final Pattern pattern
+
+		private FermanDocumentTypes(Pattern pattern) {
+			this.pattern = pattern
+		}
+
+		boolean matches(String input) {
+			pattern?.matcher(input)?.matches()
+		}
 	}
 
 	void afterPCLImportFile(Map input) {
@@ -21,6 +36,7 @@ class FermanBusinessLogicService {
 				def value = savedDocument.searchField(it)
 				if (value) {
 					log.info "Creating tag $value"
+					tagService.createTag(value)
 					savedDocument.addTag(value)
 					log.info "Added tag $value to document $d"
 				}
@@ -31,16 +47,18 @@ class FermanBusinessLogicService {
 
 	void beforePCLImportFile(Map input) {
 		def d = Handler.getDocument(input)
+		def pclDocument = input.pclDocument
+		assert pclDocument
 
-		FermanDocumentTypes t = getDocumentType(input.bytes)
+		FermanDocumentTypes t = getDocumentType(pclDocument)
 
 		def m = [:]
 		switch (t) {
 			case FermanDocumentTypes.Other:
-				m.raw = parseOther(input.bytes)
+				m.raw = parseOther(pclDocument)
 				break
 			case FermanDocumentTypes.CustomerHardCopy:
-				m = parseCustomerHardCopy(input.bytes)
+				m = parseCustomerHardCopy(pclDocument)
 				break
 			default:
 				throw new IllegalArgumentException("Unknown type: $t")
@@ -58,13 +76,9 @@ class FermanBusinessLogicService {
 		log.debug "Imported fields ($m)"
 	}
 
-	public FermanDocumentTypes getDocumentType(byte[] bytes) {
-		String data = pclHandlerService.pclToString(bytes, false)
-
-		FermanDocumentTypes type = FermanDocumentTypes.Other
-		if (data.contains("&f20901y") || data.contains("&f20913y")) {
-			type = FermanDocumentTypes.CustomerHardCopy
-		}
+	public FermanDocumentTypes getDocumentType(PclDocument pclDocument) {
+		String macro = pclDocument.pages[0].macro
+		FermanDocumentTypes type = FermanDocumentTypes.values().find { it.matches(macro) } ?: FermanDocumentTypes.Other
 
 		type
 	}
@@ -78,9 +92,9 @@ class FermanBusinessLogicService {
 		return line[start..<Math.min(end + 1, length)].trim()
 	}
 
-	Map parseCustomerHardCopy(byte[] bytes) {
-		String data = pclHandlerService.pclToString(bytes)
-		def lines = data.split(/\r\n|\n/).toList()
+	Map parseCustomerHardCopy(PclDocument pclDocument) {
+		// Since the data that we are extracting is duplicated on each page, currently we only extract the first page
+		def lines = pclDocument.pages[0].pageData.readLines()
 
 		lines = lines.reverse()
 
@@ -94,7 +108,12 @@ class FermanBusinessLogicService {
 		if (!line.trim())
 			line = lines.pop()
 		m["RO_Open_Date"] = getField(line, 55, 67)
-		m["RO_Number"] = getField(line, 68, 79)
+		String tmp = getField(line, 68, 79)
+		def idx = tmp.indexOf('/')
+		if (idx >= 0) {
+			tmp = tmp[0..<idx]
+		}
+		m["RO_Number"] = tmp
 
 		// Skip one line
 		lines.pop()
@@ -154,8 +173,12 @@ class FermanBusinessLogicService {
 		m
 	}
 
-	String parseOther(byte[] bytes) {
-		String data = pclHandlerService.pclToString(bytes)
+	String parseOther(PclDocument pclDocument) {
+		StringBuilder builder = new StringBuilder()
+		pclDocument.pages.each {
+			builder << it.pageData
+		}
+		String data = builder.toString()
 
 		def m = data =~ /(?m)(\S+)/
 		def lines = m*.getAt(1)

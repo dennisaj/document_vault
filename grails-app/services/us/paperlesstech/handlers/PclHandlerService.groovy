@@ -2,60 +2,51 @@ package us.paperlesstech.handlers
 
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
+import org.springframework.core.io.ClassPathResource
+import us.paperlesstech.helpers.FileHelpers
+import us.paperlesstech.helpers.PclDocument
 
 class PclHandlerService extends Handler {
 	static handlerFor = [MimeType.PCL]
+	static pcl2pdf = new ClassPathResource("scripts/pcl2pdf.sh").file.absolutePath
 	static transactional = true
 	def handlerChain
 
-	byte[] createPdf(DocumentData d) {
+	byte[] createPdf(DocumentData d, PclDocument pclDocument) {
 		assert d.mimeType == MimeType.PCL
 
-		String pclFile = fileService.getAbsolutePath(d)
-		File pdfFile = File.createTempFile("pcl2pdf", ".pdf")
+		String pclPath = fileService.getAbsolutePath(d)
+		File pdfFile = new File(FileHelpers.chopExtension(pclPath, ".pcl") + ".pdf")
 
 		try {
-			// TODO FirstPage is only 3 when the file has the logos appended to the head of the pcl
-			def cmd = """/usr/local/bin/pcl6 -dSAFER -dNOPAUSE -dBATCH -dFirstPage=3 -sDEVICE=pdfwrite -sOutputFile=${pdfFile.getAbsolutePath()} ${pclFile}"""
+			def cmd = """/bin/bash $pcl2pdf $pclPath ${pclDocument.startPage} ${pclDocument.endPage}"""
 			log.debug "PDF create - ${cmd}"
 			def proc = cmd.execute()
 			proc.waitFor()
 			if (proc.exitValue()) {
-				throw new RuntimeException("Unable to process file for document ${d.id} - PCL to PDF conversion failed")
+				throw new RuntimeException("Unable to process file for document ${d.id} - PCL to PDF conversion failed: $cmd")
 			}
 
 			return pdfFile.bytes
 		} finally {
-			pdfFile?.delete()
+			pdfFile.delete()
 		}
 	}
 
 	@Override
 	void importFile(Map input) {
 		def d = getDocument(input)
+		def pclDocument = input.pclDocument
+		assert pclDocument
 
 		def data = fileService.createDocumentData(mimeType: MimeType.PCL, bytes: input.bytes)
 		d.addToFiles(data)
 
-		input.bytes = createPdf(data)
+		input.bytes = createPdf(data, pclDocument)
 		handlerChain.importFile(document: d, documentData: new DocumentData(mimeType: MimeType.PDF), bytes: input.bytes)
 		input.bytes = null
 
 		assert d.files.size() == 2
 		assert d.previewImages.size() == d.files.first().pages
-	}
-
-	String pclToString(byte[] bytes, boolean skipPclHeader = true) {
-		String text = new String(bytes)
-
-		// The text starts after the first double blank line
-		if (skipPclHeader) {
-			def startOfText = text.indexOf("\n\n")
-			if (startOfText < 0)
-				startOfText = text.indexOf("\r\n\r\n")
-			text = text.substring(startOfText)
-		}
-
-		return text
 	}
 }

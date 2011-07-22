@@ -26,13 +26,13 @@ class UploadServiceSpec extends UnitSpec {
 	def "uploadInputStream should pass through mimeType"() {
 		given:
 		def d = new Document()
-		service.metaClass.uploadDocument = { byte[] bytes, Group group, String name, MimeType mimeType -> d }
+		service.metaClass.uploadDocument = { byte[] bytes, Group group, String name, MimeType mimeType -> [d] }
 
 		when:
 		def result = service.uploadInputStream(null as InputStream, new Group(), "file.pdf", "application/pdf")
 
 		then:
-		result == d
+		result == [d]
 	}
 
 	def "uploadDocument verifies the user can upload"() {
@@ -77,6 +77,6 @@ class UploadServiceSpec extends UnitSpec {
 			capturedDoc.metaClass.save = { capturedDoc }
 			capturedDoc.addToFiles(new DocumentData())
 		}
-		returnedDoc == capturedDoc
+		returnedDoc == [capturedDoc]
 	}
 }
