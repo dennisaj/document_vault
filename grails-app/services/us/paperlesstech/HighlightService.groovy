@@ -52,7 +52,7 @@ class HighlightService {
 
 	Highlight fromMap(Map corners) {
 		new Highlight(
-			_left:corners.left,
+			left:corners.left,
 			top:corners.top,
 			width:corners.width,
 			height:corners.height)

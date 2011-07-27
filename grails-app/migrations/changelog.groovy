@@ -798,7 +798,7 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "top", type: "integer") {
+			column(name: "_top", type: "integer") {
 				constraints(nullable: "false")
 			}
 
