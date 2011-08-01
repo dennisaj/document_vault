@@ -77,7 +77,7 @@ class BootStrap {
 
 		if (System.properties["flea.config.location"]) {
 			// Make sure we can parse the Config outside of the thread so the bootstrap will fail on error
-			def fleaConfig = new groovy.util.ConfigSlurper().parse(new File(System.properties["flea.config.location"])).toURL()
+			def fleaConfig = new groovy.util.ConfigSlurper().parse(new File(System.properties["flea.config.location"]).toURL())
 			def fleaThread = Thread.start {
 				Flea.config = fleaConfig
 				Flea.main()
