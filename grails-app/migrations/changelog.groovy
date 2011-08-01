@@ -274,6 +274,8 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
+			column(name: "external_id", type: "varchar(255)")
+
 			column(name: "last_updated", type: "timestamp")
 
 			column(name: "name", type: "varchar(255)") {
@@ -730,6 +732,8 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
+			column(name: "external_id", type: "varchar(255)")
+
 			column(name: "federated", type: "bit") {
 				constraints(nullable: "false")
 			}
@@ -916,6 +920,14 @@ databaseChangeLog = {
 
 			column(name: "name")
 		}
+
+		createIndex(indexName: "group_description_idx", tableName: "groups") {
+			column(name: "description")
+		}
+
+		createIndex(indexName: "group_external_id_idx", tableName: "groups") {
+			column(name: "external_id")
+		}
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-41") {
@@ -961,6 +973,10 @@ databaseChangeLog = {
 			column(name: "tenant_id")
 
 			column(name: "username")
+		}
+
+		createIndex(indexName: "user_external_id_idx", tableName: "users") {
+			column(name: "external_id")
 		}
 	}
 

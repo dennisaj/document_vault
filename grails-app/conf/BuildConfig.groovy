@@ -1,3 +1,5 @@
+//Uncomment the following to use a local version of nimble
+//grails.plugin.location.nimble = "../nimble"
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
@@ -46,6 +48,7 @@ grails.project.dependency.resolution = {
 		compile group:'net.java.dev.jai-imageio', name:'jai-imageio-core-standalone', version:'1.2-pre-dr-b04-2010-04-30'
 		compile group:'com.amazonaws', name:'aws-java-sdk', version:'1.2.2'
 		compile group:'c3p0', name:'c3p0', version:'0.9.1.2'
+		test group:'org.objenesis', name:'objenesis', version:'1.2'
 	}
 }
 
