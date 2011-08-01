@@ -1,14 +1,11 @@
 package us.paperlesstech
 
-import grails.plugins.nimble.InstanceGenerator
 import grails.plugins.nimble.core.Permission
-import grails.plugins.nimble.core.Role
 
 import java.text.ParseException
 
 class PartyService {
 	static final String dateFormat = 'MM/dd/yyyy'
-	static final List validChars = ["abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "123457890", '!@#$%&+=-']
 	static transactional = true
 
 	def authServiceProxy
@@ -16,7 +13,6 @@ class PartyService {
 	def handlerChain
 	def highlightService
 	def permissionService
-	def roleService
 	def userService
 
 	/**
@@ -280,46 +276,6 @@ class PartyService {
 	private User getSignator(String fullName, String email) {
 		def profile = Profile.findByEmail(email)
 
-		profile ? profile.owner : createUser(fullName, email)
-	}
-
-	private User createUser(String fullName, String email) {
-		def password = generatePassword()
-		def user = InstanceGenerator.user()
-		user.profile = InstanceGenerator.profile()
-
-		user.username = email
-		user.enabled = true
-		user.external = false
-		user.pass = password
-		user.passConfirm = password
-
-		user.profile.fullName = fullName
-		user.profile.email = email
-		user.profile.owner = user
-
-		def savedUser = userService.createUser(user)
-		if (savedUser.hasErrors()) {
-			return user
-		}
-
-		roleService.addMember(savedUser, Role.findByName(User.SIGNATOR_USER_ROLE))
-		savedUser
-	}
-
-	def generatePassword() {
-		Random rnd = new Random()
-
-		def password = []
-
-		while (password.size() < grailsApplication.config.nimble.passwords.minlength) {
-			validChars.each {str->
-				password += str.charAt(Math.abs(rnd.nextInt() % str.length()))
-			}
-		}
-
-		Collections.shuffle(password, rnd)
-
-		return password.join()
+		profile ? profile.owner : userService.createUser(username: email, fullName: fullName, email: email, addSignatorRole: true)
 	}
 }

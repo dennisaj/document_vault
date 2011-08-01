@@ -1,9 +1,10 @@
-package us.paperlesstech
+package us.paperlesstech.auth
 
 import org.apache.shiro.authc.AccountException
 import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.authc.UnknownAccountException
+import us.paperlesstech.Party
 
 class CodeRealm {
 	static authTokenClass = us.paperlesstech.auth.CodeToken

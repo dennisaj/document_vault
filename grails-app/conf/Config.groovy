@@ -1,3 +1,5 @@
+// Without this line LDAP started randomly failing for me
+grails.naming.entries = null
 // When true, saving a domain object throws an exception on save errors.
 //grails.gorm.failOnError = false
 
