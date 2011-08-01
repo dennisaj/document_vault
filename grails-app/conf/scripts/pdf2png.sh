@@ -4,7 +4,7 @@ PDF=$1
 
 if [ -z $PDF ] || [ ! -r $PDF ]; then
 	echo "Usage: $0 pdfName"
-	exit
+	exit 1
 fi
 
 BASEDIR=$(dirname "$PDF")
@@ -30,3 +30,5 @@ for i in $(ls $BASENAME*.png)  ; do
 		exit 1
 	fi
 done
+
+exit 0

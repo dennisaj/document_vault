@@ -36,6 +36,7 @@ class PdfHandlerService extends Handler {
 			def proc = cmd.execute()
 			proc.waitFor()
 			if (proc.exitValue()) {
+				log.error proc.getErrorStream().text
 				throw new RuntimeException("""Unable to generate preview for document ${d.id} - PDF to PNG conversion failed. Command: '$cmd'""")
 			}
 
