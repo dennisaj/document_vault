@@ -153,7 +153,7 @@ class DocumentController {
 
 	def thumbnail = {
 		def document = Document.get(params.long("documentId"))
-		def documentData = document?.previewImages?.find { it.thumbnail.id == params.long("documentDataId")}
+		def documentData = document?.previewImages?.find { it.thumbnail.id == params.long("documentDataId") }
 		if (!document || !documentData) {
 			response.status = 404
 			return

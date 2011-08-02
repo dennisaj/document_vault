@@ -23,7 +23,7 @@ var Party = {
 			$('[name="selectedParty"]:first').prop('checked', true).change();
 		}
 
-		Sign.draw(Sign.can, Sign.currentPage());
+		Draw.draw(Sign.can, Sign.currentPage());
 	},
 
 	canChangeColor: function($partyRow) {
@@ -142,7 +142,7 @@ var Party = {
 		var $party = this._getTargetRow($(event.target));
 
 		$party.children('.color').prop('disabled', !this.canChangeColor($party));
-		Sign.draw(Sign.can, Sign.currentPage());
+		Draw.draw(Sign.can, Sign.currentPage());
 	},
 
 	setupParty: function($party) {
@@ -182,7 +182,7 @@ var Party = {
 
 		$('.color', $party).bind('change keyup', function(event) {
 			self.refreshHighlightButton();
-			Sign.draw(Sign.can, Sign.currentPage());
+			Draw.draw(Sign.can, Sign.currentPage());
 		});
 
 		$party.children('.color').prop('disabled', !this.canChangeColor($party));
@@ -247,7 +247,7 @@ var Party = {
 			icons: { primary: 'ui-icon-flag' }
 		}).button('disable').click(function(event) {
 			// Refresh the canvas when the highlight button is disabled/enabled.
-			Sign.draw(Sign.can, Sign.currentPage());
+			Draw.draw(Sign.can, Sign.currentPage());
 		});
 
 		$('#get-signed').button({
@@ -269,7 +269,7 @@ var Party = {
 				self.refreshHighlightButton();
 			}
 
-			Sign.draw(Sign.can, Sign.currentPage());
+			Draw.draw(Sign.can, Sign.currentPage());
 		});
 
 		$('#show-highlights').button({
@@ -285,7 +285,7 @@ var Party = {
 				$this.addClass('ui-state-highlight');
 			}
 
-			Sign.draw(Sign.can, Sign.currentPage());
+			Draw.draw(Sign.can, Sign.currentPage());
 		});
 
 		$('#party-message').dialog({

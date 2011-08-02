@@ -19,9 +19,7 @@ hr {
 }
 
 div#main {
-	-webkit-backface-visibility: hidden;
-	-webkit-transition: all 500ms ease;
-	background: #fff;
+	background: white;
 	height: 100%;
 	left: 0;
 	position: absolute;
@@ -32,7 +30,6 @@ div#main {
 
 canvas#can {
 	-webkit-user-select: none;
-	background: #f0f0f0;
 	border: 1px solid #444;
 	left: 0;
 	position: absolute;
@@ -40,11 +37,53 @@ canvas#can {
 	z-index: 2;
 }
 
+.flip-container {
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	height: 100%;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}
+
+.flip-container.flip .front {
+	top: 2000px !important;
+	visibility: hidden;
+}
+
+#button-container {
+	position: relative !important;
+}
+
+.flip-container.flip .back {
+	top: 0;
+	visibility: visible;
+}
+
+.face {
+	-moz-transition-duration: .5s;
+	-moz-transition-timing-function: ease-in-out;
+	-ms-transition-duration: .5s;
+	-ms-transition-timing-function: ease-in-out;
+	-o-transition-duration: .5s;
+	-o-transition-timing-function: ease-in-out;
+	-webkit-transition-duration: .5s;
+	-webkit-transition-timing-function: ease-in-out;
+	transition-duration: .5s;
+	transition-timing-function: ease-in-out;
+}
+
+.back {
+	top: -2000px;
+	visibility: hidden;
+}
+
 div#buttonPanel {
-	background: #fff;
+	background: white;
 	height: auto;
 	left: 0;
-	position: relative;
+	position: absolute;
 	width: 100%;
 	z-index: 10;
 }
@@ -52,7 +91,7 @@ div#buttonPanel {
 .arrow {
 	margin: 0;
 	padding: 0;
-	position: fixed;
+	position: absolute;
 	text-align: center;
 	top: 45%;
 	z-index: 10;
@@ -79,17 +118,18 @@ div#buttonPanel {
 }
 
 #box {
-	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
 	cursor: crosshair;
 	opacity: .7;
 }
 
 #page-container {
-	border-bottom: 1px #ddd solid
+	border-bottom: 1px #ddd solid;
+	margin-bottom: 0;
 }
 
 #request-signature {
-	background: #fff;
+	background: white;
 	bottom: 0;
 	border-top: 1px black solid;
 	height: auto;

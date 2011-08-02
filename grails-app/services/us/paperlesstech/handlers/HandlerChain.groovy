@@ -65,6 +65,22 @@ class HandlerChain extends Handler {
 		handle("download", input)
 	}
 
+	@Override
+	def saveNotes(Map input) {
+		def document = getDocument(input)
+		assert authServiceProxy.canNotes(document)
+
+		handle("saveNotes", input)
+	}
+
+	@Override
+	def downloadNote(Map input) {
+		def document = getDocument(input)
+		assert authServiceProxy.canNotes(document)
+
+		handle("downloadNote", input)
+	}
+
 	private def handle(String methodName, Map input) {
 		def document = getDocument(input)
 		def data = input.documentData ?: document.files.first()

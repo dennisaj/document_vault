@@ -96,8 +96,8 @@ var SignBox = {
 		// Draw the lines on an in-memory duplicate of the main canvas so that we don't see the highlights.
 		var cleanCanvas = document.createElement('canvas');
 		var cleanPage = $.extend({}, page);
-		cleanCanvas.width = page.background.width;
-		cleanCanvas.height = page.background.height;
+		cleanCanvas.width = cleanPage.background.width;
+		cleanCanvas.height = cleanPage.background.height;
 		cleanPage.unsavedHighlights = [];
 		cleanPage.savedHighlights = [];
 
@@ -118,7 +118,7 @@ var SignBox = {
 
 		cleanCanvas = null;
 		imageData = null;
-		cleanPage = null
+		cleanPage = null;
 
 		// Save the initial image as the background so we can undo.
 		this.page.background = new Image();
@@ -181,7 +181,7 @@ var SignBox = {
 		}
 	},
 
-	init: function(sign) {
+	init: function() {
 		var self = this;
 
 		this.$main = $('#main');
@@ -236,17 +236,13 @@ var SignBox = {
 					var point = Sign._convertEventToPoint(e);
 					self.previousPoint = {x: point.x - $this.offset().left, y: point.y - $this.offset().top};
 				}
-			});
-
-			$('#sign-canvas').live('mousemove', function(e) {
+			}).live('mousemove', function(e) {
 				if (self.isMouseDown) {
 					var point = Sign._convertEventToPoint(e);
 
 					self.doMove(this, point);
 				}
-			});
-
-			$('#sign-canvas').live('mouseup mouseleave', function(e) {
+			}).live('mouseup mouseleave', function(e) {
 				if (self.isMouseDown) {
 					var point = Sign._convertEventToPoint(e);
 					self.doEnd(this, point);

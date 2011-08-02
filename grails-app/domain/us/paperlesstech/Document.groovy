@@ -15,10 +15,12 @@ class Document implements Taggable {
 	SortedSet files
 	Group group
 	String name
+	List notes
 	SortedSet previewImages
 
 	static hasMany = [previewImages: PreviewImage,
 			files: DocumentData,
+			notes: DocumentData,
 			searchFieldsCollection: DocumentSearchField,
 			otherFieldsCollection: DocumentOtherField,
 			parties:Party]
@@ -28,12 +30,14 @@ class Document implements Taggable {
 		files nullable: false, minSize: 1
 		group nullable: false
 		name nullable: true, blank: true
+		notes nullable: true
 		parties nullable: true
 	}
 
 	static mapping = {
-		otherFieldsCollection(cascade: "all, all-delete-orphan")
-		searchFieldsCollection(cascade: "all, all-delete-orphan")
+		notes joinTable:[name:'document_notes']
+		otherFieldsCollection cascade: "all, all-delete-orphan"
+		searchFieldsCollection cascade: "all, all-delete-orphan"
 	}
 	
 	/**

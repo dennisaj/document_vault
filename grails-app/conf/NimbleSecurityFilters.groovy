@@ -49,7 +49,7 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 					def action = actionName ?: "index"
 					log.info("user:$authServiceProxy.authenticatedUser; resource:$controllerName:$action; document:$document")
 					switch (controllerName) {
-						case ["document"]:
+						case "document":
 							switch (action) {
 								case ["download", "image", "show"]:
 									return document && (authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document) || authServiceProxy.canView(document))
@@ -70,6 +70,8 @@ public class NimbleSecurityFilters extends grails.plugins.nimble.security.Nimble
 								default:
 									return false
 							}
+						case "documentNote":
+							return document && (authServiceProxy.canNotes(document))
 						case "printQueue":
 							return document ? authServiceProxy.canPrint(document) : authServiceProxy.canPrintAny()
 						case "tag":

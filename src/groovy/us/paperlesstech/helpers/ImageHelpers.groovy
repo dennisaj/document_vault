@@ -1,5 +1,6 @@
 package us.paperlesstech.helpers
 
+import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
@@ -72,5 +73,14 @@ class ImageHelpers {
 				reader?.dispose()
 			}
 		}
+	}
+
+	static BufferedImage createBlankImage(width, height, background=Color.white) {
+		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+		Graphics2D g2d = bufferedImage.createGraphics()
+
+		g2d.setBackground(background)
+
+		bufferedImage
 	}
 }

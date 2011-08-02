@@ -20,8 +20,9 @@ class ActivityLogService {
 		action = action ?: "index"
 		def documentId = params.remove("documentId")
 		def pageNumber = params.remove("pageNumber")
-		// Don't log signature line data
+		// Don't log signature line or document notes data
 		params.remove("lines")
+		params.remove("notes")
 
 		def activityLog = new ActivityLog(
 				action: "$controller:$action",

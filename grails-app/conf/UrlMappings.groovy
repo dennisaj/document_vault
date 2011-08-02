@@ -19,7 +19,7 @@ class UrlMappings {
 			action = "download"
 		}
 
-		"/document/thumbnail/$documentId/$pageNumber/$documentDataId" {
+		"/document/thumbnail/$documentId/$documentDataId/$pageNumber" {
 			controller = "document"
 			action = "thumbnail"
 		}
@@ -36,6 +36,21 @@ class UrlMappings {
 		"/document/resend/$documentId/$partyId" {
 			controller = "document"
 			action = "resend"
+		}
+
+		"/documentNote/download/$documentId/$documentNoteId" {
+			controller = "documentNote"
+			action = "download"
+		}
+
+		"/documentNote/list/$documentId" {
+			controller = "documentNote"
+			action = "list"
+		}
+
+		"/documentNote/save/$documentId" {
+			controller = "documentNote"
+			action = "save"
 		}
 
 		"/printQueue/push/$printerId/$documentId" {

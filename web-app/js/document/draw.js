@@ -24,7 +24,9 @@ var Draw = {
 
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		canvas.width = canvas.width;
-		context.drawImage(page.background, 0, 0, canvas.width, canvas.height);
+		if (page.background.src) {
+			context.drawImage(page.background, 0, 0, canvas.width, canvas.height);
+		}
 	},
 
 	// Rename me
@@ -135,6 +137,44 @@ var Draw = {
 			top: Math.min(point1.y, point2.y),
 			width: Math.abs(point1.x - point2.x),
 			height: Math.abs(point1.y - point2.y)
+		}
+	},
+
+	scaleLines: function(page) {
+		if (!page || !page.lines || !page.lines.length) {
+			return {};
+		}
+
+		var scaleX = page.sourceWidth / page.background.width;
+		var scaleY = page.sourceHeight / page.background.height;
+		var lines = [];
+
+		for (var i = 0; i < page.lines.length; i++) {
+			if (page.lines[i] == Draw.LINEBREAK) {
+				lines[i] = Draw.LINEBREAK;
+				continue;
+			}
+
+			lines[i] = {
+				a: {
+					x: round(page.lines[i].start.x * scaleX),
+					y: round(page.lines[i].start.y * scaleY)
+				},
+				b: {
+					x: round(page.lines[i].end.x * scaleX),
+					y: round(page.lines[i].end.y * scaleY)
+				}
+			};
+		}
+
+		return lines;
+	},
+
+	scalePoint: function(page, point, offset) {
+		offset = offset || {left: page.scrollCanX, top: page.scrollCanY}
+		return {
+			x: (point.x - offset.left) / page.scale,
+			y: (point.y - offset.top) / page.scale
 		}
 	},
 

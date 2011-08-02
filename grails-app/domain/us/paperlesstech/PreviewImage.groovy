@@ -37,7 +37,7 @@ class PreviewImage implements Cloneable, Comparable {
 	public Map getImageAsMap() {
 		[pageNumber: pageNumber, sourceHeight: sourceHeight, sourceWidth: sourceWidth]
 	}
-	
+
 	@Override
 	String toString() {
 		"PreviewImage(${id})"

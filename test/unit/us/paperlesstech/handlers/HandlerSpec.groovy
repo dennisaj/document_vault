@@ -13,6 +13,7 @@ class HandlerSpec extends UnitSpec {
 	def authService = Mock(AuthService)
 	def handler = new Handler()
 	FileService fileService = Mock()
+	def line = [a:[x:0,y:0], b:[x:100,y:100]]
 
 	def setup() {
 		handler.authServiceProxy = authService
@@ -204,5 +205,56 @@ class HandlerSpec extends UnitSpec {
 
 		then:
 		thrown AssertionError
+	}
+
+	def "downloadNote should throw an exception if the user doesn't have notes permission for the document"() {
+		given:
+		def d = new Document()
+		authService.canNotes(d) >> false
+		def dd = new DocumentData()
+
+		when:
+		def result = handler.downloadNote(document: d)
+
+		then:
+		thrown AssertionError
+	}
+
+	def "saveNotes should throw an exception if the user doesn't have notes permission for the document"() {
+		given:
+		def d = new Document()
+		authService.canNotes(d) >> false
+		def dd = new DocumentData()
+
+		when:
+		def result = handler.saveNotes(document: d, notes: [1:[line]])
+
+		then:
+		thrown AssertionError
+	}
+
+	def "downloadNote should return a quad of the document note"() {
+		given:
+		mockDomain(Document)
+		def d = new Document(name: "file")
+		authService.canNotes(d) >> true
+		def is = Mock(InputStream)
+		def dd = new DocumentData(mimeType: mimeType, fileSize: fileSize)
+		d.addToNotes(dd)
+
+		when:
+		def result = handler.downloadNote(document: d, documentNote: dd)
+
+		then:
+		1 * fileService.getInputStream(dd) >> is
+		result[0] == "file-documentNote($dd.id).$mimeType.downloadExtension"
+		result[1] == is
+		result[2] == mimeType.downloadContentType
+		result[3] == fileSize
+
+		where:
+		fileSize = 42
+		pageNumber = 2
+		mimeType = MimeType.PNG
 	}
 }

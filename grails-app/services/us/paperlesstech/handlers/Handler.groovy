@@ -1,11 +1,18 @@
 package us.paperlesstech.handlers
 
+import java.awt.image.BufferedImage
+
+import javax.imageio.ImageIO
+
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
+import us.paperlesstech.helpers.ImageHelpers
+
 
 class Handler {
 	def authServiceProxy
 	def fileService
+	def grailsApplication
 
 	/**
 	 * Imports the document in the map.  This includes generating previews.  documentData and the perviews will be
@@ -107,6 +114,66 @@ class Handler {
 		def filename = d.toString() + data.mimeType.getDownloadExtension()
 
 		[filename, fileService.getInputStream(data), data.mimeType.downloadContentType, data.fileSize]
+	}
+
+	/**
+	 * Applies the given lines (an object called "notes" that maps from DocumentData.id to a list of lines) 
+	 * to the existing notes or creates new notes if the id is not a valid DocumentData
+	 *
+	 */
+	def saveNotes(Map input) {
+		def d = getDocument(input)
+		assert authServiceProxy.canNotes(d)
+		def notes = input.notes
+		assert notes, "This method requires notes"
+
+		def width = grailsApplication.config.document_vault.document.note.defaultWidth
+		def height = grailsApplication.config.document_vault.document.note.defaultHeight
+		def mimeType = grailsApplication.config.document_vault.document.note.defaultMimeType
+
+		notes.each {key, lines ->
+			def note = DocumentData.get(key)
+			BufferedImage original
+
+			if (note) {
+				assert note in d.notes
+				mimeType = note.mimeType
+				fileService.withInputStream(note) {is->
+					original = ImageIO.read(is)
+				}
+
+				d.removeFromNotes(note)
+			} else {
+				original = ImageHelpers.createBlankImage(width, height, BufferedImage.TYPE_INT_RGB)
+			}
+
+			ImageHelpers.drawLines(original, lines)
+
+			ByteArrayOutputStream output = new ByteArrayOutputStream()
+			ImageIO.write(original, mimeType.toString().toLowerCase(), output)
+
+			DocumentData newImage = fileService.createDocumentData(bytes:output.toByteArray(), mimeType:mimeType, pages:1)
+			d.addToNotes(newImage)
+		}
+	}
+
+	/**
+	 * Returns a quad of the documentNote image to be downloaded to the client. NOTE: The returned InputStream must be
+	 * closed by the caller.
+	 *
+	 * @param input a map that must contain document and documentNote
+	 * @return a quad of (documentFilename, document data as an Input Stream, document mimetype, and content length
+	 */
+	def downloadNote(Map input) {
+		def d = getDocument(input)
+		assert authServiceProxy.canNotes(d)
+
+		def documentNote = input.documentNote
+		assert documentNote, "This method requires a document note"
+
+		def filename = "${d.toString()}-documentNote($documentNote.id).$documentNote.mimeType.downloadExtension"
+
+		[filename, fileService.getInputStream(documentNote), documentNote.mimeType.downloadContentType, documentNote.fileSize]
 	}
 
 	/**

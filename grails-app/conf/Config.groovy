@@ -176,6 +176,11 @@ environments {
 	}
 }
 
+
+document_vault.document.note.defaultHeight = 576
+document_vault.document.note.defaultMimeType = us.paperlesstech.MimeType.PNG
+document_vault.document.note.defaultWidth = 768
+
 document_vault {
 	aws {
 		credentials {

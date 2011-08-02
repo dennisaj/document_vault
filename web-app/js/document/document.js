@@ -66,8 +66,18 @@ var Document = {
 		return $('#documentId').val();
 	},
 
+	getNotes: function(callback) {
+		var self = this;
+
+		return $.when($.post(this.urls.listNotes.format(this.documentId))).fail(this.ajaxErrorHandler);
+	},
+
+	saveNotes: function(notes) {
+		return $.when($.post(this.urls.saveNotes.format(this.documentId), {notes:JSON.stringify(notes)})).fail(this.ajaxErrorHandler);
+	},
+
 	/**
-	 *  Bypass the page cache and load directly from the server.
+	 * Bypass the page cache and load directly from the server.
 	 */
 	_getPage: function(pageNumber, callback) {
 		var self = this;
@@ -92,13 +102,16 @@ var Document = {
 					}
 
 					self.pages[data.pageNumber] = {
-						savedHighlights: data.highlights,
-						unsavedHighlights: unsavedHighlights,
-						lines: new Array(),
 						background: bg,
+						lines: new Array(),
 						pageNumber: data.pageNumber,
+						savedHighlights: data.highlights,
+						scale: 1,
+						scrollCanX: 0,
+						scrollCanY: 0,
 						sourceHeight: data.sourceHeight,
-						sourceWidth: data.sourceWidth
+						sourceWidth: data.sourceWidth,
+						unsavedHighlights: unsavedHighlights
 					};
 
 					if (self.pages[data.pageNumber].background.complete) {
@@ -120,7 +133,7 @@ var Document = {
 	},
 
 	/**
-	 *  Check the page cache and only load directly from the server if the page is not found.
+	 * Check the page cache and only load directly from the server if the page is not found.
 	 */
 	getPage: function(pageNumber, callback) {
 		var self = this;

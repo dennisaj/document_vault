@@ -15,7 +15,9 @@
 					'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}',
 					'removeParty': '${createLink(controller:"document", action:"removeParty")}/{0}/{1}',
 					'resendCode': '${createLink(controller:"document", action:"resend")}/{0}/{1}',
-					'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}'
+					'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}',
+					'saveNotes': '${createLink(controller:"documentNote", action:"save")}/{0}',
+					'listNotes': '${createLink(controller:"documentNote", action:"list")}/{0}'
 				});
 			});
 		</r:script>
@@ -23,63 +25,96 @@
 	<body>
 		<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
 		<input type="hidden" id="documentId" value="${document?.id}" />
-		<div id="buttonPanel">
-			<hr />
-			<pt:canSign document="${document}">
-			<button id="save" class="labeled-button" title="<g:message code="document-vault.view.signature.submitsignatures" />">
-				<g:message code="document-vault.view.signature.submitsignatures" />
-			</button>
-			<button id="pen" class="labeled-button mark" title="<g:message code="document-vault.label.pen" />">
-				<g:message code="document-vault.label.pen" />
-			</button>
-			<button id="undo" class="labeled-button" title="<g:message code="document-vault.label.undo" />">
-				<g:message code="document-vault.label.undo" />
-			</button>
-			<button id="clearcan" class="labeled-button" title="<g:message code="document-vault.label.clear" />">
-				<g:message code="document-vault.label.clear" />
-			</button>
-			</pt:canSign>
-			<pt:canPrint document="${document}">
-			<button id="print" class="labeled-button" title="<g:message code="document-vault.label.print" />">
-				<g:message code="document-vault.label.print" />
-			</button>
-			</pt:canPrint>
-			<g:if test="${pt.canGetSigned(document:document)}">
-			<button id="get-signed" class="labeled-button" title="<g:message code="document-vault.view.signature.requestsignatures" />">
-				<g:message code="document-vault.view.signature.requestsignatures" />
-			</button>
-			<button id="highlight" class="labeled-button mark" title="<g:message code="document-vault.label.highlight" />">
-				<span id="sample"></span>
-				<g:message code="document-vault.label.highlight" />
-			</button>
-			</g:if>
-			<g:elseif test="${grailsApplication.config.document_vault.remoteSigning.enabled && !parties.empty && pt.canSign(document:document)}">
-			<button id="show-highlights" class="labeled-button" title="<g:message code="document-vault.view.signature.showhighlights" />">
-				<g:message code="document-vault.view.signature.showhighlights" />
-			</button>
-			</g:elseif>
-			<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
-				<g:message code="document-vault.label.close" />
-			</button>
-			<h4 id="page-container"><g:message code="document-vault.label.page" />: <span id="page-number"></span></h4>
-		</div>
-		<div id="main">
-			<div id="left-arrow" class="arrow">
-				<a href="#" title="<g:message code="document-vault.label.previouspage" />"><g:message code="document-vault.label.previouspage" /></a>
+		<div id="button-container" class="flip-container">
+			<div id="buttonPanel" class="face front">
+				<hr />
+				<pt:canSign document="${document}">
+				<button id="save" class="labeled-button" title="<g:message code="document-vault.view.signature.submitsignatures" />">
+					<g:message code="document-vault.view.signature.submitsignatures" />
+				</button>
+				<button id="pen" class="labeled-button mark" title="<g:message code="document-vault.label.pen" />">
+					<g:message code="document-vault.label.pen" />
+				</button>
+				<button id="undo" class="labeled-button" title="<g:message code="document-vault.label.undo" />">
+					<g:message code="document-vault.label.undo" />
+				</button>
+				<button id="clearcan" class="labeled-button" title="<g:message code="document-vault.label.clear" />">
+					<g:message code="document-vault.label.clear" />
+				</button>
+				</pt:canSign>
+				<pt:canPrint document="${document}">
+				<button id="print" class="labeled-button" title="<g:message code="document-vault.label.print" />">
+					<g:message code="document-vault.label.print" />
+				</button>
+				</pt:canPrint>
+				<g:if test="${pt.canGetSigned(document:document)}">
+				<button id="get-signed" class="labeled-button" title="<g:message code="document-vault.view.signature.requestsignatures" />">
+					<g:message code="document-vault.view.signature.requestsignatures" />
+				</button>
+				<button id="highlight" class="labeled-button mark" title="<g:message code="document-vault.label.highlight" />">
+					<span id="sample"></span>
+					<g:message code="document-vault.label.highlight" />
+				</button>
+				</g:if>
+				<g:elseif test="${grailsApplication.config.document_vault.remoteSigning.enabled && !parties.empty && pt.canSign(document:document)}">
+				<button id="show-highlights" class="labeled-button" title="<g:message code="document-vault.view.signature.showhighlights" />">
+					<g:message code="document-vault.view.signature.showhighlights" />
+				</button>
+				</g:elseif>
+				<pt:canNotes document="${document}">
+				<button id="notes" class="labeled-button" title="<g:message code="document-vault.label.notes" />">
+					<g:message code="document-vault.label.notes" />
+				</button>
+				</pt:canNotes>
+				<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
+					<g:message code="document-vault.label.close" />
+				</button>
+				<h4 id="page-container"><g:message code="document-vault.label.page" />: <span id="page-number"></span></h4>
 			</div>
-			<div id="right-arrow" class="arrow">
-				<a href="#" title="<g:message code="document-vault.label.nextpage" />"><g:message code="document-vault.label.nextpage" /></a>
+			<pt:canNotes document="${document}">
+			<div id="scratch-buttons-container" class="face back">
+				<hr />
+				<button id="back-to-sign" class="labeled-button" title="<g:message code="document-vault.label.return" />">
+					<g:message code="document-vault.label.return" />
+				</button>
 			</div>
-			<canvas id="can"></canvas>
+			</pt:canNotes>
 		</div>
-		<div id="slider-container">
-			<button id="zoom-out" title="<g:message code="document-vault.label.zoomout" />">
-				<g:message code="document-vault.label.zoomout" />
-			</button>
-			<div id="slider"></div>
-			<button id="zoom-in" title="<g:message code="document-vault.label.zoomin" />">
-				<g:message code="document-vault.label.zoomin" />
-			</button>
+		<div id="canvas-container" class="flip-container">
+			<div id="main" class="face front">
+				<div id="slider-container">
+					<button id="zoom-out" title="<g:message code="document-vault.label.zoomout" />">
+						<g:message code="document-vault.label.zoomout" />
+					</button>
+					<div id="slider"></div>
+					<button id="zoom-in" title="<g:message code="document-vault.label.zoomin" />">
+						<g:message code="document-vault.label.zoomin" />
+					</button>
+				</div>
+				<div id="left-arrow" class="arrow">
+					<a href="#" title="<g:message code="document-vault.label.previouspage" />"><g:message code="document-vault.label.previouspage" /></a>
+				</div>
+				<div id="right-arrow" class="arrow">
+					<a href="#" title="<g:message code="document-vault.label.nextpage" />"><g:message code="document-vault.label.nextpage" /></a>
+				</div>
+				<canvas id="can"></canvas>
+			</div>
+			<div id="scratch-container" class="face back">
+				<div id="scratch-canvas-container">
+					<canvas id="scratch"></canvas>
+					<br />
+					<button id="save-scratch" class="labeled-button" title="<g:message code="document-vault.label.save" />">
+						<g:message code="document-vault.label.save" />
+					</button>
+					<button id="undo-scratch" class="labeled-button" title="<g:message code="document-vault.label.undo" />">
+						<g:message code="document-vault.label.undo" />
+					</button>
+					<button id="clear-scratch" class="labeled-button" title="<g:message code="document-vault.label.clear" />">
+						<g:message code="document-vault.label.clear" />
+					</button>
+				</div>
+				<div id="add-scratch-box">+</div>
+			</div>
 		</div>
 		<div id="signature-message" title="<g:message code="document-vault.view.party.wait.title" />">
 			<p style="overflow: hidden;">

@@ -4,10 +4,12 @@ import grails.plugin.spock.UnitSpec
 import grails.plugins.nimble.core.Group
 import us.paperlesstech.AuthService
 import us.paperlesstech.Document
+import us.paperlesstech.DocumentData
 
 class HandlerChainSpec extends UnitSpec {
 	HandlerChain chain
 	AuthService authService = Mock()
+	def line = [a:[x:0,y:0], b:[x:100,y:100]]
 
 	def setup() {
 		chain = new HandlerChain()
@@ -205,5 +207,29 @@ class HandlerChainSpec extends UnitSpec {
 		1 * authService.canView(d) >> true
 		methodName == "download"
 		input == m
+	}
+
+	def "downloadNote fails if the user can't notes the document"() {
+		given:
+		def d = new Document()
+
+		when:
+		chain.downloadNote(document: d, documentNote:new DocumentData())
+
+		then:
+		thrown AssertionError
+		1 * authService.canNotes(d) >> false
+	}
+
+	def "saveNotes fails if the user can't notes the document"() {
+		given:
+		def d = new Document()
+
+		when:
+		chain.saveNotes(document: d, notes: [1:[line]])
+
+		then:
+		thrown AssertionError
+		1 * authService.canNotes(d) >> false
 	}
 }

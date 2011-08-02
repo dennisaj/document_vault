@@ -2,29 +2,27 @@ var Sign = {
 	//global objects
 	$box: null,
 	can: null,
-	currentHeight: 0,
-	currentWidth: 0,
 	currentPageNumber: null,
 	highlightStart: null,
 	isMoving: false,
 	isMouseDown: false,
-	$main : null,
+	$main: null,
 	minVisible: 150,
+	mtouch: false,
 	ORIGIN: {x:0, y:0},
 	previousPoint: null,
-	scale: 1,
-	scrollCanX: 0,
-	scrollCanY: 0,
+	previousZoom: null,
 	trackingTouchId: null,
 	tapAndHoldTimeout: null,
 	tapAndHoldDuration: 500,
 	urls: {},
 
 	// Make sure at least 150 x 150 pixels of the screen are visible at any time. 
-	canScroll: function(x, y) {
-		if ((this.currentWidth + x) < this.minVisible) {
+	canScroll: function(canvas, x, y) {
+		var $canvas = $(canvas);
+		if (($canvas.width() + x) < this.minVisible) {
 			return false;
-		} else if ((this.currentHeight + y) < this.minVisible) {
+		} else if (($canvas.height() + y) < this.minVisible) {
 			return false;
 		} else if (this.$main.width() - x < this.minVisible) {
 			return false;
@@ -43,17 +41,17 @@ var Sign = {
 		}
 	},
 
-	_currentCenter: function() {
+	_currentCenter: function(page) {
 		var left = 0;
 		var top = 0;
 		var width = 0;
 		var height = 0;
 
-		left = -this.scrollCanX / this.scale
-		top = -this.scrollCanY / this.scale;
+		left = -page.scrollCanX / page.scale
+		top = -page.scrollCanY / page.scale;
 
-		width = left + (this.$main.width() / this.scale);
-		height = top + (this.$main.height() / this.scale);
+		width = left + (this.$main.width() / page.scale);
+		height = top + (this.$main.height() / page.scale);
 
 		return {x: (left + width) / 2, y: (top + height) / 2};
 	},
@@ -65,14 +63,17 @@ var Sign = {
 	doEnd: function(event, canvas, page) {
 		clearTimeout(this.tapAndHoldTimeout);
 
+		if (this.mtouch) {
+			return;
+		}
+
 		var isSigning = $('#pen').is('.ui-state-highlight');
 		var isHighlighting = Party.isHighlighting();
-		$('.arrow').fadeIn('fast');
 
 		if (!isSigning && !this.isMoving && !isHighlighting) {
 			var party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
 			var color = Party.getCurrentColor() || SignBox.partyColor;
-			var point = this._scalePoint(this._convertEventToPoint(event));
+			var point = Draw.scalePoint(page, this._convertEventToPoint(event));
 			var insideHighlight = Draw.isPointInsideAnyBox(point, page.unsavedHighlights[party]);
 
 			if (insideHighlight) {
@@ -93,7 +94,7 @@ var Sign = {
 		} else if (isSigning) {
 			Draw.addBreak(page);
 		} else if (isHighlighting && this.highlightStart) {
-			var corners = Draw.normalizeCorners(this._scalePoint(this.highlightStart), this._scalePoint(this.previousPoint));
+			var corners = Draw.normalizeCorners(Draw.scalePoint(page, this.highlightStart), Draw.scalePoint(page, this.previousPoint));
 			var party = Party.getSelectedPartyRow().attr('id');
 			var color = Party.getCurrentColor();
 
@@ -117,17 +118,14 @@ var Sign = {
 		var point = this._convertEventToPoint(event);
 		var isSigning = $('#pen').is('.ui-state-highlight');
 		var isHighlighting = Party.isHighlighting();
-		if ($('.arrow:visible')) {
-			$('.arrow').fadeOut('fast');
-		}
 
 		if (!isSigning && !isHighlighting) {
 			this.$main.css('cursor', 'move');
-			this.dragCanvas(canvas, this.previousPoint, point);
+			this.dragCanvas(canvas, page, this.previousPoint, point);
 		} else if (isSigning) {
 			var line = {
-				start: this._scalePoint(this.previousPoint),
-				end: this._scalePoint(point),
+				start: Draw.scalePoint(page, this.previousPoint),
+				end: Draw.scalePoint(page, point),
 			};
 			Draw.addLine(page, line);
 			Draw.drawLine(canvas, line);
@@ -153,12 +151,16 @@ var Sign = {
 		 * If the user taps/clicks and holds, see if they are over a highlight and then delete it.
 		 */
 		this.tapAndHoldTimeout = setTimeout(function() {
+			if (self.mtouch) {
+				return;
+			}
+
 			self.isMouseDown = false;
 			self.trackingTouchId = null;
 
 			var party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
 			var color = Party.getCurrentColor() || SignBox.partyColor;
-			var point = self._scalePoint(self.previousPoint);
+			var point = Draw.scalePoint(page, self.previousPoint);
 			var highlight = Draw.isPointInsideAnyBox(point, page.unsavedHighlights[party]);
 
 			if (highlight) {
@@ -166,17 +168,17 @@ var Sign = {
 				page.unsavedHighlights[party].splice(index, 1);
 				Draw.draw(canvas, page);
 			}
-		}, self.tapAndHoldDuration);
+		}, this.tapAndHoldDuration);
 	},
 
-	dragCanvas: function(canvas, oldPoint, newPoint) {
-		var newScrollCanX = this.scrollCanX + newPoint.x - oldPoint.x;
-		var newScrollCanY = this.scrollCanY + newPoint.y - oldPoint.y;
+	dragCanvas: function(canvas, page, oldPoint, newPoint) {
+		var newScrollCanX = page.scrollCanX + newPoint.x - oldPoint.x;
+		var newScrollCanY = page.scrollCanY + newPoint.y - oldPoint.y;
 
-		if (this.canScroll(newScrollCanX, newScrollCanY)) {
-			this.scrollCanX = newScrollCanX;
-			this.scrollCanY = newScrollCanY;
-			this._transform(canvas, this.scrollCanX, this.scrollCanY);
+		if (this.canScroll(canvas, newScrollCanX, newScrollCanY)) {
+			page.scrollCanX = newScrollCanX;
+			page.scrollCanY = newScrollCanY;
+			this._transform(canvas, page.scrollCanX, page.scrollCanY);
 		}
 	},
 
@@ -213,8 +215,8 @@ var Sign = {
 		var $canvas = $(canvas);
 		var headerHeight = $('.container').height() + $('#buttonPanel').height();
 		// center the canvas.
-		this.dragCanvas(canvas,
-				{x: this.scrollCanX, y: this.scrollCanY},
+		this.dragCanvas(canvas, page,
+				{x: page.scrollCanX, y: page.scrollCanY},
 				{x: (this.$main.width() - $canvas.width()) / 2, y: headerHeight});
 		Draw.draw(canvas, page);
 	},
@@ -244,44 +246,6 @@ var Sign = {
 		return scaledPage;
 	},
 
-	_scaleLines: function(page) {
-		if (!page || !page.lines || !page.lines.length) {
-			return {};
-		}
-
-		var scaleX = page.sourceWidth / page.background.width;
-		var scaleY = page.sourceHeight / page.background.height;
-		var lines = [];
-
-		for (var i = 0; i < page.lines.length; i++) {
-			if (page.lines[i] == Draw.LINEBREAK) {
-				lines[i] = Draw.LINEBREAK;
-				continue;
-			}
-
-			lines[i] = {
-				a: {
-					x: round(page.lines[i].start.x * scaleX),
-					y: round(page.lines[i].start.y * scaleY)
-				},
-				b: {
-					x: round(page.lines[i].end.x * scaleX),
-					y: round(page.lines[i].end.y * scaleY)
-				}
-			};
-		}
-
-		return lines;
-	},
-
-	_scalePoint: function(point, offset) {
-		offset = offset || {left: this.scrollCanX, top: this.scrollCanY}
-		return {
-			x: (point.x - offset.left) / this.scale,
-			y: (point.y - offset.top) / this.scale
-		}
-	},
-
 	setupCanvas: function(canvas, page) {
 		var self = this;
 		if (page.background.complete) {
@@ -298,36 +262,36 @@ var Sign = {
 		element.style.MozTransform = 'translate(' + x + 'px, ' + y + 'px)';
 		element.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
 		element.style.OTransform = 'translate(' + x + 'px, ' + y + 'px)';
+		element.style.msTransform = 'translate(' + x + 'px, ' + y + 'px)';
 	},
 
 	// Given opposite corners of a rectangle, zoom the screen to that area.
-	viewArea: function(canvas, page, point1, point2, scaleBy, center) {
+	viewArea: function(canvas, page, point1, point2, scaleBy) {
 		var corners = Draw.normalizeCorners(point1, point2);
 
 		var newWidth = corners.width;
 		var newHeight = corners.height;
 
 		if (scaleBy == 'width') {
-			this.scale = this.$main.width() / newWidth;
+			page.scale = this.$main.width() / newWidth;
 		} else {
-			this.scale = this.$main.height() / newHeight;
+			page.scale = this.$main.height() / newHeight;
 		}
 
-		this.scrollCanX = -corners.left * this.scale;
-		this.scrollCanY = -corners.top * this.scale;
+		page.scrollCanX = -corners.left * page.scale;
+		page.scrollCanY = -corners.top * page.scale;
 
-		this.currentWidth = page.background.width * this.scale;
-		this.currentHeight = page.background.height * this.scale;
-		canvas.style.width = this.currentWidth + 'px';
-		canvas.style.height = this.currentHeight + 'px';
+		var $canvas = $(canvas);
+		$canvas.width(page.background.width * page.scale);
+		$canvas.height(page.background.height * page.scale);
 
-		this._transform(canvas, this.scrollCanX, this.scrollCanY);
+		this._transform(canvas, page.scrollCanX, page.scrollCanY);
 	},
 
 	_zoomEvent: function(canvas, page, zoom) {
 		var zoomScale = 1 / zoom;
 
-		var point = this._currentCenter();
+		var point = this._currentCenter(page);
 
 		var zoomWidth = zoomScale * this.$main.width();
 		var widthOffset = zoomWidth / 2;
@@ -351,10 +315,10 @@ var Sign = {
 	// document.js functions
 	submitLines: function() {
 		var self = this;
-		var lines = {}
+		var lines = {};
 
 		$.each(Document.pages, function(index, element) {
-			lines[index] = self._scaleLines(element);
+			lines[index] = Draw.scaleLines(element);
 		});
 
 		Document.submitLines(lines).then(function() {
@@ -374,17 +338,29 @@ var Sign = {
 		var $can = $(this.can);
 		this.previousPoint = this.ORIGIN;
 		this.$box.hide();
-		var eventType = $.support.touch ? 'touchend' : 'click'
+		var eventType = $.support.touch ? 'touchend' : 'click';
 
 		if ($.support.touch) {
+			$('#slider-container').hide();
 			$can.bind('touchstart', function(event) {
+				var e = event.originalEvent;
+				self.mtouch = (e.targetTouches.length > 1);
+				if (self.mtouch) {
+					self.previousZoom = $('#slider').slider('value');
+				}
+
 				if (self.trackingTouchId == null) {
-					var e = event.originalEvent;
 					var touch = e.targetTouches[0];
 
 					self.trackingTouchId = touch.identifier;
 					self.previousPoint = self._convertEventToPoint(touch);
 					self.doStart(e, self.can, self.currentPage());
+				}
+			}).bind('gesturechange', function(event) {
+				if (self.mtouch) {
+					var e = event.originalEvent;
+
+					$('#slider').slider('value', self.previousZoom * e.scale);
 				}
 			}).bind('touchmove', function(event) {
 				var e = event.originalEvent;
@@ -413,6 +389,9 @@ var Sign = {
 					self.trackingTouchId = null;
 					self.doEnd(currentTouch, self.can, self.currentPage());
 				}
+
+				// We are still in multitouch mode if there is more than one touch and the tracked touch wasn't ended.
+				self.mtouch = (e.targetTouches.length > 1) && !currentTouch;
 			});
 		} else {
 			$can.mousedown(function(e) {
@@ -478,6 +457,13 @@ var Sign = {
 			icons: { primary: 'ui-icon-transferthick-e-w' }
 		}).bind(eventType, function(event) {
 			$('#confirm-submit').dialog('open');
+		});
+
+		$('#notes').button({
+			icons: { primary: 'ui-icon-note' }
+		}).bind(eventType, function(event) {
+			$('#canvas-container').addClass('flip');
+			$('#button-container').addClass('flip');
 		});
 
 		$('#close').button({
@@ -608,6 +594,7 @@ var Sign = {
 		// Load the page indicated by the location hash
 		$(window).hashchange();
 
-		SignBox.init(this);
+		SignBox.init();
+		Scratch.init();
 	}
 };
