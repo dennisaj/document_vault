@@ -5,7 +5,6 @@ import grails.plugins.nimble.core.Role
 import us.paperlesstech.helpers.UserHelpers
 
 class UserService extends grails.plugins.nimble.core.UserService {
-	static transactional = true
 	def roleService
 
 	User createUser(Map map) {

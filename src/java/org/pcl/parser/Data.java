@@ -29,7 +29,7 @@ public class Data {
    *
    * @return data
    */
-  public final ArrayList getData() {
+  public final ArrayList<Byte> getData() {
     return data;
   }
 

@@ -6,8 +6,6 @@
 
 package org.pcl.parser;
 
-import java.util.Arrays;
-
 /**
  * PCL Command representation
  */
