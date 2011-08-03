@@ -48,10 +48,15 @@ class BootStrap {
 				}
 			}
 
-			String ip = InetAddress.getLocalHost().getHostAddress()
-			def tenant = DomainTenantMap.findByDomainName(ip)
-			if (!tenant) {
-				new DomainTenantMap(domainName: ip, mappedTenantId: 1, name: "default").save()
+			// Add all non-loopback, IPv4 addresses
+			def interfaces = ((NetworkInterface.networkInterfaces*.interfaceAddresses).flatten()*.address.findAll { !it.isLoopbackAddress() && it instanceof java.net.Inet4Address })
+			def addresses = [] as Set
+			addresses += interfaces*.hostAddress
+			addresses.each {ip->
+				def tenant = DomainTenantMap.findByDomainName(ip)
+				if (!tenant) {
+					new DomainTenantMap(domainName: ip, mappedTenantId: 1, name: "default").save()
+				}
 			}
 		}
 
