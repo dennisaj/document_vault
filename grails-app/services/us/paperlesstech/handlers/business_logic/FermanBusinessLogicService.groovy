@@ -170,6 +170,8 @@ class FermanBusinessLogicService {
 		m["Color"] = getField(line, 55, 67)
 		m["License_Number"] = getField(line, 68, 79)
 
+		m["raw"] = trimTokens(lines.join("\n"))
+
 		m
 	}
 
@@ -180,10 +182,7 @@ class FermanBusinessLogicService {
 		}
 		String data = builder.toString()
 
-		def m = data =~ /(?m)(\S+)/
-		def lines = m*.getAt(1)
-
-		lines.join("\n")
+		trimTokens(data)
 	}
 
 	/**
@@ -208,5 +207,16 @@ class FermanBusinessLogicService {
 		m.each { k, v ->
 			m[k] = sanitize(v)
 		}
+	}
+
+	/**
+	 * Separate a block of text into individual tokens then mash 
+	 * them back together in a newline delimited string.
+	 */
+	private String trimTokens(input) {
+		def m = input =~ /(?m)(\S+)/
+		def lines = m*.getAt(1)
+
+		lines.join("\n")
 	}
 }
