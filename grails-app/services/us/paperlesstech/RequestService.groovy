@@ -1,7 +1,6 @@
 package us.paperlesstech
 
-import javax.servlet.http.HttpServletRequest
-
+import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
@@ -24,7 +23,7 @@ class RequestService {
 	}
 
 	String getRemoteAddr() {
-		getRealRequest().getRemoteAddr()
+		getRealRequest().getHeader(HttpHeaders.X_FORWARDED_FOR) ?: getRealRequest().getRemoteAddr()
 	}
 
 	void set(String entry, Object value) {

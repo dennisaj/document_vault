@@ -1,7 +1,10 @@
 package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
+
 import javax.servlet.http.HttpServletRequest
+
+import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 class RequestServiceSpec extends UnitSpec {
 	RequestService service = new RequestService()
@@ -71,5 +74,37 @@ class RequestServiceSpec extends UnitSpec {
 		where:
 		field = "User-Agent"
 		browser = "FF"
+	}
+
+	def "getRemoteAddr should return X-Forwarded-For if it is set"() {
+		given: "a test request object"
+		service.testRequest = request
+
+		when: "Get the remote request"
+		def t1 = service.remoteAddr
+
+		then: "The address is returned"
+		1 * request.getHeader(HttpHeaders.X_FORWARDED_FOR) >> addr
+		0 * request.getRemoteAddr()
+		t1 == addr
+
+		where:
+		addr = "127.0.0.1"
+	}
+
+	def "getRemoteAddr should return remoteAddr if X-Forwarded-For is not set"() {
+		given: "a test request object"
+		service.testRequest = request
+
+		when: "Get the remote request"
+		def t1 = service.remoteAddr
+
+		then: "The address is returned"
+		1 * request.getHeader(HttpHeaders.X_FORWARDED_FOR) >> ""
+		1 * request.getRemoteAddr() >> addr
+		t1 == addr
+
+		where:
+		addr = "127.0.0.1"
 	}
 }
