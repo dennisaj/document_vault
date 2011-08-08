@@ -31,7 +31,8 @@ class AuthService extends AuthenticatedService {
 	}
 
 	boolean canPrint(Document d) {
-		checkPermission(DocumentPermission.Notes, d)
+		// We cannot currently print non-pdf documents.
+		d.files.first().mimeType == MimeType.PDF && checkPermission(DocumentPermission.Notes, d)
 	}
 
 	boolean canPrintAny() {

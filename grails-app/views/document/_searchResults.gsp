@@ -55,14 +55,12 @@
 						<span class="ui-button-text"><g:message code="document-vault.label.notes" /></span>
 					</button>
 					</pt:canNotes>
-					<g:if test="${document.files.first().mimeType == MimeType.PDF }">
 					<pt:canPrint document="${document}">
 					<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.print" />" onclick="javascript:Document.print(${document.id});">
 						<span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
 						<span class="ui-button-text"><g:message code="document-vault.label.print" /></span>
 					</button>
 					</pt:canPrint>
-					</g:if>
 					<a href="${createLink(action: 'show', params:[documentId: document.id])}" style="text-decoration: none">
 						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.view" />">
 							<span class="ui-button-icon-primary ui-icon ui-icon-zoomin"></span>
