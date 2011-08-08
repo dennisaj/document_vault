@@ -75,6 +75,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		"GOOD" == m["Body"]
 		"RED" == m["Color"]
 		"123XX" == m["License_Number"]
+		"Customer\nPay\nTEST\n************************\nTEST\nCustomer\nPay\nIGUUG\n\\" == m["raw"]
 	}
 
 	def "parsing unknown should split the words in the document"() {
