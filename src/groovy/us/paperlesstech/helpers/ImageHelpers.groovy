@@ -79,7 +79,8 @@ class ImageHelpers {
 		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
 		Graphics2D g2d = bufferedImage.createGraphics()
 
-		g2d.setBackground(background)
+		g2d.setColor(background)
+		g2d.fillRect(0, 0, width, height)
 
 		bufferedImage
 	}

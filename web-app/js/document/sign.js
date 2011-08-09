@@ -251,9 +251,9 @@ var Sign = {
 		if (page.background.complete) {
 			this._realSetupCanvas(canvas, page);
 		} else {
-			page.background.addEventListener('load', function() {
+			bindEvent(page.background, 'load', function() {
 				self._realSetupCanvas(canvas, page);
-			}, false);
+			});
 		}
 	},
 

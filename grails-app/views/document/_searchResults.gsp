@@ -61,24 +61,18 @@
 						<span class="ui-button-text"><g:message code="document-vault.label.print" /></span>
 					</button>
 					</pt:canPrint>
-					<a href="${createLink(action: 'show', params:[documentId: document.id])}" style="text-decoration: none">
-						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.view" />">
-							<span class="ui-button-icon-primary ui-icon ui-icon-zoomin"></span>
-							<span class="ui-button-text"><g:message code="document-vault.label.view" /></span>
-						</button>
+					<a href="${createLink(action: 'show', params:[documentId: document.id])}" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.view" />" style="text-decoration: none">
+						<span class="ui-button-icon-primary ui-icon ui-icon-zoomin"></span>
+						<span class="ui-button-text"><g:message code="document-vault.label.view" /></span>
 					</a>
-					<a href="${createLink(action: 'download', params:[documentId: document.id, documentDataId: document.files.first().id])}" style="text-decoration: none">
-						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.download" />">
-							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-s"></span>
-							<span class="ui-button-text"><g:message code="document-vault.label.download" /></span>
-						</button>
+					<a href="${createLink(action: 'download', params:[documentId: document.id, documentDataId: document.files.first().id])}" style="text-decoration: none" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.download" />">
+						<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-s"></span>
+						<span class="ui-button-text"><g:message code="document-vault.label.download" /></span>
 					</a>
 					<pt:canSign document="${document}">
-					<a href="${createLink(action: 'sign', params:[documentId: document.id])}" style="text-decoration: none">
-						<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.sign" />">
-							<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span>
-							<span class="ui-button-text"><g:message code="document-vault.label.sign" /></span>
-						</button>
+					<a href="${createLink(action: 'sign', params:[documentId: document.id])}" style="text-decoration: none" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" title="<g:message code="document-vault.label.sign" />">
+						<span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span>
+						<span class="ui-button-text"><g:message code="document-vault.label.sign" /></span>
 					</a>
 					</pt:canSign>
 				</td>

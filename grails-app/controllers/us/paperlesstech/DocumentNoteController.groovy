@@ -3,7 +3,7 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class DocumentNoteController {
-	static allowedMethods = [download:"POST", list:"POST", save:"POST"]
+	static allowedMethods = [list:"POST", save:"POST"]
 
 	def handlerChain
 

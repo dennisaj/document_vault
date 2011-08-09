@@ -77,9 +77,9 @@ var Scratch = {
 				if (note.background.complete) {
 					self.addScratchBox(note);
 				} else {
-					note.background.addEventListener('load', function() {
+					bindEvent(note.background, 'load', function() {
 						self.addScratchBox(note);
-					}, false);
+					});
 				}
 			});
 		});

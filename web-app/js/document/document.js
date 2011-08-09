@@ -117,9 +117,9 @@ var Document = {
 					if (self.pages[data.pageNumber].background.complete) {
 						self.pages[data.pageNumber].savedHighlights = self._scaleHighlights(self.pages[data.pageNumber]);
 					} else {
-						self.pages[data.pageNumber].background.addEventListener('load', function() {
+						bindEvent(self.pages[data.pageNumber].background, 'load', function() {
 							self.pages[data.pageNumber].savedHighlights = self._scaleHighlights(self.pages[data.pageNumber]);
-						}, false);
+						});
 					}
 
 					if ($.isFunction(callback)) {

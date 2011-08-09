@@ -22,7 +22,11 @@ var Show = {
 
 		$('#page-number').text(this.currentPage.pageNumber + '/' + Document.pageCount);
 
-		canvas.html($(page.background).width(Math.min(canvas.width(), page.background.width)));
+		var width = Math.min(canvas.width(), page.background.width);
+		var scale = width / page.background.width;
+		var height = scale * page.background.height;
+
+		canvas.html($(page.background).width(width).height(height));
 	},
 
 	setupCanvas: function(canvas, page) {
