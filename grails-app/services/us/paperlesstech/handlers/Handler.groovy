@@ -144,7 +144,7 @@ class Handler {
 
 				d.removeFromNotes(note)
 			} else {
-				original = ImageHelpers.createBlankImage(width, height, BufferedImage.TYPE_INT_RGB)
+				original = ImageHelpers.createBlankImage(width, height)
 			}
 
 			ImageHelpers.drawLines(original, lines)
