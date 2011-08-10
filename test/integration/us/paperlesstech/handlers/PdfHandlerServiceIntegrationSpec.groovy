@@ -1,10 +1,11 @@
 package us.paperlesstech.handlers
 
 import org.springframework.core.io.ClassPathResource
+
 import us.paperlesstech.Document
+import us.paperlesstech.DocumentData
 import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.MimeType
-import us.paperlesstech.DocumentData
 
 class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def fileService

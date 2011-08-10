@@ -1,9 +1,11 @@
 package us.paperlesstech
 
 import grails.plugin.spock.*
-import grails.plugins.nimble.core.Group
-import grails.plugins.nimble.core.Permission
 import spock.lang.*
+import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.Permission
+import us.paperlesstech.nimble.Profile
+import us.paperlesstech.nimble.User
 
 class PartyServiceIntegrationSpec extends IntegrationSpec {
 	def partyService

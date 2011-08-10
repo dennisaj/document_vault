@@ -6,6 +6,7 @@ class AuthTagLib {
 	static namespace = "pt"
 
 	def authService
+	def facebookService
 
 	def isLoggedIn = {attrs, body ->
 		if (authService.isLoggedIn()) {
@@ -131,5 +132,15 @@ class AuthTagLib {
 
 	def canViewAny = {attr, body->
 		outputBody(authService.canViewAny(), body)
+	}
+
+	def facebookConnect = {attrs, body ->
+		def facebook = grailsApplication.config.nimble.facebook.federationprovider.enabled
+
+		if (attrs['secure']?.equals('true'))
+		out << render(template: "/templates/auth/facebookjs", contextPath: pluginContextPath, model: [facebook:facebook, secure: true, apikey: facebookService.apiKey])
+		else
+		out << render(template: "/templates/auth/facebookjs", contextPath: pluginContextPath, model: [facebook:facebook, secure: false, apikey: facebookService.apiKey])
+
 	}
 }

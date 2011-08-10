@@ -1,9 +1,9 @@
 package us.paperlesstech
 
-import grails.plugins.nimble.core.Group
 import us.paperlesstech.helpers.FileHelpers
-import us.paperlesstech.helpers.PclInfo
 import us.paperlesstech.helpers.PclDocument
+import us.paperlesstech.helpers.PclInfo
+import us.paperlesstech.nimble.Group
 
 class UploadService {
 	static transactional = true

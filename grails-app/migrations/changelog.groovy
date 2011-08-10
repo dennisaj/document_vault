@@ -308,7 +308,7 @@ databaseChangeLog = {
 
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-13") {
 		createTable(tableName: "groups_users") {
-			column(name: "user_base_id", type: "bigint") {
+			column(name: "user_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
@@ -416,9 +416,7 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "date_created", type: "timestamp") {
-				constraints(nullable: "false")
-			}
+			column(name: "date_created", type: "timestamp")
 
 			column(name: "group_id", type: "bigint")
 
@@ -583,10 +581,6 @@ databaseChangeLog = {
 			column(name: "nick_name", type: "varchar(255)")
 
 			column(name: "non_verified_email", type: "varchar(255)")
-
-			column(name: "class", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
 		}
 	}
 
@@ -632,7 +626,7 @@ databaseChangeLog = {
 
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-27") {
 		createTable(tableName: "roles_users") {
-			column(name: "user_base_id", type: "bigint") {
+			column(name: "user_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
@@ -757,10 +751,6 @@ databaseChangeLog = {
 			column(name: "username", type: "varchar(255)") {
 				constraints(nullable: "false")
 			}
-
-			column(name: "class", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
 		}
 
 		modifySql() {
@@ -770,7 +760,7 @@ databaseChangeLog = {
 
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-33") {
 		createTable(tableName: "users_passwd_history") {
-			column(name: "user_base_id", type: "bigint")
+			column(name: "user_id", type: "bigint")
 
 			column(name: "passwd_history_string", type: "varchar(255)")
 		}
@@ -778,11 +768,11 @@ databaseChangeLog = {
 
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-34") {
 		createTable(tableName: "users_users") {
-			column(name: "user_base_followers_id", type: "bigint")
+			column(name: "user_followers_id", type: "bigint")
 
-			column(name: "user_base_id", type: "bigint")
+			column(name: "user_id", type: "bigint")
 
-			column(name: "user_base_follows_id", type: "bigint")
+			column(name: "user_follows_id", type: "bigint")
 		}
 	}
 
@@ -891,11 +881,11 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-36") {
-		addPrimaryKey(columnNames: "group_id, user_base_id", tableName: "groups_users")
+		addPrimaryKey(columnNames: "group_id, user_id", tableName: "groups_users")
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-37") {
-		addPrimaryKey(columnNames: "role_id, user_base_id", tableName: "roles_users")
+		addPrimaryKey(columnNames: "role_id, user_id", tableName: "roles_users")
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-38") {
@@ -1051,7 +1041,7 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-60") {
-		addForeignKeyConstraint(baseColumnNames: "user_base_id", baseTableName: "groups_users", constraintName: "FK_GROUP_USERS_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "groups_users", constraintName: "FK_GROUP_USERS_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-61") {
@@ -1119,7 +1109,7 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-77") {
-		addForeignKeyConstraint(baseColumnNames: "user_base_id", baseTableName: "roles_users", constraintName: "FK_ROLE_USERS_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "roles_users", constraintName: "FK_ROLE_USERS_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-79") {
@@ -1135,19 +1125,19 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-82") {
-		addForeignKeyConstraint(baseColumnNames: "user_base_id", baseTableName: "users_passwd_history", constraintName: "FK_USER_PASS_HIST_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "users_passwd_history", constraintName: "FK_USER_PASS_HIST_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-83") {
-		addForeignKeyConstraint(baseColumnNames: "user_base_followers_id", baseTableName: "users_users", constraintName: "FK_users_users_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+		addForeignKeyConstraint(baseColumnNames: "user_followers_id", baseTableName: "users_users", constraintName: "FK_users_users_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-84") {
-		addForeignKeyConstraint(baseColumnNames: "user_base_follows_id", baseTableName: "users_users", constraintName: "FK_users_users_USER2", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+		addForeignKeyConstraint(baseColumnNames: "user_follows_id", baseTableName: "users_users", constraintName: "FK_users_users_USER2", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-85") {
-		addForeignKeyConstraint(baseColumnNames: "user_base_id", baseTableName: "users_users", constraintName: "FK_users_users_USER3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "users_users", constraintName: "FK_users_users_USER3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
 	changeSet(author: "seth (generated)", id: "1308779031843-5") {

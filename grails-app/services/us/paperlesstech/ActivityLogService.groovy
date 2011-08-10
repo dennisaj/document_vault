@@ -1,13 +1,13 @@
 package us.paperlesstech
 
 class ActivityLogService {
+	static transactional = false
+
 	def authServiceProxy
 	def requestService
 
-	static transactional = false
-
 	/**
-	 * Creates a log entry from the given information.  params will be altered so this should not be the actual params.
+	 * Creates a log entry from the given information. params will be altered so this should not be the actual params.
 	 *
 	 * @param controller The name of the requested controller
 	 * @param action the name of the action (defaults to "index")

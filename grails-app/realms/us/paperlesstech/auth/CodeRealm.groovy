@@ -30,7 +30,7 @@ class CodeRealm {
 			throw new DisabledAccountException("This account is currently disabled.")
 		}
 
-		def account = new SimpleAccount(user.id, user.passwordHash, "grails.plugins.nimble.realms.LocalizedRealm")
+		def account = new SimpleAccount(user.id, user.passwordHash, "us.paperlesstech.auth.LocalizedRealm")
 		log.info "Successfully logged in code [$code] as User [$user.id]$user.username."
 
 		account

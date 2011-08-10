@@ -279,6 +279,6 @@
 
 </g:else>
 
-<n:facebookConnect/>
+<pt:facebookConnect/>
 
 </body>

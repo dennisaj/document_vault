@@ -1,6 +1,6 @@
 package us.paperlesstech.auth
 
-import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.AuthenticationToken
 
 class CodeToken implements AuthenticationToken {
 	String code

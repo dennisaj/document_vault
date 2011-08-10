@@ -1,8 +1,8 @@
 package us.paperlesstech
 
-import us.paperlesstech.helpers.FileHelpers
 import grails.converters.JSON
-import grails.plugins.nimble.core.Group
+import us.paperlesstech.helpers.FileHelpers
+import us.paperlesstech.nimble.Group
 
 class UploadController {
 	static allowedMethods = [save: "POST", saveAjax: "POST"]

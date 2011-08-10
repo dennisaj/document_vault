@@ -2,8 +2,9 @@ package us.paperlesstech
 
 import grails.converters.JSON
 import grails.plugin.spock.ControllerSpec
-import grails.plugins.nimble.core.Group
 import org.springframework.core.io.ClassPathResource
+
+import us.paperlesstech.nimble.Group;
 
 class UploadControllerSpec extends ControllerSpec {
 	AuthService authService = Mock()

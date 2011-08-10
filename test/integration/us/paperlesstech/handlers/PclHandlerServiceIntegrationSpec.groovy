@@ -3,11 +3,9 @@ package us.paperlesstech.handlers
 import org.springframework.core.io.ClassPathResource
 
 import us.paperlesstech.Document
-
-import us.paperlesstech.MimeType
-
-import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.DocumentData
+import us.paperlesstech.DomainIntegrationSpec
+import us.paperlesstech.MimeType
 import us.paperlesstech.helpers.PclInfo
 
 class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {

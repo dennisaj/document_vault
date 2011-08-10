@@ -15,11 +15,34 @@
  *  limitations under the License.
  */
 
-// change the JavaScript library that grails & nimble use by adjusting this value
-// valid values: jquery, mootools prototype
 grails.views.javascript.library='jquery'
 
 nimble {
+	fieldnames {
+		uid = "uid"
+		number = "number"
+	}
+
+	fields {
+		admin {
+			user = ['username', 'external', 'federated']
+		}
+		enduser {
+			user = ['username', 'pass', 'passConfirm']
+			profile = ['fullName', 'email']
+		}
+	}
+
+	passwords {
+		mustcontain {
+			lowercase = true
+			uppercase = true
+			numbers = true
+			symbols = true
+		}
+		minlength = 8
+	}
+
 	organization {
 		name = ""
 		displayname = ""
@@ -37,6 +60,8 @@ nimble {
 
 	resources {
 		jslibrary = grails.views.javascript.library
+		usejsdev = false
+		usecssdev = false
 	}
 
 	localusers {
@@ -46,9 +71,25 @@ nimble {
 		registration {
 			enabled = true
 		}
+		usernames {
+			minlength = 4
+			validregex = '[a-zA-Z0-9]*'
+		}
+		provision {
+			active = false
+		}
 	}
 
 	facebook {
+		uid = "facebook"
+		name = "Facebook"
+		displayname = "Facebook"
+		description = "Facebook helps you connect and share with the people in your life."
+		url = "http://www.facebook.com"
+		alttext = "Facebook Homepage"
+		profileurl = "http://www.facebook.com/profile.php?id=ACCOUNTID"
+		profilealttext = "Facebook Profile"
+
 		federationprovider {
 			enabled = false
 			autoprovision = false
@@ -58,34 +99,54 @@ nimble {
 		secretkey = ""
 	}
 
+	twitter {
+		uid = "twitter"
+		name = "Twitter"
+		displayname = "Twitter"
+		description = "Lets you keep in touch with people through the exchange of quick, frequent answers to one simple question: What are you doing?"
+		url = "http://www.twitter.com"
+		alttext = "Twitter Homepage"
+		profileurl = "http://www.twitter.com/ACCOUNTID"
+		profilealttext = "Twitter Profile"
+	}
+
 	openid {
+		name = "OpenID"
+		displayname = "OpenID"
+		description = "OpenID is an open and decentralized identity system, designed \"not to crumble if one company turns evil or goes out of business\" "
+		url = "http://openid.net/"
+		alttext = "OpenID Foundation"
+
 		federationprovider {
 			enabled = false
 			autoprovision = false
+		}
+
+		discovery {
+			google = "https://www.google.com/accounts/o8/id"
+			yahoo = "http://yahoo.com"
+			flickr = "http://flickr.com"
 		}
 	}
 
 	messaging {
 		enabled = true
-		
+
 		registration {
 			subject = "Your new account is ready!"
 		}
+
+		passwordreset {
+			subject = "Your password has been reset"
+		}
+
+		changeemail {
+			subject = "Your email address has been changed"
+		}
+
 		passwordreset {
 			subject = "Your password has been reset"
 			external.subject = "Your password reset request"
-		}
-
-		mail {
-			host = "smtp.gmail.com"
-			port = 465
-			username = "donotreply@paperlesstech.us"
-			from = "Paperless Tech <donotreply@paperlesstech.us>"
-			password = "ZgJ7Gy2W"
-			props = ["mail.smtp.auth":"true",
-					"mail.smtp.socketFactory.port":"465",
-					"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-					"mail.smtp.socketFactory.fallback":"false"]
 		}
 	}
 

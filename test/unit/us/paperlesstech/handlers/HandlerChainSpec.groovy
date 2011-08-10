@@ -1,10 +1,10 @@
 package us.paperlesstech.handlers
 
 import grails.plugin.spock.UnitSpec
-import grails.plugins.nimble.core.Group
 import us.paperlesstech.AuthService
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
+import us.paperlesstech.nimble.Group;
 
 class HandlerChainSpec extends UnitSpec {
 	HandlerChain chain

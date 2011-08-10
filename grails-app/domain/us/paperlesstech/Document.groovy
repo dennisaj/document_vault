@@ -2,8 +2,13 @@ package us.paperlesstech
 
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
+import java.util.Date
+import java.util.List
+import java.util.SortedSet
+
 import org.grails.taggable.Taggable
-import grails.plugins.nimble.core.Group
+
+import us.paperlesstech.nimble.Group
 
 @MultiTenant
 class Document implements Taggable {

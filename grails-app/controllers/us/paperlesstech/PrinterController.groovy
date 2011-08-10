@@ -1,7 +1,6 @@
 package us.paperlesstech
 
 class PrinterController {
-
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
 	def index = {

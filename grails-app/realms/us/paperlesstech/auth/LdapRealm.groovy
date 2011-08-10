@@ -1,6 +1,5 @@
 package us.paperlesstech.auth
 
-import grails.plugins.nimble.core.Group
 import javax.naming.AuthenticationException
 import javax.naming.Context
 import javax.naming.NamingException
@@ -8,6 +7,7 @@ import javax.naming.PartialResultException
 import javax.naming.directory.InitialDirContext
 import javax.naming.directory.SearchControls
 import javax.naming.directory.SearchResult
+
 import org.apache.shiro.authc.AccountException
 import org.apache.shiro.authc.CredentialsException
 import org.apache.shiro.authc.IncorrectCredentialsException
@@ -15,7 +15,9 @@ import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.authc.UnknownAccountException
 import org.hibernate.Session
 import org.springframework.beans.factory.InitializingBean
-import us.paperlesstech.User
+
+import us.paperlesstech.nimble.Group;
+import us.paperlesstech.nimble.User;
 
 /**
  * A realm that authenticates users against an LDAP server.
@@ -172,7 +174,7 @@ class LdapRealm implements InitializingBean {
 			}
 
 			user = loadAndUpdateUser(searchResult)
-			account = new SimpleAccount(user.id, user.passwordHash, "grails.plugins.nimble.realms.LocalizedRealm")
+			account = new SimpleAccount(user.id, user.passwordHash, "us.paperlesstech.auth.LocalizedRealm")
 		}
 
 		if (!user) {

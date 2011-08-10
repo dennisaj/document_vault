@@ -1,12 +1,13 @@
 package us.paperlesstech
 
+import org.apache.shiro.crypto.hash.Sha256Hash
+import org.springframework.beans.factory.InitializingBean
+
 import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.amazonaws.services.s3.model.ObjectMetadata
-import org.apache.shiro.crypto.hash.Sha256Hash
-import org.springframework.beans.factory.InitializingBean
 
 class FileService implements InitializingBean {
 	static transactional = false

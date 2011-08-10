@@ -1,4 +1,4 @@
-<%@page import="grails.plugins.nimble.core.Group"%>
+<%@page import="us.paperlesstech.Group"%>
 <%@page import="us.paperlesstech.DocumentPermission"%>
 <jq:jquery>
 nimble.createPermission = function(ownerID) {

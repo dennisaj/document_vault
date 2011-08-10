@@ -1,7 +1,5 @@
 package us.paperlesstech
 
-import grails.converters.JSON
-
 import org.apache.shiro.SecurityUtils
 
 import us.paperlesstech.auth.CodeToken

@@ -1,11 +1,10 @@
-import grails.plugins.nimble.core.Group
-import grails.plugins.nimble.core.Role
-
+import grails.util.Environment
 import us.paperlesstech.DomainTenantMap
 import us.paperlesstech.Printer
-import us.paperlesstech.User
-import grails.util.Environment
 import us.paperlesstech.flea.Flea
+import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.Role
+import us.paperlesstech.nimble.User
 
 class BootStrap {
 	def grailsApplication
@@ -13,6 +12,9 @@ class BootStrap {
 	def tenantService
 
 	def init = { servletContext ->
+		// Setup nimble Realms
+		nimbleInit()
+
 		assert new File("/usr/local/bin/pcl6")?.canExecute(), "Cannot execute /usr/local/bin/pcl6"
 		assert new File("/usr/local/bin/gs")?.canExecute(), "Cannot execute /usr/local/bin/gs"
 		assert new File("/usr/local/bin/convert")?.canExecute(), "Cannot execute /usr/local/bin/convert"
@@ -91,5 +93,20 @@ class BootStrap {
 	}
 
 	def destroy = {
+	}
+
+	/**
+	 * Carry over from the Nimble BootStrap process
+	 */
+	def nimbleInit = {
+		// Execute all service init that relies on base Nimble environment
+		def services = grailsApplication.getArtefacts("Service")
+		for (service in services) {
+			if (service.clazz.methods.find { it.name == 'nimbleInit' } != null) {
+				def serviceBean = grailsApplication.mainContext.getBean(service.propertyName)
+				serviceBean.nimbleInit()
+			}
+		}
+	
 	}
 }

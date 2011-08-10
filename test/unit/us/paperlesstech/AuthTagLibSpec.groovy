@@ -1,12 +1,12 @@
 package us.paperlesstech
 
 import grails.plugin.spock.*
-import grails.plugins.nimble.core.Group
 
 import org.codehaus.groovy.grails.web.pages.GroovyPage
 import org.codehaus.groovy.grails.web.taglib.exceptions.GrailsTagException
 
 import spock.lang.*
+import us.paperlesstech.nimble.Group;
 
 class AuthTagLibSpec extends TagLibSpec {
 	@Shared

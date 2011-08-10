@@ -1,7 +1,7 @@
 package us.paperlesstech
 
 import grails.plugin.spock.IntegrationSpec
-import grails.plugins.nimble.core.Group
+import us.paperlesstech.nimble.Group
 
 class DomainIntegrationSpec extends IntegrationSpec {
 	def sessionFactory

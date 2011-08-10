@@ -40,9 +40,9 @@ modules = {
 	'dv-login' {
 		dependsOn 'dv-ui'
 
-		resource url: [plugin:'nimble', dir: '/css', file: 'login.css']
-		resource url: [plugin:'nimble', dir: '/js/jquery', file: 'nimbleui.js']
-		resource url: [plugin:'nimble', dir: '/js/jquery', file: 'jquery.url.js']
+		resource url: '/css/nimble/login.css'
+		resource url: '/js/nimble/jquery/nimbleui.js'
+		resource url: '/js/nimble/jquery/jquery.url.js'
 	}
 
 	'dv-mobile' {

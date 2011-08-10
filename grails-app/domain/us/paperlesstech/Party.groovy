@@ -5,6 +5,8 @@ import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 import java.util.Date
 import java.util.List
 
+import us.paperlesstech.nimble.User
+
 @MultiTenant
 class Party {
 	static final List allowedPermissions = [DocumentPermission.Sign, DocumentPermission.View]

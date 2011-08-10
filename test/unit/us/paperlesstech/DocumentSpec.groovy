@@ -1,8 +1,8 @@
 package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
-import grails.plugins.nimble.core.Group
 import spock.lang.Unroll
+import us.paperlesstech.nimble.Group;
 
 class DocumentSpec extends UnitSpec {
 	def setup() {}

@@ -1,11 +1,13 @@
 package us.paperlesstech.auth
 
 import grails.plugin.spock.UnitSpec
-import grails.plugins.nimble.core.Group
-import grails.plugins.nimble.core.GroupService
+
 import javax.naming.directory.BasicAttributes
 import javax.naming.directory.SearchResult
+
 import us.paperlesstech.MetaClassMixin
+import us.paperlesstech.nimble.Group;
+import us.paperlesstech.nimble.GroupService;
 
 @Mixin(MetaClassMixin)
 class LdapRealmSpec extends UnitSpec {

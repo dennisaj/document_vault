@@ -1,16 +1,19 @@
 package us.paperlesstech
 
-import grails.plugins.nimble.auth.WildcardPermission
-import grails.plugins.nimble.core.AdminsService
-import grails.plugins.nimble.core.AuthenticatedService
-import grails.plugins.nimble.core.Group
-
 import java.util.concurrent.ConcurrentHashMap
 
-class AuthService extends AuthenticatedService {
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authz.permission.WildcardPermission
+
+import us.paperlesstech.nimble.AdminsService
+import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.User
+
+class AuthService {
 	static scope = "request"
 	static transactional = false
 
+	def grailsApplication
 	Map permissionsCache = [implied:[:], permitted: [:]] as ConcurrentHashMap
 	def testSubject
 
@@ -251,5 +254,28 @@ class AuthService extends AuthenticatedService {
 		}
 
 		return checkPermission(subject, permission)
+	}
+
+	def getAuthenticatedSubject() {
+		SecurityUtils.getSubject()
+	}
+
+	def getAuthenticatedUser() {
+		GroovyClassLoader classLoader = new GroovyClassLoader(getClass().classLoader)
+		def principal = SecurityUtils.getSubject()?.getPrincipal()
+		def authUser = User.get(principal)
+
+		if (!authUser) {
+			log.info "Authenticated user was not able to be obtained from metaclass"
+			return null
+		}
+
+		authUser
+	}
+
+	def isLoggedIn() {
+		def subject = getAuthenticatedSubject()
+
+		subject?.authenticated || subject?.remembered
 	}
 }

@@ -1,0 +1,56 @@
+a.icon { background-repeat:no-repeat; padding-left:24px; background-position:4px center;}
+span.icon { background-repeat:no-repeat; padding-left:24px; background-position:4px center;}
+button.icon { background-repeat:no-repeat; padding-left:24px; background-position:4px center;}
+.ui-tabs .ui-tabs-nav li a.icon { background-repeat:no-repeat; padding-left:24px; background-position:4px center;}
+
+.icon { background-repeat:no-repeat; padding-left:24px; background-position:4px center;}
+.icon_accept{background-image:url(icons/accept.png);}
+.icon_add{background-image:url(icons/add.png);}
+.icon_anchor{background-image:url(icons/anchor.png);}
+.icon_arrow_left{background-image:url(icons/arrow_left.png);}
+.icon_arrow_refresh{background-image:url(icons/arrow_refresh.png);}
+.icon_bullet_green{background-image:url(icons/bullet_green.png);}
+.icon_cancel{background-image:url(icons/cancel.png);}
+.icon_cog{background-image:url(icons/cog.png);}
+.icon_cog_add{background-image:url(icons/cog_add.png);}
+.icon_cog_go{background-image:url(icons/cog_go.png);}
+.icon_cross{background-image:url(icons/cross.png);}
+.icon_delete{background-image:url(icons/delete.png);}
+.icon_flag_blue{background-image:url(icons/flag_blue.png);}
+.icon_flag_green{background-image:url(icons/flag_green.png);}
+.icon_flag_orange{background-image:url(icons/flag_orange.png);}
+.icon_flag_pink{background-image:url(icons/flag_pink.png);}
+.icon_flag_purple{background-image:url(icons/flag_purple.png);}
+.icon_flag_red{background-image:url(icons/flag_red.png);}
+.icon_flag_yellow{background-image:url(icons/flag_yellow.png);}
+.icon_group{background-image:url(icons/group.png);}
+.icon_group_add{background-image:url(icons/group_add.png);}
+.icon_group_delete{background-image:url(icons/group_delete.png);}
+.icon_group_edit{background-image:url(icons/group_edit.png);}
+.icon_group_error{background-image:url(icons/group_error.png);}
+.icon_group_gear{background-image:url(icons/group_gear.png);}
+.icon_group_go{background-image:url(icons/group_go.png);}
+.icon_group_key{background-image:url(icons/group_key.png);}
+.icon_group_link{background-image:url(icons/group_link.png);}
+.icon_help{background-image:url(icons/help.png);}
+.icon_information{background-image:url(icons/information.png);}
+.icon_key{background-image:url(icons/key.png);}
+.icon_key_go{background-image:url(icons/key_go.png);}
+.icon_lock{background-image:url(icons/lock.png);}
+.icon_magnifier{background-image:url(icons/magnifier.png);}
+.icon_printer{background-image:url(icons/printer.png);}
+.icon_table_go{background-image:url(icons/table_go.png);}
+.icon_tick{background-image:url(icons/tick.png);}
+.icon_user{background-image:url(icons/user.png);}
+.icon_user_add{background-image:url(icons/user_add.png);}
+.icon_user_comment{background-image:url(icons/user_comment.png);}
+.icon_user_delete{background-image:url(icons/user_delete.png);}
+.icon_user_edit{background-image:url(icons/user_edit.png);}
+.icon_user_female{background-image:url(icons/user_female.png);}
+.icon_user_go{background-image:url(icons/user_go.png);}
+.icon_user_gray{background-image:url(icons/user_gray.png);}
+.icon_user_green{background-image:url(icons/user_green.png);}
+.icon_user_orange{background-image:url(icons/user_orange.png);}
+.icon_user_red{background-image:url(icons/user_red.png);}
+.icon_user_suit{background-image:url(icons/user_suit.png);}
+.icon_world{background-image:url(icons/world.png);}

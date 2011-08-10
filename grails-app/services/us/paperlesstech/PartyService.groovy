@@ -1,8 +1,10 @@
 package us.paperlesstech
 
-import grails.plugins.nimble.core.Permission
-
 import java.text.ParseException
+
+import us.paperlesstech.nimble.Permission
+import us.paperlesstech.nimble.Profile
+import us.paperlesstech.nimble.User
 
 class PartyService {
 	static final String dateFormat = 'MM/dd/yyyy'

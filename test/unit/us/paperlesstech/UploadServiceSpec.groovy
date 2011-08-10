@@ -1,8 +1,8 @@
 package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
-import grails.plugins.nimble.core.Group
 import us.paperlesstech.handlers.HandlerChain
+import us.paperlesstech.nimble.Group;
 
 class UploadServiceSpec extends UnitSpec {
 	UploadService service

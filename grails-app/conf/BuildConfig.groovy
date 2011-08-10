@@ -40,15 +40,21 @@ grails.project.dependency.resolution = {
 	}
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-
 		compile group:'us.paperlesstech', name:'flea', version:'0.9.1'
 		compile group:'com.itextpdf', name:'itextpdf', version:'5.0.6'
 		runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'
 		compile group:'com.sun.media', name:'jai-codec', version:'1.1.3'
-		compile group:'net.java.dev.jai-imageio', name:'jai-imageio-core-standalone', version:'1.2-pre-dr-b04-2010-04-30'
-		compile group:'com.amazonaws', name:'aws-java-sdk', version:'1.2.2'
+		compile group:'net.java.dev.jai-imageio', name:'jai-imageio-core-standalone', version:'1.2-pre-dr-b04-2011-07-04'
+		compile group:'com.amazonaws', name:'aws-java-sdk', version:'1.2.6'
 		compile group:'c3p0', name:'c3p0', version:'0.9.1.2'
 		test group:'org.objenesis', name:'objenesis', version:'1.2'
+
+		// Nimble integration dependencies
+		compile group:'com.google.code.facebookapi', name:'facebook-java-api', version:'3.0.2'
+		// There is a newer version of this library. Nimble is not compatible with it.
+		compile group:'org.openid4java', name:'openid4java-consumer', version:'0.9.5'
+		compile group:'net.tanesha.recaptcha4j', name:'recaptcha4j', version:'0.0.7'
+		compile group:'org.apache.santuario', name:'xmlsec', version:'1.4.5'
 	}
 }
 
