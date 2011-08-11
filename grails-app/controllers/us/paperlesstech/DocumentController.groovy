@@ -11,7 +11,7 @@ import org.hibernate.sql.JoinFragment
 
 class DocumentController {
 	static allowedMethods = [addParty:"POST", image:"POST", removeParty:"POST", resend:"POST", saveNote:"POST", submitParties:"POST", submitSignatures:"POST"]
-	static navigation = [[action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Home']]
+	static navigation = [[action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Search']]
 
 	def authService
 	def handlerChain
