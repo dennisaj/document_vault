@@ -10,16 +10,17 @@ class PclHandlerService extends Handler {
 	static handlerFor = [MimeType.PCL]
 	static pcl2pdf = new ClassPathResource("scripts/pcl2pdf.sh").file.absolutePath
 	static transactional = true
+
 	def handlerChain
 
 	byte[] createPdf(DocumentData d, PclDocument pclDocument) {
 		assert d.mimeType == MimeType.PCL
 
 		String pclPath = fileService.getAbsolutePath(d)
-		File pdfFile = new File(FileHelpers.chopExtension(pclPath, ".pcl") + ".pdf")
+		File pdfFile = File.createTempFile("pcl2pdf", ".pdf")
 
 		try {
-			def cmd = """/bin/bash $pcl2pdf $pclPath ${pclDocument.startPage} ${pclDocument.endPage}"""
+			def cmd = """/bin/bash $pcl2pdf ${pclDocument.startPage} ${pclDocument.endPage} $pclPath ${pdfFile.absolutePath}"""
 			log.debug "PDF create - ${cmd}"
 			def proc = cmd.execute()
 			proc.waitFor()

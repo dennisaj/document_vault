@@ -340,7 +340,7 @@ public class PCLParser {
           }
           // Unknown character
           else {
-            logger.error("Unknown character [" + Integer.toHexString(bt) + "|" + Integer.toString(bt) + "] {" + (char) bt + "}");
+            logger.debug("Unknown character [" + Integer.toHexString(bt) + "|" + Integer.toString(bt) + "] {" + (char) bt + "}");
           }
         // notify listeners about parsed PCL command
         notifyCommand(position, cmd);
