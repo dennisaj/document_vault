@@ -23,9 +23,12 @@
 		<g:each var="document" in="${documentResults}" status="index">
 			<tr class="result">
 				<td>
+					<%-- The previewImage will not be available if the conversion is still in progress. --%>
+					<g:if test="${document.previewImage(1)}">
 					<a class="thumb" href="${createLink(action:'downloadImage', params:[documentId: document.id, pageNumber:1])}">
 						<img src="${createLink(action:'thumbnail', params:[documentId: document.id, pageNumber:1, documentDataId:document.previewImage(1).thumbnail.id])}" alt="Document ${document.id} Page 1" title="<g:message code="document-vault.label.clicktopreview" />" />
 					</a>
+					</g:if>
 				</td>
 				<td>
 					${document.toString()}
