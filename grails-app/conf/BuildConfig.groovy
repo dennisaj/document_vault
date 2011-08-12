@@ -40,7 +40,7 @@ grails.project.dependency.resolution = {
 	}
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-		compile group:'us.paperlesstech', name:'flea', version:'0.9.2'
+		compile group:'us.paperlesstech', name:'flea', version:'0.9.3-SNAPSHOT'
 		compile group:'com.itextpdf', name:'itextpdf', version:'5.0.6'
 		runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'
 		compile group:'com.sun.media', name:'jai-codec', version:'1.1.3'
