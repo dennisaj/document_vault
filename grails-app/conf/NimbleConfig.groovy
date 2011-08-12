@@ -150,11 +150,6 @@ nimble {
 		}
 	}
 
-	implementation {
-		user = "us.paperlesstech.User"
-		profile = "us.paperlesstech.Profile"
-	}
-
 	tablenames {
 		user = "users"
 		role = "roles"
