@@ -490,38 +490,6 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-23") {
-		createTable(tableName: "print_queue") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "print_queuePK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "date_created", type: "timestamp") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "document_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "printer_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "user_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
 	changeSet(author: "dbwatson (generated)", id: "1307476009700-24") {
 		createTable(tableName: "printer") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
@@ -1090,18 +1058,6 @@ databaseChangeLog = {
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-72") {
 		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "preview_image", constraintName: "FK_PREVIEW_IMAGE_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-73") {
-		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "print_queue", constraintName: "FK_PRINT_QUEUE_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-74") {
-		addForeignKeyConstraint(baseColumnNames: "printer_id", baseTableName: "print_queue", constraintName: "FK_PRINT_QUEUE_PRINTER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "printer", referencesUniqueColumn: "false")
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-75") {
-		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "print_queue", constraintName: "FK_PRINT_QUEUE_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
 	}
 
 	changeSet(author: "dbwatson (generated)", id: "1307406573455-76") {
