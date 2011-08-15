@@ -1,11 +1,10 @@
 package us.paperlesstech
 
 import grails.converters.JSON
-import us.paperlesstech.flea.PdfPrinter
 
 class PrintQueueController {
 	def authService
-	def fileService
+	def handlerChain
 
 	def push = {
 		def printer = Printer.load(params.printerId)
@@ -13,10 +12,7 @@ class PrintQueueController {
 		boolean printed = false
 
 		if (printer && document) {
-			def printData = fileService.getBytes(document.files.first())
-
-			printed = PdfPrinter.printByteArray(deviceType: printer.deviceType, host: printer.host,
-					port: printer.port, document: printData)
+			printed = handlerChain.print(document: document, printer: printer)
 		}
 
 		if (printed) {

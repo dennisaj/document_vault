@@ -11,11 +11,13 @@ import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.PdfStamper
+import us.paperlesstech.Printer
 
 class PdfHandlerService extends Handler {
 	static final handlerFor = [MimeType.PDF]
 	static final LINEBREAK = 'LB'
 	static pdf2png = new ClassPathResource("scripts/pdf2png.sh").file.absolutePath
+	static pdfPrint = new ClassPathResource("scripts/pdf_print.sh").file.absolutePath
 	static transactional = true
 
 	def handlerChain
@@ -150,5 +152,28 @@ class PdfHandlerService extends Handler {
 		input.documentData = newPdf
 
 		handlerChain.generatePreview(input)
+	}
+
+	@Override
+	boolean print(Map input) {
+		def d = getDocument(input)
+		Printer printer = input.printer
+		assert printer
+		log.info "Printing document ${d} to printer ${printer}"
+
+		def pdfPath = fileService.getAbsolutePath(d.files.first())
+
+		def cmd = """/bin/bash $pdfPrint $pdfPath ${printer.host} ${printer.port} ${printer.deviceType}"""
+		log.debug "PDF print - $cmd"
+		def proc = cmd.execute()
+		proc.waitFor()
+		if (proc.exitValue()) {
+			log.error proc.getErrorStream().text
+			log.error "Unable to print document ${d.id} - PDF print failed. Command: '$cmd'"
+
+			return false
+		}
+
+		return true
 	}
 }
