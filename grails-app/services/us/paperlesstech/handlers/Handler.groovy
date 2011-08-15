@@ -35,12 +35,15 @@ class Handler {
 	}
 
 	/**
-	 * Converts the document into a printable format and inserts it into the PrintQueue.  Expects an element with key document
+	 * Converts the document into a printable format and prints it to the passed printer.  Expect elements with the
+	 * key document and one with the key printer
 	 *
-	 * @param input the map to retrieve document and documentData from
+	 * @param input the map to retrieve document and printer from
+	 *
+	 * @return true if the document is successfully printed
 	 */
-	void print(Map input) {
-		throw new UnsupportedOperationException("print has no handler for ${input?.documentData?.mimeType}")
+	boolean print(Map input) {
+		throw new UnsupportedOperationException("print has no handler for ${input?.document?.files?.first?.mimeType}")
 	}
 
 	/**

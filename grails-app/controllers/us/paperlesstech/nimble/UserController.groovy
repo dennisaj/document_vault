@@ -175,7 +175,7 @@ class UserController {
 			if (!user.validate() || !userService.validatePass(user, true)) {
 				log.debug "Password change for [$user.id]$user.username was invalid"
 				render view: 'changepassword', model: [user: user]
-			} else {S
+			} else {
 				def savedUser = userService.changePassword(user)
 				log.info "Successfully saved password change for user [$user.id]$user.username"
 				flash.type = "success"
@@ -243,7 +243,7 @@ class UserController {
 			render message(code: 'nimble.user.username.invalid')
 			response.status = 500
 		} else {
-			def users = User.findAllByUsername(params?.val) 
+			def users = User.findAllByUsername(params?.val)
 			if (users != null && users.size() > 0) {
 				render message(code: 'nimble.user.username.invalid')
 				response.status = 500

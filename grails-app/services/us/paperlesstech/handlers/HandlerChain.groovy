@@ -26,7 +26,7 @@ class HandlerChain extends Handler {
 	}
 
 	@Override
-	void print(Map input) {
+	boolean print(Map input) {
 		def document = getDocument(input)
 		assert authServiceProxy.canPrint(document)
 
