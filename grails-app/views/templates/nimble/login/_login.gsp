@@ -249,7 +249,7 @@
 
           <fieldset>
             <label for="username" class="append-1"><g:message code="nimble.label.username" /></label>
-            <input id="username" type="text" name="username" class="title"/>
+            <input id="username" type="text" name="username" class="title" autocorrect="off" autocapitalize="off" />
 
             <label for="password" class="append-1"><g:message code="nimble.label.password" /></label>
             <input id="password" type="password" name="password" class="title"/>
