@@ -1,4 +1,4 @@
-<%@ page import="us.paperlesstech.Role" %>
+<%@ page import="us.paperlesstech.nimble.Role" %>
 <head>
 	<meta name="layout" content="${grailsApplication.config.nimble.layout.administration}"/>
 	<title><g:message code="nimble.view.role.list.title" /></title>
