@@ -14,6 +14,7 @@ class FermanBusinessLogicService {
 
 	enum FermanDocumentTypes {
 		CustomerHardCopy(~/20901|20913/),
+		WarrantyRepairOrder(~/206/),
 		Other(null)
 
 		private final Pattern pattern
@@ -57,6 +58,9 @@ class FermanBusinessLogicService {
 			case FermanDocumentTypes.Other:
 				m.raw = parseOther(pclDocument)
 				break
+			case FermanDocumentTypes.WarrantyRepairOrder:
+				m = parseWarrantyRepairOrder(pclDocument)
+				break
 			case FermanDocumentTypes.CustomerHardCopy:
 				m = parseCustomerHardCopy(pclDocument)
 				break
@@ -90,6 +94,65 @@ class FermanBusinessLogicService {
 		}
 
 		return line[start..<Math.min(end + 1, length)].trim()
+	}
+
+	Map parseWarrantyRepairOrder(PclDocument pclDocument) {
+		def lines = pclDocument.pages[0].pageData.readLines()
+
+		lines = lines.reverse()
+
+		def m = [:]
+
+		def line
+		while (lines && !line?.trim()) {
+			line = lines.pop()
+		}
+
+		m["Work_Phone"] = getField(line, 40, 54)
+		m["RO_Open_Date"] = getField(line, 55, 67)
+		String tmp = getField(line, 68, 79)
+		def idx = tmp.indexOf('/')
+		if (idx >= 0) {
+			tmp = tmp[0..<idx]
+		}
+		m["RO_Number"] = tmp
+
+		line = lines.pop()
+		m["Customer_Name"] = getField(line, 0, 39)
+
+		line = lines.pop()
+		m["Customer_Address"] = getField(line, 0, 39)
+		m["Home_Phone"] = getField(line, 40, 54)
+		m["RO_Close_Date"] = getField(line, 55, 67)
+		m["Cross_Reference_Number"] = getField(line, 68, 79)
+
+		line = lines.pop()
+		m["Customer_Address"] = (m["Customer_Address"] + "\n" + getField(line, 0, 39)).trim()
+
+		line = lines.pop()
+		m["Customer_Address"] = (m["Customer_Address"] + "\n" + getField(line, 0, 39)).trim()
+		m["Body"] = getField(line, 40, 54)
+		m["Mileage_In"] = getField(line, 55, 67)
+		m["Mileage_Out"] = getField(line, 68, 79)
+
+		lines.pop()
+		line = lines.pop()
+		m["Model_Year"] = getField(line, 0, 9)
+		m["Make"] = getField(line, 10, 24)
+		m["Model"] = getField(line, 25, 39)
+		m["License_Number"] = getField(line, 40, 54)
+		m["Service_Advisor"] = getField(line, 55, 79)
+
+		lines.pop()
+		line = lines.pop()
+		m["VIN"] = getField(line, 0, 24)
+		m["Color"] = getField(line, 25, 39)
+		m["Delivery_Date"] = getField(line, 55, 67)
+		m["In_Service_Date"] = getField(line, 68, 79)
+
+		m["raw"] = trimTokens(lines.join("\n"))
+
+		m
 	}
 
 	Map parseCustomerHardCopy(PclDocument pclDocument) {
@@ -210,7 +273,7 @@ class FermanBusinessLogicService {
 	}
 
 	/**
-	 * Separate a block of text into individual tokens then mash 
+	 * Separate a block of text into individual tokens then mash
 	 * them back together in a newline delimited string.
 	 */
 	private String trimTokens(input) {
