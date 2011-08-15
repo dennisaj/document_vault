@@ -1,4 +1,4 @@
-<%@ page import="us.paperlesstech.Group" %>
+<%@ page import="us.paperlesstech.nimble.Group" %>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<meta name="layout" content="${grailsApplication.config.nimble.layout.administration}"/>
