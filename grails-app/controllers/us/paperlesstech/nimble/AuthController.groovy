@@ -34,6 +34,8 @@ import us.paperlesstech.auth.FacebookConnectToken
  */
 class AuthController {
 	static Map allowedMethods = [signin: 'POST']
+	static navigation = [[action: "logout", isVisible: { authService.isLoggedIn() }, order: 100, title: "Logout"]]
+
 	private static String TARGET = 'AuthController.TARGET'
 
 	def authService
@@ -105,6 +107,7 @@ class AuthController {
 			flash.message = message(code: "nimble.login.failed.general")
 		}
 
+		params.remove('password')
 		redirect(action: 'login', params:params)
 	}
 
