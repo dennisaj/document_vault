@@ -16,6 +16,7 @@ class DocumentController {
 	def authService
 	def handlerChain
 	def partyService
+	def preferenceService
 	def sessionFactory
 	def tagService
 
@@ -82,7 +83,10 @@ class DocumentController {
 			}
 		}
 
-		def model = [tagSearchResults:tagSearchResults, documentResults:documentResults, documentTotal:documentTotal]
+		def model = [tagSearchResults:tagSearchResults,
+			documentResults:documentResults,
+			documentTotal:documentTotal,
+			defaultPrinter:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER)]
 		if (request.xhr) {
 			render(template: "searchResults", model: model)
 		} else {
@@ -100,7 +104,7 @@ class DocumentController {
 		}
 
 		render ([status:"error"] as JSON)
-	
+
 	}
 
 	def saveNote = {
@@ -174,12 +178,12 @@ class DocumentController {
 		def document = Document.get(params.long("documentId"))
 		assert document
 
-		[document: document]
+		[document: document, defaultPrinter:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER)]
 	}
 
 	def image = {
 		def d = Document.get(params.long("documentId"))
-		def pageNumber = params.int("pageNumber");
+		def pageNumber = params.int("pageNumber")
 		assert d
 
 		def map = d.previewImageAsMap(pageNumber)
@@ -192,7 +196,8 @@ class DocumentController {
 		def document = Document.get(params.long("documentId"))
 		assert document
 
-		[document: document, parties:Party.findAllByDocument(document), colors:PartyColor.values(), permissions:Party.allowedPermissions]
+		[document: document, parties:Party.findAllByDocument(document), colors:PartyColor.values(), permissions:Party.allowedPermissions,
+			defaultPrinter:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER)]
 	}
 
 	def submitSignatures = {
@@ -265,8 +270,8 @@ class DocumentController {
 			} else {
 				outParty = partyService.createParty(document, inParty)
 				if (outParty.hasErrors() || outParty.signator.hasErrors()) {
-					// If there was an error, use the existing code. 
-					// This ensures that the unsaved clientside highlights won't disappear. 
+					// If there was an error, use the existing code.
+					// This ensures that the unsaved clientside highlights won't disappear.
 					outParty.code = inParty.code
 				}
 			}

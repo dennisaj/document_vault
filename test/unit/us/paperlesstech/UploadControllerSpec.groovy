@@ -4,11 +4,12 @@ import grails.converters.JSON
 import grails.plugin.spock.ControllerSpec
 import org.springframework.core.io.ClassPathResource
 
-import us.paperlesstech.nimble.Group;
+import us.paperlesstech.nimble.Group
 
 class UploadControllerSpec extends ControllerSpec {
 	AuthService authService = Mock()
 	UploadService uploadService = Mock()
+	PreferenceService preferenceService = Mock()
 	File testFile = new ClassPathResource("dt_cust_hard.pcl").file
 
 	def setup() {
@@ -17,6 +18,7 @@ class UploadControllerSpec extends ControllerSpec {
 		testFile.metaClass.getInputStream = { Mock(InputStream) }
 		controller.authService = authService
 		controller.uploadService = uploadService
+		controller.preferenceService = preferenceService
 	}
 
 	def "savePcl responds with a 500 error when the user can't upload to any group"() {
@@ -33,7 +35,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.savePcl()
 
 		then:
-		authService.getGroupsWithPermission(DocumentPermission.Upload) >> ([new Group()] as Set)
+		authService.getGroupsWithPermission(DocumentPermission.Upload) >> ([new Group()] as SortedSet)
 		uploadService.uploadByteArray(_, _, _, _) >> [null, { throw new RuntimeException("boom") }]
 		mockResponse.status == 500
 	}
@@ -47,7 +49,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.savePcl()
 
 		then:
-		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> ([new Group()] as Set)
+		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> ([new Group()] as SortedSet)
 		1 * uploadService.uploadDocument(_, _, _, _) >> [doc]
 		mockResponse.status == 200
 		mockResponse.contentAsString.contains("42")
@@ -55,14 +57,16 @@ class UploadControllerSpec extends ControllerSpec {
 
 	def "index should return the groups that the user can upload to"() {
 		when:
+		1 * preferenceService.getPreference(_, _) >> defaultGroup
+		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> groups
 		def model = controller.index()
 
 		then:
-		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> groups
-		model == [groups: groups]
+		model == [groups: groups, defaultGroup:defaultGroup]
 
 		where:
-		groups = ["moo"] as Set
+		groups = ["moo"] as SortedSet
+		defaultGroup << ["group"]
 	}
 
 	def "ajaxSave should call the real save with ajax set to true"() {

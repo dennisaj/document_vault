@@ -2,11 +2,14 @@ package us.paperlesstech.handlers
 
 import org.springframework.core.io.ClassPathResource
 
+import us.paperlesstech.AuthService
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.MimeType
+import us.paperlesstech.PreferenceService
 import us.paperlesstech.helpers.PclInfo
+import us.paperlesstech.nimble.User
 
 class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def fileService
@@ -16,7 +19,9 @@ class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def pclBytes = new ClassPathResource("3pages_2_doc.pcl").getFile().bytes
 	PclInfo pclInfo
 
+	@Override
 	def setup() {
+		handlerChain.preferenceService = Mock(PreferenceService)
 		document = new Document()
 		document.group = DomainIntegrationSpec.group
 		pclDocumentData = new DocumentData(mimeType: MimeType.PCL)
@@ -26,6 +31,7 @@ class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 
 	def "import ferman pcl file document 1"() {
 		when:
+		handlerChain.preferenceService.setPreference (_,_,_) >> true
 		handlerChain.importFile(document: document, documentData: pclDocumentData, bytes: pclBytes,
 				pclDocument: pclInfo.documents[0])
 
@@ -44,6 +50,7 @@ class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 
 	def "import ferman pcl file document 2"() {
 		when:
+		handlerChain.preferenceService.setPreference (_,_,_) >> true
 		handlerChain.importFile(document: document, documentData: pclDocumentData, bytes: pclBytes,
 				pclDocument: pclInfo.documents[1])
 

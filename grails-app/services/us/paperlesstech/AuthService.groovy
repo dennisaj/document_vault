@@ -118,7 +118,7 @@ class AuthService {
 	 * @param permission The permission to test
 	 * @return The set of all groups where the user can perform the indicated permission
 	 */
-	Set getGroupsWithPermission(List<DocumentPermission> permissions) {
+	SortedSet getGroupsWithPermission(List<DocumentPermission> permissions) {
 		def user = authenticatedUser
 		def subject = authenticatedSubject
 
@@ -128,11 +128,11 @@ class AuthService {
 
 		def groups = Group.list()
 
-		subject.hasRole(AdminsService.ADMIN_ROLE) ? groups : groups?.findAll {group->
+		(subject.hasRole(AdminsService.ADMIN_ROLE) ? groups : groups?.findAll { Group group->
 			permissions.any {permission->
 				checkPermission(permission, group)
 			}
-		}
+		}) as SortedSet
 	}
 
 	/**
@@ -260,7 +260,7 @@ class AuthService {
 		SecurityUtils.getSubject()
 	}
 
-	def getAuthenticatedUser() {
+	User getAuthenticatedUser() {
 		GroovyClassLoader classLoader = new GroovyClassLoader(getClass().classLoader)
 		def principal = SecurityUtils.getSubject()?.getPrincipal()
 		def authUser = User.get(principal)

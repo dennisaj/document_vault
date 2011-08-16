@@ -27,7 +27,7 @@
 				<form action="${createLink(action:"save")}" method="POST" enctype="multipart/form-data">
 					<h4>
 						<g:message code="document-vault.label.upload.group" />
-						<g:select name="group" id="group" from="${groups}" optionKey="id" optionValue="name" value="${recentGroup?.id}" />
+						<g:select name="group" id="group" from="${groups}" optionKey="id" optionValue="name" value="${defaultGroup}" />
 					</h4>
 					<div class="fileupload-buttonbar">
 						<label class="fileinput-button">

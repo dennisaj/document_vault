@@ -26,7 +26,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
  * @author Bradley Beddoes
  */
 @MultiTenant
-class Group {
+class Group implements Comparable<Group> {
 	String name
 	String description
 	String realm
@@ -61,13 +61,15 @@ class Group {
 		name blank: false, unique: 'tenantId', minSize:1, maxSize: 255
 		description nullable: true, blank: false
 		realm nullable: true, blank: false
-
 		dateCreated nullable: true
 		lastUpdated nullable: true
-
 		permissions nullable:true
-
 		externalId nullable: true, blank: true
+	}
+
+	@Override
+	int compareTo(Group other) {
+		name <=> other?.name
 	}
 
 	@Override

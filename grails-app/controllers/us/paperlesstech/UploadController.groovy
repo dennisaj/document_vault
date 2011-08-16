@@ -9,10 +9,12 @@ class UploadController {
 	static navigation = [[action: 'index', isVisible: {authService.canUploadAny()}, order: 10, title: 'Upload']]
 
 	def authService
+	def preferenceService
 	def uploadService
 
 	def index = {
-		[groups:authService.getGroupsWithPermission([DocumentPermission.Upload])]
+		[groups:authService.getGroupsWithPermission([DocumentPermission.Upload]),
+			defaultGroup:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_UPLOAD_GROUP)]
 	}
 
 	def ajaxSave = {

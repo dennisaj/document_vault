@@ -20,6 +20,8 @@ import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
+import us.paperlesstech.Preference
+
 /**
  * Represents a user within a Nimble Application
  *
@@ -57,12 +59,14 @@ class User {
 		followers: User,
 		roles: Role,
 		groups: Group,
-		permissions: Permission
+		permissions: Permission,
+		preferences:Preference
 	]
 
 	static fetchMode = [
-		roles: 'eager',
-		groups: 'eager'
+		roles:'eager',
+		groups:'eager',
+		preferences:'eager'
 	]
 
 	static mapping = {
@@ -77,6 +81,7 @@ class User {
 		groups cache: true, cascade: 'none'
 		permissions cache: true
 		externalId index: "user_external_id_idx"
+		preferences cache:true
 	}
 
 	static constraints = {
@@ -95,6 +100,7 @@ class User {
 
 		permissions nullable:true
 		externalId nullable: true, blank: true
+		preferences nullable:true
 	}
 
 	// Transients

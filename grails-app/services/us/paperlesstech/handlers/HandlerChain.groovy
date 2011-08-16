@@ -2,10 +2,15 @@ package us.paperlesstech.handlers
 
 import org.apache.commons.logging.LogFactory
 
+import us.paperlesstech.PreferenceService
+import us.paperlesstech.Printer
+
 class HandlerChain extends Handler {
 	org.apache.commons.logging.Log log = LogFactory.getLog(getClass())
+
 	def businessLogicService
 	def handlers
+	def preferenceService
 
 	@Override
 	void importFile(Map input) {
@@ -14,6 +19,7 @@ class HandlerChain extends Handler {
 		byte[] bytes = input.bytes
 		assert bytes, "Data is required for import"
 
+		preferenceService.setPreference(authServiceProxy.authenticatedUser, PreferenceService.DEFAULT_UPLOAD_GROUP, document.group.id as String)
 		handle("importFile", input)
 	}
 
@@ -28,8 +34,10 @@ class HandlerChain extends Handler {
 	@Override
 	boolean print(Map input) {
 		def document = getDocument(input)
+		assert input.printer instanceof Printer
 		assert authServiceProxy.canPrint(document)
 
+		preferenceService.setPreference(authServiceProxy.authenticatedUser, PreferenceService.DEFAULT_PRINTER, input.printer.id as String)
 		handle("print", input)
 	}
 
@@ -101,7 +109,7 @@ class HandlerChain extends Handler {
 
 		assert handler.respondsTo(methodName)
 		def result = handler."$methodName"(input)
-		
+
 		businessMethod = businessMethod.replaceFirst("before", "after")
 		if (businessLogicService?.metaClass?.respondsTo(businessLogicService, businessMethod)) {
 			log.debug "calling $businessLogicService.$businessMethod"

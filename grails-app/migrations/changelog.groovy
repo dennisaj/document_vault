@@ -1113,4 +1113,6 @@ databaseChangeLog = {
 	}
 
 	include file: '20110805_documentNote.groovy'
+
+	include file: '20110816_preferences.groovy'
 }

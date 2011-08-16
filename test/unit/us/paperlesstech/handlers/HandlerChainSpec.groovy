@@ -4,16 +4,20 @@ import grails.plugin.spock.UnitSpec
 import us.paperlesstech.AuthService
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
-import us.paperlesstech.nimble.Group;
+import us.paperlesstech.PreferenceService
+import us.paperlesstech.Printer
+import us.paperlesstech.nimble.Group
 
 class HandlerChainSpec extends UnitSpec {
 	HandlerChain chain
 	AuthService authService = Mock()
+	PreferenceService preferenceService = Mock()
 	def line = [a:[x:0,y:0], b:[x:100,y:100]]
 
 	def setup() {
 		chain = new HandlerChain()
 		chain.authServiceProxy = authService
+		chain.preferenceService = preferenceService
 	}
 
 	def "importFile fails if the user can't upload to the document group"() {
@@ -44,6 +48,7 @@ class HandlerChainSpec extends UnitSpec {
 
 		then:
 		1 * authService.canUpload(d.group) >> true
+		1 * preferenceService.setPreference(_, _, _) >> true
 		methodName == "importFile"
 		input == m
 	}
@@ -98,23 +103,35 @@ class HandlerChainSpec extends UnitSpec {
 		def d = new Document()
 
 		when:
-		chain.print(document: d)
+		chain.print(document: d, printer:new Printer(id:1))
 
 		then:
 		thrown AssertionError
 		1 * authService.canPrint(d) >> false
 	}
 
+	def "print fails if there is no printer"() {
+		given:
+		def d = new Document()
+
+		when:
+		chain.print(document: d)
+
+		then:
+		thrown AssertionError
+	}
+
 	def "print calls handle"() {
 		given:
 		def d = new Document()
-		def m = [document: d]
+		def p = new Printer(id:1)
+		def m = [document: d, printer:p]
 		def methodName
 		def input
 		chain.metaClass.handle = { String a, Map b -> methodName = a; input = b }
 
 		when:
-		chain.print(document: d)
+		chain.print(document: d,, printer:p)
 
 		then:
 		1 * authService.canPrint(d) >> true
