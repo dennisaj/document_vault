@@ -16,6 +16,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 	PclHandlerService pclHandlerService = Mock()
 	TagService tagService = Mock()
 	File custHard
+	File warrantyRepairOrder
 	String otherText
 
 	def setup() {
@@ -25,6 +26,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		service.tagService = tagService
 
 		custHard = new ClassPathResource("dt_cust_hard.pcl").file
+		warrantyRepairOrder = new ClassPathResource("WarrantyRepairOrder.pcl").file
 
 		otherText = new ClassPathResource("dt_other.pcl").file.text
 		otherText = otherText.substring(otherText.indexOf("\n\n"))
@@ -77,6 +79,39 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		"123XX" == m["License_Number"]
 		"Customer\nPay\nTEST\n************************\nTEST\nCustomer\nPay\nIGUUG\n\\" == m["raw"]
 	}
+
+	def "parsing WarrantyRepairOrder pcl"() {
+		given:
+		def pclInfo = new PclInfo()
+		pclInfo.parse(pclFile: warrantyRepairOrder)
+
+		when: "The document is parsed"
+		def m = service.parseWarrantyRepairOrder(pclInfo.documents[0])
+
+		then: "All of the following fields should be parsed out"
+		"234-567-8910" == m["Work_Phone"]
+		"7/14/11" == m["RO_Open_Date"]
+		"57026641" == m["RO_Number"]
+		"JACKIE STEPHENSON" == m["Customer_Name"]
+		"13017 TERRACE BROOK PL\nTAMPA, FL  336370000" == m["Customer_Address"]
+		"813-846-3918" == m["Home_Phone"]
+		"7/14/11" == m["RO_Close_Date"]
+		"x-ref #" == m["Cross_Reference_Number"]
+		"4DR SDN I4 CV" == m["Body"]
+		"23079" == m["Mileage_In"]
+		"23081" == m["Mileage_Out"]
+		"2010" == m["Model_Year"]
+		"NISSAN" == m["Make"]
+		"ALTIMA" == m["Model"]
+		"abc 123" == m["License_Number"]
+		"Larry Edwards       7484" == m["Service_Advisor"]
+		"1N4AL2AP0AC100933" == m["VIN"]
+		"RED" == m["Color"]
+		"7/15/11" == m["Delivery_Date"]
+		"7/16/11" == m["In_Service_Date"]
+		m["raw"]
+	}
+
 
 	def "parsing unknown should split the words in the document"() {
 		given:
