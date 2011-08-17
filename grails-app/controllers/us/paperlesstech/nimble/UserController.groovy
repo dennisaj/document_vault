@@ -110,7 +110,7 @@ class UserController {
 		def profileFields = grailsApplication.config.nimble.fields.enduser.profile
 		user.properties[userFields] = params
 		user.profile.properties[profileFields] = params
-		user.enabled = false
+		user.enabled = true
 		user.external = false
 
 		def savedUser = userService.createUser(user)

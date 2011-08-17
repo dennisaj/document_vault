@@ -123,7 +123,7 @@ class AuthService {
 		def subject = authenticatedSubject
 
 		if (!isLoggedIn()) {
-			return [] as Set
+			return [] as SortedSet
 		}
 
 		def groups = Group.list()
