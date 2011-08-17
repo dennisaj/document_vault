@@ -15,6 +15,7 @@ class FermanBusinessLogicService {
 	enum FermanDocumentTypes {
 		CustomerHardCopy(~/20901|20913/),
 		WarrantyRepairOrder(~/206/),
+		ServiceInvoice(~/20813/),
 		Other(null)
 
 		private final Pattern pattern
@@ -64,6 +65,9 @@ class FermanBusinessLogicService {
 			case FermanDocumentTypes.CustomerHardCopy:
 				m = parseCustomerHardCopy(pclDocument)
 				break
+			case FermanDocumentTypes.ServiceInvoice:
+				m = parseServiceInvoice(pclDocument)
+				break
 			default:
 				throw new IllegalArgumentException("Unknown type: $t")
 		}
@@ -110,12 +114,7 @@ class FermanBusinessLogicService {
 
 		m["Work_Phone"] = getField(line, 40, 54)
 		m["RO_Open_Date"] = getField(line, 55, 67)
-		String tmp = getField(line, 68, 79)
-		def idx = tmp.indexOf('/')
-		if (idx >= 0) {
-			tmp = tmp[0..<idx]
-		}
-		m["RO_Number"] = tmp
+		m["RO_Number"] = cleanRO(getField(line, 68, 79))
 
 		line = lines.pop()
 		m["Customer_Name"] = getField(line, 0, 39)
@@ -155,6 +154,67 @@ class FermanBusinessLogicService {
 		m
 	}
 
+	Map parseServiceInvoice(PclDocument pclDocument) {
+		def lines = pclDocument.pages[0].pageData.readLines()
+
+		lines = lines.reverse()
+
+		def m = [:]
+
+		def line
+		while (lines && !line?.trim()) {
+			line = lines.pop()
+		}
+
+		m["RO_Open_Date"] = getField(line, 55, 67)
+		m["RO_Number"] = cleanRO(getField(line, 68, 79))
+
+		// Skip one line
+		lines.pop()
+		line = lines.pop()
+		m["RO_Close_Date"] = getField(line, 55, 67)
+		m["Status"] = getField(line, 68, 79)
+
+		lines.pop()
+		line = lines.pop()
+		m["Mileage_In"] = getField(line, 55, 67)
+		m["Mileage_Out"] = getField(line, 68, 79)
+
+		lines.pop()
+		line = lines.pop()
+		m["Service_Advisor"] = getField(line, 55, 79)
+
+		line = lines.pop()
+		m["Customer_Name"] = getField(line, 0, 35)
+
+		line = lines.pop()
+		m["Customer_Address"] = getField(line, 0, 35)
+		m["Work_Phone"] = getField(line, 36, 54)
+		m["VIN"] = getField(line, 55, 79)
+
+		line = lines.pop()
+		m["Customer_Address"] = (m["Customer_Address"] + "\n" + getField(line, 0, 35)).trim()
+
+		line = lines.pop()
+		m["Customer_Address"] = (m["Customer_Address"] + "\n" + getField(line, 0, 35)).trim()
+		m["Home_Phone"] = getField(line, 36, 54)
+		m["Delivery_Date"] = getField(line, 55, 67)
+		m["In_Service_Date"] = getField(line, 68, 79)
+
+		lines.pop()
+		line = lines.pop()
+		m["Model_Year"] = getField(line, 0, 5)
+		m["Make"] = getField(line, 6, 20)
+		m["Model"] = getField(line, 21, 35)
+		m["Body"] = getField(line, 36, 54)
+		m["Color"] = getField(line, 55, 67)
+		m["License_Number"] = getField(line, 68, 79)
+
+		m["raw"] = trimTokens(lines.join("\n"))
+
+		m
+	}
+
 	Map parseCustomerHardCopy(PclDocument pclDocument) {
 		// Since the data that we are extracting is duplicated on each page, currently we only extract the first page
 		def lines = pclDocument.pages[0].pageData.readLines()
@@ -171,12 +231,7 @@ class FermanBusinessLogicService {
 		if (!line.trim())
 			line = lines.pop()
 		m["RO_Open_Date"] = getField(line, 55, 67)
-		String tmp = getField(line, 68, 79)
-		def idx = tmp.indexOf('/')
-		if (idx >= 0) {
-			tmp = tmp[0..<idx]
-		}
-		m["RO_Number"] = tmp
+		m["RO_Number"] = cleanRO(getField(line, 68, 79))
 
 		// Skip one line
 		lines.pop()
@@ -281,5 +336,14 @@ class FermanBusinessLogicService {
 		def lines = m*.getAt(1)
 
 		lines.join("\n")
+	}
+
+	private String cleanRO(String RO) {
+		def idx = RO.indexOf('/')
+		if (idx >= 0) {
+			RO = RO[0..<idx]
+		}
+
+		RO
 	}
 }

@@ -17,6 +17,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 	TagService tagService = Mock()
 	File custHard
 	File warrantyRepairOrder
+	File serviceInvoice
 	String otherText
 
 	def setup() {
@@ -27,6 +28,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 
 		custHard = new ClassPathResource("dt_cust_hard.pcl").file
 		warrantyRepairOrder = new ClassPathResource("WarrantyRepairOrder.pcl").file
+		serviceInvoice = new ClassPathResource("ServiceInvoice.pcl").file
 
 		otherText = new ClassPathResource("dt_other.pcl").file.text
 		otherText = otherText.substring(otherText.indexOf("\n\n"))
@@ -89,7 +91,6 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		def m = service.parseWarrantyRepairOrder(pclInfo.documents[0])
 
 		then: "All of the following fields should be parsed out"
-		"234-567-8910" == m["Work_Phone"]
 		"7/14/11" == m["RO_Open_Date"]
 		"57026641" == m["RO_Number"]
 		"JACKIE STEPHENSON" == m["Customer_Name"]
@@ -112,6 +113,37 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		m["raw"]
 	}
 
+	def "parsing ServiceInvoice pcl"() {
+		given:
+		def pclInfo = new PclInfo()
+		pclInfo.parse(pclFile: serviceInvoice)
+
+		when: "The document is parsed"
+		def m = service.parseServiceInvoice(pclInfo.documents[0])
+
+		then: "All of the following fields should be parsed out"
+		"8/17/11" == m["RO_Open_Date"]
+		"57028977" == m["RO_Number"]
+		"8/17/11" == m["RO_Close_Date"]
+		"Final" == m["Status"]
+		"49721" == m["Mileage_In"]
+		"49726" == m["Mileage_Out"]
+		"Chris Csercsics/3284*W*" == m["Service_Advisor"]
+		"JULIO ALONSO" == m["Customer_Name"]
+		"3840 N LAKE DR UNIT 127\nTAMPA, FL  336142044" == m["Customer_Address"]
+		"999-999-9999" == m["Work_Phone"]
+		"813-928-1926" == m["Home_Phone"]
+		"4 DOOR SEDAN" == m["Body"]
+		"2005" == m["Model_Year"]
+		"NISSAN" == m["Make"]
+		"ALTIMA" == m["Model"]
+		"ABC 123" == m["License_Number"]
+		"1N4AL11D45N454075" == m["VIN"]
+		"MYSTIC EME" == m["Color"]
+		"12/21/04" == m["Delivery_Date"]
+		"12/21/04" == m["In_Service_Date"]
+		m["raw"]
+	}
 
 	def "parsing unknown should split the words in the document"() {
 		given:
