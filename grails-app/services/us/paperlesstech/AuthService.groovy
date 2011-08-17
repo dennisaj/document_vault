@@ -119,16 +119,13 @@ class AuthService {
 	 * @return The set of all groups where the user can perform the indicated permission
 	 */
 	SortedSet getGroupsWithPermission(List<DocumentPermission> permissions) {
-		def user = authenticatedUser
-		def subject = authenticatedSubject
-
 		if (!isLoggedIn()) {
 			return [] as SortedSet
 		}
 
 		def groups = Group.list()
 
-		(subject.hasRole(AdminsService.ADMIN_ROLE) ? groups : groups?.findAll { Group group->
+		(isAdmin() ? groups : groups?.findAll { Group group->
 			permissions.any {permission->
 				checkPermission(permission, group)
 			}
@@ -277,5 +274,10 @@ class AuthService {
 		def subject = getAuthenticatedSubject()
 
 		subject?.authenticated || subject?.remembered
+	}
+
+	def isAdmin() {
+		def subject = getAuthenticatedSubject()
+		subject?.hasRole(AdminsService.ADMIN_ROLE)
 	}
 }

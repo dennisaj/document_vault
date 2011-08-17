@@ -19,7 +19,7 @@ class AuthTagLib {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 * <code>body()</code> If allowed is true and body is not empty.<br>
 	 * <code>true</code> If allowed is true and body is empty.<br>
@@ -134,6 +134,10 @@ class AuthTagLib {
 		outputBody(authService.canViewAny(), body)
 	}
 
+	def isAdmin = { attr, body->
+		outputBody(authService.isAdmin(), body)
+	}
+
 	def facebookConnect = {attrs, body ->
 		def facebook = grailsApplication.config.nimble.facebook.federationprovider.enabled
 
@@ -141,6 +145,5 @@ class AuthTagLib {
 		out << render(template: "/templates/auth/facebookjs", contextPath: pluginContextPath, model: [facebook:facebook, secure: true, apikey: facebookService.apiKey])
 		else
 		out << render(template: "/templates/auth/facebookjs", contextPath: pluginContextPath, model: [facebook:facebook, secure: false, apikey: facebookService.apiKey])
-
 	}
 }

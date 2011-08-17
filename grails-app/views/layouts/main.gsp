@@ -29,5 +29,6 @@
 			<g:layoutBody />
 		</div>
 		<r:layoutResources/>
+		<g:render template="/footer" />
 	</body>
 </html>
