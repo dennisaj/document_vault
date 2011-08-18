@@ -18,6 +18,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 	File custHard
 	File warrantyRepairOrder
 	File serviceInvoice
+	File techHardCard
 	String otherText
 
 	def setup() {
@@ -29,6 +30,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		custHard = new ClassPathResource("dt_cust_hard.pcl").file
 		warrantyRepairOrder = new ClassPathResource("WarrantyRepairOrder.pcl").file
 		serviceInvoice = new ClassPathResource("ServiceInvoice.pcl").file
+		techHardCard = new ClassPathResource("TechHardCard.pcl").file
 
 		otherText = new ClassPathResource("dt_other.pcl").file.text
 		otherText = otherText.substring(otherText.indexOf("\n\n"))
@@ -142,6 +144,40 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		"MYSTIC EME" == m["Color"]
 		"12/21/04" == m["Delivery_Date"]
 		"12/21/04" == m["In_Service_Date"]
+		m["raw"]
+	}
+
+	def "parsing TechHardCard pcl"() {
+		given:
+		def pclInfo = new PclInfo()
+		pclInfo.parse(pclFile: techHardCard)
+
+		when: "The document is parsed"
+		def m = service.parseTechHardCard(pclInfo.documents[0])
+
+		then: "All of the following fields should be parsed out"
+		"AMPARO T FECTO" == m["Customer_Name"]
+		"813-345-8990" == m["Home_Phone"]
+		"8/17/11" == m["RO_Open_Date"]
+		"57029007" == m["RO_Number"]
+		"11:28" == m["Time_Received"]
+		"Waiting" == m["Time_Promised"]
+		"1523" == m["Key_Tag_Number"]
+		"10202" == m["Current_Mileage"]
+		"12345" == m["Mileage_Out"]
+		"Larry Edwar" == m["Service_Advisor"]
+		"21026 TANGOR RD\nLAND O LAKES, FL  346377426" == m["Customer_Address"]
+		"999-999-9999" == m["Work_Phone"]
+		"4 DR 2.5S XTR" == m["Body"]
+		"ABCD" == m["Engine_Code"]
+		"2009" == m["Model_Year"]
+		"NISSAN" == m["Make"]
+		"AL" == m["Model"]
+		"1N4AL21E69N554344" == m["VIN"]
+		"WINTER FRO" == m["Color"]
+		"ABC 123" == m["License_Number"]
+		"9/13/09" == m["Delivery_Date"]
+		"9/16/09" == m["In_Service_Date"]
 		m["raw"]
 	}
 
