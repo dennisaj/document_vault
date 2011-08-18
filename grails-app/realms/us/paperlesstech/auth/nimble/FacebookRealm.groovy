@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package us.paperlesstech.auth
+package us.paperlesstech.auth.nimble
 
 import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.IncorrectCredentialsException
@@ -22,9 +22,9 @@ import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.authc.UnknownAccountException
 
 import us.paperlesstech.helpers.InstanceGenerator
-import us.paperlesstech.nimble.FacebookService;
-import us.paperlesstech.nimble.FederationProvider;
-import us.paperlesstech.nimble.User;
+import us.paperlesstech.nimble.FacebookService
+import us.paperlesstech.nimble.FederationProvider
+import us.paperlesstech.nimble.User
 
 import com.google.code.facebookapi.ProfileField
 
@@ -35,7 +35,7 @@ import com.google.code.facebookapi.ProfileField
  * @author Bradley Beddoes
  */
 public class FacebookRealm {
-	static authTokenClass = us.paperlesstech.auth.FacebookConnectToken
+	static authTokenClass = us.paperlesstech.auth.nimble.FacebookConnectToken
 
 	def grailsApplication
 	def facebookService
@@ -86,7 +86,7 @@ public class FacebookRealm {
 							user.errors.each {
 								log.warn it
 							}
-							throw new RuntimeException("Account creation exception for new facebook based account");
+							throw new RuntimeException("Account creation exception for new facebook based account")
 						}
 						log.info "Created new user [$user.id]$user.username from facebook credentials"
 					}

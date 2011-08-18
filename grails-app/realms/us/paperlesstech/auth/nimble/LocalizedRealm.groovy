@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package us.paperlesstech.auth
+package us.paperlesstech.auth.nimble
 
 import org.apache.shiro.authc.AccountException
 import org.apache.shiro.authc.DisabledAccountException
@@ -65,7 +65,7 @@ class LocalizedRealm {
 			throw new DisabledAccountException("This account is currently disabled")
 		}
 
-		def account = new SimpleAccount(user.id, user.passwordHash, "us.paperlesstech.auth.LocalizedRealm")
+		def account = new SimpleAccount(user.id, user.passwordHash, "us.paperlesstech.auth.nimble.LocalizedRealm")
 		if (!credentialMatcher.doCredentialsMatch(authToken, account)) {
 			log.warn "Supplied password for user [$user.id]$user.username is incorrect"
 			throw new IncorrectCredentialsException("Invalid password for user '${username}'")

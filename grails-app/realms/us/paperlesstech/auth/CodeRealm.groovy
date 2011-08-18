@@ -30,7 +30,7 @@ class CodeRealm {
 			throw new DisabledAccountException("This account is currently disabled.")
 		}
 
-		def account = new SimpleAccount(user.id, user.passwordHash, "us.paperlesstech.auth.LocalizedRealm")
+		def account = new SimpleAccount(user.id, user.passwordHash, "us.paperlesstech.auth.nimble.LocalizedRealm")
 		log.info "Successfully logged in code [$code] as User [$user.id]$user.username."
 
 		account

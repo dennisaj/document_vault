@@ -61,5 +61,5 @@ grails.project.dependency.resolution = {
 }
 
 coverage {
-	exclusions = ["changelog*", "201*_*", "*Config*", "**/us/paperlesstech/nimble/**"]
+	exclusions = ["changelog*", "201*_*", "*Config*", "**/us/paperlesstech/nimble/**", "**/us/paperlesstech/auth/nimble/**"]
 }

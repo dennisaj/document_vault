@@ -25,7 +25,7 @@ import org.apache.shiro.authc.IncorrectCredentialsException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.openid4java.message.ParameterList
 
-import us.paperlesstech.auth.FacebookConnectToken
+import us.paperlesstech.auth.nimble.FacebookConnectToken
 
 /**
  * Manages all authentication processes including integration with OpenID, Facebook etc.
@@ -229,7 +229,7 @@ class AuthController {
 			def currentFBSessionCookies = new Cookie[request.cookies.length]
 
 			// Process Facebook supplied cookies per FB Connect API docs
-			int i = 0;
+			int i = 0
 			request.cookies.each {cookie ->
 				if (cookie.name.startsWith(facebookService.apiKey)) {
 					currentFBSessionCookies[i] = cookie
@@ -316,12 +316,12 @@ class AuthController {
 		}
 
 		def discovered = session.getAttribute("discovered")
-		ParameterList openIDResponse = new ParameterList(request.getParameterMap());
+		ParameterList openIDResponse = new ParameterList(request.getParameterMap())
 
 		StringBuffer receivingUrl = new StringBuffer(createLink(action: "${service}resp", absolute: true))
-		String queryString = request.getQueryString();
+		String queryString = request.getQueryString()
 		if (queryString != null && queryString.length() > 0)
-		receivingUrl.append("?").append(request.getQueryString());
+		receivingUrl.append("?").append(request.getQueryString())
 
 		def authToken = openIDService.processResponse(discovered, openIDResponse, receivingUrl.toString())
 

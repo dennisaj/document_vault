@@ -174,7 +174,7 @@ class LdapRealm implements InitializingBean {
 			}
 
 			user = loadAndUpdateUser(searchResult)
-			account = new SimpleAccount(user.id, user.passwordHash, "us.paperlesstech.auth.LocalizedRealm")
+			account = new SimpleAccount(user.id, user.passwordHash, "us.paperlesstech.auth.nimble.LocalizedRealm")
 		}
 
 		if (!user) {

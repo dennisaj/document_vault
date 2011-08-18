@@ -14,17 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package us.paperlesstech.auth
+package us.paperlesstech.auth.nimble
 
 import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.authc.UnknownAccountException
 
-import us.paperlesstech.auth.OpenIDToken
 import us.paperlesstech.helpers.InstanceGenerator
-import us.paperlesstech.nimble.FederationProvider;
-import us.paperlesstech.nimble.OpenIDService;
-import us.paperlesstech.nimble.User;
+import us.paperlesstech.nimble.FederationProvider
+import us.paperlesstech.nimble.OpenIDService
+import us.paperlesstech.nimble.User
 
 /**
  * Integrates with Shiro to establish a session for users accessing the system based
@@ -33,7 +32,7 @@ import us.paperlesstech.nimble.User;
  * @author Bradley Beddoes
  */
 public class OpenIDRealm {
-	static authTokenClass = us.paperlesstech.auth.OpenIDToken
+	static authTokenClass = us.paperlesstech.auth.nimble.OpenIDToken
 
 	def grailsApplication
 	def openIDService
@@ -64,7 +63,7 @@ public class OpenIDRealm {
 
 				newUser.profile = InstanceGenerator.profile()
 				newUser.profile.owner = newUser
-				
+
 				newUser.profile.fullName = authToken.fullName
 				newUser.profile.nickName = authToken.nickName
 				newUser.profile.email = authToken.email
@@ -76,7 +75,7 @@ public class OpenIDRealm {
 					user.errors.each {
 						log.error(it)
 					}
-					throw new RuntimeException("Account creation exception for new openID based account");
+					throw new RuntimeException("Account creation exception for new openID based account")
 				}
 				log.info("Created new user [$user.id]$user.username from openID credentials")
 			}

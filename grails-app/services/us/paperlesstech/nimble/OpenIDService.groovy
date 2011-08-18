@@ -28,7 +28,7 @@ import org.openid4java.message.ax.FetchRequest
 import org.openid4java.message.ax.FetchResponse
 import org.openid4java.server.RealmVerifier
 
-import us.paperlesstech.auth.OpenIDToken
+import us.paperlesstech.auth.nimble.OpenIDToken
 
 /**
  * Provides methods for interacting with OpenID authentication processes.
