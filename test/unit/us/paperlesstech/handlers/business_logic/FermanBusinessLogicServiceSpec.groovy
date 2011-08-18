@@ -19,6 +19,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 	File warrantyRepairOrder
 	File serviceInvoice
 	File techHardCard
+	File repairOrderAuditCopy
 	String otherText
 
 	def setup() {
@@ -31,6 +32,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		warrantyRepairOrder = new ClassPathResource("WarrantyRepairOrder.pcl").file
 		serviceInvoice = new ClassPathResource("ServiceInvoice.pcl").file
 		techHardCard = new ClassPathResource("TechHardCard.pcl").file
+		repairOrderAuditCopy = new ClassPathResource("RepairOrderAuditCopy.pcl").file
 
 		otherText = new ClassPathResource("dt_other.pcl").file.text
 		otherText = otherText.substring(otherText.indexOf("\n\n"))
@@ -144,6 +146,39 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		"MYSTIC EME" == m["Color"]
 		"12/21/04" == m["Delivery_Date"]
 		"12/21/04" == m["In_Service_Date"]
+		m["raw"]
+	}
+
+	def "parsing RepairOrderAuditCopy pcl"() {
+		given:
+		def pclInfo = new PclInfo()
+		pclInfo.parse(pclFile: repairOrderAuditCopy)
+
+		when: "The document is parsed"
+		def m = service.parseRepairOrderAuditCopy(pclInfo.documents[0])
+
+		then: "All of the following fields should be parsed out"
+		"MARK M ABIRI" == m["Customer_Name"]
+		"305-467-6011" == m["Work_Phone"]
+		"7/13/11" == m["RO_Open_Date"]
+		"57026565" == m["RO_Number"]
+		"813-236-3641" == m["Home_Phone"]
+		"Pre-Invoice" == m["RO_Close_Date"]
+		"R3213" == m["Receipt_Number"]
+		"2 DOOR EXTEND" == m["Body"]
+		"124454" == m["Mileage_In"]
+		"124454" == m["Mileage_Out"]
+		"James Spicer" == m["Service_Advisor"]
+		"1917 E HANNA AVE\nTAMPA, FL  336103544" == m["Customer_Address"]
+		"1995" == m["Model_Year"]
+		"NISSAN TRUCK" == m["Make"]
+		"PICKUP" == m["Model"]
+		"1N6HD16S9SC445910" == m["VIN"]
+		"GREEN" == m["Color"]
+		"ABC 123" == m["License_Number"]
+		"ACC 3621" == m["Account_Number"]
+		"10/05/07" == m["Delivery_Date"]
+		"10/06/07" == m["In_Service_Date"]
 		m["raw"]
 	}
 

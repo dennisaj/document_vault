@@ -17,6 +17,7 @@ class FermanBusinessLogicService {
 		WarrantyRepairOrder(~/206/),
 		ServiceInvoice(~/20813/),
 		TechHardCard(~/207/),
+		RepairOrderAuditCopy(~/205/),
 		Other(null)
 
 		private final Pattern pattern
@@ -71,6 +72,9 @@ class FermanBusinessLogicService {
 				break
 			case FermanDocumentTypes.TechHardCard:
 				m = parseTechHardCard(pclDocument)
+				break
+			case FermanDocumentTypes.RepairOrderAuditCopy:
+				m = parseRepairOrderAuditCopy(pclDocument)
 				break
 			default:
 				throw new IllegalArgumentException("Unknown type: $t")
@@ -152,6 +156,61 @@ class FermanBusinessLogicService {
 		m["Color"] = getField(line, 25, 39)
 		m["Delivery_Date"] = getField(line, 55, 67)
 		m["In_Service_Date"] = getField(line, 68, 79)
+
+		m["raw"] = trimTokens(lines.join("\n"))
+
+		m
+	}
+
+	Map parseRepairOrderAuditCopy(PclDocument pclDocument) {
+		def lines = pclDocument.pages[0].pageData.readLines()
+
+		lines = lines.reverse()
+
+		def m = [:]
+
+		def line
+		while (lines && !line?.trim()) {
+			line = lines.pop()
+		}
+
+		m["Work_Phone"] = getField(line, 40, 54)
+		m["RO_Open_Date"] = getField(line, 55, 67)
+		m["RO_Number"] = cleanRO(getField(line, 68, 79))
+
+		line = lines.pop()
+		m["Customer_Name"] = getField(line, 0, 39)
+
+		line = lines.pop()
+		m["Customer_Address"] = getField(line, 0, 39)
+		m["Home_Phone"] = getField(line, 40, 54)
+		m["RO_Close_Date"] = getField(line, 55, 67)
+		m["Receipt_Number"] = getField(line, 68, 79)
+
+		line = lines.pop()
+		m["Customer_Address"] = (m["Customer_Address"] + "\n" + getField(line, 0, 39)).trim()
+
+		line = lines.pop()
+		m["Customer_Address"] = (m["Customer_Address"] + "\n" + getField(line, 0, 39)).trim()
+		m["Body"] = getField(line, 40, 54)
+		m["Mileage_In"] = getField(line, 55, 67)
+		m["Mileage_Out"] = getField(line, 68, 79)
+
+		lines.pop()
+		line = lines.pop()
+		m["Model_Year"] = getField(line, 0, 9)
+		m["Make"] = getField(line, 10, 24)
+		m["Model"] = getField(line, 25, 39)
+		m["License_Number"] = getField(line, 40, 54)
+		m["Service_Advisor"] = getField(line, 55, 79)
+
+		lines.pop()
+		line = lines.pop()
+		m["VIN"] = getField(line, 0, 24)
+		m["Color"] = getField(line, 25, 39)
+		m["Account_Number"] = getField(line, 40, 54)
+		m["Delivery_Date"] = getField(line,55, 67)
+		m["In_Service_Date"] = getField(line, 67, 79)
 
 		m["raw"] = trimTokens(lines.join("\n"))
 
