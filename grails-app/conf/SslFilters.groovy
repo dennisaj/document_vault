@@ -8,6 +8,9 @@ class SslFilters {
 				if (grailsApplication.config.document_vault.forceSSL) {
 					if (request.getHeader('X-Forwarded-Proto') && request.getHeader('X-Forwarded-Proto') != 'https' && request.getHeader('User-Agent') != "ELB-HealthChecker") {
 						def url = g.createLink(absolute: true, controller: controllerName, action: actionName, params: params)
+						flash.each {key, value->
+							flash[key] = value
+						}
 						redirect(url: url)
 					}
 				}

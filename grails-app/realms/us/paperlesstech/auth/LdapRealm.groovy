@@ -16,8 +16,8 @@ import org.apache.shiro.authc.UnknownAccountException
 import org.hibernate.Session
 import org.springframework.beans.factory.InitializingBean
 
-import us.paperlesstech.nimble.Group;
-import us.paperlesstech.nimble.User;
+import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.User
 
 /**
  * A realm that authenticates users against an LDAP server.

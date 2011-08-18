@@ -24,7 +24,7 @@ import org.apache.shiro.authc.UnknownAccountException
 import org.apache.shiro.authz.permission.AllPermission
 import org.apache.shiro.authz.permission.WildcardPermission
 
-import us.paperlesstech.nimble.User;
+import us.paperlesstech.nimble.User
 
 /**
  * Integrates with Shiro to establish a session for users accessing the system based
