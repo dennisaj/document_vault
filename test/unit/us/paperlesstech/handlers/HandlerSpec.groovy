@@ -4,10 +4,10 @@ import grails.plugin.spock.UnitSpec
 import us.paperlesstech.AuthService
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
-import us.paperlesstech.MimeType
-import us.paperlesstech.PreviewImage
 import us.paperlesstech.FileService
-import javax.print.DocFlavor.INPUT_STREAM
+import us.paperlesstech.MimeType
+import us.paperlesstech.Note
+import us.paperlesstech.PreviewImage
 
 class HandlerSpec extends UnitSpec {
 	def authService = Mock(AuthService)
@@ -236,18 +236,19 @@ class HandlerSpec extends UnitSpec {
 	def "downloadNote should return a quad of the document note"() {
 		given:
 		mockDomain(Document)
-		def d = new Document(name: "file")
+		mockDomain(Note)
+		def d = new Document(name:"file")
 		authService.canNotes(d) >> true
 		def is = Mock(InputStream)
-		def dd = new DocumentData(mimeType: mimeType, fileSize: fileSize)
-		d.addToNotes(dd)
+		def note = new Note(id:1, data:new DocumentData(id:1,mimeType: mimeType, fileSize: fileSize))
+		d.addToNotes(note)
 
 		when:
-		def result = handler.downloadNote(document: d, documentNote: dd)
+		def result = handler.downloadNote(document: d, note:note)
 
 		then:
-		1 * fileService.getInputStream(dd) >> is
-		result[0] == "file-documentNote($dd.id).$mimeType.downloadExtension"
+		1 * fileService.getInputStream(note.data) >> is
+		result[0] == "file-note($note.id)-${note.data.id}.$mimeType.downloadExtension"
 		result[1] == is
 		result[2] == mimeType.downloadContentType
 		result[3] == fileSize

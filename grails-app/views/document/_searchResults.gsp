@@ -86,7 +86,17 @@
 					<g:message code="document-vault.label.notes" />:
 				</td>
 				<td colspan="4">
-					<span class="noteField" id="${document.id}">${document.searchField('Note')}</span>
+					<div id="noteField-${document.id}">
+						<g:render template="/note/textNotes" model="[document:document]" />
+					</div>
+					<g:form name="noteForm-${document.id}" >
+						<g:textArea class="noteTextarea" name="value" id="note-${document.id}" rows="5" />
+						
+						<g:submitToRemote url="[controller:'note', action:'saveText', params:[documentId:document.id]]" name="submit" 
+							value="${g.message(code:'document-vault.label.submit')}" 
+							update="noteField-${document.id}"
+							after="\$('#note-${document.id}').val('');" />
+					</g:form>
 				</td>
 			</tr>
 			</pt:canNotes>

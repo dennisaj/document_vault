@@ -6,6 +6,7 @@ import javax.imageio.ImageIO
 
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
+import us.paperlesstech.Note
 import us.paperlesstech.helpers.ImageHelpers
 
 
@@ -120,9 +121,9 @@ class Handler {
 	}
 
 	/**
-	 * Applies the given lines (an object called "notes" that maps from DocumentData.id to a list of lines) 
-	 * to the existing notes or creates new notes if the id is not a valid DocumentData
-	 *
+	 * Takes a list of Maps in a variable called notes that contain two entries: 'lines' and 'text'.
+	 * <br><br>
+	 * e.g.: input.notes = [[text:"this is some text", lines:[/ * Line Data Goes here * /]]
 	 */
 	def saveNotes(Map input) {
 		def d = getDocument(input)
@@ -134,29 +135,22 @@ class Handler {
 		def height = grailsApplication.config.document_vault.document.note.defaultHeight
 		def mimeType = grailsApplication.config.document_vault.document.note.defaultMimeType
 
-		notes.each {key, lines ->
-			def note = DocumentData.get(key)
-			BufferedImage original
+		notes.each { entry->
+			assert entry.text || entry.lines, "A note must contain either text or lines"
 
-			if (note) {
-				assert note in d.notes
-				mimeType = note.mimeType
-				fileService.withInputStream(note) {is->
-					original = ImageIO.read(is)
-				}
+			def note = new Note(user:authServiceProxy.authenticatedUser, note:entry.text)
 
-				d.removeFromNotes(note)
-			} else {
-				original = ImageHelpers.createBlankImage(width, height)
+			if (entry.lines) {
+				BufferedImage original = ImageHelpers.createBlankImage(width, height)
+				ImageHelpers.drawLines(original, entry.lines)
+				ByteArrayOutputStream output = new ByteArrayOutputStream()
+				ImageIO.write(original, mimeType.toString().toLowerCase(), output)
+
+				DocumentData newImage = fileService.createDocumentData(bytes:output.toByteArray(), mimeType:mimeType, pages:1)
+				note.data = newImage
 			}
 
-			ImageHelpers.drawLines(original, lines)
-
-			ByteArrayOutputStream output = new ByteArrayOutputStream()
-			ImageIO.write(original, mimeType.toString().toLowerCase(), output)
-
-			DocumentData newImage = fileService.createDocumentData(bytes:output.toByteArray(), mimeType:mimeType, pages:1)
-			d.addToNotes(newImage)
+			d.addToNotes(note)
 		}
 	}
 
@@ -164,19 +158,19 @@ class Handler {
 	 * Returns a quad of the documentNote image to be downloaded to the client. NOTE: The returned InputStream must be
 	 * closed by the caller.
 	 *
-	 * @param input a map that must contain document and documentNote
+	 * @param input a map that must contain document and note
 	 * @return a quad of (documentFilename, document data as an Input Stream, document mimetype, and content length
 	 */
 	def downloadNote(Map input) {
 		def d = getDocument(input)
 		assert authServiceProxy.canNotes(d)
 
-		def documentNote = input.documentNote
-		assert documentNote, "This method requires a document note"
+		def note = input.note
+		assert note?.data, "This method requires a note with DocumentData"
 
-		def filename = "${d.toString()}-documentNote($documentNote.id).$documentNote.mimeType.downloadExtension"
+		def filename = "${d.toString()}-note($note.id)-${note.data.id}.$note.data.mimeType.downloadExtension"
 
-		[filename, fileService.getInputStream(documentNote), documentNote.mimeType.downloadContentType, documentNote.fileSize]
+		[filename, fileService.getInputStream(note.data), note.data.mimeType.downloadContentType, note.data.fileSize]
 	}
 
 	/**

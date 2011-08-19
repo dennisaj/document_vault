@@ -34,15 +34,32 @@ var Scratch = {
 		return this.notes[noteId];
 	},
 
-	addScratchBox: function(note) {
+	_addEmptyScratchBox: function(note) {
 		var $scratchBox = $('<div />').attr('id', 'scratch-box' + note.pageNumber).addClass('scratch-box');
-		$scratchBox.append('<div />');
+		$scratchBox.append('<img />');
 		$scratchBox.data('scratch-id', note.pageNumber);
 		$('#add-scratch-box').before($scratchBox);
-		this.setPreview(note, $scratchBox);
+	},
+
+	_addScratchBoxImage: function(note) {
+		var $scratchBox = $('#scratch-box' + note.pageNumber);
+		this._setPreview(note, $scratchBox);
+	},
+
+	_closeScratch: function() {
+		var note = this.notes[this.currentNote];
+		if (note) {
+			$('#scratch-canvas-container').hide();
+			this._setPreview(note, $('#scratch-box' + note.pageNumber));
+			$('.scratch-box.toggle').removeClass('toggle');
+		}
 	},
 
 	doEnd: function(event, canvas, note) {
+		if (this._isSaved(note)) {
+			return;
+		}
+
 		if (!this.isMoving) {
 		} else {
 			Draw.addBreak(note);
@@ -52,6 +69,10 @@ var Scratch = {
 	},
 
 	doMove: function(event, canvas, note) {
+		if (this._isSaved(note)) {
+			return;
+		}
+
 		this.isMoving = true;
 		var point = Sign._convertEventToPoint(event);
 
@@ -72,17 +93,22 @@ var Scratch = {
 			$('.scratch-box').remove();
 			self.notes = {};
 
-			$.each(data, function(index, src) {
-				var note = self.addNote(index, src);
+			$.each(data, function(index, noteInfo) {
+				var note = self.addNote(index, noteInfo.url);
+				self._addEmptyScratchBox(note);
 				if (note.background.complete) {
-					self.addScratchBox(note);
+					self._addScratchBoxImage(note);
 				} else {
 					bindEvent(note.background, 'load', function() {
-						self.addScratchBox(note);
+						self._addScratchBoxImage(note);
 					});
 				}
 			});
 		});
+	},
+
+	_isSaved: function(note) {
+		return note.pageNumber > 0;
 	},
 
 	saveNotes: function() {
@@ -90,7 +116,7 @@ var Scratch = {
 		var notes = {};
 
 		$.each(this.notes, function(index, note) {
-			if (note.lines.length > 0) {
+			if (!self._isSaved(note) && note.lines.length > 0) {
 				notes[index] = Draw.scaleLines(note);
 			}
 		});
@@ -103,17 +129,11 @@ var Scratch = {
 	},
 
 	_saveScratch: function() {
-		var note = this.notes[this.currentNote];
-		if (note) {
-			$('#scratch-canvas-container').hide();
-			this.setPreview(note, $('#scratch-box' + note.pageNumber));
-			$('.scratch-box.toggle').removeClass('toggle');
-		}
-
+		this._closeScratch();
 		this.saveNotes();
 	},
 
-	setPreview: function(note, $target) {
+	_setPreview: function(note, $target) {
 		var cleanCanvas = document.createElement('canvas');
 		cleanCanvas.width = note.background.width;
 		cleanCanvas.height = note.background.height;
@@ -129,7 +149,6 @@ var Scratch = {
 		var self = this;
 		var $scratch = $('#scratch');
 		var eventType = $.support.touch ? 'touchend' : 'click';
-
 		this.scratch = $scratch[0];
 
 		this.getNotes();
@@ -144,6 +163,8 @@ var Scratch = {
 			$('.scratch-box.toggle').removeClass('toggle');
 			$(this).addClass('toggle');
 
+			$('#scratch-edit-buttons').toggle(!self._isSaved(note));
+
 			self.scratch.width = note.background.width;
 			self.scratch.height = note.background.height;
 			$('#scratch-canvas-container').show();
@@ -152,7 +173,14 @@ var Scratch = {
 
 		$('#add-scratch-box').bind(eventType, function(event) {
 			var note = self.addNote(-($('.scratch-box').length + 1));
-			self.addScratchBox(note);
+			self._addEmptyScratchBox(note);
+		});
+
+		$('#close-scratch').button({
+			icons: { primary: 'ui-icon-circle-close' }
+		}).bind(eventType, function(event) {
+			self.notes[self.currentNote].lines.splice(0, self.notes[self.currentNote].lines.length);
+			self._closeScratch()
 		});
 
 		$('#clear-scratch').button({

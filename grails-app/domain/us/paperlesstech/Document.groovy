@@ -20,12 +20,12 @@ class Document implements Taggable {
 	SortedSet files
 	Group group
 	String name
-	List notes
+	SortedSet notes
 	SortedSet previewImages
 
 	static hasMany = [previewImages: PreviewImage,
 			files: DocumentData,
-			notes: DocumentData,
+			notes:Note,
 			searchFieldsCollection: DocumentSearchField,
 			otherFieldsCollection: DocumentOtherField,
 			parties:Party]
@@ -40,11 +40,10 @@ class Document implements Taggable {
 	}
 
 	static mapping = {
-		notes joinTable:[name:'document_notes']
 		otherFieldsCollection cascade: "all, all-delete-orphan"
 		searchFieldsCollection cascade: "all, all-delete-orphan"
 	}
-	
+
 	/**
 	* Returns the highlight data for the given page.
 	*

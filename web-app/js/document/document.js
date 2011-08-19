@@ -67,8 +67,6 @@ var Document = {
 	},
 
 	getNotes: function(callback) {
-		var self = this;
-
 		return $.when($.post(this.urls.listNotes.format(this.documentId))).fail(this.ajaxErrorHandler);
 	},
 

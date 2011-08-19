@@ -43,17 +43,16 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		when:
 		def d = getDocument()
 		d.searchField("field1", "value1")
-		d.otherField("field1","value2")
-		def result = d.save(failOnError: true)
-		d = Document.get(1)
+		d.otherField("field1", "value2")
+		def result = d.save(failOnError: true, flush:true)
 
 		then: "Adding to the document map it should not throw a NPE"
 		result
 		Document.count() == 1
 		DocumentSearchField.count() == 1
 		DocumentOtherField.count() == 1
-		d.searchField("field1") == "value1"
-		d.otherField("field1") == "value2"
+		result.searchField("field1") == "value1"
+		result.otherField("field1") == "value2"
 	}
 
 	def "can update document maps"() {

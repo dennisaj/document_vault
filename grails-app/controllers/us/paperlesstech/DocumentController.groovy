@@ -10,14 +10,13 @@ import org.hibernate.criterion.Subqueries
 import org.hibernate.sql.JoinFragment
 
 class DocumentController {
-	static allowedMethods = [addParty:"POST", image:"POST", removeParty:"POST", resend:"POST", saveNote:"POST", submitParties:"POST", submitSignatures:"POST"]
+	static allowedMethods = [addParty:"POST", image:"POST", removeParty:"POST", resend:"POST", submitParties:"POST", submitSignatures:"POST"]
 	static navigation = [[action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Search']]
 
 	def authService
 	def handlerChain
 	def partyService
 	def preferenceService
-	def sessionFactory
 	def tagService
 
 	def index = {
@@ -92,33 +91,6 @@ class DocumentController {
 		} else {
 			model
 		}
-	}
-
-	def note = {
-		def document = Document.get(params.long('documentId'))
-		if (document) {
-			assert authService.canNotes(document)
-
-			render text:document.searchField("Note") ?: "", contentType: "text/plain"
-			return
-		}
-
-		render ([status:"error"] as JSON)
-
-	}
-
-	def saveNote = {
-		def document = Document.get(params.long('documentId'))
-		if (document) {
-			assert authService.canNotes(document)
-			document.searchField("Note", params.value)
-			document.save(flush:true)
-
-			render text:document.searchField("Note")?.encodeAsHTML(), contentType: "text/plain"
-			return
-		}
-
-		render ([status:"error"] as JSON)
 	}
 
 	def downloadImage = {

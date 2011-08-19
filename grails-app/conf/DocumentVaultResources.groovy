@@ -104,8 +104,6 @@ modules = {
 	}
 
 	'dv-ui-notes' {
-		dependsOn 'dv-ui', 'jquery-jeditable'
-
 		resource url: '/js/document/documentnote.js'
 	}
 
@@ -125,12 +123,6 @@ modules = {
 		defaultBundle 'dv-jquery-plugins'
 
 		resource url: '/js/jquery.ba-hashchange.js', minify: true, nominify: false
-	}
-
-	'jquery-jeditable' {
-		defaultBundle 'dv-jquery-plugins'
-
-		resource url: '/js/jquery.jeditable.min.js', minify: false, nominify: true
 	}
 
 	'jquery-template' {

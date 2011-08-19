@@ -38,19 +38,19 @@ class UrlMappings {
 			action = "resend"
 		}
 
-		"/documentNote/download/$documentId/$documentNoteId" {
-			controller = "documentNote"
+		"/note/download/$documentId/$noteDataId" {
+			controller = "note"
 			action = "download"
 		}
 
-		"/documentNote/list/$documentId" {
-			controller = "documentNote"
+		"/note/list/$documentId" {
+			controller = "note"
 			action = "list"
 		}
 
-		"/documentNote/save/$documentId" {
-			controller = "documentNote"
-			action = "save"
+		"/note/saveLines/$documentId" {
+			controller = "note"
+			action = "saveLines"
 		}
 
 		"/printQueue/push/$printerId/$documentId" {

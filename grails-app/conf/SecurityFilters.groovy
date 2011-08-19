@@ -1,5 +1,5 @@
 import us.paperlesstech.Document
-import us.paperlesstech.nimble.AdminsService;
+import us.paperlesstech.nimble.AdminsService
 
 public class SecurityFilters {
 	private static String openControllers = "auth|logout|account|code"
@@ -40,8 +40,6 @@ public class SecurityFilters {
 									return document && (authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document))
 								case ["submitSignatures"]:
 									return document && (authServiceProxy.canSign(document))
-								case ["note", "saveNote"]:
-									return document && (authServiceProxy.canNotes(document))
 								case ["addParty", "submitParties", "removeParty"]:
 									return document && (authServiceProxy.canGetSigned(document))
 								case "resend":
@@ -49,7 +47,7 @@ public class SecurityFilters {
 								default:
 									return false
 							}
-						case "documentNote":
+						case "note":
 							return document && (authServiceProxy.canNotes(document))
 						case "printQueue":
 							return document ? authServiceProxy.canPrint(document) : authServiceProxy.canPrintAny()

@@ -16,8 +16,8 @@
 					'removeParty': '${createLink(controller:"document", action:"removeParty")}/{0}/{1}',
 					'resendCode': '${createLink(controller:"document", action:"resend")}/{0}/{1}',
 					'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}',
-					'saveNotes': '${createLink(controller:"documentNote", action:"save")}/{0}',
-					'listNotes': '${createLink(controller:"documentNote", action:"list")}/{0}'
+					'saveNotes': '${createLink(controller:"note", action:"saveLines")}/{0}',
+					'listNotes': '${createLink(controller:"note", action:"list")}/{0}'
 				});
 			});
 		</r:script>
@@ -103,6 +103,10 @@
 				<div id="scratch-canvas-container">
 					<canvas id="scratch"></canvas>
 					<br />
+					<button id="close-scratch" class="labeled-button" title="<g:message code="document-vault.label.close" />">
+						<g:message code="document-vault.label.close" />
+					</button>
+					<span id="scratch-edit-buttons">
 					<button id="save-scratch" class="labeled-button" title="<g:message code="document-vault.label.save" />">
 						<g:message code="document-vault.label.save" />
 					</button>
@@ -112,6 +116,7 @@
 					<button id="clear-scratch" class="labeled-button" title="<g:message code="document-vault.label.clear" />">
 						<g:message code="document-vault.label.clear" />
 					</button>
+					</span>
 				</div>
 				<div id="add-scratch-box">+</div>
 			</div>

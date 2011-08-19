@@ -10,12 +10,6 @@
 		<r:require module='dv-ui-previewimage'/>
 		<r:script>
 			$(document).ready(function() {
-				DocumentNote.init({
-					'load': '${createLink(controller:"document", action:"note")}',
-					'save': '${createLink(controller:"document", action:"saveNote")}',
-					'spinner': '${resource(dir:"images", file:"spinner.gif")}'
-				});
-
 				Document.init({
 					'close': '${createLink(controller:"document", action:"index")}',
 					'downloadImage': '${createLink(controller:"document", action:"downloadImage")}/{0}/{1}',
