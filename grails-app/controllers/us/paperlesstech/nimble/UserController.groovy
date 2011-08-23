@@ -16,6 +16,8 @@
  */
 package us.paperlesstech.nimble
 
+import org.hibernate.Criteria
+
 import us.paperlesstech.helpers.InstanceGenerator
 
 /**
@@ -38,11 +40,34 @@ class UserController {
 	}
 
 	def list = {
-		if (!params.max) {
-			params.max = 10
-		}
 		log.debug "Listing users"
-		[users: User.list(params)]
+		params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		params.offset = params.offset ? params.int('offset') : 0
+		params.sort = params.sort ?: "username"
+		params.order = params.order ?: "desc"
+
+		def model = [:]
+		def filter = params.userFilter?.trim()
+
+		if (filter) {
+			params.sort = "fullName"
+			params.order = "asc"
+			def c = Profile.createCriteria()
+			def profiles = c.list(params) {
+				ilike "fullName", "%$filter%"
+			}
+			model = [userCount:profiles.totalCount, users:profiles*.owner]
+		} else {
+			params.sort = (params.sort == "fullName" ? "username" : params.sort)
+			model = [userCount:User.count(), users:User.list(params)]
+		}
+
+		if (request.xhr) {
+			render template:"list", model:model
+			return
+		} else {
+			return model
+		}
 	}
 
 	def show = {
