@@ -19,6 +19,8 @@ hr {
 }
 
 div#main {
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
 	background: white;
 	height: 100%;
 	left: 0;
@@ -35,48 +37,6 @@ canvas#can {
 	position: absolute;
 	top: 0;
 	z-index: 2;
-}
-
-.flip-container {
-	-webkit-backface-visibility: hidden;
-	backface-visibility: hidden;
-	height: 100%;
-	left: 0;
-	position: absolute;
-	top: 0;
-	width: 100%;
-}
-
-.flip-container.flip .front {
-	top: 2000px !important;
-	visibility: hidden;
-}
-
-#button-container {
-	position: relative !important;
-}
-
-.flip-container.flip .back {
-	top: 0;
-	visibility: visible;
-}
-
-.face {
-	-moz-transition-duration: .5s;
-	-moz-transition-timing-function: ease-in-out;
-	-ms-transition-duration: .5s;
-	-ms-transition-timing-function: ease-in-out;
-	-o-transition-duration: .5s;
-	-o-transition-timing-function: ease-in-out;
-	-webkit-transition-duration: .5s;
-	-webkit-transition-timing-function: ease-in-out;
-	transition-duration: .5s;
-	transition-timing-function: ease-in-out;
-}
-
-.back {
-	top: -2000px;
-	visibility: hidden;
 }
 
 div#buttonPanel {
@@ -182,4 +142,20 @@ div#buttonPanel {
 .ui-dialog, .ui-widget-overlay {
 	-webkit-tap-highlight-color: 0;
 	-webkit-touch-callout: none;
+}
+
+.noteTextarea {
+	display: block;
+	height: 5em;
+	padding: 0;
+	resize: none;
+	width: 25em !important;
+}
+
+#notes-container {
+	overflow-x:hidden;
+	overflow-y:auto;
+	height:500px;
+	display:none;
+	border-bottom: 1px solid black;
 }

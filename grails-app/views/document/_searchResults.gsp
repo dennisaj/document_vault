@@ -91,9 +91,8 @@
 					</div>
 					<g:form name="noteForm-${document.id}" >
 						<g:textArea class="noteTextarea" name="value" id="note-${document.id}" rows="5" />
-						
 						<g:submitToRemote url="[controller:'note', action:'saveText', params:[documentId:document.id]]" name="submit" 
-							value="${g.message(code:'document-vault.label.submit')}" 
+							value="${message(code:'document-vault.label.submit')}" 
 							update="noteField-${document.id}"
 							after="\$('#note-${document.id}').val('');" />
 					</g:form>

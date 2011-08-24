@@ -462,8 +462,8 @@ var Sign = {
 		$('#notes').button({
 			icons: { primary: 'ui-icon-note' }
 		}).bind(eventType, function(event) {
-			$('#canvas-container').addClass('flip');
-			$('#button-container').addClass('flip');
+			$('#notes-container').slideToggle();
+			$('textarea', '#notes-list').focus();
 		});
 
 		$('#close').button({
@@ -591,10 +591,13 @@ var Sign = {
 			$slider.slider('value', value - step);
 		});
 
+		this.$main.bind('mousewheel', function(event, delta) {
+			event.wheelDelta > 0 ? $('#zoom-in').click() : $('#zoom-out').click();
+		});
+
 		// Load the page indicated by the location hash
 		$(window).hashchange();
 
 		SignBox.init();
-		Scratch.init();
 	}
 };

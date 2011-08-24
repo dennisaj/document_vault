@@ -84,10 +84,8 @@ modules = {
 		dependsOn 'dv-ui-document'
 
 		resource url: '/css/document/sign.css', minify: true, nominify: false
-		resource url: '/css/document/scratch.css', minify: true, nominify: false
 		resource url: '/js/document/draw.js'
 		resource url: '/js/document/signbox.js'
-		resource url: '/js/document/scratch.js'
 		resource url: '/js/document/sign.js'
 		resource url: '/js/document/party.js'
 	}

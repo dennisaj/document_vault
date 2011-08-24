@@ -67,10 +67,11 @@ th.desc a:after {
 }
 
 .noteTextarea {
+	display: block;
 	height: 5em;
 	padding: 0;
 	resize: none;
-	width: 100% !important;
+	width: 25em !important;
 }
 
 .hidden {
