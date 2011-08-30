@@ -15,8 +15,12 @@
 					'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}',
 					'removeParty': '${createLink(controller:"document", action:"removeParty")}/{0}/{1}',
 					'resendCode': '${createLink(controller:"document", action:"resend")}/{0}/{1}',
-					'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}'
+					'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}',
+					'listNotes': '${createLink(controller:"note", action:"list")}/{0}',
+					'saveTextNote': '${createLink(controller:"note", action:"saveText")}/{0}'
 				});
+
+				Notes.init();
 			});
 		</r:script>
 	</head>
@@ -59,7 +63,7 @@
 			</button>
 			</g:elseif>
 			<pt:canNotes document="${document}">
-			<button id="notes" class="labeled-button" title="<g:message code="document-vault.label.notes" />">
+			<button id="notes" class="mark labeled-button" title="<g:message code="document-vault.label.notes" />">
 				<g:message code="document-vault.label.notes" />
 			</button>
 			</pt:canNotes>
@@ -67,22 +71,6 @@
 				<g:message code="document-vault.label.close" />
 			</button>
 			<h4 id="page-container"><g:message code="document-vault.label.page" />: <span id="page-number"></span></h4>
-			<pt:canNotes document="${document}">
-				<div id="notes-container">
-					<div id="notes-list">
-						<div id="noteField-${document.id}">
-							<g:render template="/note/textNotes" model="[document:document]" />
-						</div>
-						<g:form name="noteForm-${document.id}" >
-							<g:textArea class="noteTextarea" name="value" id="note-${document.id}" rows="5" />
-							<g:submitToRemote url="[controller:'note', action:'saveText', params:[documentId:document.id]]" name="submit" 
-								value="${message(code:'document-vault.label.submit')}" 
-								update="noteField-${document.id}"
-								after="\$('#note-${document.id}').val('');" />
-						</g:form>
-					</div>
-				</div>
-			</pt:canNotes>
 		</div>
 		<div id="main">
 			<div id="slider-container">

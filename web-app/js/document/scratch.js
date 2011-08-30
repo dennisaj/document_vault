@@ -74,7 +74,7 @@ var Scratch = {
 		}
 
 		this.isMoving = true;
-		var point = Sign._convertEventToPoint(event);
+		var point = Draw.convertEventToPoint(event);
 
 		var line = {
 			start: Draw.scalePoint(note, this.previousPoint),
@@ -217,7 +217,7 @@ var Scratch = {
 					var touch = e.targetTouches[0];
 
 					self.trackingTouchId = touch.identifier;
-					self.previousPoint = Sign._convertEventToPoint(touch);
+					self.previousPoint = Draw.convertEventToPoint(touch);
 				}
 			}).bind('touchmove', function(event) {
 				var e = event.originalEvent;
@@ -251,7 +251,7 @@ var Scratch = {
 			$scratch.bind('mousedown', function(e) {
 				if (e.which == 1) {
 					self.isMouseDown = true;
-					self.previousPoint = Sign._convertEventToPoint(e);
+					self.previousPoint = Draw.convertEventToPoint(e);
 				}
 			}).bind('mousemove', function(e) {
 				if (self.isMouseDown) {

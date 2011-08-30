@@ -53,6 +53,11 @@ class UrlMappings {
 			action = "saveLines"
 		}
 
+		"/note/saveText/$documentId" {
+			controller = "note"
+			action = "saveText"
+		}
+
 		"/printQueue/push/$printerId/$documentId" {
 			controller = "printQueue"
 			action = "push"

@@ -3,7 +3,7 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class NoteController {
-	static allowedMethods = [list:"POST", saveLines:"POST", saveTextNote:"POST",]
+	static allowedMethods = [list:"POST", saveLines:"POST", saveText:"POST",]
 
 	def authService
 	def handlerChain
@@ -33,9 +33,8 @@ class NoteController {
 
 		def notes = [:]
 		document.notes.each {
-			if (it.data) {
-				notes[it.id] = [url:g.createLink(action:"download", params:[documentId:document.id, noteDataId:it.data.id]), note:it.note]
-			}
+			def url = (it.data ? g.createLink(action:"download", params:[documentId:document.id, noteDataId:it.data.id]) : "")
+			notes[it.id] = [url:url, note:it.note, page:it.page, left:it.left, top:it.top]
 		}
 
 		render(notes as JSON)
@@ -54,6 +53,7 @@ class NoteController {
 		}
 
 		handlerChain.saveNotes([document:document, notes:notes])
+		document.save(flush:true)
 
 		render([status:'success'] as JSON)
 	}
@@ -64,8 +64,14 @@ class NoteController {
 
 		if (document) {
 			def value = params.value?.trim()
+			def page = params.int('page') ?: 0
+			def left = params.float('left') as int ?: 0
+			def top = params.float('top') as int ?: 0
+
+			assert page <= document.files.first().pages
+
 			if (value) {
-				handlerChain.saveNotes([document:document, notes:[[text:value]]])
+				handlerChain.saveNotes([document:document, notes:[[text:value, left:left, top:top, page:page]]])
 				document.save(flush:true)
 			}
 

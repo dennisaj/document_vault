@@ -70,6 +70,10 @@ var Document = {
 		return $.when($.post(this.urls.listNotes.format(this.documentId))).fail(this.ajaxErrorHandler);
 	},
 
+	saveTextNote: function(note) {
+		return $.when($.post(this.urls.saveTextNote.format(this.documentId), { value:note.note, page:note.page, left:note.left, top:note.top })).fail(this.ajaxErrorHandler);
+	},
+
 	saveNotes: function(notes) {
 		return $.when($.post(this.urls.saveNotes.format(this.documentId), {notes:JSON.stringify(notes)})).fail(this.ajaxErrorHandler);
 	},

@@ -332,5 +332,35 @@ var Party = {
 		});
 
 		this.initParties();
+
+		Draw.addDrawEvent('party', function(canvas, page) {
+			// Only draw the highlights when we are requesting signatures
+			if (self.isRequestingSignatures()) {
+				var activePartyId = self.getSelectedPartyRow().attr('id');
+
+				// Merge saved and unsaved highlights.
+				var highlights = $.extend(true, {}, page.savedHighlights);
+				$.each(page.unsavedHighlights, function(key, value) {
+					highlights[key] = $.merge(highlights[key] || [], value);
+				});
+
+				for (var party in highlights) {
+					// If we are highlighting and this party is the active party or if we are not highlighting, use the dark opacity.
+					// Otherwise use the lighter opacity.
+					var useHighlight = (party == activePartyId || !self.isHighlighting());
+
+					for (var i = 0; i < highlights[party].length; i++) {
+						Draw.highlight(canvas, page, highlights[party][i], self.getPartyColor(party), useHighlight ? Draw.highlightOpacity : Draw.lowlightOpacity);
+					}
+				}
+			} else {
+				if (page.unsavedHighlights) {
+				// Print sign-box highlights if we are not in highlighting mode.
+					$.each(page.unsavedHighlights[SignBox.partyName] || [], function(key, value) {
+						Draw.highlight(canvas, page, value, SignBox.partyColor, Draw.highlightOpacity);
+					});
+				}
+			}
+		});
 	}
 };

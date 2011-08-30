@@ -1,4 +1,5 @@
 var Draw = {
+	drawEvents: {},
 	highlightOpacity: .7,
 	LINEBREAK: 'LB',
 	lowlightOpacity: .2,
@@ -8,6 +9,16 @@ var Draw = {
 		if (page.lines[page.lines.length - 1] != this.LINEBREAK) {
 			page.lines.push(this.LINEBREAK);
 		}
+	},
+
+	addDrawEvent: function(key, event) {
+		if ($.isFunction(event)) {
+			this.drawEvents[key] = event;
+		}
+	},
+
+	dropDrawEvent: function(key) {
+		delete this.drawEvents[key];
 	},
 
 	addLine: function(page, line) {
@@ -29,6 +40,14 @@ var Draw = {
 		}
 	},
 
+	convertEventToPoint: function(touch) {
+		if (touch) {
+			return {x: touch.pageX, y: touch.pageY};
+		} else {
+			return {x: 0, y: 0};
+		}
+	},
+
 	// Rename me
 	draw: function(canvas, page) {
 		var self = this;
@@ -41,34 +60,9 @@ var Draw = {
 			this.drawLine(canvas, page.lines[i]);
 		}
 
-		// TODO: Remove the party.js dependency
-		// Only draw the highlights when we are requesting signatures
-		if (Party.isRequestingSignatures()) {
-			var activePartyId = Party.getSelectedPartyRow().attr('id');
-
-			// Merge saved and unsaved highlights.
-			var highlights = $.extend(true, {}, page.savedHighlights);
-			$.each(page.unsavedHighlights, function(key, value) {
-				highlights[key] = $.merge(highlights[key] || [], value);
-			});
-
-			for (var party in highlights) {
-				// If we are highlighting and this party is the active party or if we are not highlighting, use the dark opacity.
-				// Otherwise use the lighter opacity.
-				var useHighlight = (party == activePartyId || !Party.isHighlighting());
-
-				for (var i = 0; i < highlights[party].length; i++) {
-					this.highlight(canvas, page, highlights[party][i], Party.getPartyColor(party), useHighlight ? this.highlightOpacity : this.lowlightOpacity);
-				}
-			}
-		} else {
-			if (page.unsavedHighlights) {
-			// Print sign-box highlights if we are not in highlighting mode.
-				$.each(page.unsavedHighlights[SignBox.partyName] || [], function(key, value) {
-					self.highlight(canvas, page, value, SignBox.partyColor, this.highlightOpacity);
-				});
-			}
-		}
+		$.each(this.drawEvents, function(index, event) {
+			event(canvas, page);
+		});
 	},
 
 	drawLine: function(canvas, line, strokeStyle) {

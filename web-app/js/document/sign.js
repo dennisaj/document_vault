@@ -4,15 +4,10 @@ var Sign = {
 	can: null,
 	currentPageNumber: null,
 	highlightStart: null,
-	isMoving: false,
-	isMouseDown: false,
 	$main: null,
 	minVisible: 150,
 	mtouch: false,
 	ORIGIN: {x:0, y:0},
-	previousPoint: null,
-	previousZoom: null,
-	trackingTouchId: null,
 	tapAndHoldTimeout: null,
 	tapAndHoldDuration: 500,
 	urls: {},
@@ -31,14 +26,6 @@ var Sign = {
 		}
 
 		return true;
-	},
-
-	_convertEventToPoint: function(touch) {
-		if (touch) {
-			return {x: touch.pageX, y: touch.pageY};
-		} else {
-			return this.ORIGIN;
-		}
 	},
 
 	_currentCenter: function(page) {
@@ -61,19 +48,21 @@ var Sign = {
 	},
 
 	doEnd: function(event, canvas, page) {
+		var canvas = this.can;
+		var page = this.currentPage();
 		clearTimeout(this.tapAndHoldTimeout);
 
-		if (this.mtouch) {
+		if (InputHandler.mtouch) {
 			return;
 		}
 
 		var isSigning = $('#pen').is('.ui-state-highlight');
 		var isHighlighting = Party.isHighlighting();
 
-		if (!isSigning && !this.isMoving && !isHighlighting) {
+		if (!isSigning && !InputHandler.isMoving && !isHighlighting) {
 			var party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
 			var color = Party.getCurrentColor() || SignBox.partyColor;
-			var point = Draw.scalePoint(page, this._convertEventToPoint(event));
+			var point = Draw.scalePoint(page, Draw.convertEventToPoint(event));
 			var insideHighlight = Draw.isPointInsideAnyBox(point, page.unsavedHighlights[party]);
 
 			if (insideHighlight) {
@@ -94,7 +83,7 @@ var Sign = {
 		} else if (isSigning) {
 			Draw.addBreak(page);
 		} else if (isHighlighting && this.highlightStart) {
-			var corners = Draw.normalizeCorners(Draw.scalePoint(page, this.highlightStart), Draw.scalePoint(page, this.previousPoint));
+			var corners = Draw.normalizeCorners(Draw.scalePoint(page, this.highlightStart), Draw.scalePoint(page, InputHandler.previousPoint));
 			var party = Party.getSelectedPartyRow().attr('id');
 			var color = Party.getCurrentColor();
 
@@ -107,24 +96,32 @@ var Sign = {
 		} else if (!this.highlightStart) {
 			this.$main.css('cursor', 'default');
 		}
+	},
 
-		this.isMoving = false;
+	doGestureChange: function(event) {
+		if (InputHandler.mtouch) {
+			var e = event.originalEvent;
+			var $slider = $('#slider');
+			var previousZoom = $slider.slider('value');
+			$slider.slider('value', previousZoom * e.scale);
+		}
 	},
 
 	doMove: function(event, canvas, page) {
+		var canvas = this.can;
+		var page = this.currentPage();
 		clearTimeout(this.tapAndHoldTimeout);
 
-		this.isMoving = true;
-		var point = this._convertEventToPoint(event);
+		var point = Draw.convertEventToPoint(event);
 		var isSigning = $('#pen').is('.ui-state-highlight');
 		var isHighlighting = Party.isHighlighting();
 
 		if (!isSigning && !isHighlighting) {
 			this.$main.css('cursor', 'move');
-			this.dragCanvas(canvas, page, this.previousPoint, point);
+			this.dragCanvas(canvas, page, InputHandler.previousPoint, point);
 		} else if (isSigning) {
 			var line = {
-				start: Draw.scalePoint(page, this.previousPoint),
+				start: Draw.scalePoint(page, InputHandler.previousPoint),
 				end: Draw.scalePoint(page, point),
 			};
 			Draw.addLine(page, line);
@@ -141,26 +138,28 @@ var Sign = {
 			}
 		}
 
-		this.previousPoint = point;
+		InputHandler.previousPoint = point;
 	},
 
 	doStart: function(event, canvas, page) {
 		var self = this;
+		var canvas = this.can;
+		var page = this.currentPage();
 
 		/**
 		 * If the user taps/clicks and holds, see if they are over a highlight and then delete it.
 		 */
 		this.tapAndHoldTimeout = setTimeout(function() {
-			if (self.mtouch) {
+			if (InputHandler.mtouch) {
 				return;
 			}
 
-			self.isMouseDown = false;
-			self.trackingTouchId = null;
+			InputHandler.isMouseDown = false;
+			InputHandler.trackingTouchId = null;
 
 			var party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
 			var color = Party.getCurrentColor() || SignBox.partyColor;
-			var point = Draw.scalePoint(page, self.previousPoint);
+			var point = Draw.scalePoint(page, InputHandler.previousPoint);
 			var highlight = Draw.isPointInsideAnyBox(point, page.unsavedHighlights[party]);
 
 			if (highlight) {
@@ -336,90 +335,11 @@ var Sign = {
 		this.$box = $('#box');
 		this.can = document.getElementById('can');
 		var $can = $(this.can);
-		this.previousPoint = this.ORIGIN;
 		this.$box.hide();
 		var eventType = $.support.touch ? 'touchend' : 'click';
 
 		if ($.support.touch) {
 			$('#slider-container').hide();
-			$can.bind('touchstart', function(event) {
-				var e = event.originalEvent;
-				self.mtouch = (e.targetTouches.length > 1);
-				if (self.mtouch) {
-					self.previousZoom = $('#slider').slider('value');
-				}
-
-				if (self.trackingTouchId == null) {
-					var touch = e.targetTouches[0];
-
-					self.trackingTouchId = touch.identifier;
-					self.previousPoint = self._convertEventToPoint(touch);
-					self.doStart(e, self.can, self.currentPage());
-				}
-			}).bind('gesturechange', function(event) {
-				if (self.mtouch) {
-					var e = event.originalEvent;
-
-					$('#slider').slider('value', self.previousZoom * e.scale);
-				}
-			}).bind('touchmove', function(event) {
-				var e = event.originalEvent;
-				var currentTouch = null;
-
-				for (var i = 0; i < e.touches.length; i++) {
-					if (self.trackingTouchId == e.touches[i].identifier) {
-						currentTouch = e.touches[i];
-					}
-				}
-
-				if (currentTouch) {
-					self.doMove(currentTouch, self.can, self.currentPage());
-				}
-			}).bind('touchend touchcancel', function(event) {
-				var e = event.originalEvent;
-				var currentTouch = null;
-
-				for (var i = 0; i < e.changedTouches.length; i++) {
-					if (self.trackingTouchId == e.changedTouches[i].identifier) {
-						currentTouch = e.changedTouches[i];
-					}
-				}
-
-				if (currentTouch) {
-					self.trackingTouchId = null;
-					self.doEnd(currentTouch, self.can, self.currentPage());
-				}
-
-				// We are still in multitouch mode if there is more than one touch and the tracked touch wasn't ended.
-				self.mtouch = (e.targetTouches.length > 1) && !currentTouch;
-			});
-		} else {
-			$can.mousedown(function(e) {
-				if (e.which == 1) {
-					self.isMouseDown = true;
-					self.previousPoint = self._convertEventToPoint(e);
-
-					self.doStart(e, self.can, self.currentPage());
-				}
-			});
-
-			$('#can, #box').mousemove(function(e) {
-				if (self.isMouseDown) {
-					self.doMove(e, self.can, self.currentPage());
-				}
-			}).mouseup(function(e) {
-				if (self.isMouseDown) {
-					self.doEnd(e, self.can, self.currentPage());
-					self.isMouseDown = false;
-				}
-			});
-
-			$can.mouseleave(function(e) {
-				if (e.toElement && e.toElement.id != 'box' && self.isMouseDown) {
-					self.doEnd(e, self.can, self.currentPage());
-					self.isMouseDown = false;
-				}
-			});
 		}
 
 		if (navigator.userAgent.match(/iphone|android/i)) {
@@ -457,13 +377,6 @@ var Sign = {
 			icons: { primary: 'ui-icon-transferthick-e-w' }
 		}).bind(eventType, function(event) {
 			$('#confirm-submit').dialog('open');
-		});
-
-		$('#notes').button({
-			icons: { primary: 'ui-icon-note' }
-		}).bind(eventType, function(event) {
-			$('#notes-container').slideToggle();
-			$('textarea', '#notes-list').focus();
 		});
 
 		$('#close').button({
@@ -517,6 +430,8 @@ var Sign = {
 			} else {
 				self.$main.css('cursor', 'default');
 			}
+
+			$('.mark').trigger('marked');
 		});
 
 		$('#signature-message').dialog({
@@ -560,7 +475,7 @@ var Sign = {
 		});
 
 		$('#slider').slider({
-			min: .5,
+			min: .25,
 			max: 2,
 			change: function(event, ui) {
 				self._zoomEvent(self.can, self.currentPage(), ui.value);
@@ -598,6 +513,7 @@ var Sign = {
 		// Load the page indicated by the location hash
 		$(window).hashchange();
 
+		InputHandler.init(this, $can);
 		SignBox.init();
 	}
 };

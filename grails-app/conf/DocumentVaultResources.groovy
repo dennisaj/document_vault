@@ -80,10 +80,17 @@ modules = {
 		resource url: '/js/document/show.js'
 	}
 
+	'dv-ui-overlay-notes' {
+		resource url: '/css/document/notes.css', minify: true, nominify: false
+		resource url: '/js/jquery.textarea-expander.js'
+		resource url: '/js/document/notes.js'
+	}
+
 	'dv-ui-sign' {
-		dependsOn 'dv-ui-document'
+		dependsOn 'dv-ui-document', 'dv-ui-overlay-notes'
 
 		resource url: '/css/document/sign.css', minify: true, nominify: false
+		resource url: '/js/document/inputhandler.js'
 		resource url: '/js/document/draw.js'
 		resource url: '/js/document/signbox.js'
 		resource url: '/js/document/sign.js'

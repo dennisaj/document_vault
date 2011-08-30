@@ -195,7 +195,7 @@ var SignBox = {
 					var touch = e.targetTouches[0];
 
 					self.trackingTouchId = touch.identifier;
-					var point = Sign._convertEventToPoint(touch);
+					var point = Draw.convertEventToPoint(touch);
 					self.previousPoint = {x: point.x - $this.offset().left, y: point.y - $this.offset().top};
 				}
 			}).live('touchmove', function(event) {
@@ -209,7 +209,7 @@ var SignBox = {
 				}
 
 				if (currentTouch) {
-					var point = Sign._convertEventToPoint(currentTouch);
+					var point = Draw.convertEventToPoint(currentTouch);
 					self.doMove(this, point);
 				}
 			}).live('touchend touchcancel', function(event) {
@@ -223,7 +223,7 @@ var SignBox = {
 				}
 
 				if (currentTouch) {
-					var point = Sign._convertEventToPoint(currentTouch);
+					var point = Draw.convertEventToPoint(currentTouch);
 					self.doEnd(this, point);
 				}
 			});
@@ -233,18 +233,18 @@ var SignBox = {
 					var $this = $(this);
 
 					self.isMouseDown = true;
-					var point = Sign._convertEventToPoint(e);
+					var point = Draw.convertEventToPoint(e);
 					self.previousPoint = {x: point.x - $this.offset().left, y: point.y - $this.offset().top};
 				}
 			}).live('mousemove', function(e) {
 				if (self.isMouseDown) {
-					var point = Sign._convertEventToPoint(e);
+					var point = Draw.convertEventToPoint(e);
 
 					self.doMove(this, point);
 				}
 			}).live('mouseup mouseleave', function(e) {
 				if (self.isMouseDown) {
-					var point = Sign._convertEventToPoint(e);
+					var point = Draw.convertEventToPoint(e);
 					self.doEnd(this, point);
 				}
 			});
