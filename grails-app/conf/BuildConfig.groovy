@@ -38,8 +38,16 @@ grails.project.dependency.resolution = {
 		//mavenCentral()
 		//mavenRepo "http://snapshots.repository.codehaus.org"
 	}
+	
+	plugins {
+		runtime(':lesscss-resources:0.4') {
+			excludes "js"
+		}
+	}
+	
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
+		//runtime group:'rhino', name:'js', version:'1.6R7'
 		compile group:'us.paperlesstech', name:'flea', version:'0.9.3'
 		compile group:'com.itextpdf', name:'itextpdf', version:'5.0.6'
 		runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'

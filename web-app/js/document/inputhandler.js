@@ -71,7 +71,10 @@ var InputHandler = {
 					self.previousPoint = Draw.convertEventToPoint(e);
 					self.handlingInput.doStart(e);
 				}
-			}).bind('mousemove', function(e) {
+			});
+
+			// TODO Make this less of a mess.
+			$('#' + $target[0].id +  ', #box').bind('mousemove', function(e) {
 				if (self.isMouseDown) {
 					self.isMoving = true;
 					self.handlingInput.doMove(e);
@@ -82,7 +85,9 @@ var InputHandler = {
 					self.isMouseDown = false;
 					self.isMoving = false;
 				}
-			}).bind('mouseleave', function(e) {
+			});
+
+			$target.bind('mouseleave', function(e) {
 				if (e.toElement && e.toElement.id != 'box' && self.isMouseDown) {
 					self.handlingInput.doEnd(e);
 					self.isMouseDown = false;

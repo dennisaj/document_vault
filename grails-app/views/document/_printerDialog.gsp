@@ -1,6 +1,6 @@
-<div id="printer-select" title="Choose a Printer" class="hidden">
+<div id="printer-select" title="Choose a Printer" class="hidden" style="display: none;"">
 	<p>
-		<span class="ui-icon ui-icon-print" style="float: left; margin: 0 7px 50px 0;"></span>
+		<%--<span class="ui-icon ui-icon-print" style="float: left; margin: 0 7px 50px 0;"></span>--%>
 		<input type="hidden" id="print-documentId" value="" />
 		<g:select name="printer" from="${us.paperlesstech.Printer.list()}" optionKey="id" value="${defaultPrinter}" />
 	</p>

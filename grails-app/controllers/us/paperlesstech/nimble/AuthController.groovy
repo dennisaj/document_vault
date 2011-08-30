@@ -34,7 +34,7 @@ import us.paperlesstech.auth.nimble.FacebookConnectToken
  */
 class AuthController {
 	static Map allowedMethods = [signin: 'POST']
-	static navigation = [[action: "logout", isVisible: { authService.isLoggedIn() }, order: 100, title: "Logout"]]
+	static navigation = [[group: "user", action: "logout", isVisible: { authService.isLoggedIn() }, order: 100, title: "Logout"]]
 
 	private static String TARGET = 'AuthController.TARGET'
 
@@ -65,8 +65,9 @@ class AuthController {
 	def signin = {
 		def authToken = new UsernamePasswordToken(params.username, params.password)
 
-		if (params.rememberme)
+		if (params.rememberme) {
 			authToken.rememberMe = true
+		}
 
 		log.info("Attempting to authenticate user, $params.username. RememberMe is $authToken.rememberMe")
 

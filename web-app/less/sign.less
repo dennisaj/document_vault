@@ -1,0 +1,178 @@
+@import "base";
+
+html, body {
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	-webkit-user-select: none;
+	background-color: #eaeaea;
+	overflow: hidden;
+	position: relative;
+	user-select: none;
+
+	#logged-in-user {
+		background-color: #eaeaea;
+		position: relative;
+		z-index: 10;
+	}
+
+	#searchForm {
+		display: none;
+	}
+}
+
+.subbar {
+	padding-bottom: 0;
+	position: relative;
+	z-index: 10;
+
+	#page-container {
+		float: left;
+		font-weight: bold;
+		line-height: 26px;
+		margin-left: 10px;
+	}
+}
+
+#main {
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+
+	.arrow {
+		@arrowSize: 90px;
+		@arrowColor: #ccc;
+
+		background-color: rgba(0,0,0,0.2);
+		font-size: 90px;
+		font-weight: bold;
+		height: @arrowSize;
+		line-height: 76px;
+		position: fixed;
+		top: 45%;
+		width: @arrowSize;
+		z-index: 10;
+
+		.border-radius(@arrowSize / 2);
+
+		.transition(background-color 0.3s);
+
+		&:hover {
+			background-color: #333;
+		}
+
+		a {
+			display: block;
+			margin: 16px 0 0 0;
+			padding: 0;
+			text-decoration: none;
+		}
+
+		&.left {
+			left: 10px;
+			a {
+				#arrow > .left(@arrowSize / 3, @arrowColor);
+				margin-left: 22px;
+			}
+		}
+
+		&.right {
+			right: 10px;
+			a {
+				#arrow > .right(@arrowSize / 3, @arrowColor);
+				margin-left: 36px;
+			}
+		}
+		&.ui-state-disabled {
+				display: none;
+		}
+	}
+
+	canvas#can {
+		-webkit-user-select: none;
+		border: 1px solid #444;
+		left: 0;
+		position: absolute;
+		top: 0;
+		z-index: 2;
+	}
+
+	#canvas {
+		padding: 3px;
+		overflow: scroll;
+		text-align: center;
+
+		img {
+			border: 1px black solid;
+		}
+	}
+}
+
+#slider-container {
+	position: absolute;
+	right: 2em;
+	top: 6em;
+	z-index: 11;
+
+	#slider {
+		display: inline-block;
+		margin-bottom: auto;
+		margin-left: .5em;
+		margin-right: .5em;
+		margin-top: auto;
+		width: 12em;
+	}
+}
+
+#request-signature {
+	background: white;
+	bottom: 0;
+	border-top: 1px black solid;
+	height: auto;
+	left: 0;
+	position: fixed;
+	width: 100%;
+	z-index: 9;
+
+	label {
+		display: inline;
+	}
+
+	#party-container {
+		max-height: 15em;
+		overflow-y: auto;
+
+		.party {
+			&:nth-child(even) {
+				background-color: #E5ECF9;
+			}
+
+				&.errors {
+				color: red;
+			}
+		}
+	}
+}
+
+#highlight #sample {
+	background-color: transparent;
+	border: 1px black solid;
+	bottom: 0;
+	display: inline-block;
+	height: 12px;
+	margin-bottom: -4px;
+	position: relative;
+	width: 12px;
+}
+
+#box {
+	cursor: crosshair;
+	opacity: 0.7;
+	position: absolute;
+	z-index:100;
+}

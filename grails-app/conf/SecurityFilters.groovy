@@ -22,7 +22,7 @@ public class SecurityFilters {
 			before = {
 				def document
 				if (params.documentId) {
-					document = Document.get(params.documentId)
+					document = Document.get(params.long('documentId'))
 				}
 				accessControl (auth: false) {
 					def action = actionName ?: "index"

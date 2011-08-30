@@ -1,0 +1,131 @@
+@import "base";
+
+#tag-search-form {
+	.subbar;
+
+	&:before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		background-color: #fff;
+		.opacity(75);
+		height: 1px;
+	}
+
+	fieldset {
+		border: 0 none;
+		margin-bottom: 0;
+
+		div {
+			background-color: @primaryLightGrey;
+			padding: 1px 0 1px 2px;
+
+			.box-shadow(~"inset 0 1px 5px rgba(0,0,0,0.4), inset 1px 0 3px rgba(0,0,0,0.2), inset 1px 1px 0 rgba(0,0,0,0.3), inset -1px -1px 0 rgba(0,0,0,0.3)");
+			.border-radius;
+
+			.transition(background-color 0.3s);
+
+			&:hover {
+				background-color: #fff;
+			}
+
+			&.active {
+				background-color: #fff;
+				.box-shadow(~"inset 0 1px 5px rgba(0,0,0,0.4), inset 1px 1px 0 #4d90fe, inset -1px -1px 0 #4d90fe");
+			}
+
+			input[type="text"] {
+				@pseudoInputWidth: 140px;
+
+				background: none;
+				border: 0 none;
+				margin-left: 1px;
+				vertical-align: middle;
+				width: @pseudoInputWidth;
+				-webkit-appearance: none;
+
+				.transition(width 0.3s);
+
+				&:hover, &:focus {
+					width: @pseudoInputWidth + 100;
+				}
+			}
+
+			button {
+				margin: 5px 10px 5px 5px;
+				padding: 0.5em 0.1em 0.5em 1.0em !important;
+				vertical-align: middle;
+
+				.border-radius;
+			}
+		}
+	}
+}
+
+#tag-results {
+	clear: left;
+}
+
+#untagged {
+	border-top: 1px solid black;
+	clear: left;
+}
+
+#allTagged {
+	border-top: 1px solid black;
+	clear: left;
+
+	.droppable {
+		&.active {
+			border: 1px solid #F6A828;
+			background: rgba(246, 168, 40, .8);
+		}
+	}
+}
+
+#tag-search-results ul {
+	list-style: none;
+	margin: 0 0 20px 0;
+	padding: 0;
+}
+
+#tag-search-results ul li {
+	float: left;
+	padding: 2px 10px;
+	position: relative;
+	text-align: center;
+}
+
+#tag-search-results ul li a {
+	text-decoration: none;
+}
+
+#tag-search-results ul li a:hover {
+	text-decoration: underline;
+}
+
+#tag-search-results .droppable {
+	background: url(../images/folder-blue_open.png);
+	display: block;
+	height: 64px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 64px;
+}
+
+#tag-search-results .droppable.active {
+	background: url(../images/folder-blue.png);
+}
+
+.draggable {
+	display: inline-block;
+}
+input#tagName {
+	width: 150px !important;
+}
+
+#create {
+	clear: both;
+}

@@ -1,0 +1,165 @@
+@import "base";
+
+#search-results {
+	.subbar;
+}
+
+ul#document-items {
+	list-style-type: none;
+	list-style-position: inside;
+	margin: 0;
+	padding: 0;
+	
+	> li {
+		#gradient > .horizontal(#eaeaea, #fff);
+		
+		border-style: solid none solid none;
+		border-width: 1px 0 1px 0;
+		border-color: @primaryLightGrey transparent @primaryLightGrey transparent;
+		margin-bottom: -1px;
+		min-height: 114px;
+		position: relative;
+		padding-top: 10px;
+		
+		&.signed {
+			a.thumb:before {
+				background-image: url(../css/lib/images/rosette-16x16.png);
+				background-repeat: no-repeat;
+				content: "";
+				height: 16px;
+				position: absolute;
+				top: 5px;
+				left: 93px;
+				width: 16px;
+			}
+		}
+		
+		p {
+			position: absolute;
+			left: 130px;
+			top: 10px;
+			
+			b {
+				font-size: 1.4em; font-weight: bold;
+				line-height: 10px;
+				text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+			}
+			
+			span {
+				font-size: 0.9em;
+			}
+		}
+		
+		a.thumb {
+			background-color: #fff;
+			border: 1px solid #999;
+			display: inline-block;
+			height: 104px;
+			text-decoration: none;
+			margin: 0 10px 10px 20px;
+			
+			.box-shadow(~"0 0 4px rgba(0,0,0,0.2)");
+		}
+		
+		div.document-actions {
+			left: 130px;
+			//margin-top: -26px;
+			position: absolute;
+			top: 62px;
+
+			a {
+				font-size: 13px;
+				height: 32px;
+				line-height: 32px;
+				padding: 8px 12px;
+			}
+
+			._background (@backgroundImage) {
+				background-image: url(@backgroundImage);
+				background-repeat: no-repeat;
+				content: attr(data-count) "";
+				float: left;
+				height: 32px;
+				margin: 0 0.75em 0 -0.25em;
+				position: relative;
+				text-align: center;
+				top: 1px;
+				width: 32px;
+			}
+			.tags:before { ._background("../css/lib/images/document-tag-32x32.png"); }
+			.notes:before { ._background("../css/lib/images/note-32x32.png"); }
+			.print:before { ._background("../css/lib/images/printer-32x32.png"); }
+			.show:before { ._background("../css/lib/images/document-inspector-32x32.png"); }
+			.download:before { ._background("../css/lib/images/download-32x32.png"); }
+			.sign:before { ._background("../css/lib/images/document-signature-32x32.png"); }
+		}
+		
+		div.notebox {
+			background-color: #fff;
+			border: 1px solid #999;
+			margin: 0 20px 20px 20px;
+			
+			.border-radius(2px);
+			.box-shadow(~"0 1px 1px rgba(0,0,0,0.2)");
+			
+			@noteItemBgColor: #d3eeff;
+			
+			div.notebox-items {
+				p {
+					background-color: @noteItemBgColor;
+					border-bottom: 1px solid darken(@noteItemBgColor, 25%);
+					color: #000;
+					font-size: 0.9em;
+					line-height: 1.6em;
+					margin: 0;
+					padding: 4px 10px;
+					position: static;
+					
+					.box-shadow(~"inset 0 1px 1px rgba(255,255,255,0.8)");
+					
+				}
+			}
+			
+			form {
+				background-color: lighten(@noteItemBgColor, 5%);
+				padding: 10px;
+			
+				textarea {
+					resize: none;
+					vertical-align: bottom;
+					width: 25%;
+				}
+			}
+		}
+	}
+}
+
+div.pagination {
+	padding: 10px;
+	
+	.currentStep {
+		background-color: #fff;
+		border: 1px solid #000;
+		color: #cacaca;
+		cursor: default;
+		margin-right: 5px;
+		padding: 5px 10px 5px 10px;
+		
+	}
+	
+	.prevLink, .nextLink {
+		margin-right: 5px;
+	}
+	
+	.step {
+		background-color: #fff;
+		border: 1px solid #000;
+		margin-right: 5px;
+		padding: 5px 10px 5px 10px;
+		
+	}
+}
+
+.hidden {
+	display: none;
+}

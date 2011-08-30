@@ -5,7 +5,7 @@ import grails.converters.JSON
 import org.grails.taggable.Tag
 
 class TagController {
-	static navigation = [[action:'index', isVisible: {authService.canTagAny()}, order:20, title:"Tags"]]
+	static navigation = [[group: 'tabs', action:'index', isVisible: {authService.canTagAny()}, order:20, title:"Tags"]]
 
 	def authService
 	def tagService
@@ -69,7 +69,7 @@ class TagController {
 
 	def search = {
 		def results = []
-		def query = params.q?.trim()
+		def query = params.tagq?.trim()
 		def terms = query?.tokenize(",").collect { it.trim() }.findAll { it }
 		if (terms?.size()) {
 			results = tagService.tagSearch(terms)

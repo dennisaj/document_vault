@@ -6,7 +6,7 @@ import us.paperlesstech.nimble.Group
 
 class UploadController {
 	static allowedMethods = [save: "POST", saveAjax: "POST"]
-	static navigation = [[action: 'index', isVisible: {authService.canUploadAny()}, order: 10, title: 'Upload']]
+	static navigation = [[group: 'tabs', action: 'index', isVisible: {authService.canUploadAny()}, order: 10, title: 'Upload']]
 
 	def authService
 	def preferenceService

@@ -1,0 +1,84 @@
+.border-radius (@radius: 5px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+	
+	-webkit-background-clip: padding;
+    -moz-background-clip: padding;
+    -o-background-clip: padding-box; 
+}
+
+.box-shadow (@shadow: 0 1px 3px rgba(0,0,0,0.25)) {
+	-webkit-box-shadow: @shadow;
+	-moz-box-shadow: @shadow;
+	box-shadow: @shadow;
+}
+
+.transition(@transition) {
+	-webkit-transition: @transition;
+	-moz-transition: @transition;
+	-o-transition: @transition;
+	-ms-transition: @transition;
+	transition: @transition;
+}
+
+#gradient {
+	.horizontal (@startColor: #555, @endColor: #333) {
+		background-color:  @endColor;
+		background-repeat: repeat-x;
+		background-image: -khtml-gradient(linear, left top, right top, from(@startColor), to(@endColor));
+		background-image: -moz-linear-gradient(left, @startColor, @endColor);
+		background-image: -ms-linear-gradient(left, @startColor, @endColor);
+		background-image: -webkit-gradient(linear, left top, right top, color-stop(0%, @startColor), color-stop(100%, @endColor));
+		background-image: -webkit-linear-gradient(left, @startColor, @endColor);
+		background-image: -o-linear-gradient(left, @startColor, @endColor);
+		filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)", @startColor, @endColor));
+		-ms-filter: %("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)", @startColor, @endColor);
+		background-image: linear-gradient(left, @startColor, @endColor);
+	}
+	.vertical (@startColor: #555, @endColor: #333) {
+		background-color: @endColor;
+		background-repeat: repeat-x;
+		background-image: -khtml-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
+		background-image: -moz-linear-gradient(@startColor, @endColor);
+		background-image: -ms-linear-gradient(@startColor, @endColor);
+		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, @startColor), color-stop(100%, @endColor));
+		background-image: -webkit-linear-gradient(@startColor, @endColor);
+		background-image: -o-linear-gradient(@startColor, @endColor);
+		filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)", @startColor, @endColor));
+		-ms-filter: %("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)", @startColor, @endColor);
+		background-image: linear-gradient(@startColor, @endColor);
+	}
+	.radial (@startColor: #555, @endColor: #333) {
+		background-color: @endColor;
+		background-repeat: repeat-x;
+		background: -moz-radial-gradient(circle, @startColor, @endColor);
+		background: -ms-radial-gradient(circle, @startColor, @endColor);
+		background: -webkit-gradient(radial, center center, 0, center center, 460, from(@startColor), to(@endColor)) fixed;
+		background: -webkit-radial-gradient(circle, @startColor, @endColor);
+	}
+	.directional (@startColor: #555, @endColor: #333, @deg: 45deg) {
+		background-color: @endColor;
+		background-repeat: repeat-x;
+		background-image: -moz-linear-gradient(@deg, @startColor, @endColor);
+		background-image: -ms-linear-gradient(@deg, @startColor, @endColor);
+		background-image: -webkit-linear-gradient(@deg, @startColor, @endColor);
+		background-image: -o-linear-gradient(@deg, @startColor, @endColor);
+		background-image: linear-gradient(@deg, @startColor, @endColor);
+	}
+	.vertical-three-colors (@startColor: #00b3ee, @midColor: #7a43b6, @colorStop: 0.5, @endColor: #c3325f) {
+		background-color: @endColor;
+		background-repeat: no-repeat;
+		background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
+		background-image: -webkit-linear-gradient(@startColor, color-stop(@colorStop, @midColor), @endColor);
+		background-image: -moz-linear-gradient(@startColor, color-stop(@midColor, @colorStop),@endColor);
+	}
+}
+
+// Opacity
+.opacity (@opacity: 100) {
+	filter: e(%("alpha(opacity=%d)", @opacity));
+	-khtml-opacity: @opacity / 100;
+	-moz-opacity: @opacity / 100;
+	opacity: @opacity / 100;
+}

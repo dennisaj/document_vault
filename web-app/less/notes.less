@@ -1,0 +1,37 @@
+#inline-note-container {
+	background-color: rgba(255, 255, 255, 0.8);
+	border: 1px solid rgb(102, 102, 102);
+	font-family: sans-serif;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	z-index: 100;
+}
+
+.inline-note {
+	-webkit-appearance: none;
+	background: rgba(255, 255, 255, 0);
+	border: 0 none;
+	display: block;
+	font-family: inherit;
+	font-size: inherit;
+	height: 50px;
+	line-height: 1em;
+	margin: 0;
+	outline: none;
+	overflow: hidden;
+	padding: 0;
+	resize: none;
+	width: 100%;
+}
+
+.inline-note:focus {
+	border: 0 none;
+}
+
+#inline-note-container > input[type=button] {
+	font-size: .75em;
+	line-height: 1em;
+	margin: 0;
+	padding: 0;
+}

@@ -1,6 +1,7 @@
 var Tagging = {
 	urls: {},
 	useDocumentSearch: false,
+
 	addTag: function(documentId, tag, callback) {
 		var self = this;
 		callback = callback || function() {};
@@ -12,16 +13,18 @@ var Tagging = {
 			url: self.urls.addTag
 		});
 	},
+
 	create: function(name, callback) {
 		var self = this;
 		$.ajax({
-			data: {documentId:holder.attr('documentid'), tag:value},
+			data: {documentId:holder.attr('data-documentid'), tag:value},
 			global: false,
 			success: callback,
 			type: 'GET',
 			url: self.urls.createTag.format(name)
 		});
 	},
+
 	showAllTagged: function(name, displayId) {
 		var self = this;
 
@@ -47,20 +50,24 @@ var Tagging = {
 					}, 500);
 				}
 			},
+			data: {
+				name: name
+			},
 			error: function(jqXHR, textStatus, errorThrown) { $displayId.html(errorThrown); },
 			global: false,
 			success: function(data) {
 				clearTimeout(spinnerTimeout);
 				$displayId.fadeOut('fast', function() {
 					$displayId.html(data);
-					Tagging.initDragAndDrop();
+					self.initDragAndDrop();
 					$displayId.fadeIn(100);
 				});
 			},
 			type: 'GET',
-			url: self.urls.allTagged.format(name)
+			url: self.urls.allTagged
 		});
 	},
+
 	showTagbox: function(boxId, button) {
 		var self = this;
 		var $boxId = $(boxId);
@@ -70,20 +77,22 @@ var Tagging = {
 				tagSource: self.urls.list,
 				triggerKeys: ['enter', 'comma', 'tab'],
 				initialTags: function(holder) {
-					return self.urls.documentList.format(holder.attr('documentId'))
+					return self.urls.documentList.format(holder.attr('data-documentId'))
 				},
 				onAdd: function(holder, value) {
-					self.addTag(holder.attr('documentId'), value);
+					self.addTag(holder.attr('data-documentId'), value);
 				},
 				onRemove: function(holder, value) {
-					self.removeTag(holder.attr('documentId'), value);
+					self.removeTag(holder.attr('data-documentId'), value);
 				}
 			});
 		}
 
 		$(button).toggleClass('ui-state-active');
-		$boxId.parent().parents('tr').toggleClass('hidden');
+		$boxId.parent().toggleClass('hidden');
+		return false;
 	},
+
 	removeTag: function(documentId, tag, callback) {
 		var self = this;
 		callback = callback || function() {};
@@ -96,7 +105,9 @@ var Tagging = {
 			url: self.urls.removeTag
 		});
 	},
+
 	initDragAndDrop: function() {
+		var self = this;
 		$('.draggable').draggable('destroy');
 		$('.droppable').droppable('destroy');
 
@@ -116,12 +127,12 @@ var Tagging = {
 			accept: '.draggable',
 			hoverClass: 'active',
 			drop: function(event, ui) {
-				Tagging.addTag(ui.draggable.attr('documentid'), $(event.target).attr('tag'), function(data) {
+				self.addTag(ui.draggable.attr('data-documentid'), $(event.target).attr('data-tag'), function(data) {
 					if (ui.draggable.is('.remove')) {
 						ui.draggable.fadeOut('fast', function() { $(this).remove(); });
 					}
 
-					Tagging.showAllTagged($(event.target).attr('tag'), '#allTagged');
+					self.showAllTagged($(event.target).attr('data-tag'), '#allTagged');
 				});
 			}
 		});
@@ -130,22 +141,21 @@ var Tagging = {
 			accept: '.draggable',
 			hoverClass: 'active',
 			drop: function(event, ui) {
-				Tagging.addTag(ui.draggable.attr('documentid'), $(event.target).attr('tag'), function(data) {
+				self.addTag(ui.draggable.attr('data-documentid'), $(event.target).attr('data-tag'), function(data) {
 					if (ui.draggable.is('.remove')) {
 						ui.draggable.fadeOut('fast', function() { $(this).remove(); });
 					}
 
-					Tagging.showAllTagged($(event.target).attr('tag'), '#allTagged');
+					self.showAllTagged($(event.target).attr('data-tag'), '#allTagged');
 				});
 			}
 		});
 	},
+
 	init: function(urls, useDocumentSearch) {
 		this.urls = urls;
 		this.useDocumentSearch = useDocumentSearch || false;
 
-		$('#tag-search-submit').button({
-			icons: { primary: 'ui-icon-search' }
-		});
+		$('#tag-search-submit').button();
 	}
 };

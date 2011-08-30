@@ -14,9 +14,10 @@ var Notes = {
 			var font = (this.baseFontSize * page.scale) + 'px';
 			var width = (canvas.width - scaledPoint.x);
 
-			var $container = $('<div />').prop('id', 'inline-note-container').css('font-size', font).offset({left:previousPoint.x, top:previousPoint.y}).appendTo($('body'));
+			var $container = $('<div />').prop('id', 'inline-note-container').css('font-size', font);
+			$container.css({left:previousPoint.x, top:previousPoint.y}).appendTo($('body')).width(width * page.scale);
 			var $submit = $('<input />').attr('value', 'Submit').attr('type', 'button');
-			var $textarea = $('<textarea />').addClass('inline-note').appendTo($container).width(width * page.scale);
+			var $textarea = $('<textarea />').addClass('inline-note').appendTo($container);
 			$textarea.TextAreaExpander();
 			$textarea.after($submit);
 			$textarea.focus();

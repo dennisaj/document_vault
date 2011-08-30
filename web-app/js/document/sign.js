@@ -4,6 +4,7 @@ var Sign = {
 	can: null,
 	currentPageNumber: null,
 	highlightStart: null,
+	initialZoom: null,
 	$main: null,
 	minVisible: 150,
 	mtouch: false,
@@ -47,7 +48,7 @@ var Sign = {
 		return Document.pages[this.currentPageNumber];
 	},
 
-	doEnd: function(event, canvas, page) {
+	doEnd: function(event) {
 		var canvas = this.can;
 		var page = this.currentPage();
 		clearTimeout(this.tapAndHoldTimeout);
@@ -101,13 +102,11 @@ var Sign = {
 	doGestureChange: function(event) {
 		if (InputHandler.mtouch) {
 			var e = event.originalEvent;
-			var $slider = $('#slider');
-			var previousZoom = $slider.slider('value');
-			$slider.slider('value', previousZoom * e.scale);
+			$('#slider').slider('value', this.initialZoom * e.scale);
 		}
 	},
 
-	doMove: function(event, canvas, page) {
+	doMove: function(event) {
 		var canvas = this.can;
 		var page = this.currentPage();
 		clearTimeout(this.tapAndHoldTimeout);
@@ -145,6 +144,7 @@ var Sign = {
 		var self = this;
 		var canvas = this.can;
 		var page = this.currentPage();
+		this.initialZoom = $('#slider').slider('value');
 
 		/**
 		 * If the user taps/clicks and holds, see if they are over a highlight and then delete it.
@@ -195,14 +195,14 @@ var Sign = {
 		$('#right-arrow a').attr('href', '#' + Math.min(Document.pageCount, page.pageNumber + 1));
 		$('#left-arrow a').attr('href', '#' + Math.max(Document.FIRST_PAGE, page.pageNumber - 1));
 
-		$('.arrow a').removeClass('disabled ui-state-disabled');
+		$('.arrow').removeClass('ui-state-disabled disabled');
 
 		if (page.pageNumber == 1) {
-			$('#left-arrow a').addClass('disabled ui-state-disabled');
+			$('#left-arrow').addClass('ui-state-disabled disabled');
 		}
 
 		if (page.pageNumber == Document.pageCount) {
-			$('#right-arrow a').addClass('disabled ui-state-disabled');
+			$('#right-arrow').addClass('ui-state-disabled disabled');
 		}
 
 		canvas.width = page.background.width;
@@ -212,7 +212,7 @@ var Sign = {
 
 		this._zoomEvent(canvas, page, $('#slider').slider('value'));
 		var $canvas = $(canvas);
-		var headerHeight = $('.container').height() + $('#buttonPanel').height();
+		var headerHeight = $('#logged-in-user').outerHeight(true) + $('#button-panel').outerHeight(true);
 		// center the canvas.
 		this.dragCanvas(canvas, page,
 				{x: page.scrollCanX, y: page.scrollCanY},
@@ -385,17 +385,7 @@ var Sign = {
 			window.location.href = self.urls.close;
 		});
 
-		$('#left-arrow a').button({
-			icons: { primary: 'ui-icon-circle-arrow-w' },
-			text: false
-		});
-
-		$('#right-arrow a').button({
-			icons: { primary: 'ui-icon-circle-arrow-e' },
-			text: false
-		});
-
-		$('.arrow a').bind(eventType, function(event) {
+		$('.arrow').bind(eventType, function(event) {
 			if ($(this).is('.disabled')) {
 				return false;
 			}

@@ -6,24 +6,131 @@ def appCtx = org.codehaus.groovy.grails.commons.ApplicationHolder.application.ma
 def plugin = appCtx.pluginManager.getGrailsPlugin('jquery-ui')
 def jquiver = plugin.instance.JQUERYUI_VERSION
 
+// For explicitly disabling minification on a resource
+//"myModule" {
+//	resource url: [dir: "js", file: "myResourceThatShouldRemainUntouched.js"],  exclude:'minify'
+//}
+
 modules = {
 	overrides {
-		jquery {
-			resource id: 'js', url:'https://ajax.googleapis.com/ajax/libs/jquery/'+jqver+'/jquery.min.js'
+		'jquery' {
+			resource id: 'js', url:'https://ajax.googleapis.com/ajax/libs/jquery/'+jqver+'/jquery.min.js', disposition: 'head'
 		}
 		'jquery-ui' {
-			resource id: 'js', url:'https://ajax.googleapis.com/ajax/libs/jqueryui/'+jquiver+'/jquery-ui.min.js'
-		}
-		'jquery-theme' {
-			resource id: 'theme', url:'https://ajax.googleapis.com/ajax/libs/jqueryui/'+jquiver+'/themes/ui-lightness/jquery-ui.css'
+			dependsOn 'jquery'
+			resource id: 'js', url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/'+jquiver+'/jquery-ui.min.js', disposition: 'head'
 		}
 	}
 
-	'dv-core' {
+	lessLibraries {
+		resource url: '/less/bootstrap.less', attrs:[rel: 'stylesheet/less', type: 'css'], exclude: '*'
+		resource url: '/less/base.less', attrs:[rel: 'stylesheet/less', type: 'css'], exclude: '*'
+	}
+
+	dvDefaults {
+		resource url: '/css/lib/inuit.css'
+		resource url: '/css/lib/grid.inuit.css'
+		resource url: '/css/lib/buttons.css'
+		resource url: '/css/lib/style.css'
+	}
+
+	dvTags {
+		resource url: '/css/tagit-simple-blue.css', minify: true, nominify: false
+		resource url: '/less/tag.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'dvTags'
+		resource url: '/js/tagit.js'
+		resource url: '/js/document/tagging.js'
+		// TODO i18n text
+		resource url: '/images/tag-blue-delete.png', attrs: [alt:'Delete Tag'], disposition: 'inline'
+	}
+
+	dvNotes {
+		resource url: '/js/document/documentnote.js'
+	}
+
+	fileUpload {
+
+		resource url: '/js/lib/jquery.tmpl.js'
+		resource url: '/js/lib/jquery.iframe-transport.js'
+		resource url: '/js/lib/jquery.fileupload.js'
+		resource url: '/js/lib/jquery.fileupload-ui.js'
+	}
+
+	jqueryShowSign {
+		dependsOn 'jquery-ui'
+
+		resource url: '/js/jquery.ba-hashchange.js'
+		resource url: '/js/global.js'
+		resource url: '/js/document/document.js'
+	}
+
+	documentBase {
+		dependsOn 'jquery, dvDefaults'
+
+		resource url: '/js/new/base.js'
+	}
+
+	documentLogin {
+		dependsOn 'jquery, dvDefaults'
+
+		resource url: '/less/login.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'documentLogin'
+		resource url: '/js/new/login.js'
+	}
+
+	documentSearch {
+		dependsOn 'documentBase, jqueryShowSign'
+
+		resource url: '/less/search.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSearch'
+		resource url: '/js/new/search.js'
+	}
+
+	documentUpload {
+		dependsOn 'documentBase, jquery-ui, fileUpload'
+
+		resource url: '/less/upload.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentUpload'
+		resource url: '/js/new/upload.js'
+	}
+
+	documentShow {
+		dependsOn 'documentBase, jqueryShowSign'
+
+		resource url: '/less/show.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentShow'
+		resource url: '/js/new/show.js'
+	}
+
+	documentSign {
+		dependsOn 'documentBase, jqueryShowSign, documentAlert'
+
+		resource url: '/less/notes.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSign'
+		resource url: '/less/sign.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSign'
+		resource url: '/js/lib/jquery.textarea-expander.js'
+		resource url: '/js/document/inputhandler.js'
+		resource url: '/js/document/notes.js'
+		resource url: '/js/document/draw.js'
+		resource url: '/js/document/signbox.js'
+		resource url: '/js/document/scratch.js'
+		resource url: '/js/document/sign.js'
+		resource url: '/js/document/party.js'
+	}
+
+	documentAlert {
+		resource url: '/js/HtmlAlert.js'
+	}
+
+	documentTagging {
+		dependsOn 'documentBase, jqueryShowSign, dvTags'
+
+		resource url: '/js/lib/jquery.ui.touch-punch.min.js'
+	}
+
+
+
+
+
+
+	/*'dv-core' {
 		defaultBundle 'core-ui'
 
 		dependsOn 'jquery'
-		dependsOn 'blueprint', 'blueprint-fancy-type'
 
 		resource url: '/images/favicon.ico'
 		resource url: '/js/global.js', minify: true
@@ -51,25 +158,17 @@ modules = {
 		resource url: '/css/mobile.css', minify: true
 	}
 
-	'dv-ui' {
-		dependsOn 'jquery-ui', 'jquery-theme'
-	}
-
 	'dv-ui-document' {
-		dependsOn 'dv-ui', 'dv-ui-htmlalert', 'jquery-hashchange'
+		dependsOn 'dv-ui-htmlalert', 'jquery-hashchange'
 
 		resource url: '/js/document/document.js'
 	}
 
 	'dv-ui-htmlalert' {
-		dependsOn 'dv-ui'
-
 		resource url: '/js/HtmlAlert.js'
 	}
 
 	'dv-ui-previewimage' {
-		dependsOn 'dv-ui'
-
 		resource url: '/js/previewimage.js'
 	}
 
@@ -98,8 +197,6 @@ modules = {
 	}
 
 	'dv-ui-tags' {
-		dependsOn 'dv-ui'
-
 		resource url: '/css/tagit-simple-blue.css', minify: true, nominify: false
 		resource url: '/css/tag.css', minify: true, nominify: false
 		resource url: '/js/tagit.js'
@@ -113,13 +210,13 @@ modules = {
 	}
 
 	'dv-ui-search' {
-		dependsOn 'dv-ui', 'jquery-hashchange'
+		dependsOn 'jquery-hashchange'
 
 		resource url: '/js/document/documentsearch.js'
 	}
 
 	'dv-ui-upload' {
-		dependsOn 'dv-ui', 'jquery-upload'
+		dependsOn 'jquery-upload'
 
 		resource url: '/js/upload.js'
 	}
@@ -144,11 +241,11 @@ modules = {
 
 	'jquery-upload' {
 		defaultBundle 'dv-jquery-upload-plugins'
-		dependsOn 'dv-ui', 'jquery-template'
+		dependsOn 'jquery-template'
 
 		resource url: '/css/jquery.fileupload-ui.css', minify: true, nominify: false
 		resource url: '/js/jquery.iframe-transport.js', minify: true, nominify: false
 		resource url: '/js/jquery.fileupload.js', minify: true, nominify: false
 		resource url: '/js/jquery.fileupload-ui.js', minify: true, nominify: false
-	}
+	}*/
 }

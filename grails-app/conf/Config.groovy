@@ -54,6 +54,10 @@ grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
 
+// Set resources plugin filter rules
+grails.resources.cssrewriter.includes = ['**/*.css', '**/*.less']
+grails.resources.csspreprocessor.includes = ['**/*.css', '**/*.less']
+
 // set per-environment serverURL stem for creating absolute links
 environments {
 	production {
@@ -112,7 +116,7 @@ log4j = {
 	warn	'org.mortbay.log'
 	// Uncomment to log all SQL and parameters
 	//debug  'org.hibernate.SQL'
-	//trace 'org.hibernate.type'
+	//debug 'org.grails.plugin.resource'
 }
 
 grails {
