@@ -62,10 +62,13 @@ class DocumentController {
 		} else {
 			DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Document.class)
 				.createAlias("searchFieldsCollection", "sfc", JoinFragment.LEFT_OUTER_JOIN)
+				.createAlias("notes", "n", JoinFragment.LEFT_OUTER_JOIN)
 				.setProjection(Projections.distinct(Projections.id()))
 				.add(Restrictions.or(Restrictions.in("id", specificDocs), Restrictions.in("group.id", allowedGroupIds)))
 			if (params.q) {
-				detachedCriteria.add(Restrictions.or(Restrictions.ilike("name", "%$params.q%"), Restrictions.ilike("sfc.value", "%$params.q%")))
+				detachedCriteria.add(Restrictions.disjunction().add(Restrictions.ilike("name", "%$params.q%"))
+						.add(Restrictions.ilike("sfc.value", "%$params.q%"))
+						.add(Restrictions.ilike("n.note", "%$params.q%")))
 			}
 
 			documentTotal = Document.createCriteria().count {
