@@ -178,8 +178,8 @@ document_vault.document.note.defaultWidth = 768
 document_vault {
 	aws {
 		credentials {
-			accessKey = "AKIAJV54QXJFWZEJO5AA"
-			secretKey = "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"
+			accessKey = "AKIAIXNHGGMEG62GBNZQ"
+			secretKey = "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"
 		}
 		s3 {
 			bucket = "pt_docvault_dev"
