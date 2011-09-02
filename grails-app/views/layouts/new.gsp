@@ -20,34 +20,34 @@
 			});
 		});
 	</r:script>
-	
+
 	<nav:resources override="true" />
 </head>
 <body>
 	<pt:isLoggedIn>
-	
+
 		<div id="logged-in-user">
 			<p>Welcome, <b><pt:username /></b> - </p>
 			<nav:render group="user" />
 		</div>
-	
+
 		<g:formRemote name="searchForm" url="[action: 'index']" update="resultsHolder" after="DocumentSearch.setHash(\$('#q').val())">
 		<nav:render group="tabs" />
-		<fieldset class="">
+		<fieldset>
 			<div class="right">
-				<g:textField name="q" value="${q}" placeholder="Search Documents" maxlength="255" />
+				<g:textField name="q" value="${q}" placeholder="Search Documents" maxlength="255" autocapitalize="off" />
 				<button id="sub" type="submit" name="submit" class="ui-button icon search"></button>
 			</div>
 		</fieldset>
 		</g:formRemote>
-		
+
 	</pt:isLoggedIn>
-	
+
 	<g:render template="/layouts/messages" />
 
 	<g:layoutBody />
 
 	<r:layoutResources/>
-	
+
 </body>
 </html>

@@ -53,9 +53,9 @@ nimble {
 	}
 
 	layout {
-		application = 'main'
+		application = 'new'
 		administration = 'admin'
-		login = 'main'
+		login = 'new'
 	}
 
 	resources {

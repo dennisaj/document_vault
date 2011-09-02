@@ -342,17 +342,6 @@ var Sign = {
 			$('#slider-container').hide();
 		}
 
-		if (navigator.userAgent.match(/iphone|android/i)) {
-			$('h1', '#header').slideUp('fast');
-			$('head').append('<link>');
-			// TODO: Replace this with grails browser detection
-			var css = $('head').children(':last').attr({
-				rel: 'stylesheet',
-				type: 'text/css',
-				href: '/document_vault/css/document/iphone.css'
-			});
-		}
-
 		$('#clearcan').button({
 			icons: { primary: 'ui-icon-refresh' }
 		}).bind(eventType, function(event) {

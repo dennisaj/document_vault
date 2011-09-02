@@ -1,4 +1,3 @@
-<%--<r:require module="dv-ui-tags"/>--%>
 <div id="tag-search-results">
 <ul>
 <g:each var="tag" in="${tagSearchResults}" status="index">

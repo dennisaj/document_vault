@@ -1,4 +1,3 @@
-
 var PreviewImage = {
 	show: function(uri) {
 		$('body').append('<div id="preview"></div>');

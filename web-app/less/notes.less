@@ -6,32 +6,31 @@
 	padding: 0;
 	position: absolute;
 	z-index: 100;
-}
 
-.inline-note {
-	-webkit-appearance: none;
-	background: rgba(255, 255, 255, 0);
-	border: 0 none;
-	display: block;
-	font-family: inherit;
-	font-size: inherit;
-	height: 50px;
-	line-height: 1em;
-	margin: 0;
-	outline: none;
-	overflow: hidden;
-	padding: 0;
-	resize: none;
-	width: 100%;
-}
+	& > input[type=button] {
+		font-size: .75em;
+		line-height: 1em;
+		margin: 0;
+	}
 
-.inline-note:focus {
-	border: 0 none;
-}
+	.inline-note {
+		-webkit-appearance: none;
+		background: rgba(255, 255, 255, 0);
+		border: 0 none;
+		display: block;
+		font-family: inherit;
+		font-size: inherit;
+		height: 50px;
+		line-height: 1em;
+		margin: 0;
+		outline: none;
+		overflow: hidden;
+		padding: 0;
+		resize: none;
+		width: 100%;
 
-#inline-note-container > input[type=button] {
-	font-size: .75em;
-	line-height: 1em;
-	margin: 0;
-	padding: 0;
+		&:focus {
+			border: 0 none;
+		}
+	}
 }

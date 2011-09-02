@@ -3,7 +3,6 @@
 	<head>
 		<title> - <g:message code="document-vault.view.error.title" /></title>
 		<meta name="layout" content="new" />
-		<%--<r:require module="dv-core"/>--%>
 	</head>
 	<body>
 		<br />
@@ -15,7 +14,7 @@
 			<h2>Error Details</h2>
 			<strong>Error ${request.'javax.servlet.error.status_code'}:</strong> ${request.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
 			<div class="message">
-				
+
 				<strong>Servlet:</strong> ${request.'javax.servlet.error.servlet_name'}<br/>
 				<strong>URI:</strong> ${request.'javax.servlet.error.request_uri'}<br/>
 				<g:if test="${exception}">

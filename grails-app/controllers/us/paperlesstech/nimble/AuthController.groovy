@@ -109,7 +109,7 @@ class AuthController {
 		}
 
 		params.remove('password')
-		redirect(action: 'login', params:params)
+		login()
 	}
 
 	def logout = {

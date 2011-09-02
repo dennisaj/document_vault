@@ -16,7 +16,7 @@ var Notes = {
 
 			var $container = $('<div />').prop('id', 'inline-note-container').css('font-size', font);
 			$container.css({left:previousPoint.x, top:previousPoint.y}).appendTo($('body')).width(width * page.scale);
-			var $submit = $('<input />').attr('value', 'Submit').attr('type', 'button');
+			var $submit = $('<input />').attr('value', 'Submit').attr('type', 'button').button();
 			var $textarea = $('<textarea />').addClass('inline-note').appendTo($container);
 			$textarea.TextAreaExpander();
 			$textarea.after($submit);
@@ -42,7 +42,10 @@ var Notes = {
 		Sign.doMove(event);
 	},
 
-	doStart: function(event) {},
+	doStart: function(event) {
+		// Set initialZoom so that pinch to zoom works when notes.js is active.
+		Sign.initialZoom = $('#slider').slider('value');
+	},
 
 	drawNotes: function(canvas, page) {
 		if (InputHandler.handlingInput !== this) {

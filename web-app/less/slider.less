@@ -1,0 +1,90 @@
+@import "bootstrap";
+
+@primaryLightGrey: #e4e4e4;
+@primaryDarkGrey: #cacaca;
+
+.ui-slider {
+	.border-radius(.3em);
+
+	color: white;
+	border: 1px solid black;
+	font-weight: bold;
+	text-align: left;
+	text-shadow: 0 -1px 1px black;
+	position: relative;
+
+	.ui-slider-handle {
+		.border-radius(1em);
+		#gradient > .directional(#5f9cc5, #396b9e, top);
+
+		border: 1px solid #145072;
+		color: #fff;
+		cursor: default;
+		text-shadow: 0 -1px 1px #145072;
+		font-weight: bold;
+		height: 1.2em;
+		outline: none;
+		position: absolute;
+		width: 1.2em;
+		z-index: 2;
+	}
+
+	.ui-slider-range {
+		background-position: 0 0;
+		border: 0;
+		display: block;
+		font-size: .7em;
+		position: absolute;
+		z-index: 1;
+	}
+}
+.ui-slider-horizontal {
+	#gradient > .directional(@primaryLightGrey, @primaryDarkGrey, top);
+
+	height: .8em;
+	width: 12em;
+
+	.ui-slider-handle {
+		top: -.3em;
+		margin-left: -.6em;
+	}
+
+	.ui-slider-range {
+		height: 100%;
+		top: 0;
+	}
+
+	.ui-slider-range-min {
+		left: 0;
+	}
+
+	.ui-slider-range-max {
+		right: 0;
+	}
+}
+
+.ui-slider-vertical {
+	#gradient > .directional(@primaryLightGrey, @primaryDarkGrey, left);
+
+	height: 12em;
+	width: .8em;
+
+	.ui-slider-handle {
+		left: -.3em;
+		margin-bottom: -.6em;
+		margin-left: -.35em;
+	}
+
+	.ui-slider-range {
+		left: 0;
+		width: 100%;
+	}
+
+	.ui-slider-range-min {
+		bottom: 0;
+	}
+
+	.ui-slider-range-max {
+		top: 0;
+	}
+}

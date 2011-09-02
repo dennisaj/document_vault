@@ -43,23 +43,23 @@ http://github.com/necolas/css3-github-buttons
     *display: inline; 
 }
  /*
- #54d875, #338f4a
+ #54d875, #6fbf4d
  #599bdc, #3072b3
  */
 .ui-button:hover,
 .ui-button:focus,
 .ui-button:active,
 .ui-button.active {
-    border-color: #338f4a;
-    border-bottom-color: #2a65a0;
+    border-color: #477a31;
+    border-bottom-color: #2F5221;
     text-decoration: none; 
-    text-shadow: -1px -1px 0 rgba(0,0,0,0.3); 
+    text-shadow: 0 1px 0 rgba(0,0,0,0.5); 
     color: #fff; 
-    background-color: #3C8DDE;
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#54d875), to(#338f4a));
-    background-image: -moz-linear-gradient(#54d875, #338f4a);
-    background-image: -o-linear-gradient(#54d875, #338f4a);
-    background-image: linear-gradient(#54d875, #338f4a);
+    background-color: #6fbf4d;
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#a9d995), to(#6fbf4d));
+    background-image: -moz-linear-gradient(#a9d995, #6fbf4d);
+    background-image: -o-linear-gradient(#a9d995, #6fbf4d);
+    background-image: linear-gradient(#a9d995, #6fbf4d);
     filter: none;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -68,13 +68,13 @@ http://github.com/necolas/css3-github-buttons
  
 .ui-button:active,
 .ui-button.active {
-    border-color: #2a65a0;
-    border-bottom-color: #3884CF;
-    background-color: #338f4a;
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#338f4a), to(#54d875));
-    background-image: -moz-linear-gradient(#338f4a, #54d875);
-    background-image: -o-linear-gradient(#338f4a, #54d875);
-    background-image: linear-gradient(#338f4a, #54d875);
+    border-color: #477a31;
+    border-bottom-color: #2F5221;
+    background-color: #6fbf4d;
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#6fbf4d), to(#a9d995));
+    background-image: -moz-linear-gradient(#6fbf4d, #a9d995);
+    background-image: -o-linear-gradient(#6fbf4d, #a9d995);
+    background-image: linear-gradient(#6fbf4d, #a9d995);
     filter: none;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -389,12 +389,12 @@ http://github.com/necolas/css3-github-buttons
 .ui-button-group.minor-group .ui-button:hover,
 .ui-button-group.minor-group .ui-button:focus,
 .ui-button-group.minor-group .ui-button:active {
-    background-color: #54d875;
+    background-color: #dc5f59;
 }
  
 .ui-button-group.minor-group .ui-button:active,
 .ui-button-group.minor-group .ui-button.active {
-    background-color: #338f4a;
+    background-color: #6fbf4d;
 }
  
 .ui-button-group.minor-group .ui-button.icon:before {

@@ -28,7 +28,7 @@
 <input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
 <input type="hidden" id="documentId" value="${document?.id}" />
 
-<div id="button-panel" class="subbar">
+<div id="button-panel">
 	<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
 	<input type="hidden" id="documentId" value="${document?.id}" />
 
@@ -75,7 +75,7 @@
 			<g:message code="document-vault.label.close" />
 		</button>
 
-		<div id="page-container"><g:message code="document-vault.label.page" /> <span id="page-number">${pageNumber}/${document?.previewImages?.size()}</span></div>
+		<span id="page-container"><g:message code="document-vault.label.page" /> <span id="page-number">${pageNumber}/${document?.previewImages?.size()}</span></span>
 	</div>
 </div>
 
@@ -90,11 +90,11 @@
 		</button>
 	</div>
 	<div id="left-arrow" class="arrow left">
-		<a href="#" title="<g:message code="document-vault.label.previouspage" />"></a>
+		<a class="ui-button" href="#" title="<g:message code="document-vault.label.previouspage" />"><r:img uri="/css/lib/images/document-page-previous-32x32.png" /></a>
 	</div>
 
 	<div id="right-arrow" class="arrow right">
-		<a href="#" title="<g:message code="document-vault.label.nextpage" />"></a>
+		<a class="ui-button" href="#" title="<g:message code="document-vault.label.nextpage" />"><r:img uri="/css/lib/images/document-page-next-32x32.png" /></a>
 	</div>
 
 	<canvas id="can"></canvas>

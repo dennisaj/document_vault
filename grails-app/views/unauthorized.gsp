@@ -3,7 +3,6 @@
 	<head>
 		<title> - <g:message code="document-vault.view.unauthorized.title" /></title>
 		<meta name="layout" content="new" />
-		<%--<r:require module="dv-core"/>--%>
 	</head>
 	<body>
 		<br />

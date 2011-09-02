@@ -1,9 +1,7 @@
 /*** MAIN ***/
 
 html {
-	background-color: #eaeaea;
-	background-image: url(images/background-1500x1200.png);
-	background-repeat: no-repeat;
+	background: #fcfcfc;
 	color: #333;
 	font-family: "Helvetica Neue", Arial, sans-serif;
 	height: 100%;
