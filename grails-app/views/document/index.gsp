@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="layout" content="new"/>
+	<meta name="layout" content="new" />
 	<title>- <g:message code="document-vault.view.document.search.title" /></title>
 
 	<r:require module="documentSearch" />
-	<r:require module="dvTags"/>
-	<r:require module="dvNotes"/>
+	<r:require module="dvTags" />
+	<r:require module="dvNotes" />
 
 	<nav:resources override="true" />
 

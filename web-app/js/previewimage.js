@@ -29,9 +29,7 @@ var PreviewImage = {
 			var height = scale * image.height;
 
 			$imageDialog.html($(image).width(width).height(height));
-
-			// Tiny timeout before re-centering to help out Chrome.
-			setTimeout(function() {$imageDialog.dialog('option', 'position', 'center')}, 2);
+			$imageDialog.dialog('option', 'position', 'center');
 		};
 
 		if (image.complete) {

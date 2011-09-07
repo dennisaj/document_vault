@@ -3,7 +3,7 @@
 <head>
 	<title> - <g:message code="document-vault.view.signature.title" /></title>
 	<meta name="layout" content="new" />
-	<r:require module="documentSign"/>
+	<r:require module="documentSign" />
 	<r:script>
 		$(document).ready(function() {
 			Sign.init({
@@ -74,9 +74,8 @@
 		<button id="close" class="labeled-button" title="<g:message code="document-vault.label.close" />">
 			<g:message code="document-vault.label.close" />
 		</button>
-
-		<span id="page-container"><g:message code="document-vault.label.page" /> <span id="page-number">${pageNumber}/${document?.previewImages?.size()}</span></span>
 	</div>
+	<span id="page-container"><g:message code="document-vault.label.page" /> <span id="page-number">${pageNumber}/${document?.previewImages?.size()}</span></span>
 </div>
 
 <div id="main">

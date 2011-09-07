@@ -29,7 +29,7 @@ var Notes = {
 			});
 		}
 
-		$('#main').css('cursor', 'crosshair');
+		$(event.currentTarget).css('cursor', 'crosshair');
 	},
 
 	doGestureChange: function(event) {

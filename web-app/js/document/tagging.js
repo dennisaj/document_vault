@@ -88,7 +88,7 @@ var Tagging = {
 			});
 		}
 
-		$(button).toggleClass('ui-state-active');
+		$(button).toggleClass('ui-state-highlight');
 		$boxId.parent().toggleClass('hidden');
 		return false;
 	},

@@ -136,15 +136,23 @@
 				&:hover, &:focus {
 					width: @pseudoInputWidth + 100;
 				}
-				
 			}
 
-			button {
-				margin: 5px 10px 5px 5px;
+			& > input + button {
+				border-right: none;
+				margin: 5px -6px 5px 5px;
 				padding: 0.5em 0.1em 0.5em 1.0em !important;
 				vertical-align: middle;
-				
-				.border-radius;
+
+				.border-radius (5px 0 0 5px);
+			}
+
+			& > button:last-child {
+				margin: 5px 10px 5px 0;
+				padding: 0.5em 0.1em 0.5em 1.0em !important;
+				vertical-align: middle;
+
+				.border-radius (0 5px 5px 0);
 			}
 		}
 	}
@@ -268,6 +276,9 @@
 .ui-dialog {
 	border: 1px solid #000;
 	background-color: #fff;
+	overflow: hidden;
+	position: absolute;
+	width: 300px;
 
 	.box-shadow(~"0 0 32px rgba(0,0,0,0.6)");
 
@@ -281,6 +292,7 @@
 		.ui-dialog-titlebar-close {
 			position: absolute;
 			right: 6px;
+			text-decoration: none;
 			//text-shadow: 0
 
 			&:after {
@@ -302,6 +314,9 @@
 		text-align: right;
 	}
 }
+.ui-draggable .ui-dialog-titlebar {
+	cursor: move;
+}
 
 .ui-widget-overlay {
 	#gradient > .radial(rgba(127,127,127,0.5), rgba(0,0,0,0.7));
@@ -320,5 +335,7 @@
 
 	&.ui-state-highlight {
 		background: white;
+		color: black;
+		text-shadow: none;
 	}
 }

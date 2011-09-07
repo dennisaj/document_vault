@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="layout" content="new"/>
+	<meta name="layout" content="new" />
 	<title> - <g:message code="document-vault.view.document.show.title" /></title>
 
 	<r:require module="documentShow" />
@@ -49,9 +49,9 @@
 		<button id="close" class="ui-button icon remove" title="<g:message code="document-vault.label.close" />">
 			<g:message code="document-vault.label.close" />
 		</button>
-
-		<span id="page-container"><g:message code="document-vault.label.page" /> <span id="page-number">${pageNumber}/${document?.previewImages?.size()}</span></span>
 	</div>
+
+	<span id="page-container"><g:message code="document-vault.label.page" /> <span id="page-number">${pageNumber}/${document?.previewImages?.size()}</span></span>
 </div>
 
 <div id="main">

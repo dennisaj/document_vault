@@ -63,6 +63,12 @@ modules = {
 		resource url: '/js/document/document.js'
 	}
 
+	documentPreview {
+		dependsOn 'jquery-ui'
+
+		resource url: '/js/previewimage.js'
+	}
+
 	documentBase {
 		dependsOn 'jquery, dvDefaults'
 
@@ -77,7 +83,7 @@ modules = {
 	}
 
 	documentSearch {
-		dependsOn 'documentBase, jqueryShowSign'
+		dependsOn 'documentBase, jqueryShowSign, documentPreview'
 
 		resource url: '/less/search.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSearch'
 		resource url: '/js/new/search.js'
@@ -118,7 +124,7 @@ modules = {
 	}
 
 	documentTagging {
-		dependsOn 'documentBase, jqueryShowSign, dvTags'
+		dependsOn 'documentBase, jqueryShowSign, dvTags, documentPreview'
 
 		resource url: '/js/lib/jquery.ui.touch-punch.min.js'
 	}

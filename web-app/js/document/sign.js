@@ -95,7 +95,7 @@ var Sign = {
 			this.highlightStart = null;
 			this.$box.hide().width(0).height(0);
 		} else if (!this.highlightStart) {
-			this.$main.css('cursor', 'default');
+			$(canvas).css('cursor', 'default');
 		}
 	},
 
@@ -116,7 +116,7 @@ var Sign = {
 		var isHighlighting = Party.isHighlighting();
 
 		if (!isSigning && !isHighlighting) {
-			this.$main.css('cursor', 'move');
+			$(canvas).css('cursor', 'move');
 			this.dragCanvas(canvas, page, InputHandler.previousPoint, point);
 		} else if (isSigning) {
 			var line = {
@@ -195,14 +195,14 @@ var Sign = {
 		$('#right-arrow a').attr('href', '#' + Math.min(Document.pageCount, page.pageNumber + 1));
 		$('#left-arrow a').attr('href', '#' + Math.max(Document.FIRST_PAGE, page.pageNumber - 1));
 
-		$('.arrow').removeClass('ui-state-disabled disabled');
+		$('.arrow a').removeClass('ui-state-disabled disable');
 
 		if (page.pageNumber == 1) {
-			$('#left-arrow').addClass('ui-state-disabled disabled');
+			$('#left-arrow a').addClass('ui-state-disabled disable');
 		}
 
 		if (page.pageNumber == Document.pageCount) {
-			$('#right-arrow').addClass('ui-state-disabled disabled');
+			$('#right-arrow a').addClass('ui-state-disabled disable');
 		}
 
 		canvas.width = page.background.width;
@@ -213,10 +213,11 @@ var Sign = {
 		this._zoomEvent(canvas, page, $('#slider').slider('value'));
 		var $canvas = $(canvas);
 		var headerHeight = $('#logged-in-user').outerHeight(true) + $('#button-panel').outerHeight(true);
+		var center = ((this.$main.height() + headerHeight) / 2) - ($canvas.height() / 2);
 		// center the canvas.
 		this.dragCanvas(canvas, page,
-				{x: page.scrollCanX, y: page.scrollCanY},
-				{x: (this.$main.width() - $canvas.width()) / 2, y: headerHeight});
+			{ x: page.scrollCanX, y: page.scrollCanY },
+			{ x: (this.$main.width() - $canvas.width()) / 2, y: center });
 		Draw.draw(canvas, page);
 	},
 
@@ -374,8 +375,8 @@ var Sign = {
 			window.location.href = self.urls.close;
 		});
 
-		$('.arrow').bind(eventType, function(event) {
-			if ($(this).is('.disabled')) {
+		$('.arrow a').bind(eventType, function(event) {
+			if ($(this).is('.disable')) {
 				return false;
 			}
 		});
@@ -405,9 +406,9 @@ var Sign = {
 			}
 
 			if ($this.is('.ui-state-highlight')) {
-				self.$main.css('cursor', 'crosshair');
+				$can.css('cursor', 'crosshair');
 			} else {
-				self.$main.css('cursor', 'default');
+				$can.css('cursor', 'default');
 			}
 
 			$('.mark').trigger('marked');

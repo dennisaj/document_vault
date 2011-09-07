@@ -7,7 +7,7 @@ http://github.com/necolas/css3-github-buttons
  
 /* ------------------------------------------------------------------------------------------------------------- BUTTON */
  
-.ui-button { 
+[role="button"], .ui-button { 
     position: relative; 
     overflow: visible; 
     display: inline-block; 
@@ -46,10 +46,10 @@ http://github.com/necolas/css3-github-buttons
  #54d875, #6fbf4d
  #599bdc, #3072b3
  */
-.ui-button:hover,
-.ui-button:focus,
-.ui-button:active,
-.ui-button.active {
+[role="button"]:hover, .ui-button:hover,
+[role="button"]:focus, .ui-button:focus,
+[role="button"]:active, .ui-button:active,
+[role="button"].active, .ui-button.active {
     border-color: #477a31;
     border-bottom-color: #2F5221;
     text-decoration: none; 
@@ -66,8 +66,8 @@ http://github.com/necolas/css3-github-buttons
     box-shadow: none;
 }
  
-.ui-button:active,
-.ui-button.active {
+[role="button"]:active, .ui-button:active,
+[role="button"].active, .ui-button.active {
     border-color: #477a31;
     border-bottom-color: #2F5221;
     background-color: #6fbf4d;
@@ -82,7 +82,7 @@ http://github.com/necolas/css3-github-buttons
 }
  
 /* overrides extra padding on button elements in Firefox */
-.ui-button::-moz-focus-inner {
+[role="button"]::-moz-focus-inner, .ui-button::-moz-focus-inner {
     padding: 0;
     border: 0;
 }

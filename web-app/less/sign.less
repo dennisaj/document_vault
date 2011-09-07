@@ -1,5 +1,10 @@
 @import "base";
 
+button.ui-button {
+	font-size: .8em;
+	min-height: 44px;
+}
+
 html, body {
 	-khtml-user-select: none;
 	-moz-user-select: none;
@@ -28,6 +33,7 @@ html, body {
 
 	#page-container {
 		margin-left: 10px;
+		position: absolute;
 	}
 }
 
@@ -48,27 +54,16 @@ html, body {
 
 		a {
 			display: block;
-			margin: 16px 0 0 0;
 			padding: 5px;
 			text-decoration: none;
 		}
 
 		&.left {
 			left: 10px;
-			a {
-				margin-left: 22px;
-			}
 		}
 
 		&.right {
 			right: 10px;
-			a {
-				margin-left: 36px;
-			}
-		}
-
-		&.ui-state-disabled {
-			.opacity(35);
 		}
 	}
 

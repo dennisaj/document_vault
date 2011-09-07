@@ -12,7 +12,7 @@
 	<link rel="apple-touch-icon-precomposed" href="icon.png" />
 	
 	<g:layoutHead />
-	<r:layoutResources/>
+	<r:layoutResources />
 	<r:script>
 		jQuery(function($) {
 			$('#can').parents('body').bind('touchmove', function block(e) {
@@ -24,19 +24,28 @@
 	<nav:resources override="true" />
 </head>
 <body>
+	<div id="spinner" class="spinner" style="display:none;">
+		<r:img uri='/css/lib/images/loading.gif' alt="${message(code:'spinner.alt', default:'Loading...')}" />
+	</div>
 	<pt:isLoggedIn>
 
 		<div id="logged-in-user">
-			<p>Welcome, <b><pt:username /></b> - </p>
+			<p><g:message code="document-vault.label.welcomemessage" />, <b><pt:username /></b> - </p>
 			<nav:render group="user" />
 		</div>
 
-		<g:formRemote name="searchForm" url="[action: 'index']" update="resultsHolder" after="DocumentSearch.setHash(\$('#q').val())">
+		<%-- If we are not on the search page, the search form should not use ajax. --%>
+		<g:if test="${params.controller != 'document' || params.action != 'index'}">
+			<g:set var="before" value="return" />
+		</g:if>
+
+		<g:formRemote name="searchForm" url="[controller:'document', action: 'index']" before="${before}" update="resultsHolder" after="DocumentSearch.setHash(\$('#q').val())">
 		<nav:render group="tabs" />
 		<fieldset>
 			<div class="right">
 				<g:textField name="q" value="${q}" placeholder="Search Documents" maxlength="255" autocapitalize="off" />
 				<button id="sub" type="submit" name="submit" class="ui-button icon search"></button>
+				<button id="reset1" type="reset" name="reset1" class="ui-button icon remove"></button>
 			</div>
 		</fieldset>
 		</g:formRemote>
@@ -47,7 +56,6 @@
 
 	<g:layoutBody />
 
-	<r:layoutResources/>
-
+	<r:layoutResources />
 </body>
 </html>
