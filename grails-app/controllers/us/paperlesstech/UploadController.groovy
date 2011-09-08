@@ -27,9 +27,10 @@ class UploadController {
 		def isAjax = params.ajax || request.xhr
 		def results = []
 		def group = Group.get(params.int('group'))
+		def tags = params.tags ?: []
 
 		if (group) {
-			request.getMultiFileMap().each {inputName, files->
+			request.getMultiFileMap().each { inputName, files->
 				files.each { mpf ->
 					def is = mpf.inputStream
 					is.withStream {
@@ -37,6 +38,7 @@ class UploadController {
 
 						if (documents) {
 							documents.each { document ->
+								document.addTags(tags)
 								def url = g.createLink(controller:"document", action:"show", params:[documentId:document.id])
 								def thumbnail_url = g.createLink(controller:"document", action:"thumbnail", params:[documentId:document.id, pageNumber:1, documentDataId:document.previewImage(1).thumbnail.id])
 								results.add([name:document.toString(), size:document.files.first().fileSize, url:url,thumbnail_url:thumbnail_url])

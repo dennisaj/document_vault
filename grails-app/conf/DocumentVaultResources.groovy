@@ -34,10 +34,15 @@ modules = {
 		resource url: '/css/lib/style.css'
 	}
 
-	dvTags {
+	tagit {
+		resource url: '/less/tag.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'tagit'
 		resource url: '/css/tagit-simple-blue.css', minify: true, nominify: false
-		resource url: '/less/tag.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'dvTags'
 		resource url: '/js/lib/tagit.js'
+	}
+
+	dvTags {
+		dependsOn 'tagit'
+
 		resource url: '/js/document/tagging.js'
 		// TODO i18n text
 		resource url: '/images/tag-blue-delete.png', attrs: [alt:'Delete Tag'], disposition: 'inline'
@@ -59,7 +64,6 @@ modules = {
 		dependsOn 'jquery-ui'
 
 		resource url: '/js/lib/jquery.ba-hashchange.js'
-		resource url: '/js/global.js'
 		resource url: '/js/document/document.js'
 	}
 
@@ -73,6 +77,7 @@ modules = {
 		dependsOn 'jquery, dvDefaults'
 
 		resource url: '/js/new/base.js'
+		resource url: '/js/global.js'
 	}
 
 	documentLogin {
@@ -90,7 +95,7 @@ modules = {
 	}
 
 	documentUpload {
-		dependsOn 'documentBase, jquery-ui, fileUpload'
+		dependsOn 'documentBase, jquery-ui, fileUpload, tagit'
 
 		resource url: '/less/upload.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentUpload'
 		resource url: '/js/new/upload.js'

@@ -89,7 +89,12 @@
 						}
 					}
 					&.tagit-new {
-						input { line-height: 25px; background-color: @tagBgColor; }
+						input {
+							background-color: @tagBgColor;
+							&:focus {
+								line-height: 25px;
+							}
+						}
 					}
 				}
 			}
