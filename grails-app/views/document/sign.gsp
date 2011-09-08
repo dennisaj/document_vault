@@ -5,7 +5,7 @@
 	<meta name="layout" content="new" />
 	<r:require module="documentSign" />
 	<r:script>
-		$(document).ready(function() {
+		jQuery(function($) {
 			Sign.init({
 				'close': '${createLink(controller:"document", action:"index")}',
 				'downloadImage': '${createLink(controller:"document", action:"downloadImage")}/{0}/{1}',
@@ -20,9 +20,15 @@
 				'saveTextNote': '${createLink(controller:"note", action:"saveText")}/{0}'
 			});
 
-			Notes.init();
 		});
 	</r:script>
+	<pt:canNotes document="${document}">
+		<r:script>
+			jQuery(function($) {
+				Notes.init();
+			});
+		</r:script>
+	</pt:canNotes>
 </head>
 <body>
 <input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />

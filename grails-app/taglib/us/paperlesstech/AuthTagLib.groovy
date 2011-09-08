@@ -5,17 +5,17 @@ import org.codehaus.groovy.grails.web.pages.GroovyPage
 class AuthTagLib {
 	static namespace = "pt"
 
-	def authService
+	def authServiceProxy
 	def facebookService
 
 	def isLoggedIn = {attrs, body ->
-		if (authService.isLoggedIn()) {
+		if (authServiceProxy.isLoggedIn()) {
 			out << body()
 		}
 	}
 
 	def username = {attrs, body ->
-		out << authService.authenticatedUser?.username
+		out << authServiceProxy.authenticatedUser?.username
 	}
 
 	/**
@@ -37,7 +37,7 @@ class AuthTagLib {
 			throwTagError("Tag [canDelete] must have [document] attribute.")
 		}
 
-		outputBody(authService.canDelete(d), body)
+		outputBody(authServiceProxy.canDelete(d), body)
 	}
 
 	def canGetSigned = {attr, body->
@@ -47,7 +47,7 @@ class AuthTagLib {
 			throwTagError("Tag [canGetSigned] must have [document] attribute.")
 		}
 
-		outputBody(authService.canGetSigned(d), body)
+		outputBody(authServiceProxy.canGetSigned(d), body)
 	}
 
 	def canNotes = {attr, body->
@@ -57,11 +57,11 @@ class AuthTagLib {
 			throwTagError("Tag [canNotes] must have [document] attribute.")
 		}
 
-		outputBody(authService.canNotes(d), body)
+		outputBody(authServiceProxy.canNotes(d), body)
 	}
 
 	def canNotesAny = {attr, body->
-		outputBody(authService.canNotesAny(), body)
+		outputBody(authServiceProxy.canNotesAny(), body)
 	}
 
 	def canPrint = {attr, body->
@@ -71,11 +71,11 @@ class AuthTagLib {
 			throwTagError("Tag [canPrint] must have [document] attribute.")
 		}
 
-		outputBody(authService.canPrint(d), body)
+		outputBody(authServiceProxy.canPrint(d), body)
 	}
 
 	def canPrintAny = {attr, body->
-		outputBody(authService.canPrintAny(), body)
+		outputBody(authServiceProxy.canPrintAny(), body)
 	}
 
 	def canSign = {attr, body->
@@ -85,11 +85,11 @@ class AuthTagLib {
 			throwTagError("Tag [canSign] must have [document] attribute.")
 		}
 
-		outputBody(authService.canSign(d), body)
+		outputBody(authServiceProxy.canSign(d), body)
 	}
 
 	def canSignAny = {attr, body->
-		outputBody(authService.canSignAny(), body)
+		outputBody(authServiceProxy.canSignAny(), body)
 	}
 
 	def canTag = {attr, body->
@@ -99,11 +99,11 @@ class AuthTagLib {
 			throwTagError("Tag [canTag] must have [document] attribute.")
 		}
 
-		outputBody(authService.canTag(d), body)
+		outputBody(authServiceProxy.canTag(d), body)
 	}
 
 	def canTagAny = {attr, body->
-		outputBody(authService.canTagAny(), body)
+		outputBody(authServiceProxy.canTagAny(), body)
 	}
 
 	def canUpload = {attr, body->
@@ -113,11 +113,11 @@ class AuthTagLib {
 			throwTagError("Tag [canUpload] must have [group] attribute.")
 		}
 
-		outputBody(authService.canUpload(group), body)
+		outputBody(authServiceProxy.canUpload(group), body)
 	}
 
 	def canUploadAny = {attr, body->
-		outputBody(authService.canUploadAny(), body)
+		outputBody(authServiceProxy.canUploadAny(), body)
 	}
 
 	def canView = {attr, body->
@@ -127,15 +127,15 @@ class AuthTagLib {
 			throwTagError("Tag [canView] must have [document] attribute.")
 		}
 
-		outputBody(authService.canView(d), body)
+		outputBody(authServiceProxy.canView(d), body)
 	}
 
 	def canViewAny = {attr, body->
-		outputBody(authService.canViewAny(), body)
+		outputBody(authServiceProxy.canViewAny(), body)
 	}
 
 	def isAdmin = { attr, body->
-		outputBody(authService.isAdmin(), body)
+		outputBody(authServiceProxy.isAdmin(), body)
 	}
 
 	def facebookConnect = {attrs, body ->

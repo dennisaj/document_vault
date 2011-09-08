@@ -3,6 +3,7 @@ package us.paperlesstech
 import org.apache.shiro.SecurityUtils
 
 import us.paperlesstech.auth.CodeToken
+import us.paperlesstech.nimble.User
 
 class CodeController {
 	def allowedMethods = [index: "GET"]
@@ -13,9 +14,13 @@ class CodeController {
 		assert codeToken.code
 
 		try {
-			SecurityUtils.subject.login(codeToken)
-			userService.createLoginRecord(request)
 			def party = Party.findByCode(codeToken.code)
+
+			// If the user is a generated user, log them in automatically.
+			if (party?.signator?.roles?.any { it.name == User.SIGNATOR_USER_ROLE }) {
+				SecurityUtils.subject.login(codeToken)
+				userService.createLoginRecord(request)
+			}
 
 			switch (party.documentPermission) {
 				case DocumentPermission.Sign:

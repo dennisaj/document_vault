@@ -64,7 +64,14 @@ var Sign = {
 			var party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
 			var color = Party.getCurrentColor() || SignBox.partyColor;
 			var point = Draw.scalePoint(page, Draw.convertEventToPoint(event));
-			var insideHighlight = Draw.isPointInsideAnyBox(point, page.unsavedHighlights[party]);
+
+			// Merge saved and unsaved highlights.
+			var highlights = $.extend(true, {}, page.savedHighlights);
+			$.each(page.unsavedHighlights, function(key, value) {
+				highlights[key] = $.merge(highlights[key] || [], value);
+			});
+
+			var insideHighlight = Draw.isPointInsideAnyBox(point, highlights[party]);
 
 			if (insideHighlight) {
 				SignBox.signBox(canvas, page, insideHighlight);

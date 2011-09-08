@@ -44,7 +44,7 @@ class UserService {
 	 * login - Called when a user logs in.
 	 * logout - Called when  a user logs out.
 	 * beforeregister - Called immediately before a new user is created.  Can be used for validation. (i.e., user.errors.rejectValue('customfield', 'user.customfield.invalid') )
-	 * afterregister - Called immediately after a new user is created. 
+	 * afterregister - Called immediately after a new user is created.
 	 */
 	def events = [:]
 
@@ -238,7 +238,6 @@ class UserService {
 
 				log.info "Successfully created user [$user.id]$user.username"
 				return savedUser
-		
 			}
 		}
 
@@ -442,9 +441,7 @@ class UserService {
 
 	User createUser(Map map) {
 		String username = map.username
-		assert username
 		String fullName = map.fullName
-		assert fullName
 		String email = map.email
 		String externalId = map.externalId
 		String realm = map.realm

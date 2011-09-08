@@ -162,7 +162,7 @@ environments {
 		document_vault.forceSSL = true
 	}
 	development {
-		document_vault.remoteSigning.enabled = false
+		document_vault.remoteSigning.enabled = true
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp"
 		document_vault.forceSSL = false

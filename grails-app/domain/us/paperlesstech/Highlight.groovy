@@ -20,10 +20,8 @@ class Highlight {
 	static constraints = {
 		accepted nullable:true
 		height min:0
-		left min:0
 		pageNumber min:1, max:10000
 		width min:0
-		top min:0
 	}
 
 	static mapping = {

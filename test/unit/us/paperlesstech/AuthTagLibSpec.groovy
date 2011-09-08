@@ -6,16 +6,16 @@ import org.codehaus.groovy.grails.web.pages.GroovyPage
 import org.codehaus.groovy.grails.web.taglib.exceptions.GrailsTagException
 
 import spock.lang.*
-import us.paperlesstech.nimble.Group;
+import us.paperlesstech.nimble.Group
 
 class AuthTagLibSpec extends TagLibSpec {
 	@Shared
 	def methods
 
 	def setup() {
-		tagLib.authService = Mock(AuthService)
-		tagLib.authService./can.*/(_) >> true
-		tagLib.authService./can.*Any/() >> true
+		tagLib.authServiceProxy = Mock(AuthService)
+		tagLib.authServiceProxy./can.*/(_) >> true
+		tagLib.authServiceProxy./can.*Any/() >> true
 
 		methods = tagLib.properties.keySet().findAll{key->
 			key ==~ /can.*/
@@ -53,9 +53,9 @@ class AuthTagLibSpec extends TagLibSpec {
 
 	def "null should be output when permissions is denied"() {
 		given:
-			tagLib.authService = Mock(AuthService)
-			tagLib.authService./can.*/(_) >> false
-			tagLib.authService./can.*Any/() >> false
+			tagLib.authServiceProxy = Mock(AuthService)
+			tagLib.authServiceProxy./can.*/(_) >> false
+			tagLib.authServiceProxy./can.*Any/() >> false
 		when:
 			def ret = "$method"(document:new Document(), group: new Group()) {
 				"output"
