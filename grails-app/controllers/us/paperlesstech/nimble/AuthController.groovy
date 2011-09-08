@@ -45,6 +45,14 @@ class AuthController {
 	def shiroSecurityManager
 	def userService
 
+	def beforeInterceptor = [action:this.&loggedInCheck, except:['logout', 'signout']]
+
+	def loggedInCheck() {
+		if (authService.isLoggedIn()) {
+			redirect(controller:"document", action:"index")
+		}
+	}
+
 	def index = {
 		redirect(action: 'login', params: params)
 	}
