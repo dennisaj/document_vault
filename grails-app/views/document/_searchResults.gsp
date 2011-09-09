@@ -1,6 +1,4 @@
-<%@page import="us.paperlesstech.MimeType"%>
-
-<div id="search-results" class="span-24 last ui-widget-header ui-corner-top">
+<div id="search-results">
 	<g:if test="${!params.q && !documentResults}">
 		<g:message code="document-vault.view.document.search.noresults" args="[params.q.encodeAsHTML()]" />
 	</g:if>
@@ -15,8 +13,8 @@
 	</g:if>
 </div>
 
-<g:if test="${tagSearchResults}">
-<div id="tag-results" class="span-24 last append-bottom">
+<g:if test="${tagSearchResults && pt.canTagAny()}">
+<div id="tag-results">
 	<g:render template="/tag/tagSearchResults" model="${pageScope.variables}" />
 </div>
 </g:if>

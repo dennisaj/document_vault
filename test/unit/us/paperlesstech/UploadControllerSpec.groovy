@@ -150,6 +150,7 @@ class UploadControllerSpec extends ControllerSpec {
 		def dd = new DocumentData(fileSize: fileSize)
 		mockDomain(Document)
 		def d = new Document(name: "docName")
+		d.metaClass.addTags = {tags-> }
 		d.addToFiles(dd)
 		d.addToPreviewImages(new PreviewImage(data:dd, pageNumber:1, thumbnail:dd))
 		def resultMap = [:]

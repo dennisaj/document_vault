@@ -85,7 +85,7 @@ var Tagging = {
 				onRemove: function(holder, value) {
 					self.removeTag(holder.attr('data-documentId'), value);
 				}
-			});
+			}).find('input').attr('placeholder', '+');
 		}
 
 		$(button).toggleClass('ui-state-highlight');

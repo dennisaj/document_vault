@@ -7,7 +7,13 @@
 	<r:require module="documentUpload" />
 
 	<r:script>
-		var controller = "${createLink(controller:"upload", action:"ajaxSave")}";
+		jQuery(function($) {
+			Upload.init({
+				'controller': '${createLink(controller:"upload", action:"ajaxSave")}',
+				'createTag': '${createLink(controller:"tag", action:"create")}/{0}',
+				'list': '${createLink(controller:"tag", action:"list")}'
+			});
+		});
 	</r:script>
 </head>
 <body>
@@ -15,10 +21,10 @@
 <g:if test="${results}">
 	<g:each var="result" in="${results}" status="index">
 		<g:if test="${result.error}">
-			<div class="error span-24 last">${result.name + ": " + result.error}</div>
+			<div class="error">${result.name + ": " + result.error}</div>
 		</g:if>
 		<g:else>
-			<div class="success span-24 last"><a href="${result.url}">${result.name}</a></div>
+			<div class="success"><a href="${result.url}">${result.name}</a></div>
 		</g:else>
 	</g:each>
 </g:if>
@@ -27,9 +33,7 @@
 
 <div id="fileupload">
 	<form action="${createLink(action:"save")}" method="post" enctype="multipart/form-data">
-
 		<div class="fileupload-buttonbar ui-button-container">
-
 			<g:if test="${groups.size() == 1}">
 				<g:hiddenField name="group" value="${groups.first().id}"/>
 			</g:if>
@@ -38,19 +42,23 @@
 				<g:select name="group" id="group" from="${groups}" optionKey="id" optionValue="name" value="${recentGroup?.id}" />
 			</g:else>
 
+			<pt:canTagAny>
+			<div id="tag-container">
+				<g:message code="document-vault.label.upload.tagging" />: <ul class="taggable" id="tagbox" data-name="tags"></ul>
+			</div>
+			</pt:canTagAny>
+
 			<label class="fileinput-button primary icon add">
 				<span><g:message code="document-vault.label.upload.addfiles" /></span>
 				<input type="file" name="files" multiple>
 			</label>
 		</div>
-
 	</form>
 
 	<div class="fileupload-content">
 		<ul class="files"></ul>
 		<div class="fileupload-progressbar"></div>
 	</div>
-
 </div>
 
 <script id="template-upload" type="text/html">
