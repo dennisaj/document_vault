@@ -48,7 +48,7 @@ grails.project.dependency.resolution = {
 
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-		compile group:'us.paperlesstech', name:'flea', version:'0.9.3'
+		compile group:'us.paperlesstech', name:'flea', version:'0.9.4'
 		// The most recent version of iText has an incompatible license. 2.1.7 is the latest version that we can use.
 		compile group:'com.lowagie', name:'itext', version:'2.1.7'
 		runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'
