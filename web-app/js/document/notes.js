@@ -24,7 +24,7 @@ var Notes = {
 			$submit.bind('click', function(event) {
 				var note = $textarea.val().trim();
 				self.multiFillText(canvas, note, scaledPoint.x, scaledPoint.y, width);
-				self.saveNote({note:note, page:page.pageNumber, left:scaledPoint.x, top:scaledPoint.y});
+				self.saveNote({note:note, pageNumber:page.pageNumber, left:scaledPoint.x, top:scaledPoint.y});
 				self.resetNotes();
 			});
 		}
@@ -54,8 +54,9 @@ var Notes = {
 
 		var self = this;
 		$.each(this.notes[page.pageNumber] || [], function(index, note) {
-			var width = canvas.width - note.left;
-			self.multiFillText(canvas, note.note, note.left, note.top, width);
+			var scaledNote = self._scaleIncomingNote(page, note);
+			var width = canvas.width - scaledNote.left;
+			self.multiFillText(canvas, scaledNote.note, scaledNote.left, scaledNote.top, width + 100);
 		});
 	},
 
@@ -66,8 +67,8 @@ var Notes = {
 			self.notes = [];
 
 			$.each(data, function(index, note) {
-				self.notes[note.page] = self.notes[note.page] || {};
-				self.notes[note.page][index] = {
+				self.notes[note.pageNumber] = self.notes[note.pageNumber] || {};
+				self.notes[note.pageNumber][index] = {
 					left: note.left,
 					top: note.top,
 					note: note.note
@@ -91,6 +92,17 @@ var Notes = {
 		});
 	},
 
+	_scaleIncomingNote: function(page, note) {
+		var scaleX = page.background.width / page.sourceWidth;
+		var scaleY = page.background.height / page.sourceHeight;
+
+		var scaleNote = $.extend({}, note);
+		scaleNote.left = round(scaleNote.left * scaleX);
+		scaleNote.top = round(scaleNote.top * scaleY);
+
+		return scaleNote;
+	},
+
 	/**
 	 * Borrowed from http://stackoverflow.com/questions/4478742/html5-canvas-can-i-somehow-use-linefeeds-in-filltext/7029882#7029882
 	 */
@@ -99,7 +111,7 @@ var Notes = {
 		var ctx = canvas.getContext('2d');
 		var lineHeight = this.baseFontSize;
 
-		ctx.font = this.baseFontSize + 'px sans-serif';
+		ctx.font = this.baseFontSize + 'px Helvetica';
 		ctx.fillStyle = 'black';
 		ctx.textAlign = 'start';
 		ctx.textBaseline = 'top';

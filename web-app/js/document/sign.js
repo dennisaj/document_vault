@@ -392,7 +392,7 @@ var Sign = {
 			var newPage = parseInt(location.hash.substring(1)) || Document.FIRST_PAGE;
 
 			if (!self.currentPage() || newPage != self.currentPageNumber) {
-				Document.getPage(newPage, function(page) {
+				Document.getPage(newPage).done(function(page) {
 					self.setupCanvas(self.can, page);
 				});
 			}

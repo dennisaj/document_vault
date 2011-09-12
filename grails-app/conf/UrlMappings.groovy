@@ -113,5 +113,15 @@ class UrlMappings {
 			controller = "code"
 			action = "index"
 		}
+
+		"/printQueue/printWindow/$documentId" {
+			controller = "printQueue"
+			action = "printWindow"
+		}
+
+		"/p/window/$documentId" {
+			controller = "printQueue"
+			action = "printWindow"
+		}
 	}
 }

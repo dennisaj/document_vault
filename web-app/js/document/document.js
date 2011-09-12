@@ -45,12 +45,13 @@ var Document = {
 		return false;
 	},
 
-	_print: function(printerId, documentId) {
-		var self = this;
-		$.ajax({
+	_print: function(printerId, documentId, addNotes) {
+		return $.ajax({
+			data: { addNotes:addNotes },
 			error: this.ajaxErrorHandler,
 			global: false,
 			success: function(data) {
+				// TODO i18n
 				if (data.status == 'success') {
 					HtmlAlert._alert('Print has been queue', '<p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 50px 0;"></span>This document has been sent to the printer</p>');
 				} else {
@@ -71,11 +72,21 @@ var Document = {
 	},
 
 	saveTextNote: function(note) {
-		return $.when($.post(this.urls.saveTextNote.format(this.documentId), { value:note.note, page:note.page, left:note.left, top:note.top })).fail(this.ajaxErrorHandler);
+		var self = this;
+		var dfd = $.Deferred();
+
+		this.getPage(note.pageNumber).done(function(page) {
+			var scaledNote = self._scaleOutgoingNote(page, note);
+			$.when($.post(self.urls.saveTextNote.format(self.documentId), { value:scaledNote.note, pageNumber:scaledNote.pageNumber, left:scaledNote.left, top:scaledNote.top }))
+				.done(function(data) { dfd.resolve(data); })
+				.fail(self.ajaxErrorHandler);
+		});
+
+		return dfd;
 	},
 
 	saveNotes: function(notes) {
-		return $.when($.post(this.urls.saveNotes.format(this.documentId), {notes:JSON.stringify(notes)})).fail(this.ajaxErrorHandler);
+		return $.when($.post(this.urls.saveNotes.format(this.documentId), { notes:JSON.stringify(notes) })).fail(this.ajaxErrorHandler);
 	},
 
 	/**
@@ -83,6 +94,7 @@ var Document = {
 	 */
 	_getPage: function(pageNumber, callback) {
 		var self = this;
+		var dfd = $.Deferred();
 
 		$.ajax({
 			error: this.ajaxErrorHandler,
@@ -123,15 +135,16 @@ var Document = {
 							self.pages[data.pageNumber].savedHighlights = self._scaleHighlights(self.pages[data.pageNumber]);
 						});
 					}
-
-					if ($.isFunction(callback)) {
-						callback(self.pages[data.pageNumber]);
-					}
+					dfd.resolve(self.pages[data.pageNumber]);
+				} else {
+					dfd.resolve();
 				}
 			},
 			type: 'POST',
 			url: this.urls.image.format(this.documentId, pageNumber)
 		});
+
+		return dfd;
 	},
 
 	/**
@@ -147,11 +160,9 @@ var Document = {
 		}
 
 		if (this.pages[pageNumber]) {
-			if ($.isFunction(callback)) {
-				callback(this.pages[pageNumber]);
-			}
+			return $.Deferred().resolve(this.pages[pageNumber]);
 		} else {
-			this._getPage(pageNumber, callback);
+			return this._getPage(pageNumber, callback);
 		}
 	},
 
@@ -194,13 +205,38 @@ var Document = {
 	},
 
 	print: function(documentId) {
-		if (documentId) {
-			$('#print-documentId').val(documentId);
-		} else {
-			$('#print-documentId').val(this.documentId);
-		}
+		var self = this;
+		documentId = documentId || this.documentId;
 
-		$('#printer-select').dialog('open');
+		// TODO: Add loading message
+		return $.when($.post(this.urls.printWindow.format(documentId))).then(function(data) {
+			$(data).dialog({
+				buttons: {
+					'Print': function() {
+						var printer = $('#printer').val();
+						var documentId = $('#print-documentId').val();
+						var addNotes = $('#addNotes').prop('checked');
+						$(this).dialog('close');
+						self._print(printer, documentId, addNotes);
+					},
+					'Cancel' :function() {
+						$(this).dialog('close');
+					}
+				},
+				close: function(event, ui) {
+					$(this).remove();
+				},
+				modal: true,
+				open: function(event, ui) {
+					var dialog = this;
+					$('.ui-widget-overlay').click(function() {
+						$(dialog).dialog('close');
+					});
+				},
+				resizable: false,
+				width: 'auto'
+			});
+		}).fail(this.ajaxErrorHandler);
 	},
 
 	refreshPageCache: function(callback) {
@@ -214,7 +250,7 @@ var Document = {
 			for (var pageNumber = this.FIRST_PAGE; pageNumber <= this.pageCount; pageNumber++) {
 				// Skip this page if it has not already been loaded
 				if (this.pages[pageNumber]) {
-					self._getPage(pageNumber, function(page) {
+					self._getPage(pageNumber).done(function(page) {
 						self.pages[page.pageNumber] = page;
 
 						if ($.isFunction(callback)) {
@@ -271,6 +307,17 @@ var Document = {
 		return scaledHighlights;
 	},
 
+	_scaleOutgoingNote: function(page, note) {
+		var scaleX = page.sourceWidth / page.background.width;
+		var scaleY = page.sourceHeight / page.background.height;
+
+		var scaledNote = $.extend({}, note);
+		scaledNote.left = round(scaledNote.left * scaleX);
+		scaledNote.top = round(scaledNote.top * scaleY);
+
+		return scaledNote;
+	},
+
 	/**
 	 * Returns a deferred object to which callbacks can be attached.
 	 */
@@ -292,22 +339,5 @@ var Document = {
 		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
 		this.pages = new Array(this.pageCount + this.FIRST_PAGE);
 		this.urls = urls;
-
-		$('#printer-select').removeClass('hidden').dialog({
-			autoOpen: false,
-			buttons: {
-				'Print': function() {
-					$(this).dialog('close');
-					self._print($('#printer').val(), $('#print-documentId').val());
-				},
-				'Cancel' :function() {
-					$(this).dialog('close');
-				}
-			},
-			modal: true,
-			open: function(event, ui) {},
-			resizable: false,
-			width: 400
-		});
 	}
 };

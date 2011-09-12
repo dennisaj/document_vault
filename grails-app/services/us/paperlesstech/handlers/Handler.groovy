@@ -122,7 +122,7 @@ class Handler {
 
 	/**
 	 * Takes a list of Maps in a variable called notes that contain two entries: 'lines' and 'text'.
-	 * The map may also optionally include 'top', 'left' and 'page.' However, if page is not set, top and left will be ignored.
+	 * The map may also optionally include 'top', 'left' and 'pageNumber.' However, if pageNumber is not set, top and left will be ignored.
 	 * <br><br>
 	 * e.g.: input.notes = [[text:"this is some text", lines:[/ * Line Data Goes here * /]]
 	 */
@@ -141,8 +141,8 @@ class Handler {
 
 			def note = new Note(user:authServiceProxy.authenticatedUser, note:entry.text)
 
-			if (entry.page) {
-				note.page = entry.page
+			if (entry.pageNumber) {
+				note.pageNumber = entry.pageNumber
 				note.left = entry.left
 				note.top = entry.top
 			}

@@ -18,7 +18,8 @@
 				'finish_redirect': '${createLink(controller:"document", action:"index")}',
 				'image': '${createLink(controller:"document", action:"image")}/{0}/{1}',
 				'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}',
-				'sign': '${createLink(controller:"document", action:"sign")}/{0}'
+				'sign': '${createLink(controller:"document", action:"sign")}/{0}',
+				'printWindow': '${createLink(controller:"p", action:"window")}/{0}'
 			});
 
 			Tagging.init({
@@ -45,7 +46,6 @@
 	<g:render template="searchResults" />
 </div>
 
-<g:render template="printerDialog" />
 <g:render template="/alert" />
 
 </body>

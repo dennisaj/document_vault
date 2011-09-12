@@ -67,7 +67,7 @@ var Show = {
 			var newPage = parseInt(location.hash.substring(1)) || Document.FIRST_PAGE;
 
 			if (!self.currentPage || newPage != self.currentPage.pageNumber) {
-				Document.getPage(newPage, function(page) {
+				Document.getPage(newPage).done(function(page) {
 					self.setupCanvas(self.$canvas, page);
 				});
 			}

@@ -121,8 +121,24 @@ class HandlerChainSpec extends UnitSpec {
 		thrown AssertionError
 	}
 
-	def "print calls handle"() {
+	def "printing notes fails without notes permissions"() {
 		given:
+		def d = new Document()
+		def p = new Printer(id:1)
+		1 * authService.canPrint(d) >> true
+		1 * authService.canNotes(d) >> false
+
+		when:
+		chain.print(document:d, printer:p, addNotes:true)
+
+		then:
+		thrown AssertionError
+	}
+
+	def "printing without notes skips the permission check"() {
+		given:
+		1 * authService.canPrint(_) >> true
+		0 * authService.canNotes(_)
 		def d = new Document()
 		def p = new Printer(id:1)
 		def m = [document: d, printer:p]
@@ -131,10 +147,28 @@ class HandlerChainSpec extends UnitSpec {
 		chain.metaClass.handle = { String a, Map b -> methodName = a; input = b }
 
 		when:
-		chain.print(document: d,, printer:p)
+		chain.print(m)
+
+		then:
+		methodName == "print"
+		input == m
+	}
+
+	def "print calls handle"() {
+		given:
+		def d = new Document()
+		def p = new Printer(id:1)
+		def m = [document: d, printer:p, addNotes:true]
+		def methodName
+		def input
+		chain.metaClass.handle = { String a, Map b -> methodName = a; input = b }
+
+		when:
+		chain.print(m)
 
 		then:
 		1 * authService.canPrint(d) >> true
+		1 * authService.canNotes(d) >> true
 		methodName == "print"
 		input == m
 	}

@@ -17,7 +17,8 @@
 				'resendCode': '${createLink(controller:"document", action:"resend")}/{0}/{1}',
 				'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}',
 				'listNotes': '${createLink(controller:"note", action:"list")}/{0}',
-				'saveTextNote': '${createLink(controller:"note", action:"saveText")}/{0}'
+				'saveTextNote': '${createLink(controller:"note", action:"saveText")}/{0}',
+				'printWindow': '${createLink(controller:"p", action:"window")}/{0}'
 			});
 
 		});
@@ -104,10 +105,6 @@
 
 	<canvas id="can"></canvas>
 </div>
-
-<pt:canPrint document="${document}">
-	<g:render template="printerDialog" />
-</pt:canPrint>
 
 <g:render template="/alert" />
 

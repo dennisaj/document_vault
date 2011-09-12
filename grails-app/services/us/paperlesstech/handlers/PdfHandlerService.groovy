@@ -5,13 +5,14 @@ import org.springframework.core.io.ClassPathResource
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
 import us.paperlesstech.PreviewImage
-import us.paperlesstech.helpers.FileHelpers
-
-import com.itextpdf.text.Rectangle
-import com.itextpdf.text.pdf.PdfContentByte
-import com.itextpdf.text.pdf.PdfReader
-import com.itextpdf.text.pdf.PdfStamper
 import us.paperlesstech.Printer
+import us.paperlesstech.helpers.FileHelpers
+import us.paperlesstech.helpers.PdfHelpers
+
+import com.lowagie.text.Rectangle
+import com.lowagie.text.pdf.PdfContentByte
+import com.lowagie.text.pdf.PdfReader
+import com.lowagie.text.pdf.PdfStamper
 
 class PdfHandlerService extends Handler {
 	static final handlerFor = [MimeType.PDF]
@@ -124,7 +125,7 @@ class PdfHandlerService extends Handler {
 			pdfReader = new PdfReader(fileService.getAbsolutePath(data))
 			pdfStamper = new PdfStamper(pdfReader, output)
 
-			(1..data.pages).each {i ->
+			(1..data.pages).each { i ->
 				def lines = signatures[i.toString()]
 				if (!lines) {
 					return
@@ -158,22 +159,33 @@ class PdfHandlerService extends Handler {
 	boolean print(Map input) {
 		def d = getDocument(input)
 		Printer printer = input.printer
-		assert printer
 		log.info "Printing document ${d} to printer ${printer}"
 
-		def pdfPath = fileService.getAbsolutePath(d.files.first())
+		def data = d.files.first()
+		def pdfPath = fileService.getAbsolutePath(data)
 
-		def cmd = """/bin/bash $pdfPrint $pdfPath ${printer.host} ${printer.port} ${printer.deviceType}"""
-		log.debug "PDF print - $cmd"
-		def proc = cmd.execute()
-		proc.waitFor()
-		if (proc.exitValue()) {
-			log.error proc.getErrorStream().text
-			log.error "Unable to print document ${d.id} - PDF print failed. Command: '$cmd'"
-
-			return false
+		if (input.addNotes) {
+			def f = PdfHelpers.addNotesToPdf(d, data, pdfPath)
+			pdfPath = f.getAbsolutePath()
 		}
 
-		return true
+		try {
+			def cmd = """/bin/bash $pdfPrint $pdfPath ${printer.host} ${printer.port} ${printer.deviceType}"""
+			log.debug "PDF print - $cmd"
+			def proc = cmd.execute()
+			proc.waitFor()
+			if (proc.exitValue()) {
+				log.error proc.getErrorStream().text
+				log.error "Unable to print document ${d.id} - PDF print failed. Command: '$cmd'"
+
+				return false
+			}
+
+			return true
+		} finally {
+			if (input.addNotes) {
+				new File(pdfPath).delete()
+			}
+		}
 	}
 }

@@ -18,7 +18,7 @@ databaseChangeLog = {
 
 	changeSet(author: "seth (generated)", id: "1314625758008-1") {
 		addColumn(tableName: "note") {
-			column(name: "page", type: "integer") {
+			column(name: "page_number", type: "integer") {
 				constraints(nullable: "false")
 			}
 		}

@@ -36,6 +36,7 @@ class HandlerChain extends Handler {
 		def document = getDocument(input)
 		assert input.printer instanceof Printer
 		assert authServiceProxy.canPrint(document)
+		assert !input.addNotes || authServiceProxy.canNotes(document)
 
 		preferenceService.setPreference(authServiceProxy.authenticatedUser, PreferenceService.DEFAULT_PRINTER, input.printer.id as String)
 		handle("print", input)

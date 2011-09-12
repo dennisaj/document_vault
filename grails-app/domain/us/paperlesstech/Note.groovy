@@ -7,7 +7,7 @@ class Note implements Comparable<Note> {
 	Date dateCreated
 	int left = 0
 	String note
-	int page = 0
+	int pageNumber = 0
 	int top = 0
 	User user
 
@@ -17,7 +17,7 @@ class Note implements Comparable<Note> {
 		data nullable:true
 		left min:0
 		note blank:true, nullable:true, maxSize:4096
-		page min:0
+		pageNumber min:0
 		top min:0
 	}
 

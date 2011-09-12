@@ -61,7 +61,7 @@ modules = {
 	}
 
 	jqueryShowSign {
-		dependsOn 'jquery-ui'
+		dependsOn 'jquery-ui, documentAlert'
 
 		resource url: '/js/lib/jquery.ba-hashchange.js'
 		resource url: '/js/document/document.js'
@@ -109,7 +109,7 @@ modules = {
 	}
 
 	documentSign {
-		dependsOn 'documentBase, jqueryShowSign, documentAlert'
+		dependsOn 'documentBase, jqueryShowSign'
 
 		resource url: '/less/slider.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSign'
 		resource url: '/less/notes.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSign'

@@ -16,7 +16,6 @@ class DocumentController {
 	def authService
 	def handlerChain
 	def partyService
-	def preferenceService
 	def tagService
 
 	def index = {
@@ -87,8 +86,7 @@ class DocumentController {
 
 		def model = [tagSearchResults:tagSearchResults,
 			documentResults:documentResults,
-			documentTotal:documentTotal,
-			defaultPrinter:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER)]
+			documentTotal:documentTotal]
 		if (request.xhr) {
 			render(template: "searchResults", model: model)
 		} else {
@@ -153,7 +151,7 @@ class DocumentController {
 		def document = Document.get(params.long("documentId"))
 		assert document
 
-		[document: document, defaultPrinter:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER)]
+		[document: document]
 	}
 
 	def image = {
@@ -171,8 +169,7 @@ class DocumentController {
 		def document = Document.get(params.long("documentId"))
 		assert document
 
-		[document: document, parties:Party.findAllByDocument(document), colors:PartyColor.values(), permissions:Party.allowedPermissions,
-			defaultPrinter:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER)]
+		[document: document, parties:Party.findAllByDocument(document), colors:PartyColor.values(), permissions:Party.allowedPermissions]
 	}
 
 	def submitSignatures = {
