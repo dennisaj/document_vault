@@ -57,5 +57,6 @@
 	<g:layoutBody />
 
 	<r:layoutResources />
+	<g:render template="/footer" />
 </body>
 </html>
