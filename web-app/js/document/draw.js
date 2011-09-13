@@ -1,8 +1,8 @@
 var Draw = {
 	drawEvents: {},
-	highlightOpacity: .7,
+	highlightOpacity: 0.7,
 	LINEBREAK: 'LB',
-	lowlightOpacity: .2,
+	lowlightOpacity: 0.2,
 
 	addBreak: function(page) {
 		// Don't add consecutive LINEBREAKs
@@ -131,7 +131,7 @@ var Draw = {
 			top: Math.min(point1.y, point2.y),
 			width: Math.abs(point1.x - point2.x),
 			height: Math.abs(point1.y - point2.y)
-		}
+		};
 	},
 
 	scaleLines: function(page) {
@@ -165,17 +165,18 @@ var Draw = {
 	},
 
 	scalePoint: function(page, point, offset) {
-		offset = offset || {left: page.scrollCanX, top: page.scrollCanY}
+		offset = offset || { left: page.scrollCanX, top: page.scrollCanY };
+
 		return {
 			x: (point.x - offset.left) / page.scale,
 			y: (point.y - offset.top) / page.scale
-		}
+		};
 	},
 
 	undo: function(canvas, page) {
 		var splicePoint = page.lines.length;
 		for (var i = page.lines.length - 2; i >= 0; i--) {
-			if (page.lines[i] == this.LINEBREAK || i == 0) {
+			if (page.lines[i] === this.LINEBREAK || i === 0) {
 				splicePoint = i;
 				break;
 			}
@@ -184,5 +185,5 @@ var Draw = {
 		page.lines.splice(splicePoint, page.lines.length);
 		this.addBreak(page);
 		this.draw(canvas, page);
-	},
+	}
 };

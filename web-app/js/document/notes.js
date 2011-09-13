@@ -72,7 +72,7 @@ var Notes = {
 					left: note.left,
 					top: note.top,
 					note: note.note
-				}
+				};
 			});
 		});
 	},

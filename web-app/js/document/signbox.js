@@ -1,7 +1,7 @@
 var SignBox = {
 	boxes: [],
 	boxScale: 1,
-	heightScale: .5,
+	heightScale: 0.5,
 	isMouseDown: false,
 	isMoving: false,
 	$main: null,
@@ -11,11 +11,11 @@ var SignBox = {
 	},
 	partyColor: '#ff0',
 	partyName: 'sign-box',
-	previousPoint: {x:0, y:0},
+	previousPoint: { x:0, y:0 },
 	// Add a little offset to compensate for touch screen inaccuracy.
 	touchOffset: 30,
 	trackingTouchId: null,
-	widthScale: .4,
+	widthScale: 0.4,
 
 	addBox: function(box) {
 		boxes.push(box);
@@ -178,7 +178,7 @@ var SignBox = {
 		return {
 			x: point.x / scale,
 			y: point.y / scale
-		}
+		};
 	},
 
 	init: function() {
@@ -190,7 +190,7 @@ var SignBox = {
 			$('#sign-canvas').live('touchstart', function(event) {
 				var e = event.originalEvent;
 
-				if (self.trackingTouchId == null) {
+				if (self.trackingTouchId === null) {
 					var $this = $(this);
 					var touch = e.targetTouches[0];
 

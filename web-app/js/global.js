@@ -6,7 +6,7 @@ String.prototype.format = function () {
 };
 
 function round(number, places) {
-	places = places || 1
+	places = places || 1;
 	return parseFloat(number.toFixed(places));
 }
 
@@ -47,5 +47,5 @@ if (!Object.keys)  {
 		}
 
 		return ret;
-	}
+	};
 }

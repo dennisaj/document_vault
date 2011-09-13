@@ -77,7 +77,7 @@ var Tagging = {
 				tagSource: self.urls.list,
 				triggerKeys: ['enter', 'comma', 'tab'],
 				initialTags: function(holder) {
-					return self.urls.documentList.format(holder.attr('data-documentId'))
+					return self.urls.documentList.format(holder.attr('data-documentId'));
 				},
 				onAdd: function(holder, value) {
 					self.addTag(holder.attr('data-documentId'), value);
