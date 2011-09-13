@@ -92,7 +92,7 @@ var Document = {
 	/**
 	 * Bypass the page cache and load directly from the server.
 	 */
-	_getPage: function(pageNumber, callback) {
+	_getPage: function(pageNumber) {
 		var self = this;
 		var dfd = $.Deferred();
 
@@ -106,9 +106,9 @@ var Document = {
 
 					// If the page already exists, preserve the unsaved highlights of new parties.
 					// This prevents highlights from being lost when there is an error saving a new party.
-					var unsavedHighlights = {}
+					var unsavedHighlights = {};
 					if (self.pages[data.pageNumber]) {
-						$.each(self.pages[data.pageNumber].unsavedHighlights, function(key, value) { 
+						$.each(self.pages[data.pageNumber].unsavedHighlights, function(key, value) {
 							if (key.match(/^[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/i)) {
 								unsavedHighlights[key] = value;
 							}
@@ -117,7 +117,7 @@ var Document = {
 
 					self.pages[data.pageNumber] = {
 						background: bg,
-						lines: new Array(),
+						lines: [],
 						pageNumber: data.pageNumber,
 						savedHighlights: data.highlights,
 						scale: 1,
@@ -150,7 +150,7 @@ var Document = {
 	/**
 	 * Check the page cache and only load directly from the server if the page is not found.
 	 */
-	getPage: function(pageNumber, callback) {
+	getPage: function(pageNumber) {
 		var self = this;
 
 		if (pageNumber > this.pageCount) {
@@ -162,45 +162,7 @@ var Document = {
 		if (this.pages[pageNumber]) {
 			return $.Deferred().resolve(this.pages[pageNumber]);
 		} else {
-			return this._getPage(pageNumber, callback);
-		}
-	},
-
-	/**
-	 * Load all uncached pages then perform the callback once the last page is loaded.
-	 * 
-	 * If all pages are already loaded, perform the callback immediately.
-	 */
-	loadAllPages: function(callback) {
-		var self = this;
-
-		if (self._areAllPagesLoaded()) {
-			if ($.isFunction(callback)) {
-				callback();
-			}
-		} else {
-			for (var pageNumber = this.FIRST_PAGE; pageNumber <= this.pageCount; pageNumber++) {
-				// Skip this page if it has already been loaded
-				if (!this.pages[pageNumber]) {
-					self.getPage(pageNumber, function(page) {
-						self.pages[page.pageNumber] = page;
-
-						if ($.isFunction(callback)) {
-							if (page.background.complete) {
-								if (self._areAllPagesLoaded()) {
-									callback();
-								}
-							} else {
-								page.background.onload = function() {
-									if (self._areAllPagesLoaded()) {
-										callback();
-									}
-								};
-							}
-						}
-					});
-				}
-			}
+			return this._getPage(pageNumber);
 		}
 	},
 
@@ -336,7 +298,7 @@ var Document = {
 		var self = this;
 
 		this.documentId = this.getDocumentId();
-		this.pageCount = parseInt($('#pageCount').val() || this.FIRST_PAGE);
+		this.pageCount = parseInt($('#pageCount').val(), 10) || this.FIRST_PAGE;
 		this.pages = new Array(this.pageCount + this.FIRST_PAGE);
 		this.urls = urls;
 	}

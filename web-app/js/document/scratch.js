@@ -17,7 +17,7 @@ var Scratch = {
 
 		this.notes[noteId] = {
 			background: bg,
-			lines: new Array(),
+			lines: [],
 			pageNumber: noteId,
 			savedHighlights: [],
 			scale: 1,
@@ -78,7 +78,7 @@ var Scratch = {
 
 		var line = {
 			start: Draw.scalePoint(note, this.previousPoint),
-			end: Draw.scalePoint(note, point),
+			end: Draw.scalePoint(note, point)
 		};
 		Draw.addLine(note, line);
 		Draw.drawLine(canvas, line);
@@ -180,7 +180,7 @@ var Scratch = {
 			icons: { primary: 'ui-icon-circle-close' }
 		}).bind(eventType, function(event) {
 			self.notes[self.currentNote].lines.splice(0, self.notes[self.currentNote].lines.length);
-			self._closeScratch()
+			self._closeScratch();
 		});
 
 		$('#clear-scratch').button({
@@ -212,7 +212,7 @@ var Scratch = {
 
 		if ($.support.touch) {
 			$scratch.bind('touchstart', function(event) {
-				if (self.trackingTouchId == null) {
+				if (self.trackingTouchId === null) {
 					var e = event.originalEvent;
 					var touch = e.targetTouches[0];
 

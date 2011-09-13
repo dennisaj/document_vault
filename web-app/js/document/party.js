@@ -27,7 +27,7 @@ var Party = {
 	},
 
 	canChangeColor: function($partyRow) {
-		return this._canSign($partyRow) && !$partyRow.children('.permission').prop('disabled')
+		return this._canSign($partyRow) && !$partyRow.children('.permission').prop('disabled');
 	},
 
 	_canSign: function($partyRow) {
@@ -48,8 +48,9 @@ var Party = {
 		$.each(Document.pages, function(j, page) {
 			if (page && page.unsavedHighlights) {
 				var scaledPage = Sign._scaleCorners(page);
+
 				for (var party in page.unsavedHighlights) {
-					highlights[party] = highlights[party] || new Array();
+					highlights[party] = highlights[party] || [];
 					highlights[party][page.pageNumber] = scaledPage[party];
 				}
 			}
@@ -60,13 +61,13 @@ var Party = {
 
 	_getParties: function() {
 		var highlights = this._getUnsavedHighlights();
-		var parties = new Array();
+		var parties = [];
 
 		$.each($('.party'), function(i, party) {
 			var code = $(party).attr('id');
 
 			if (code) {
-				var partyId = $('#id-' + code).val()
+				var partyId = $('#id-' + code).val();
 
 				// If partyId is set, we are updating. If not, we are adding.
 				if (partyId) {
@@ -161,7 +162,7 @@ var Party = {
 			var $this = $(this);
 			var $party = $this.parent();
 			var code = $party.attr('id');
-			var partyId = $('#id-' + code).val()
+			var partyId = $('#id-' + code).val();
 
 			// If partyId is set, resend. If not, continue.
 			if (partyId) {
@@ -308,7 +309,7 @@ var Party = {
 					$(this).dialog('close');
 					var $party = $('#confirm-remove').data().dialog.$party;
 					var code = $party.attr('id');
-					var partyId = $('#id-' + code).val()
+					var partyId = $('#id-' + code).val();
 
 					// If partyId is set, this is an existing Party. If not, just remove the row.
 					if (partyId) {

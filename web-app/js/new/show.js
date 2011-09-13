@@ -44,8 +44,7 @@ var Show = {
 		var self = this;
 		this.urls = urls;
 
-		this.$canvas = $('#canvas')
-		this.$canvas.css('overflow', 'hidden');
+		this.$canvas = $('#canvas').css('overflow', 'hidden');
 
 		$('#sign').button({
 			icons: { primary: 'ui-icon-pencil' }
@@ -64,7 +63,7 @@ var Show = {
 		});
 
 		$(window).hashchange(function() {
-			var newPage = parseInt(location.hash.substring(1)) || Document.FIRST_PAGE;
+			var newPage = parseInt(location.hash.substring(1), 10) || Document.FIRST_PAGE;
 
 			if (!self.currentPage || newPage != self.currentPage.pageNumber) {
 				Document.getPage(newPage).done(function(page) {

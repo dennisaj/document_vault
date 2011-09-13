@@ -35,7 +35,7 @@ var Sign = {
 		var width = 0;
 		var height = 0;
 
-		left = -page.scrollCanX / page.scale
+		left = -page.scrollCanX / page.scale;
 		top = -page.scrollCanY / page.scale;
 
 		width = left + (this.$main.width() / page.scale);
@@ -59,11 +59,15 @@ var Sign = {
 
 		var isSigning = $('#pen').is('.ui-state-highlight');
 		var isHighlighting = Party.isHighlighting();
+		var corners;
+		var party;
+		var color;
+		var point;
 
 		if (!isSigning && !InputHandler.isMoving && !isHighlighting) {
-			var party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
-			var color = Party.getCurrentColor() || SignBox.partyColor;
-			var point = Draw.scalePoint(page, Draw.convertEventToPoint(event));
+			party = Party.getSelectedPartyRow().attr('id') || SignBox.partyName;
+			color = Party.getCurrentColor() || SignBox.partyColor;
+			point = Draw.scalePoint(page, Draw.convertEventToPoint(event));
 
 			// Merge saved and unsaved highlights.
 			var highlights = $.extend(true, {}, page.savedHighlights);
@@ -78,12 +82,12 @@ var Sign = {
 			} else {
 				var boxWidth = (canvas.width * SignBox.widthScale);
 				var boxHeight = boxWidth * SignBox.heightScale;
-				var corners = {
+				corners = {
 					left: point.x - SignBox.touchOffset,
 					top: point.y - boxHeight + SignBox.touchOffset,
 					width: boxWidth,
 					height: boxHeight
-				}
+				};
 
 				Draw.addHighlight(page, party, corners);
 				Draw.highlight(canvas, page, corners, color);
@@ -91,9 +95,9 @@ var Sign = {
 		} else if (isSigning) {
 			Draw.addBreak(page);
 		} else if (isHighlighting && this.highlightStart) {
-			var corners = Draw.normalizeCorners(Draw.scalePoint(page, this.highlightStart), Draw.scalePoint(page, InputHandler.previousPoint));
-			var party = Party.getSelectedPartyRow().attr('id');
-			var color = Party.getCurrentColor();
+			corners = Draw.normalizeCorners(Draw.scalePoint(page, this.highlightStart), Draw.scalePoint(page, InputHandler.previousPoint));
+			party = Party.getSelectedPartyRow().attr('id');
+			color = Party.getCurrentColor();
 
 			Draw.addHighlight(page, party, corners);
 			Draw.highlight(canvas, page, corners, color);
@@ -128,7 +132,7 @@ var Sign = {
 		} else if (isSigning) {
 			var line = {
 				start: Draw.scalePoint(page, InputHandler.previousPoint),
-				end: Draw.scalePoint(page, point),
+				end: Draw.scalePoint(page, point)
 			};
 			Draw.addLine(page, line);
 			Draw.drawLine(canvas, line);
@@ -147,7 +151,7 @@ var Sign = {
 		InputHandler.previousPoint = point;
 	},
 
-	doStart: function(event, canvas, page) {
+	doStart: function(event) {
 		var self = this;
 		var canvas = this.can;
 		var page = this.currentPage();
@@ -237,18 +241,19 @@ var Sign = {
 		var scaleY = page.sourceHeight / page.background.height;
 		var scaledPage = {};
 
-		for (var party in page.unsavedHighlights) {
-			scaledPage[party] = [];
+		//for (var party in page.unsavedHighlights) {
+		$.each(page.unsavedHighlights, function(partyId, unsavedHighlights) {
+			scaledPage[partyId] = [];
 
-			for (var i = 0; i < page.unsavedHighlights[party].length; i++) {
-				scaledPage[party][i] = {
-					height: round(page.unsavedHighlights[party][i].height * scaleY),
-					left: round(page.unsavedHighlights[party][i].left * scaleX),
-					width: round(page.unsavedHighlights[party][i].width * scaleX),
-					top: round(page.unsavedHighlights[party][i].top * scaleY)
+			for (var i = 0; i < unsavedHighlights.length; i++) {
+				scaledPage[partyId][i] = {
+					height: round(unsavedHighlights[i].height * scaleY),
+					left: round(unsavedHighlights[i].left * scaleX),
+					width: round(unsavedHighlights[i].width * scaleX),
+					top: round(unsavedHighlights[i].top * scaleY)
 				};
 			}
-		}
+		});
 
 		return scaledPage;
 	},
@@ -389,7 +394,7 @@ var Sign = {
 		});
 
 		$(window).hashchange(function(event) {
-			var newPage = parseInt(location.hash.substring(1)) || Document.FIRST_PAGE;
+			var newPage = parseInt(location.hash.substring(1), 10) || Document.FIRST_PAGE;
 
 			if (!self.currentPage() || newPage != self.currentPageNumber) {
 				Document.getPage(newPage).done(function(page) {
@@ -462,13 +467,13 @@ var Sign = {
 		});
 
 		$('#slider').slider({
-			min: .25,
+			min: 0.25,
 			max: 2,
 			change: function(event, ui) {
 				self._zoomEvent(self.can, self.currentPage(), ui.value);
 			},
-			step: .25,
-			value: .5
+			step: 0.25,
+			value: 0.5
 		});
 
 		$('#zoom-in').button({
@@ -494,7 +499,11 @@ var Sign = {
 		});
 
 		this.$main.bind('mousewheel', function(event, delta) {
-			event.wheelDelta > 0 ? $('#zoom-in').click() : $('#zoom-out').click();
+			if (event.wheelDelta > 0) {
+				$('#zoom-in').click();
+			} else {
+				$('#zoom-out').click();
+			}
 		});
 
 		// Load the page indicated by the location hash

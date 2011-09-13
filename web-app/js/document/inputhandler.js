@@ -16,7 +16,7 @@ var InputHandler = {
 				var e = event.originalEvent;
 				self.mtouch = (e.targetTouches.length > 1);
 
-				if (self.trackingTouchId == null) {
+				if (self.trackingTouchId === null) {
 					var touch = e.targetTouches[0];
 
 					self.trackingTouchId = touch.identifier;
