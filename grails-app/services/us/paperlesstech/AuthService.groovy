@@ -1,10 +1,9 @@
 package us.paperlesstech
 
 import java.util.concurrent.ConcurrentHashMap
-
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.permission.WildcardPermission
-
+import org.apache.shiro.subject.Subject
 import us.paperlesstech.nimble.AdminsService
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
@@ -14,11 +13,15 @@ class AuthService {
 	static transactional = false
 
 	def grailsApplication
-	Map permissionsCache = [implied:[:], permitted: [:]] as ConcurrentHashMap
+	protected Map permissionsCache = [implied: [:], permitted: [:]] as ConcurrentHashMap
 	def testSubject
 
 	boolean canDelete(Document d) {
 		checkPermission(DocumentPermission.Delete, d)
+	}
+
+	boolean canDeleteAny() {
+		isPermissionImplied("document:delete")
 	}
 
 	boolean canGetSigned(Document d) {
@@ -35,7 +38,7 @@ class AuthService {
 
 	boolean canPrint(Document d) {
 		// We cannot currently print non-pdf documents.
-		d.files.first().mimeType == MimeType.PDF && checkPermission(DocumentPermission.Notes, d)
+		d.files.first().mimeType == MimeType.PDF && checkPermission(DocumentPermission.Print, d)
 	}
 
 	boolean canPrintAny() {
@@ -74,7 +77,7 @@ class AuthService {
 		isPermissionImplied("document:view")
 	}
 
-	boolean checkPermission(DocumentPermission permission, Document d) {
+	private boolean checkPermission(DocumentPermission permission, Document d) {
 		assert d
 		def subject = testSubject ?: getAuthenticatedSubject()
 
@@ -87,7 +90,7 @@ class AuthService {
 		checkPermission(subject, pString)
 	}
 
-	boolean checkPermission(DocumentPermission permission, Group g) {
+	private boolean checkPermission(DocumentPermission permission, Group g) {
 		assert g
 		def subject = testSubject ?: getAuthenticatedSubject()
 
@@ -100,13 +103,13 @@ class AuthService {
 		checkPermission(subject, pString)
 	}
 
-	boolean checkPermission(def subject, String permission) {
+	private boolean checkPermission(def subject, String permission) {
 		def permitted = permissionsCache.permitted[permission]
 		if (permitted == null) {
 			permitted = subject.isPermitted(permission)
 
 			// The parentheses around permission are required so that the value of the string is used as the key
-			permissionsCache.permitted << [(permission):permitted]
+			permissionsCache.permitted << [(permission): permitted]
 		}
 
 		permitted
@@ -125,8 +128,8 @@ class AuthService {
 
 		def groups = Group.list()
 
-		(isAdmin() ? groups : groups?.findAll { Group group->
-			permissions.any {permission->
+		(isAdmin() ? groups : groups?.findAll { Group group ->
+			permissions.any {permission ->
 				checkPermission(permission, group)
 			}
 		}) as SortedSet
@@ -158,14 +161,14 @@ class AuthService {
 
 		def user = authenticatedUser
 		for (p in user.permissions) {
-			if((match = (p.target =~ matcher))) {
+			if ((match = (p.target =~ matcher))) {
 				matches << match[0][1]
 			}
 		}
 
 		for (role in user.roles) {
 			for (p in role.permissions) {
-				if((match = (p.target =~ matcher))) {
+				if ((match = (p.target =~ matcher))) {
 					matches << match[0][1]
 				}
 			}
@@ -174,7 +177,7 @@ class AuthService {
 		for (group in user.groups) {
 			for (role in group.roles) {
 				for (p in role.permissions) {
-					if((match = (p.target =~ matcher))) {
+					if ((match = (p.target =~ matcher))) {
 						matches << match[0][1]
 					}
 				}
@@ -197,7 +200,7 @@ class AuthService {
 	 * @param permission The permission to imply against the users permissions
 	 * @return true if the permission was implied
 	 */
-	boolean isPermissionImplied(String permission) {
+	private boolean isPermissionImplied(String permission) {
 		def subject = testSubject ?: getAuthenticatedSubject()
 		if (!isLoggedIn()) {
 			return false
@@ -209,7 +212,6 @@ class AuthService {
 		}
 
 		if (testSubject) {
-			// TODO add better testing for roles
 			return true
 		}
 
@@ -218,7 +220,7 @@ class AuthService {
 		def user = authenticatedUser
 		for (p in user.permissions) {
 			if (wp.implies(new WildcardPermission(p.target))) {
-				permissionsCache.implied << [(permission):true]
+				permissionsCache.implied << [(permission): true]
 				return true
 			}
 		}
@@ -226,7 +228,7 @@ class AuthService {
 		for (role in user.roles) {
 			for (p in role.permissions) {
 				if (wp.implies(new WildcardPermission(p.target))) {
-					permissionsCache.implied << [(permission):true]
+					permissionsCache.implied << [(permission): true]
 					return true
 				}
 			}
@@ -236,7 +238,7 @@ class AuthService {
 			for (role in group.roles) {
 				for (p in role.permissions) {
 					if (wp.implies(new WildcardPermission(p.target))) {
-						permissionsCache.implied << [(permission):true]
+						permissionsCache.implied << [(permission): true]
 						return true
 					}
 				}
@@ -244,7 +246,7 @@ class AuthService {
 
 			for (p in group.permissions) {
 				if (wp.implies(new WildcardPermission(p.target))) {
-					permissionsCache.implied << [(permission):true]
+					permissionsCache.implied << [(permission): true]
 					return true
 				}
 			}
@@ -253,13 +255,12 @@ class AuthService {
 		return checkPermission(subject, permission)
 	}
 
-	def getAuthenticatedSubject() {
+	Subject getAuthenticatedSubject() {
 		SecurityUtils.getSubject()
 	}
 
 	User getAuthenticatedUser() {
-		GroovyClassLoader classLoader = new GroovyClassLoader(getClass().classLoader)
-		def principal = SecurityUtils.getSubject()?.getPrincipal()
+		def principal = SecurityUtils.subject?.principal
 		def authUser = User.get(principal)
 
 		if (!authUser) {
@@ -270,14 +271,15 @@ class AuthService {
 		authUser
 	}
 
-	def isLoggedIn() {
-		def subject = getAuthenticatedSubject()
+	boolean isLoggedIn() {
+		def subject = testSubject ?: getAuthenticatedSubject()
 
 		subject?.authenticated || subject?.remembered
 	}
 
-	def isAdmin() {
-		def subject = getAuthenticatedSubject()
+	boolean isAdmin() {
+		def subject = testSubject ?: getAuthenticatedSubject()
+
 		subject?.hasRole(AdminsService.ADMIN_ROLE)
 	}
 }

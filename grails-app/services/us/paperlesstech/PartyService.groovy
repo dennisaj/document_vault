@@ -218,7 +218,7 @@ class PartyService {
 	 *
 	 * @throws RuntimeException If there is a error saving the Party.
 	 * @throws org.springframework.mail.MailException If the Spring mail library encounters an error.
-	 * @throws grails.plugin.mail.GrailsMailException If the mail plugin encounters an error.
+	 * @throws org.grails.mail.GrailsMailException If the mail plugin encounters an error.
 	 * @throws java.lang.IllegalArgumentException If a bad argument is passed to the mail plugin.
 	 */
 	Party sendCode(Party party) {
