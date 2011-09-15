@@ -24,14 +24,22 @@
 	<nav:resources override="true" />
 </head>
 <body>
-	<div id="spinner" class="spinner" style="display:none;">
-		<r:img uri='/css/lib/images/loading.gif' alt="${message(code:'spinner.alt', default:'Loading...')}" />
-	</div>
 	<pt:isLoggedIn>
-
-		<div id="logged-in-user">
-			<p><g:message code="document-vault.label.welcomemessage" />, <b><pt:username /></b> - </p>
-			<nav:render group="user" />
+		<div id="masthead">
+		
+			<div id="spinner">
+				<div>
+					<span id="spinner-message">
+						<g:message code="spinner.alt" default="Loading..." />
+					</span>
+				</div>
+			</div>
+			
+			<div id="logged-in-user">
+				<p><g:message code="document-vault.label.welcomemessage" />, <b><pt:username /></b> - </p>
+				<nav:render group="user" />
+			</div>
+		
 		</div>
 
 		<%-- If we are not on the search page, the search form should not use ajax. --%>

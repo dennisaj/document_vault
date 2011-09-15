@@ -1,4 +1,4 @@
-@import "base";
+@import "bootstrap";
 
 #tag-search-form {
 	.subbar;
@@ -65,7 +65,10 @@
 }
 
 #tag-results {
-	//clear: left;
+	background-image: url(../css/lib/images/crosshatch-8x8.png);
+	background-repeat: repeat;
+	border-bottom: 1px solid #efefef;
+	margin-bottom: -1px;
 	padding: 5px 10px;
 	
 	> p { margin: 0; }
@@ -111,6 +114,7 @@
 			&:hover {
 				background-color: #f3f3f3;
 				.border-radius;
+				.box-shadow;
 			}
 		}
 		

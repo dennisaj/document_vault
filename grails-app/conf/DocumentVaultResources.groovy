@@ -22,9 +22,9 @@ modules = {
 		}
 	}
 
-	lessLibraries {
-		resource url: '/less/bootstrap.less', attrs:[rel: 'stylesheet/less', type: 'css'], exclude: '*'
-		resource url: '/less/base.less', attrs:[rel: 'stylesheet/less', type: 'css'], exclude: '*'
+	less {
+		resource url: '/less/bootstrap.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_less'
+		resource url: '/less/base.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_less'
 	}
 
 	dvDefaults {
@@ -35,6 +35,8 @@ modules = {
 	}
 
 	tagit {
+		dependsOn 'less'
+		
 		resource url: '/less/tag.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'tagit'
 		resource url: '/css/tagit-simple-blue.css', minify: true, nominify: false
 		resource url: '/js/lib/tagit.js'
@@ -81,39 +83,39 @@ modules = {
 	}
 
 	documentLogin {
-		dependsOn 'jquery, dvDefaults'
+		dependsOn 'jquery, less, dvDefaults'
 
-		resource url: '/less/login.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'documentLogin'
+		resource url: '/less/login.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'bundle_documentLogin'
 		resource url: '/js/new/login.js'
 	}
 
 	documentSearch {
-		dependsOn 'documentBase, jqueryShowSign, documentPreview'
+		dependsOn 'documentBase, less, jqueryShowSign, documentPreview'
 
-		resource url: '/less/search.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSearch'
+		resource url: '/less/search.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentSearch'
 		resource url: '/js/new/search.js'
 	}
 
 	documentUpload {
-		dependsOn 'documentBase, jquery-ui, fileUpload, tagit'
+		dependsOn 'documentBase, less, jquery-ui, fileUpload, tagit'
 
-		resource url: '/less/upload.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentUpload'
+		resource url: '/less/upload.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentUpload'
 		resource url: '/js/new/upload.js'
 	}
 
 	documentShow {
-		dependsOn 'documentBase, jqueryShowSign'
+		dependsOn 'documentBase, less, jqueryShowSign'
 
-		resource url: '/less/show.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentShow'
+		resource url: '/less/show.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentShow'
 		resource url: '/js/new/show.js'
 	}
 
 	documentSign {
-		dependsOn 'documentBase, jqueryShowSign'
+		dependsOn 'documentBase, less, jqueryShowSign'
 
-		resource url: '/less/slider.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSign'
-		resource url: '/less/notes.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSign'
-		resource url: '/less/sign.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'documentSign'
+		resource url: '/less/slider.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentSign'
+		resource url: '/less/notes.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentSign'
+		resource url: '/less/sign.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentSign'
 		resource url: '/js/lib/jquery.textarea-expander.js'
 		resource url: '/js/document/inputhandler.js'
 		resource url: '/js/document/notes.js'

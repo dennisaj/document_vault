@@ -1,6 +1,6 @@
 <div id="search-results">
 	<g:if test="${!params.q && !documentResults}">
-		<g:message code="document-vault.view.document.search.noresults" args="[params.q.encodeAsHTML()]" />
+		<g:message code="document-vault.view.document.search.noresults" />
 	</g:if>
 	<g:if test="${!params.q && documentResults}">
 		<g:message code="document-vault.view.document.search.recent" args="[params.max.encodeAsHTML()]" />

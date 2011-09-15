@@ -1,4 +1,4 @@
-@import "base";
+@import "bootstrap";
 
 button.ui-button {
 	font-size: .8em;
@@ -15,9 +15,9 @@ html, body {
 	position: relative;
 	user-select: none;
 
-	#logged-in-user {
+	#masthead {
 		position: relative;
-		z-index: 10;
+		z-index: 11;
 	}
 
 	#searchForm {
@@ -38,6 +38,8 @@ html, body {
 }
 
 #main {
+	.background-crosshatch;
+	
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 	bottom: 0;
@@ -56,6 +58,10 @@ html, body {
 			display: block;
 			padding: 5px;
 			text-decoration: none;
+			
+			&.ui-button.ui-state-disabled {
+				display: none;
+			}
 		}
 
 		&.left {
