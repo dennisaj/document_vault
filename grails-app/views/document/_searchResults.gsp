@@ -51,7 +51,7 @@
 			</pt:canNotes>
 
 			<pt:canPrint document="${document}">
-			<a href="#" class="ui-button print" title="<g:message code="document-vault.label.print" />" onclick="javascript:Document.print(${document.id});">
+			<a href="#" class="ui-button print" title="<g:message code="document-vault.label.print" />" onclick="javascript:Document.print(${document.id}); return false;">
 				<g:message code="document-vault.label.print" />
 			</a>
 			</pt:canPrint>

@@ -44,21 +44,26 @@ class UserController {
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 		params.sort = params.sort ?: "username"
-		params.order = params.order ?: "desc"
+		params.order = params.order ?: "asc"
 
 		def model = [:]
 		def filter = params.userFilter?.trim()
 
 		if (filter) {
-			params.sort = "fullName"
 			params.order = "asc"
-			def c = Profile.createCriteria()
-			def profiles = c.list(params) {
-				ilike "fullName", "%$filter%"
+
+			def c = User.createCriteria()
+			def users = c.list(params) {
+				or {
+					ilike "username", "%$filter%"
+					profile {
+						ilike "fullName", "%$filter%"
+					}
+				}
 			}
-			model = [userCount:profiles.totalCount, users:profiles*.owner]
+			model = [userCount:users.totalCount, users:users]
 		} else {
-			params.sort = (params.sort == "fullName" ? "username" : params.sort)
+			params.sort = (params.sort == "fullName" ? "id" : params.sort)
 			model = [userCount:User.count(), users:User.list(params)]
 		}
 
@@ -299,7 +304,7 @@ class UserController {
 	def listgroups = {
 		def user = User.get(params.id)
 		if (!user) {
-				log.warn "User identified by id '$params.id' was not located"
+			log.warn "User identified by id '$params.id' was not located"
 			render message(code: 'nimble.user.nonexistant', args: [params.id])
 			response.status = 500
 		} else {
@@ -338,7 +343,7 @@ class UserController {
 			render message(code: 'nimble.user.nonexistant', args: [params.id])
 			response.status = 500
 		} else {
-		def group = Group.get(params.groupID)
+			def group = Group.get(params.groupID)
 			if (!group) {
 				log.warn "Group identified by id '$params.groupID' was not located"
 				render message(code: 'nimble.group.nonexistant', args: [params.groupID])
@@ -421,15 +426,15 @@ class UserController {
 	def removepermission = {
 		def user = User.get(params.id)
 		if (!user) {
-				log.warn "User identified by id '$params.id' was not located"
-				render message(code: 'nimble.user.nonexistant', args: [params.id])
-				response.status = 500
+			log.warn "User identified by id '$params.id' was not located"
+			render message(code: 'nimble.user.nonexistant', args: [params.id])
+			response.status = 500
 		} else {
 			def permission = Permission.get(params.permID)
 			if (!permission) {
-					log.warn "Permission identified by id '$params.permID' was not located"
-					render message(code: 'nimble.permission.nonexistant', args: [params.permID])
-					response.status = 500
+				log.warn "Permission identified by id '$params.permID' was not located"
+				render message(code: 'nimble.permission.nonexistant', args: [params.permID])
+				response.status = 500
 			} else {
 				permissionService.deletePermission(permission)
 				log.info "Removing permission [$permission.id] from user [$user.id]$user.username succeeded"
@@ -441,9 +446,9 @@ class UserController {
 	def listroles = {
 		def user = User.get(params.id)
 		if (!user) {
-				log.warn "User identified by id '$params.id' was not located"
-				render message(code: 'nimble.user.nonexistant', args: [params.id])
-				response.status = 500
+			log.warn "User identified by id '$params.id' was not located"
+			render message(code: 'nimble.user.nonexistant', args: [params.id])
+			response.status = 500
 		} else {
 			log.debug "Listing roles user [$user.id]$user.username is granted"
 			render(template: '/templates/admin/roles_list', contextPath: pluginContextPath, model: [roles: user.roles, ownerID: user.id])
@@ -512,7 +517,7 @@ class UserController {
 				response.status = 500
 			} else {
 				if (role.protect) {
-						log.warn "Can't assign user [$user.id]$user.username role [$role.id]$role.name as role is protected"
+					log.warn "Can't assign user [$user.id]$user.username role [$role.id]$role.name as role is protected"
 					render message(code: 'nimble.role.protected.no.modification', args: [role.name, user.username])
 					response.status = 500
 				} else {
@@ -523,5 +528,87 @@ class UserController {
 			}
 		}
 	}
-}
 
+	def listdelegators = {
+		def user = User.get(params.id)
+		if (!user) {
+			log.warn "User identified by id '$params.id' was not located"
+			render message(code:'nimble.user.nonexistant', args:[params.id])
+			response.status = 500
+		} else {
+			log.debug "Listing delegators for user [$user.id]$user.username"
+			render(template:'/templates/admin/delegators_list', contextPath:pluginContextPath, model:[delegators:user.delegators, ownerID:user.id])
+		}
+	}
+
+	def searchdelegators = {
+		def q = "%" + params.q + "%"
+
+		log.debug "Performing search for delegators matching $q"
+		def user = User.get(params.id)
+		if (!user) {
+			log.warn "User identified by id '$params.id' was not located"
+			render message(code:'nimble.user.nonexistant', args:[params.id])
+			response.status = 500
+		} else {
+			def c = User.createCriteria()
+			def delegators = c.list(params) {
+				or {
+					ilike "username", q
+					profile {
+						ilike "fullName", q
+					}
+				}
+				not {
+					'in' ('id', (user.delegators + user)*.id)
+				}
+			}
+			log.info "Search for new delegators for user [$user.id]$user.username"
+			render(template:'/templates/admin/delegators_search', contextPath:pluginContextPath, model:[delegators:delegators, ownerID:user.id])
+		}
+	}
+
+	def grantdelegator = {
+		def user = User.get(params.id)
+		if (!user) {
+			log.warn "User identified by id '$params.id' was not located"
+			render message(code:'nimble.user.nonexistant', args:[params.id])
+			response.status = 500
+		} else {
+			def delegator = User.get(params.delegatorId)
+			if (!delegator) {
+				log.warn "Delegator identified by id '$params.delegatorId' was not located"
+				render message(code:'nimble.user.nonexistant', args:[params.delegatorId])
+				response.status = 500
+			} else {
+				if (!(delegator in user.delegators)) {
+					user.addToDelegators(delegator)
+					user.save(flush:true)
+					log.info "Added delegator [$delegator]$delegator.username to user [user.id]$user.username"
+					render message(code:'nimble.delegator.adddelegator.success', args:[delegator.username, user.username])
+				}
+			}
+		}
+	}
+
+	def removedelegator = {
+		def user = User.get(params.id)
+		if (!user) {
+			log.warn "User identified by id '$params.id' was not located"
+			render message(code:'nimble.user.nonexistant', args:[params.id])
+			response.status = 500
+		} else {
+			def delegator = User.get(params.delegatorId)
+			if (!delegator) {
+				log.warn "user identified by id '$params.delegatorId' was not located"
+				render message(code:'nimble.user.nonexistant', args:[params.delegatorId])
+				response.status = 500
+			} else {
+				user.removeFromDelegators(delegator)
+				user.save(flush:true)
+				log.info "Removed delegator [$delegator.id]delegator.username from user [$user.id]user.username"
+				render message(code:'nimble.delegator.removedelegator.success', args:[delegator.username, user.username])
+			}
+		}
+	}
+}

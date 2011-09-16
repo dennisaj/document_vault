@@ -22,6 +22,13 @@
 						<td valign="top" class="value"><g:link action="show" controller="user" class="button icon icon_user_go" id="${activityLogInstance.user?.id}">${activityLogInstance.user?.username}</g:link></td>
 					</tr>
 
+					<g:if test="${activityLogInstance.delegate}">
+					<tr class="prop">
+						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.delegate" /></td>
+						<td valign="top" class="value"><g:link action="show" controller="user" class="button icon icon_user_go" id="${activityLogInstance.delegate.id}">${activityLogInstance.delegate.username}</g:link></td>
+					</tr>
+					</g:if>
+
 					<tr class="prop">
 						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.dateCreated" /></td>
 						<td valign="top" class="value"><g:formatDate date="${activityLogInstance?.dateCreated}" /></td>

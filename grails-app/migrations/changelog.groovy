@@ -1119,4 +1119,6 @@ databaseChangeLog = {
 	include file: '20110818-notes.groovy'
 
 	include file: '20110825-notes.groovy'
+
+	include file: '20110915-delegators.groovy'
 }

@@ -10,6 +10,7 @@ import us.paperlesstech.nimble.User
 class ActivityLog {
 	String action
 	Date dateCreated
+	User delegate
 	String document
 	String ip
 	String pageNumber
@@ -25,6 +26,7 @@ class ActivityLog {
 
 	static constraints = {
 		document nullable: true, blank: true
+		delegate nullable:true
 		pageNumber nullable: true, blank: true
 		params nullable:true, blank:true, maxSize:4096
 		user nullable:true

@@ -1,12 +1,13 @@
 package us.paperlesstech
 
-import grails.plugin.spock.*
+import grails.plugin.spock.TagLibSpec
 
 import org.codehaus.groovy.grails.web.pages.GroovyPage
 import org.codehaus.groovy.grails.web.taglib.exceptions.GrailsTagException
 
-import spock.lang.*
+import spock.lang.Shared
 import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.User
 
 class AuthTagLibSpec extends TagLibSpec {
 	@Shared
@@ -28,12 +29,12 @@ class AuthTagLibSpec extends TagLibSpec {
 		then:
 			thrown(GrailsTagException)
 		where:
-			method << ["canDelete", "canGetSigned", "canNotes", "canPrint", "canSign", "canTag", "canUpload", "canView"]
+			method << ["canDelete", "canGetSigned", "canNotes", "canPrint", "canSign", "canTag", "canUpload", "canView", "canRunAs"]
 	}
 
 	def "empty body should return boolean"() {
 		when:
-			def ret = "$method"(document:new Document(), group: new Group(), GroovyPage.EMPTY_BODY_CLOSURE)
+			def ret = "$method"(user:new User(), document:new Document(), group: new Group(), GroovyPage.EMPTY_BODY_CLOSURE)
 		then:
 			ret in ["true", "false"]
 		where:
@@ -42,7 +43,7 @@ class AuthTagLibSpec extends TagLibSpec {
 
 	def "non-empty body should return result of closure"() {
 		when:
-			def ret = "$method"(document:new Document(), group: new Group()) {
+			def ret = "$method"(user:new User(), document:new Document(), group: new Group()) {
 				"output"
 			}
 		then:
@@ -57,7 +58,7 @@ class AuthTagLibSpec extends TagLibSpec {
 			tagLib.authServiceProxy./can.*/(_) >> false
 			tagLib.authServiceProxy./can.*Any/() >> false
 		when:
-			def ret = "$method"(document:new Document(), group: new Group()) {
+			def ret = "$method"(user:new User(), document:new Document(), group: new Group()) {
 				"output"
 			}
 		then:

@@ -34,12 +34,27 @@
 					</span>
 				</div>
 			</div>
-			
 			<div id="logged-in-user">
-				<p><g:message code="document-vault.label.welcomemessage" />, <b><pt:username /></b> - </p>
-				<nav:render group="user" />
+				<g:message code="document-vault.label.welcomemessage" />, 
+				<g:if test="${pt.canRunAsAny()}">
+				<div id="header-menu">
+					<div class="menu">
+						<ul>
+							<li>
+								<a href="#"><b><pt:username /></b><span class="arrow"></span></a>
+								<div class="content">
+									<pt:runAsList />
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				</g:if>
+				<g:else>
+					<b><pt:username /></b>
+				</g:else>
+				 - <nav:render group="user" />
 			</div>
-		
 		</div>
 
 		<%-- If we are not on the search page, the search form should not use ajax. --%>
@@ -57,7 +72,6 @@
 			</div>
 		</fieldset>
 		</g:formRemote>
-
 	</pt:isLoggedIn>
 
 	<g:render template="/layouts/messages" />

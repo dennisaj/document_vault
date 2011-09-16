@@ -37,7 +37,7 @@ class NimbleInlineJSTagLib {
 	// User management
 	def user = {attrs ->
 		if (attrs.user == null) {
-			throwTagError("User management tag requires user attribute [njs]")
+			throwTagError("User management tag requires user attribute [user]")
 		}
 
 		out << render(template: "/templates/inlinejs/jquery/user", contextPath: pluginContextPath, model:[nimblePath:pluginContextPath, user:attrs.user])
@@ -45,7 +45,7 @@ class NimbleInlineJSTagLib {
 
 	def permission = {attrs ->
 		if (attrs.parent == null) {
-			throwTagError("Permission management tag requires owner attribute [njs]")
+			throwTagError("Permission management tag requires owner attribute [parent]")
 		}
 
 		out << render(template: "/templates/inlinejs/jquery/permission", contextPath: pluginContextPath, model:[nimblePath:pluginContextPath, parent:attrs.parent])
@@ -53,7 +53,7 @@ class NimbleInlineJSTagLib {
 
 	def role = {attrs ->
 		if (attrs.parent == null) {
-			throwTagError("Role management tag requires user attribute [njs]")
+			throwTagError("Role management tag requires user attribute [parent]")
 		}
 
 		out << render(template: "/templates/inlinejs/jquery/role", contextPath: pluginContextPath, model:[nimblePath:pluginContextPath, parent:attrs.parent])
@@ -61,17 +61,25 @@ class NimbleInlineJSTagLib {
 
 	def group = {attrs ->
 		if (attrs.parent == null) {
-			throwTagError("Group management tag requires user attribute [njs]")
+			throwTagError("Group management tag requires user attribute [parent]")
 		}
 
-		 out << render(template: "/templates/inlinejs/jquery/group", contextPath: pluginContextPath, model:[nimblePath:pluginContextPath, parent:attrs.parent])
+		out << render(template: "/templates/inlinejs/jquery/group", contextPath: pluginContextPath, model:[nimblePath:pluginContextPath, parent:attrs.parent])
 	}
 
 	def member = {attrs ->
 		if(attrs.parent == null) {
-			throwTagError("Member management tag requires user attribute [njs]")
+			throwTagError("Member management tag requires user attribute [parent]")
 		}
 
 		out << render(template: "/templates/inlinejs/jquery/member", contextPath: pluginContextPath, model:[nimblePath:pluginContextPath, parent:attrs.parent])
+	}
+
+	def delegator = {attrs ->
+		if (attrs.parent == null) {
+			throwTagError("Delegator management tag requires user attribute [parent]")
+		}
+
+		out << render(template: "/templates/inlinejs/jquery/delegator", contextPath: pluginContextPath, model:[nimblePath:pluginContextPath, parent:attrs.parent])
 	}
 }

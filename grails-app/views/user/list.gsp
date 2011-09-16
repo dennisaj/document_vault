@@ -5,14 +5,14 @@
 <body>
 	<h2><g:message code="nimble.view.user.list.heading" /></h2>
 
-	<g:remoteField value="${params.userFilter}"
+	<g:remoteField value="${params.userFilter}" style="width: 20em;"
 		name="user-filter"
 		id="userFilter"
 		paramName="userFilter"
 		url="[controller:'user', action:'list', params:[max:params.max, offset:params.offset, order:params.order, sort:params.sort]]"
-		update="userlist-container" />
+		update="userlist-container" placeholder="${g.message(code:'document-vault.placeholder.user.list.search')}" />
 
 	<div id="userlist-container">
-	<g:render template="list" model="${model}" />
+		<g:render template="list" model="${model}" />
 	</div>
 </body>

@@ -123,5 +123,15 @@ class UrlMappings {
 			controller = "printQueue"
 			action = "printWindow"
 		}
+
+		"/r/ra/$userId" {
+			controller = "runAs"
+			action = "runas"
+		}
+
+		"/r/r" {
+			controller = "runAs"
+			action = "release"
+		}
 	}
 }

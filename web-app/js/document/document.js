@@ -49,7 +49,6 @@ var Document = {
 		return $.ajax({
 			data: { addNotes:addNotes },
 			error: this.ajaxErrorHandler,
-			global: false,
 			success: function(data) {
 				// TODO i18n
 				if (data.status == 'success') {
@@ -98,7 +97,6 @@ var Document = {
 
 		$.ajax({
 			error: this.ajaxErrorHandler,
-			global: false,
 			success: function(data) {
 				if (data.pageNumber) {
 					var bg = new Image();

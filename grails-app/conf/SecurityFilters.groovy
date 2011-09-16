@@ -1,5 +1,6 @@
 import us.paperlesstech.Document
 import us.paperlesstech.nimble.AdminsService
+import us.paperlesstech.nimble.User
 
 public class SecurityFilters {
 	private static String openControllers = "auth|logout|account|code"
@@ -57,6 +58,16 @@ public class SecurityFilters {
 							return authServiceProxy.canUploadAny()
 						case "console":
 							return grails.util.Environment.current == grails.util.Environment.DEVELOPMENT
+						case "runAs":
+							switch (action) {
+								case "runas":
+									def u = User.get(params.long('userId'))
+									return authServiceProxy.canRunAs(u)
+								case "release":
+									return authServiceProxy.authenticatedSubject.isRunAs()
+								default:
+									return false
+							}
 						default:
 							return false
 					}

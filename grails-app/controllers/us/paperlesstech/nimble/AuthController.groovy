@@ -34,7 +34,7 @@ import us.paperlesstech.auth.nimble.FacebookConnectToken
  */
 class AuthController {
 	static Map allowedMethods = [signin: 'POST']
-	static navigation = [[group: "user", action: "logout", isVisible: { authService.isLoggedIn() }, order: 100, title: "Logout"]]
+	static navigation = [[group: "user", action: "logout", isVisible: { authService.isLoggedIn() && !authService.authenticatedSubject.isRunAs() }, order: 100, title: "Logout"]]
 
 	private static String TARGET = 'AuthController.TARGET'
 
@@ -126,6 +126,11 @@ class AuthController {
 
 	def signout = {
 		log.info("Signing out user ${authService.authenticatedUser?.username}")
+
+		if (authService.authenticatedSubject.isRunAs()) {
+			redirect(controller:"runAs", action:"release")
+			return
+		}
 
 		if (userService.events["logout"]) {
 			log.info("Executing logout callback")

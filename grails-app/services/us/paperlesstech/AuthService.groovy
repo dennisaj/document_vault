@@ -77,6 +77,14 @@ class AuthService {
 		isPermissionImplied("document:view")
 	}
 
+	boolean canRunAs(User u) {
+		!authenticatedSubject?.isRunAs() && u in authenticatedUser?.delegators
+	}
+
+	boolean canRunAsAny() {
+		!authenticatedSubject?.isRunAs() && !authenticatedUser?.delegators?.isEmpty()
+	}
+
 	private boolean checkPermission(DocumentPermission permission, Document d) {
 		assert d
 		def subject = testSubject ?: getAuthenticatedSubject()
@@ -281,5 +289,18 @@ class AuthService {
 		def subject = testSubject ?: getAuthenticatedSubject()
 
 		subject?.hasRole(AdminsService.ADMIN_ROLE)
+	}
+
+	/**
+	 *
+	 * @return The base user if the running as a delegate.
+	 */
+	User getDelegateUser() {
+		def p = authenticatedSubject.previousPrincipals?.iterator()?.next()
+		if (p) {
+			return User.get(p)
+		}
+
+		return null
 	}
 }

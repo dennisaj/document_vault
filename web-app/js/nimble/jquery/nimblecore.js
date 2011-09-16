@@ -4,12 +4,13 @@ var nimble = window.nimble;
 // all of the endpoints that may be referenced in this script
 if(!nimble.endpoints)
 nimble.endpoints = {
-    admin: { 'list':null, 'search':null, 'remove':null, 'grant':null },
-    user: { 'logins':null, 'enableAPI':null, 'disableAPI':null, 'enable':null, 'disable':null },
-    role: { 'list':null, 'search':null, 'remove':null, 'grant':null },
-    group: { 'list':null, 'search':null, 'remove':null, 'grant':null },
-    permission: { 'list':null, 'remove':null, 'create':null },
-    member: { 'list':null, 'search':null, 'remove':null, 'add':null, 'groupSearch':null, 'groupAdd':null, 'groupRemove':null }
+	admin: { 'list':null, 'search':null, 'remove':null, 'grant':null },
+	user: { 'logins':null, 'enableAPI':null, 'disableAPI':null, 'enable':null, 'disable':null },
+	role: { 'list':null, 'search':null, 'remove':null, 'grant':null },
+	group: { 'list':null, 'search':null, 'remove':null, 'grant':null },
+	permission: { 'list':null, 'remove':null, 'create':null },
+	member: { 'list':null, 'search':null, 'remove':null, 'add':null, 'groupSearch':null, 'groupAdd':null, 'groupRemove':null },
+	delegator: { 'list':null, 'search':null, 'remove':null, 'grant':null }
 };
 
 // Admins
@@ -357,6 +358,72 @@ nimble.removeGroup = function(parentID, groupID) {
       nimble.growl('error', xhr.responseText);
     }
   });
+};
+
+// Delegators
+nimble.searchDelegators = function(parentID) {
+	var dataString = "id=" + parentID + "&q=" + $('#qdelegators').val();
+	$.ajax({
+		type: "POST",
+		url: nimble.endpoints.delegator.search,
+		data: dataString,
+		success: function(res) {
+			$("#delegatorsearchresponse").empty().hide();
+			$("#delegatorsearchresponse").append(res).show();
+		},
+		error: function (xhr) {
+			nimble.growl("error", xhr.responseText);
+		}
+	});
+};
+
+nimble.listDelegators = function(parentID) {
+	var dataString = 'id=' + parentID;
+	$.ajax({
+		type: "GET",
+		url: nimble.endpoints.delegator.list,
+		data: dataString,
+		success: function(res) {
+			$("#assigneddelegators").empty().append(res).show();
+		},
+		error: function (xhr) {
+			nimble.growl('error', xhr.responseText);
+		}
+	});
+};
+
+nimble.grantDelegator = function(parentID, delegatorId) {
+	var dataString = 'id=' + parentID + '&delegatorId=' + delegatorId;
+	$.ajax({
+		type: "POST",
+		url: nimble.endpoints.delegator.grant,
+		data: dataString,
+		success: function(res) {
+			nimble.listDelegators(parentID);
+			nimble.searchDelegators(parentID);
+			nimble.growl('success', res);
+		},
+		error: function (xhr) {
+			nimble.growl('error', xhr.responseText);
+		}
+	});
+};
+
+nimble.removeDelegator = function(parentID, delegatorId) {
+	var dataString = 'id=' + parentID + '&delegatorId=' + delegatorId;
+	$.ajax({
+		type: "POST",
+		url: nimble.endpoints.delegator.remove,
+		data: dataString,
+		success: function(res) {
+			nimble.listDelegators(parentID);
+			nimble.searchDelegators(parentID);
+			nimble.growl('success', res);
+		},
+		error: function (xhr) {
+			nimble.growl('error', xhr.responseText);
+		}
+	});
 };
 
 // Members

@@ -28,14 +28,13 @@ import us.paperlesstech.Preference
  * @author Bradley Beddoes
  */
 @MultiTenant
-class User {
-	static SIGNATOR_USER_ROLE = "SIGNATOR_USER"
+class User implements Comparable<User> {
+	static final String SIGNATOR_USER_ROLE = "SIGNATOR_USER"
 
 	String username
 	String realm
 	String passwordHash
 	String actionHash
-
 	boolean enabled
 	boolean external
 	boolean federated
@@ -49,6 +48,7 @@ class User {
 	Date lastUpdated
 
 	String externalId
+	SortedSet delegators
 
 	static belongsTo = [Role, Group]
 
@@ -60,13 +60,8 @@ class User {
 		roles: Role,
 		groups: Group,
 		permissions: Permission,
-		preferences:Preference
-	]
-
-	static fetchMode = [
-		roles:'eager',
-		groups:'eager',
-		preferences:'eager'
+		preferences:Preference,
+		delegators: User
 	]
 
 	static mapping = {
@@ -82,6 +77,7 @@ class User {
 		permissions cache: true
 		externalId index: "user_external_id_idx"
 		preferences cache:true
+		delegators nullable:true, joinTable:[name:'users_delegators']
 	}
 
 	static constraints = {
@@ -101,6 +97,14 @@ class User {
 		permissions nullable:true
 		externalId nullable: true, blank: true
 		preferences nullable:true
+	}
+
+	/**
+	 * Sort by profile.fullName by fall back to username if profile.fullName is empty
+	 */
+	@Override
+	int compareTo(User other) {
+		(profile?.fullName ?: username).toLowerCase() <=> (other?.profile?.fullName ?: other?.username).toLowerCase()
 	}
 
 	// Transients

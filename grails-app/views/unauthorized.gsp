@@ -9,6 +9,9 @@
 <div class="subbar">
 	<div class="ui-button-group">
 		<a class="ui-button icon arrowleft" href="#" onclick="history.go(-1); return false;"><g:message code="document-vault.link.goback" /></a>
+		<pt:isRunAs>
+		<g:link class="ui-button icon user" controller="runAs" action="release" params="[targetUri:(request.forwardURI - request.contextPath)]"><g:message code="document-vault.link.releasedelegator" /></g:link>
+		</pt:isRunAs>
 		<a class="ui-button icon reload" href=""><g:message code="document-vault.link.tryagain" /></a>
 	</div>
 </div>

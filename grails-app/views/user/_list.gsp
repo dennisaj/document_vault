@@ -8,6 +8,7 @@
 	</tr>
 	</thead>
 	<tbody>
+	
 	<g:each in="${users}" status="i" var="user">
 		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			<g:if test="${user.username?.length() > 50}">

@@ -26,6 +26,7 @@ class ActivityLogService {
 
 		def activityLog = new ActivityLog(
 				action: "$controller:$action",
+				delegate: authServiceProxy.delegateUser,
 				document: documentId,
 				userAgent: requestService.getHeader("User-Agent"),
 				ip: requestService.getRemoteAddr(),
