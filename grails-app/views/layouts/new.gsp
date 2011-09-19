@@ -29,9 +29,7 @@
 		
 			<div id="spinner">
 				<div>
-					<span id="spinner-message">
-						<g:message code="spinner.alt" default="Loading..." />
-					</span>
+					<span><g:message code="spinner.alt" default="Loading..." /></span>
 				</div>
 			</div>
 			<div id="logged-in-user">

@@ -25,10 +25,10 @@ $.extend({
 // 200ms seems a reasonable delay - tests show responses between 50ms and 150ms (again, locally). Adjust the delay for production
 function Spinner() {
 	var spcontainer = $("#spinner"),
-		spmessage = $("#spinner-message"),
+		spmessage = spcontainer.find("span"),
 		that = this;
 	
-	this.showdelay = 200;
+	this.showdelay = 300;
 	
 	this.message = function(msg) {
 		if (msg !== undefined && typeof msg === "string") {
@@ -53,7 +53,30 @@ function Spinner() {
 // Extend jQuery with an instance of Spinner
 $.extend({ spinner: new Spinner() });
 
-$.support.touch = (typeof Touch === 'object' || window.ontouchstart !== undefined);
+// Extend jQuery with a fairly simple Notification system.
+// This function assumes there is a single element within the .messages element with a class of 'ondemand'.
+// Whenever we want to display a non-persistent persistent message, we can use $.notify.<whatever> to display the type
+// of notification we want for whatever message we want.
+function Notify() {
+	var msgparent = $(".messages"),
+		nycontainer = msgparent.find(".ondemand"),
+		that = this;
+	
+	var showNotify = function(ntype, nmsg) {
+		return nycontainer.removeClass("info warning error success").addClass(ntype).html(nmsg).slideDown(220, function() { msgparent.addClass("visible"); });
+	};
+	
+	this.dismiss = function() { return nycontainer.slideUp(220, function() { msgparent.removeClass("visible"); }); };
+	
+	this.info = function(msg) { return showNotify("info", msg); };
+	this.warning = function(msg) { return showNotify("warning", msg); };
+	this.error = function(msg) { return showNotify("error", msg); };
+	this.success = function(msg) { return showNotify("success", msg); };
+}
+
+$.extend({ notify: new Notify() });
+
+$.support.touch = (typeof Touch === 'object' || window.ontouchstart === undefined);
 
 // Because IE sucks
 // See http://stackoverflow.com/questions/1695376/msie-and-addeventlistener-problem-in-javascript
