@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="${grailsApplication.config.nimble.layout.administration}" />
-		<g:set var="entityName" value="${message(code: 'activityLog.label', default: 'ActivityLog')}" />
+		<g:set var="entityName" value="${g.message(code: 'activityLog.label', default: 'ActivityLog')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
 	</head>
 	<body>
@@ -41,7 +41,7 @@
 
 					<tr class="prop">
 						<td valign="top" class="name"><g:message code="document-vault.view.activitylog.document" /></td>
-						<td valign="top" class="value"><g:link controller="activityLog" action="list" params="[documentId: activityLogInstance.document]">${activityLogInstance.document}</g:link></td>
+						<td valign="top" class="value"><g:link controller="activityLog" action="list" params="[documentId: activityLogInstance.document?.id]">${activityLogInstance.document?.id}</g:link></td>
 					</tr>
 
 					<tr class="prop">

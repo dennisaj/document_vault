@@ -87,7 +87,7 @@ class AuthService {
 
 	private boolean checkPermission(DocumentPermission permission, Document d) {
 		assert d
-		def subject = testSubject ?: getAuthenticatedSubject()
+		def subject = testSubject ?: authenticatedSubject
 
 		if (!isLoggedIn()) {
 			return false
@@ -100,7 +100,7 @@ class AuthService {
 
 	private boolean checkPermission(DocumentPermission permission, Group g) {
 		assert g
-		def subject = testSubject ?: getAuthenticatedSubject()
+		def subject = testSubject ?: authenticatedSubject
 
 		if (!isLoggedIn()) {
 			return false
@@ -209,7 +209,7 @@ class AuthService {
 	 * @return true if the permission was implied
 	 */
 	private boolean isPermissionImplied(String permission) {
-		def subject = testSubject ?: getAuthenticatedSubject()
+		def subject = testSubject ?: authenticatedSubject
 		if (!isLoggedIn()) {
 			return false
 		}
@@ -264,11 +264,11 @@ class AuthService {
 	}
 
 	Subject getAuthenticatedSubject() {
-		SecurityUtils.getSubject()
+		SecurityUtils.subject
 	}
 
 	User getAuthenticatedUser() {
-		def principal = SecurityUtils.subject?.principal
+		def principal = authenticatedSubject?.principal
 		def authUser = User.get(principal)
 
 		if (!authUser) {
@@ -280,13 +280,13 @@ class AuthService {
 	}
 
 	boolean isLoggedIn() {
-		def subject = testSubject ?: getAuthenticatedSubject()
+		def subject = testSubject ?: authenticatedSubject
 
 		subject?.authenticated || subject?.remembered
 	}
 
 	boolean isAdmin() {
-		def subject = testSubject ?: getAuthenticatedSubject()
+		def subject = testSubject ?: authenticatedSubject
 
 		subject?.hasRole(AdminsService.ADMIN_ROLE)
 	}
@@ -302,5 +302,9 @@ class AuthService {
 		}
 
 		return null
+	}
+
+	void login(token) {
+		SecurityUtils.subject.login(token)
 	}
 }

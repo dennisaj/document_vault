@@ -11,11 +11,11 @@
 				'downloadImage': '${createLink(controller:"document", action:"downloadImage")}/{0}/{1}',
 				'finish_redirect': '${createLink(controller:"document", action:"index")}',
 				'image': '${createLink(controller:"document", action:"image")}/{0}/{1}',
-				'submitParties': '${createLink(controller:"document", action:"submitParties")}/{0}',
+				'submitParties': '${createLink(controller:"party", action:"submitParties")}/{0}',
 				'print': '${createLink(controller:"printQueue", action:"push")}/{0}/{1}',
-				'removeParty': '${createLink(controller:"document", action:"removeParty")}/{0}/{1}',
-				'resendCode': '${createLink(controller:"document", action:"resend")}/{0}/{1}',
-				'sign': '${createLink(controller:"document", action:"submitSignatures")}/{0}',
+				'removeParty': '${createLink(controller:"party", action:"removeParty")}/{0}/{1}',
+				'resendCode': '${createLink(controller:"party", action:"resend")}/{0}/{1}',
+				'sign': '${createLink(controller:"party", action:"submitSignatures")}/{0}',
 				'listNotes': '${createLink(controller:"note", action:"list")}/{0}',
 				'saveTextNote': '${createLink(controller:"note", action:"saveText")}/{0}',
 				'printWindow': '${createLink(controller:"p", action:"window")}/{0}'
@@ -131,7 +131,7 @@
 	</p>
 </div>
 
-<g:render template="requestSignature" />
+<g:render template="/party/requestSignature" />
 
 <pt:canGetSigned document="${document}">
 <div id="confirm-remove" title="<g:message code="document-vault.view.signature.confirmremove.title" />">

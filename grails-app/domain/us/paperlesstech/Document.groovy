@@ -51,9 +51,9 @@ class Document implements Taggable {
 	*
 	* @return A map of the highlights for all parties on the given page.
 	*/
-	def highlightsAsMap = {int pageNumber ->
+	def highlightsAsMap = { int pageNumber ->
 		def m = [:]
-		parties?.each{party->
+		parties?.each{ party->
 			m.(party.id) = party.pageHighlights(pageNumber)
 		}
 

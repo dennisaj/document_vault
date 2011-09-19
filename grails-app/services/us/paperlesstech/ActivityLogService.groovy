@@ -18,7 +18,7 @@ class ActivityLogService {
 	 */
 	ActivityLog addLog(String controller, String action, int status, Map params = [:]) {
 		action = action ?: "index"
-		def documentId = params.remove("documentId")
+		def document = Document.get(params.remove("documentId"))
 		def pageNumber = params.remove("pageNumber")
 		// Don't log signature line or document notes data
 		params.remove("lines")
@@ -27,7 +27,7 @@ class ActivityLogService {
 		def activityLog = new ActivityLog(
 				action: "$controller:$action",
 				delegate: authServiceProxy.delegateUser,
-				document: documentId,
+				document: document,
 				userAgent: requestService.getHeader("User-Agent"),
 				ip: requestService.getRemoteAddr(),
 				user: authServiceProxy.authenticatedUser,

@@ -80,8 +80,8 @@ class AuthController {
 		log.info("Attempting to authenticate user, $params.username. RememberMe is $authToken.rememberMe")
 
 		try {
-			SecurityUtils.subject.login(authToken)
-			this.userService.createLoginRecord(request)
+			authService.login(authToken)
+			userService.createLoginRecord(request)
 
 			def targetUri = session.getAttribute(AuthController.TARGET) ?: "/"
 			session.removeAttribute(AuthController.TARGET)
@@ -253,8 +253,8 @@ class AuthController {
 
 			def authToken = new FacebookConnectToken(currentFBSessionKey, currentFBSessionCookies)
 			try {
-				SecurityUtils.subject.login(authToken)
-				this.userService.createLoginRecord(request)
+				authService.login(authToken)
+				userService.createLoginRecord(request)
 
 				def targetUri = session.getAttribute(AuthController.TARGET) ?: "/"
 				session.removeAttribute(AuthController.TARGET)
@@ -341,8 +341,8 @@ class AuthController {
 
 		if (authToken) {
 			try {
-				SecurityUtils.subject.login(authToken)
-				this.userService.createLoginRecord(request)
+				authService.login(authToken)
+				userService.createLoginRecord(request)
 
 				def targetUri = session.getAttribute(AuthController.TARGET) ?: "/"
 				session.removeAttribute(AuthController.TARGET)

@@ -1,6 +1,6 @@
 package us.paperlesstech
 
-import us.paperlesstech.nimble.User;
+import us.paperlesstech.nimble.User
 import grails.plugin.spock.UnitSpec
 import groovy.mock.interceptor.MockFor
 import grails.converters.JSON
@@ -19,6 +19,7 @@ class ActivityLogServiceSpec extends UnitSpec {
 
 	def "add log should call methods off the request service"() {
 		mockDomain(ActivityLog)
+		mockDomain(Document, [new Document(id:4)])
 		when: "Try to save"
 		def activityLog = service.addLog(controller, action, status, params)
 
@@ -28,7 +29,7 @@ class ActivityLogServiceSpec extends UnitSpec {
 		1 * request.getRequestURI() >> uri
 		1 * authService.authenticatedUser >> currentUser
 		activityLog.action == "document:index"
-		activityLog.document == "4"
+		activityLog.document.id == 4
 		activityLog.ip == ip
 		activityLog.pageNumber == "2"
 		activityLog.params == [param1:"1", param2:"2"].toString()

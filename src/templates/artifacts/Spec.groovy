@@ -2,7 +2,7 @@
 import grails.plugin.spock.*
 
 class @artifact.name@ extends @artifact.superclass@ {
-    def "feature method"() {
+	def "feature method"() {
 
-    }
+	}
 }

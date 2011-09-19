@@ -6,7 +6,9 @@ import us.paperlesstech.auth.CodeToken
 import us.paperlesstech.nimble.User
 
 class CodeController {
-	def allowedMethods = [index: "GET"]
+	static def allowedMethods = [index: "GET"]
+
+	def authService
 	def userService
 
 	def index = {
@@ -15,10 +17,11 @@ class CodeController {
 
 		try {
 			def party = Party.findByCode(codeToken.code)
+			assert party
 
 			// If the user is a generated user, log them in automatically.
-			if (party?.signator?.roles?.any { it.name == User.SIGNATOR_USER_ROLE }) {
-				SecurityUtils.subject.login(codeToken)
+			if (party.signator.roles?.any { it.name == User.SIGNATOR_USER_ROLE }) {
+				authService.login(codeToken)
 				userService.createLoginRecord(request)
 			}
 

@@ -28,14 +28,18 @@ class UrlMappings {
 			controller = "document"
 		}
 
-		"/document/removeParty/$documentId/$partyId"{
-			controller = "document"
+		"/party/removeParty/$documentId/$partyId"{
+			controller = "party"
 			action = "removeParty"
 		}
 
-		"/document/resend/$documentId/$partyId" {
-			controller = "document"
+		"/party/resend/$documentId/$partyId" {
+			controller = "party"
 			action = "resend"
+		}
+
+		"/party/$action?/$documentId?" {
+			controller = "party"
 		}
 
 		"/note/download/$documentId/$noteDataId" {

@@ -39,19 +39,22 @@ public class SecurityFilters {
 									return authServiceProxy.canViewAny() || authServiceProxy.canSignAny()
 								case ["sign"]:
 									return document && (authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document))
+								default:
+									return false
+							}
+						case "party":
+							switch (action) {
 								case ["submitSignatures"]:
-									return document && (authServiceProxy.canSign(document))
-								case ["addParty", "submitParties", "removeParty"]:
-									return document && (authServiceProxy.canGetSigned(document))
-								case "resend":
-									return document && (authServiceProxy.canGetSigned(document))
+									return document && authServiceProxy.canSign(document)
+								case ["addParty", "submitParties", "removeParty", "resend"]:
+									return document && authServiceProxy.canGetSigned(document)
 								default:
 									return false
 							}
 						case "note":
-							return document && (authServiceProxy.canNotes(document))
+							return document && authServiceProxy.canNotes(document)
 						case "printQueue":
-							return document ? authServiceProxy.canPrint(document) : authServiceProxy.canPrintAny()
+							return document && authServiceProxy.canPrint(document)
 						case "tag":
 							return document ? authServiceProxy.canTag(document) : authServiceProxy.canTagAny()
 						case "upload":

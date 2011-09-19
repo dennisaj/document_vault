@@ -5,13 +5,15 @@ import grails.converters.JSON
 class NoteController {
 	static allowedMethods = [list:"POST", saveLines:"POST", saveText:"POST",]
 
-	def authService
 	def handlerChain
 
 	def download = {
-		def document = Document.get(params.documentId)
-		def note = document?.notes?.find { it.data?.id == params.long("noteDataId") }
-		if (!document || !note?.data) {
+		def noteDataId = params.long('noteDataId')
+		assert noteDataId != null
+
+		def document = Document.get(params.long('documentId'))
+		def note = document?.notes?.find { it.data?.id == noteDataId }
+		if (!document || !note) {
 			response.status = 404
 			return
 		}
@@ -19,11 +21,11 @@ class NoteController {
 		cache neverExpires: true
 
 		def (filename, is, contentType, length) = handlerChain.downloadNote(document:document, note:note)
-		is.withStream {
+		is.withStream { stream->
 			response.setContentType(contentType)
 			response.setContentLength(length)
 			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
-			response.getOutputStream() << is
+			response.getOutputStream() << stream
 		}
 	}
 
@@ -41,18 +43,21 @@ class NoteController {
 	}
 
 	def saveLines = {
+		def inputNotes = JSON.parse(params.notes)
+		assert inputNotes
+
 		def document = Document.get(params.documentId)
 		assert document
 
 		def notes = []
-		JSON.parse(params?.notes).each {
+		inputNotes.each {
 			if (it) {
 				it.value
 				notes << [lines:it.value]
 			}
 		}
 
-		handlerChain.saveNotes([document:document, notes:notes])
+		handlerChain.saveNotes(document:document, notes:notes)
 		document.save(flush:true)
 
 		render([status:'success'] as JSON)
@@ -60,25 +65,20 @@ class NoteController {
 
 	def saveText = {
 		def document = Document.get(params.long('documentId'))
-		assert authService.canNotes(document)
+		assert document
 
-		if (document) {
-			def value = params.value?.trim()
-			def pageNumber = params.int('pageNumber') ?: 0
-			def left = params.float('left') as int ?: 0
-			def top = params.float('top') as int ?: 0
+		def value = params.value?.trim()
+		assert value
 
-			assert pageNumber <= document.files.first().pages
+		def pageNumber = Math.max(params.int('pageNumber') ?: 0, 0)
+		assert pageNumber <= document.files.first().pages
 
-			if (value) {
-				handlerChain.saveNotes([document:document, notes:[[text:value, left:left, top:top, pageNumber:pageNumber]]])
-				document.save(flush:true)
-			}
+		def left = params.float('left') as int ?: 0
+		def top = params.float('top') as int ?: 0
 
-			render template:"textNotes", model:[document:document]
-			return
-		}
+		handlerChain.saveNotes(document:document, notes:[[text:value, left:left, top:top, pageNumber:pageNumber]])
+		document.save(flush:true)
 
-		render ([status:"error"] as JSON)
+		render template:"textNotes", model:[document:document]
 	}
 }

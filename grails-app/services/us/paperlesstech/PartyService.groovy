@@ -2,6 +2,8 @@ package us.paperlesstech
 
 import java.text.ParseException
 
+import org.codehaus.groovy.grails.web.json.JSONObject
+
 import us.paperlesstech.nimble.Permission
 import us.paperlesstech.nimble.Profile
 import us.paperlesstech.nimble.User
@@ -18,10 +20,11 @@ class PartyService {
 	def userService
 
 	/**
-	 * Attempts to create a party for the given document. 
+	 * Attempts to create a party for the given document.
 	 *
 	 * @pre The current user must have the {@link DocumentPermission#GetSigned} permission for document.
 	 *
+	 * @param p a Map of Party values (eg: [highlights:[list of highlights], color:..., permission:..., fullName:..., email:..., expiration:...])
 	 * @return The Party object, with errors populated if any occur.
 	 */
 	Party createParty(Document document, Map p) {
@@ -65,7 +68,7 @@ class PartyService {
 	/**
 	 * Applies the signatures to the document for the currently logged in user.
 	 *
-	 * If the user is not currently a party on the document, they are added and a 0 width 
+	 * If the user is not currently a party on the document, they are added and a 0 width
 	 * highlight is added to that party. No email should be sent
 	 *
 	 * @pre The current user must have the {@link DocumentPermission#Sign} permission for document.
@@ -107,13 +110,17 @@ class PartyService {
 			return savedDocument
 		}
 
+		document.errors.each {
+			log.error "[Document(${document.id})] - " + it
+		}
+
 		document
 	}
 
 	/**
 	 * Set all {@link Highlight#accepted} dates to now.
 	 *
-	 * @pre The current user must have either the {@link DocumentPermission#GetSigned} or 
+	 * @pre The current user must have either the {@link DocumentPermission#GetSigned} or
 	 * {@link DocumentPermission#Sign} permission for party.document.
 	 *
 	 * @return The updated Party.
@@ -135,8 +142,8 @@ class PartyService {
 
 	/**
 	 * Set the {@link Party#rejected} flag to true.
-	 * 
-	 * @pre The current user must have either the {@link DocumentPermission#GetSigned} or 
+	 *
+	 * @pre The current user must have either the {@link DocumentPermission#GetSigned} or
 	 * {@link DocumentPermission#Sign} permission for party.document.
 	 *
 	 * @return The updated Party.
@@ -159,7 +166,7 @@ class PartyService {
 	/**
 	 * Set the {@link Party#viewed} flag to true.
 	 *
-	 * @pre The current user must have either the {@link DocumentPermission#GetSigned} or 
+	 * @pre The current user must have either the {@link DocumentPermission#GetSigned} or
 	 * {@link DocumentPermission#Sign} permission for party.document.
 	 *
 	 * @return The updated Party.
@@ -270,6 +277,51 @@ class PartyService {
 		}
 
 		savedParty
+	}
+
+	/**
+	 * Iterates over the inParties list and either updates the highlights if the party already exists
+	 * or creates a new party and adds it to the document
+	 *
+	 * @param inParties a List of Maps (see createParty)
+	 * @return a List of Party objects that each may have error information associated with them
+	 *
+	 * @see #createParty(Document, Map)
+	 * @see #updateHighlights(Party, List)
+	 */
+	List submitParties(Document document, List inParties) {
+		assert document
+		assert authServiceProxy.canGetSigned(document)
+
+		inParties.collect { inParty->
+			// Remove JSONObject.Null entries
+			// TODO replace with collectEntries with Groovy 1.8.0
+			inParty = [:].putAll(inParty.collect {k,v->
+				if (v == JSONObject.NULL) {
+					v = null
+				}
+
+				new MapEntry(k,v)
+			})
+
+			def outParty = null
+			if (inParty.id) {
+				def party = Party.get(inParty.id as long)
+
+				if (party) {
+					outParty = updateHighlights(party, inParty.highlights)
+				}
+			} else {
+				outParty = createParty(document, inParty)
+				if (outParty.hasErrors() || outParty.signator.hasErrors()) {
+					// If there was an error, use the existing code.
+					// This ensures that the unsaved clientside highlights won't disappear.
+					outParty.code = inParty.code
+				}
+			}
+
+			outParty
+		}
 	}
 
 	/**

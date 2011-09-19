@@ -1116,9 +1116,11 @@ databaseChangeLog = {
 
 	include file: '20110816_preferences.groovy'
 
-	include file: '20110818-notes.groovy'
+	include file: '20110818_notes.groovy'
 
-	include file: '20110825-notes.groovy'
+	include file: '20110825_notes.groovy'
 
-	include file: '20110915-delegators.groovy'
+	include file: '20110915_delegators.groovy'
+
+	include file: '20110919_activitylog_document.groovy'
 }
