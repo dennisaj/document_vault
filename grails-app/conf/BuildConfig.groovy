@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
 	}
 
 	plugins {
-		runtime(':lesscss-resources:0.6') {
+		runtime(':lesscss-resources:0.6.1') {
 			excludes "js"
 		}
 	}
