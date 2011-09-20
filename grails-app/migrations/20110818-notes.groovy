@@ -29,11 +29,11 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "seth (generated)", id: "1313694576051-2") {
-		dropForeignKeyConstraint(baseTableName: "DOCUMENT_NOTES", baseTableSchemaName: "PUBLIC", constraintName: "FK_NOTES_DDATA")
+		dropForeignKeyConstraint(baseTableName: "document_notes", constraintName: "FK_NOTES_DDATA")
 	}
 
 	changeSet(author: "seth (generated)", id: "1313694576051-3") {
-		dropForeignKeyConstraint(baseTableName: "DOCUMENT_NOTES", baseTableSchemaName: "PUBLIC", constraintName: "FK_NOTES_DOCUMENT")
+		dropForeignKeyConstraint(baseTableName: "document_notes", constraintName: "FK_NOTES_DOCUMENT")
 	}
 
 	changeSet(author: "seth (generated)", id: "1313694576051-4") {
@@ -49,6 +49,6 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "seth (generated)", id: "1313694576051-7") {
-		dropTable(tableName: "DOCUMENT_NOTES")
+		dropTable(tableName: "document_notes")
 	}
 }
