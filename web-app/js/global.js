@@ -76,7 +76,7 @@ function Notify() {
 
 $.extend({ notify: new Notify() });
 
-$.support.touch = (typeof Touch === 'object' || window.ontouchstart === undefined);
+$.support.touch = (typeof Touch === 'object' || window.ontouchstart !== undefined);
 
 // Because IE sucks
 // See http://stackoverflow.com/questions/1695376/msie-and-addeventlistener-problem-in-javascript
