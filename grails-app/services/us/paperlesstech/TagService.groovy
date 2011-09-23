@@ -73,7 +73,8 @@ class TagService {
 	}
 
 	List<String> getRecentTags() {
-		return Tag.list([max:5, sort:'id', order:'desc'])
+		def tags = Tag.list([max:5, sort:'id', order:'desc'])
+		return tags*.name
 	}
 
 	List findAllByTag(String name) {
