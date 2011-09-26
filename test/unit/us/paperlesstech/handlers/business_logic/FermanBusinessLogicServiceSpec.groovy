@@ -242,7 +242,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		multipleSlashes = /\one slash \two slash/
 	}
 
-	def "afterPclImportFile should tag the document"() {
+	def "afterPclImportFile should tag the document and rename it"() {
 		setup:
 		def tags = []
 		mockDomain(Document)
@@ -251,11 +251,14 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		d.metaClass.addTag = { it -> tags << it }
 		d.searchField("RO_Number", "RO_Number")
 		d.searchField("VIN", "VIN")
+		d.searchField("Customer_Name", "NAME")
+		d.searchField("Key_Tag_Number", "TAG")
 
 		when:
 		service.afterPCLImportFile(document: d)
 
 		then:
+		d.name == "NAME - TAG"
 		2 * tagService.createTag(_)
 		tags[0] == "RO_Number"
 		tags[1] == "VIN"

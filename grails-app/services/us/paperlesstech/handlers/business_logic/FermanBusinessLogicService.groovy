@@ -45,6 +45,15 @@ class FermanBusinessLogicService {
 					log.info "Added tag $value to document $d"
 				}
 			}
+
+			def name = savedDocument.searchField("Customer_Name")
+			def tag = savedDocument.searchField("Key_Tag_Number")
+
+			savedDocument.name = name
+			if (tag) {
+				savedDocument.name = "$name - $tag"
+			}
+
 			Handler.setDocument(input, savedDocument)
 		}
 	}
