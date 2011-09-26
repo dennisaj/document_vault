@@ -1,5 +1,6 @@
 var PreviewImage = {
 	show: function(uri) {
+		$('#preview').remove();
 		$('body').append('<div id="preview"></div>');
 		var $imageDialog = $('#preview');
 
@@ -28,7 +29,7 @@ var PreviewImage = {
 			var scale = width / image.width;
 			var height = scale * image.height;
 
-			$imageDialog.html($(image).width(width).height(height));
+			$imageDialog.html($(image).width(width).height(height)).width(width).height(height);
 			$imageDialog.dialog('option', 'position', 'center');
 		};
 
