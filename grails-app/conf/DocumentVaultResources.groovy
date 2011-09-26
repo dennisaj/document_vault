@@ -45,6 +45,7 @@ modules = {
 	dvTags {
 		dependsOn 'tagit'
 
+		resource url: '/js/lib/jquery.jcarousel.js'
 		resource url: '/js/document/tagging.js'
 		// TODO i18n text
 		resource url: '/images/tag-blue-delete.png', attrs: [alt:'Delete Tag'], disposition: 'inline'

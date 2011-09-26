@@ -1,7 +1,12 @@
+<!DOCTYPE html>
 <html>
 <head>
 	<meta name="layout" content="new" />
+	<title>- <g:message code="document-vault.view.tag.title" /></title>
+
 	<r:require module="documentTagging" />
+	<nav:resources override="true" />
+
 	<r:script>
 		$(document).ready(function() {
 			Tagging.init({
@@ -16,16 +21,28 @@
 			Tagging.initDragAndDrop();
 
 			$('.thumb').live('click', function(event) {
-				PreviewImage.show($(event.target).attr('data-source-image'));
+				PreviewImage.show($(this).data('source-image'));
 			});
+			
+			$('#tag-search-results ul').jcarousel({});
 		});
 	</r:script>
-	<title> - <g:message code="document-vault.view.tag.title" /></title>
 </head>
 <body>
+
 <g:render template="tagSearch" />
-<div id="untagged">
-	<g:render template="untagged" />
+
+<div class="document-frame-wrapper">
+	<div id="all-untagged" class="document-frames">
+		<g:render template="untagged" />
+	</div>
+	
+	<div id="all-tagged" class="document-frames">
+		<h3>&nbsp;</h3>
+	</div>
+	
+	<div class="droppable tag-remove"></div>
 </div>
+
 </body>
 </html>

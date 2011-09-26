@@ -64,7 +64,7 @@
 		<nav:render group="tabs" />
 		<fieldset>
 			<div class="right">
-				<g:textField name="q" value="${q}" placeholder="Search Documents" maxlength="255" autocapitalize="off" />
+				<g:textField name="q" value="${q}" placeholder="Search" maxlength="255" autocapitalize="off" />
 				<button id="sub" type="submit" name="submit" class="ui-button icon search"></button>
 				<button id="reset1" type="reset" name="reset1" class="ui-button icon remove"></button>
 			</div>
