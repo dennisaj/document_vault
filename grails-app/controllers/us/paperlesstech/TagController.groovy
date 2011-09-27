@@ -55,7 +55,7 @@ class TagController {
 	}
 
 	def index = {
-		[untagged:tagService.untaggedDocuments(), tagSearchResults:tagService.getRecentTags()]
+		[untagged:tagService.untaggedDocuments(), tagSearchResults:Tag.list(max:100)*.name]
 	}
 
 	def list = {
@@ -74,9 +74,8 @@ class TagController {
 		if (terms?.size()) {
 			results = tagService.tagSearch(terms)
 		} else {
-			results = tagService.getRecentTags()
+			results = Tag.list(max:100)*.name
 		}
-
 		render(template:"tagSearchResults", model:[tagSearchResults:results])
 	}
 }

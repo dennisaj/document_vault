@@ -26,7 +26,7 @@ var Tagging = {
 	},
 
 	showAllTagged: function(name, displayId) {
-		var self = this;
+		var	self = this;
 
 		if (self.useDocumentSearch) {
 			$("#q").val("tagged " + name);
@@ -54,13 +54,12 @@ var Tagging = {
 				name: name
 			},
 			error: function(jqXHR, textStatus, errorThrown) { $displayId.html(errorThrown); },
-			global: false,
 			success: function(data) {
 				clearTimeout(spinnerTimeout);
 				$displayId.fadeOut('fast', function() {
 					$displayId.html(data);
 					self.initDragAndDrop();
-					$displayId.fadeIn(100);
+					$displayId.fadeIn(100, function() { $("li[data-tag=" + name + "]").addClass("on").siblings().removeClass("on"); });
 				});
 			},
 			type: 'GET',
@@ -108,48 +107,76 @@ var Tagging = {
 
 	initDragAndDrop: function() {
 		var self = this;
+
 		$('.draggable').draggable('destroy');
 		$('.droppable').droppable('destroy');
 
 		$('.draggable').draggable({
+			addClasses: false,
 			containment: 'document',
 			cursor: 'move',
-			cursorAt: {
-				left: 10,
-				top: 50
-			},
+			cursorAt: { left: 10, top: 50 },
+			distance: 20,
 			helper: 'clone',
-			opacity: '.75',
-			revert: 'invalid'
+			opacity: 0.75,
+			revert: 'invalid',
+			revertDuration: 0,
+			zIndex: 100
 		});
 
 		$('.droppable', '#tag-results').droppable({
 			accept: '.draggable',
+			activeClass: 'drop',
 			hoverClass: 'active',
+			tolerance: 'pointer',
 			drop: function(event, ui) {
-				self.addTag(ui.draggable.attr('data-documentid'), $(event.target).attr('data-tag'), function(data) {
+				self.addTag(ui.draggable.data('documentid'), $(event.target).data('tag'), function() {
 					if (ui.draggable.is('.remove')) {
-						ui.draggable.fadeOut('fast', function() { $(this).remove(); });
+						ui.draggable.parent(".document").fadeOut('fast', function() { $(this).remove(); });
 					}
 
-					self.showAllTagged($(event.target).attr('data-tag'), '#allTagged');
+					self.showAllTagged($(event.target).data('tag'), '#all-tagged');
 				});
 			}
 		});
 
-		$('.droppable', '#allTagged').droppable({
-			accept: '.draggable',
+		$('.droppable', '#all-tagged').droppable({
+			accept: '#all-untagged .draggable',
+			activeClass: 'drop',
+			addClasses: false,
 			hoverClass: 'active',
+			tolerance: 'pointer',
 			drop: function(event, ui) {
-				self.addTag(ui.draggable.attr('data-documentid'), $(event.target).attr('data-tag'), function(data) {
+				var data = ui.draggable.data();
+				self.addTag(data.documentid, $(event.target).data('tag'), function() {
 					if (ui.draggable.is('.remove')) {
-						ui.draggable.fadeOut('fast', function() { $(this).remove(); });
+						ui.draggable.parent(".document").fadeOut('fast', function() { $(this).remove(); });
 					}
-
-					self.showAllTagged($(event.target).attr('data-tag'), '#allTagged');
+					
+					self.showAllTagged($(event.target).data('tag'), '#all-tagged');
 				});
 			}
 		});
+		
+		$('.droppable.tag-remove').droppable({
+			accept: '#all-tagged .draggable',
+			activeClass: 'drop',
+			addClasses: false,
+			hoverClass: 'active',
+			tolerance: 'pointer',
+			drop: function(event, ui) {
+				var data = ui.draggable.data();
+				self.removeTag(data.documentid, data.tag, function() {
+					self.showAllTagged(data.tag, '#all-tagged');
+					self.showAllTagged('', '#all-untagged');
+				});
+			}
+		});
+	},
+	
+	initTagResults: function() {
+		this.initDragAndDrop();
+		$('#tag-search-results ul').jcarousel({});
 	},
 
 	init: function(urls, useDocumentSearch) {

@@ -66,6 +66,7 @@ function Notify() {
 		return nycontainer.removeClass("info warning error success").addClass(ntype).html(nmsg).slideDown(220, function() { msgparent.addClass("visible"); });
 	};
 	
+	// TODO: Check that .ondemand is the only child before removing .visible from msgparent
 	this.dismiss = function() { return nycontainer.slideUp(220, function() { msgparent.removeClass("visible"); }); };
 	
 	this.info = function(msg) { return showNotify("info", msg); };
