@@ -23,7 +23,14 @@
 			$('.thumb').live('click', function(event) {
 				PreviewImage.show($(this).data('source-image'));
 			});
-			
+
+			if ($.browser.msie && $.browser.version <= 9) {
+				$('.thumb img').live('dragstart', function() {
+					return false;
+				});
+				document.onselectstart = function() { return false; }
+			}
+
 			$('#tag-search-results ul').jcarousel({});
 		});
 	</r:script>

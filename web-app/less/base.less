@@ -80,17 +80,18 @@
 		li {
 			//#gradient > .vertical(@primaryLightGrey, @primaryDarkGrey);
 			#gradient > .vertical(#ffffff, #e9e9e9);
-
+			
+			border: 1px solid #b9b9b9;
 			display: inline-block;
 			font-weight: bold;
-			margin: 0;
+			margin: 0 0 0 -1px;
 			min-width: 80px;
 			padding: 0;
 			position: relative;
 			text-align: center;
 			text-shadow: 0 1px 0 rgba(255,255,255,0.5);
 
-			.box-shadow(~"0 0 0 1px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255, 255, 255, 1.0)");
+			//.box-shadow(~"0 0 0 1px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255, 255, 255, 1.0)");
 
 			a {
 				display: inline-block;
@@ -124,10 +125,11 @@
 		margin-bottom: 0;
 
 		div {
+			border: 1px solid #b9b9b9;
 			background-color: @primaryLightGrey;
 			padding: 1px 0 1px 2px;
 
-			.box-shadow(~"inset 0 1px 5px rgba(0,0,0,0.4), inset 1px 0 3px rgba(0,0,0,0.2), inset 1px 1px 0 rgba(0,0,0,0.3), inset -1px -1px 0 rgba(0,0,0,0.3)");
+			.box-shadow(~"inset 0 1px 5px rgba(0,0,0,0.4), inset 1px 1px 0 rgba(0,0,0,0.3), inset -1px -1px 0 rgba(0,0,0,0.3)");
 			.border-radius;
 
 			.transition(background-color 0.3s);

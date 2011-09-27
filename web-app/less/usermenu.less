@@ -1,15 +1,15 @@
 @import "bootstrap";
 
 .menu {
-	color: #3366CC;
+	color: #437a2c;
 	display: inline-block;
 	text-align: left;
 	text-shadow: none;
 
 	a {
-		color: #3366CC;
+		color: #000;
 		outline: none;
-		text-decoration: none;
+		text-decoration: underline;
 	}
 
 	& > ul {
@@ -26,13 +26,9 @@
 			}
 
 			&:hover {
-				background-color: #437a2c;
+				background-color: #ececec;
 				& > a {
-					color: white;
-
-					.arrow {
-						border-color: white transparent transparent;
-					}
+					text-decoration: none;
 				}
 			}
 
@@ -50,12 +46,8 @@
 
 			&.active {
 				& > a {
-					background-color: #437a2c;
-					color: white;
-
-					.arrow {
-						border-color: white transparent transparent;
-					}
+					background-color: #ececec;
+					text-decoration: none;
 				}
 
 				.content {
@@ -69,7 +61,7 @@
 			}
 
 			.arrow {
-				border-color: #3366CC transparent transparent;
+				border-color: #000 transparent transparent;
 				border-style: solid dashed dashed;
 				margin-left: 5px;
 				position: relative;

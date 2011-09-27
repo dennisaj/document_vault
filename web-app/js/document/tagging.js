@@ -9,7 +9,7 @@ var Tagging = {
 			data: {documentId:documentId, tag:tag},
 			global: false,
 			success: callback,
-			type: 'GET',
+			type: 'POST',
 			url: self.urls.addTag
 		});
 	},
@@ -20,7 +20,7 @@ var Tagging = {
 			data: {documentId:holder.attr('data-documentid'), tag:value},
 			global: false,
 			success: callback,
-			type: 'GET',
+			type: 'POST',
 			url: self.urls.createTag.format(name)
 		});
 	},
@@ -40,7 +40,7 @@ var Tagging = {
 		$.ajax({
 			beforeSend: function() {
 				// If the target element is empty, add the spinner now
-				if (!$displayId.html().trim()) {
+				if (!$.trim($displayId.html())) {
 					$displayId.html($('#spinner').html());
 				} else {
 					// If the target is not empty, wait a second then add the spinner after the last draggable element
@@ -59,10 +59,10 @@ var Tagging = {
 				$displayId.fadeOut('fast', function() {
 					$displayId.html(data);
 					self.initDragAndDrop();
-					$displayId.fadeIn(100, function() { $("li[data-tag=" + name + "]").addClass("on").siblings().removeClass("on"); });
+					$displayId.fadeIn(100, function() { $("li[data-tag='" + name + "']").addClass("on").siblings().removeClass("on"); });
 				});
 			},
-			type: 'GET',
+			type: 'POST',
 			url: self.urls.allTagged
 		});
 	},
@@ -100,7 +100,7 @@ var Tagging = {
 			error: function() { },
 			global: false,
 			success: callback,
-			type: 'GET',
+			type: 'POST',
 			url: self.urls.removeTag
 		});
 	},

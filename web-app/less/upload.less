@@ -18,6 +18,7 @@
 		.subbar;
 
 		label.fileinput-button {
+			display: inline-block;
 			overflow: hidden;
 
 			input {
@@ -92,18 +93,33 @@
 		}
 	}
 
+	div.fileupload-buttonbar {
+		display: inline-block;
+	}
+	
 	#tag-container {
-		padding-bottom: 5px;
-		padding-top: 5px;
-
+		background-image: url(../css/lib/images/crosshatch-8x8.png);
+		background-repeat: repeat;
+		border-bottom: 1px solid #efefef;
+		height: 95px;
+		
+		p {
+			margin: 0 0 4px 0;
+			padding: 8px 0 0 10px;
+		}
+		
 		ul.taggable {
 			@noteItemBgColor: #d3eeff;
 			@tagBgColor: lighten(@noteItemBgColor, 5%);
 			background-color: @tagBgColor;
 			border: 1px solid #aaa;
-			box-shadow: 0 0 1px #888;
-			margin: 0;
+			
+			display: block;
+			line-height: 25px;
+			margin: 0 20px 0 30px;
 			padding: 4px 10px;
+			
+			.box-shadow(~"0 0 1px #888;");
 
 			li {
 				&.tagit-choice {
@@ -118,13 +134,15 @@
 					}
 				}
 				&.tagit-new {
-						input {
-							background-color: @tagBgColor;
-							&:focus {
-								line-height: 25px;
-							}
+					padding: 3px 4px 4px 0;
+					input {
+						background-color: @tagBgColor;
+						&:focus {
+							font-size: 100%;
+							line-height: 25px;
 						}
 					}
+				}
 			}
 		}
 	}

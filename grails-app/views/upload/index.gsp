@@ -33,6 +33,10 @@
 
 <div id="fileupload">
 	<form action="${createLink(action:"save")}" method="post" enctype="multipart/form-data">
+		<label class="fileinput-button primary icon add">
+			<span><g:message code="document-vault.label.upload.addfiles" /></span>
+			<input type="file" name="files" multiple>
+		</label>
 		<div class="fileupload-buttonbar ui-button-container">
 			<g:if test="${groups.size() == 1}">
 				<g:hiddenField name="group" value="${groups.first().id}"/>
@@ -41,20 +45,15 @@
 				<g:message code="document-vault.label.upload.group" />
 				<g:select name="group" id="group" from="${groups}" optionKey="id" optionValue="name" value="${recentGroup?.id}" />
 			</g:else>
-
-			<pt:canTagAny>
-			<div id="tag-container">
-				<g:message code="document-vault.label.upload.tagging" />: <ul class="taggable" id="tagbox" data-name="tags"></ul>
-			</div>
-			</pt:canTagAny>
-
-			<label class="fileinput-button primary icon add">
-				<span><g:message code="document-vault.label.upload.addfiles" /></span>
-				<input type="file" name="files" multiple>
-			</label>
 		</div>
 	</form>
-
+	
+	<pt:canTagAny>
+		<div id="tag-container">
+			<p><g:message code="document-vault.label.upload.tagging" />:</p> <ul class="taggable" id="tagbox" data-name="tags"></ul>
+		</div>
+	</pt:canTagAny>
+	
 	<div class="fileupload-content">
 		<ul class="files"></ul>
 		<div class="fileupload-progressbar"></div>
@@ -89,7 +88,7 @@
 
 <script id="template-download" type="text/html">
 <li class="document template-download{{if error}} error{{/if}}">
-	<div class="thumb">{{if thumbnail_url}}<a href="{{= url }}" target="_blank"><img src="{{= thumbnail_url }}"></a>{{/if}}</div>
+	<div class="thumb">{{if thumbnail_url}}<a href="{{= url }}"><img src="{{= thumbnail_url }}"></a>{{/if}}</div>
 	<p>
 	{{if error}}
 		<b>{{= name }}</b><br />

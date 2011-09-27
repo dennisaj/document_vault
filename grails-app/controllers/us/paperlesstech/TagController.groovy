@@ -17,7 +17,6 @@ class TagController {
 		}
 
 		render(template:"/notsaved", model:[message:g.message(code:"document-vault.tag.notsaved")])
-		return
 	}
 
 	def documentAdd = {
@@ -27,7 +26,6 @@ class TagController {
 		}
 
 		render(template:"/notsaved", model:[message:g.message(code:"document-vault.tag.document.nottagged", args:[params.documentId])])
-		return
 	}
 
 	def documentList = {
@@ -55,7 +53,7 @@ class TagController {
 	}
 
 	def index = {
-		[untagged:tagService.untaggedDocuments(), tagSearchResults:Tag.list(max:100)*.name]
+		[untagged:tagService.untaggedDocuments(), tagSearchResults:Tag.list(max:100, sort:"name", order:"asc")*.name]
 	}
 
 	def list = {
@@ -74,7 +72,7 @@ class TagController {
 		if (terms?.size()) {
 			results = tagService.tagSearch(terms)
 		} else {
-			results = Tag.list(max:100)*.name
+			results = Tag.list(max:100, sort:"name", order:"asc")*.name
 		}
 		render(template:"tagSearchResults", model:[tagSearchResults:results])
 	}

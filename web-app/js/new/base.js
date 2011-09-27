@@ -22,4 +22,7 @@ jQuery(function($) {
 			$('.menu > ul > li.active').removeClass('active');
 		}
 	});
+	
+	// For browsers that need it (*cough*IE*cough*), use clunky placeholders
+	$(":input[placeholder]").placeholder();
 });

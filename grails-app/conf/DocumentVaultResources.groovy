@@ -80,6 +80,7 @@ modules = {
 		dependsOn 'jquery, dvDefaults'
 
 		resource url: '/less/usermenu.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'documentBase'
+		resource url: '/js/lib/jquery.placeholder.js'
 		resource url: '/js/new/base.js'
 		resource url: '/js/global.js'
 	}
