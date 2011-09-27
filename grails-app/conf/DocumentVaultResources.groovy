@@ -36,7 +36,7 @@ modules = {
 
 	tagit {
 		dependsOn 'less'
-		
+
 		resource url: '/less/tag.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'tagit'
 		resource url: '/css/tagit-simple-blue.css', minify: true, nominify: false
 		resource url: '/js/lib/tagit.js'
@@ -119,6 +119,7 @@ modules = {
 		resource url: '/less/notes.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentSign'
 		resource url: '/less/sign.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentSign'
 		resource url: '/js/lib/jquery.textarea-expander.js'
+		resource url: '/js/lib/uuCanvas.js'
 		resource url: '/js/document/inputhandler.js'
 		resource url: '/js/document/notes.js'
 		resource url: '/js/document/draw.js'

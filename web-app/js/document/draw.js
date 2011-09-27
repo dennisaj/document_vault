@@ -36,7 +36,18 @@ var Draw = {
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		canvas.width = canvas.width;
 		if (page.background.src) {
-			context.drawImage(page.background, 0, 0, canvas.width, canvas.height);
+			var $canvas = $(canvas);
+			if (page.highlight) {
+				// If there is a highlight on the page object, we only want to use that slice of the background.
+				context.drawImage(page.background, page.highlight.left, page.highlight.top, page.highlight.width, page.highlight.height, 0, 0, canvas.width, canvas.height);
+				$canvas.width(page.highlight.width * page.scale).height(page.highlight.height * page.scale);
+			} else {
+				context.drawImage(page.background, 0, 0, canvas.width, canvas.height);
+				$canvas.width(page.background.width * page.scale).height(page.background.height * page.scale);
+			}
+
+			// Set zoom level for IE8 so that the vml scales correctly.
+			$('div', $canvas).css('zoom', page.scale);
 		}
 	},
 

@@ -26,7 +26,7 @@ var SignBox = {
 		this.isMouseDown = false;
 		var $this = $(element);
 
-		point = {x: point.x - $this.offset().left, y: point.y - $this.offset().top};
+		point = { x: point.x - $this.offset().left, y: point.y - $this.offset().top };
 
 		// If the canvas was tapped, draw a point.
 		if (!this.isMoving && point.x == this.previousPoint.x && point.y == this.previousPoint.y) {
@@ -79,9 +79,9 @@ var SignBox = {
 		var self = this;
 		this.page.lines = [];
 		this.page.background = null;
+		this.page.background = page.background;
 
-		// The following painful calculations are brought to you by Firefox's broken canvas code.
-		// See https://bugzilla.mozilla.org/show_bug.cgi?id=564332
+		// Calculate the real size of the highlight box in case the user clicked close to the edge of the screen.
 		var bottomOfHighlight = highlight.top + highlight.height;
 		var left = Math.max(highlight.left, 0);
 		var top = Math.max(highlight.top, 0);
@@ -89,49 +89,37 @@ var SignBox = {
 		var height = Math.min(Math.min(bottomOfHighlight, highlight.height), page.background.height - top);
 		this.boxScale = (this.$main.width() / (width + 30));
 
+		this.page.highlight = {
+			left: left,
+			top: top,
+			width: width,
+			height: height
+		};
+
 		if (this.boxScale * height > this.$main.height()) {
 			this.boxScale = (this.$main.height() / (height + 80));
 		}
 
-		// Draw the lines on an in-memory duplicate of the main canvas so that we don't see the highlights.
-		var cleanCanvas = document.createElement('canvas');
-		var cleanPage = $.extend({}, page);
-		cleanCanvas.width = cleanPage.background.width;
-		cleanCanvas.height = cleanPage.background.height;
-		cleanPage.unsavedHighlights = [];
-		cleanPage.savedHighlights = [];
-
-		Draw.draw(cleanCanvas, cleanPage);
-
-		var imageData = cleanCanvas.getContext('2d').getImageData(left, top, width, height);
+		this.page.scale = this.boxScale;
 
 		$('body').append('<div id="sign-box"></div>');
 		var $signDialog = $('#sign-box');
 		$signDialog.append('<canvas id="sign-canvas"></canvas>');
 
-		var signCanvas = $('#sign-canvas')[0];
-		signCanvas.width = width + 1;
-		signCanvas.height = height + 1;
-		signCanvas.style.width = (signCanvas.width * this.boxScale) + 'px';
-		signCanvas.style.height = (signCanvas.height * this.boxScale) + 'px';
-		signCanvas.getContext('2d').putImageData(imageData, 0, 0);
+		var signCanvas = uu.canvas.create(width, height, "vml", uu.id("sign-canvas"));
+		// uu.create.canvas removes the id of the placeholder for some reason so we have to reset it.
+		$(signCanvas).attr('id', 'sign-canvas');
 
-		cleanCanvas = null;
-		imageData = null;
-		cleanPage = null;
-
-		// Save the initial image as the background so we can undo.
-		this.page.background = new Image();
-		this.page.background.src = signCanvas.toDataURL('image/png');
+		Draw.draw(signCanvas, this.page);
 
 		$signDialog.dialog({
 			buttons: {
 				// TODO i18n text
-				Undo: function() {
-					Draw.undo(signCanvas, self.page);
-				},
 				Save: function() {
 					$(this).dialog('close');
+				},
+				Undo: function() {
+					Draw.undo(signCanvas, self.page);
 				},
 				Cancel: function() {
 					self.page.lines = [];

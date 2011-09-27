@@ -241,7 +241,6 @@ var Sign = {
 		var scaleY = page.sourceHeight / page.background.height;
 		var scaledPage = {};
 
-		//for (var party in page.unsavedHighlights) {
 		$.each(page.unsavedHighlights, function(partyId, unsavedHighlights) {
 			scaledPage[partyId] = [];
 
@@ -270,11 +269,8 @@ var Sign = {
 	},
 
 	_transform: function(element, x, y) {
-		element.style.webkitTransform = 'translate(' + x + 'px, ' + y + 'px)';
-		element.style.MozTransform = 'translate(' + x + 'px, ' + y + 'px)';
-		element.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-		element.style.OTransform = 'translate(' + x + 'px, ' + y + 'px)';
-		element.style.msTransform = 'translate(' + x + 'px, ' + y + 'px)';
+		element.style.left = x + 'px';
+		element.style.top = y + 'px';
 	},
 
 	// Given opposite corners of a rectangle, zoom the screen to that area.
@@ -294,21 +290,24 @@ var Sign = {
 		page.scrollCanY = -corners.top * page.scale;
 
 		var $canvas = $(canvas);
-		$canvas.width(page.background.width * page.scale);
-		$canvas.height(page.background.height * page.scale);
+		$canvas.width(page.background.width * page.scale).height(page.background.height * page.scale);
+		// Set zoom level for IE8 so that the vml scales correctly.
+		$('div', $canvas).css('zoom', page.scale);
 
 		this._transform(canvas, page.scrollCanX, page.scrollCanY);
 	},
 
 	_zoomEvent: function(canvas, page, zoom) {
-		var zoomScale = 1 / zoom;
+		if (zoom === page.scale) {
+			return;
+		}
 
 		var point = this._currentCenter(page);
 
-		var zoomWidth = zoomScale * this.$main.width();
+		var zoomWidth = this.$main.width() / zoom;
 		var widthOffset = zoomWidth / 2;
 
-		var zoomHeight = zoomScale * this.$main.height();
+		var zoomHeight = this.$main.height() / zoom;
 		var heightOffset = zoomHeight / 2;
 
 		var zoomStart = {
@@ -341,6 +340,7 @@ var Sign = {
 	// !document.js functions
 
 	init: function(urls) {
+		uu.canvas.init();
 		var self = this;
 		this.urls = urls;
 

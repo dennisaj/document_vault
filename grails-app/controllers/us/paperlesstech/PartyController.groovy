@@ -33,12 +33,12 @@ class PartyController {
 		if (signatures) {
 			document = partyService.cursiveSign(document, signatures)
 			if (!document.hasErrors()) {
-				flash.green = g.message(code:"document-vault.signature.success")
+				flash.green = g.message(code:"document-vault.signature.success", args:[document])
 			} else {
-				flash.red = g.message(code:"document-vault.signature.error.failure")
+				flash.red = g.message(code:"document-vault.signature.error.failure", args:[document])
 			}
 		} else {
-			flash.yellow = g.message(code:"document-vault.signature.error.nosignatures")
+			flash.yellow = g.message(code:"document-vault.signature.error.nosignatures", args:[document])
 		}
 
 		render([status:"success"] as JSON)

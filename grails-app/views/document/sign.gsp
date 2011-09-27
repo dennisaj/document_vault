@@ -6,6 +6,11 @@
 	<r:require module="documentSign" />
 	<r:script>
 		jQuery(function($) {
+			// prevent text selection in IE9 or lower
+			if ($.browser.msie && $.browser.version <= 9) {
+				document.onselectstart = function() { return false; }
+			}
+
 			Sign.init({
 				'close': '${createLink(controller:"document", action:"index")}',
 				'downloadImage': '${createLink(controller:"document", action:"downloadImage")}/{0}/{1}',
