@@ -2,18 +2,18 @@ package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
 import us.paperlesstech.handlers.HandlerChain
-import us.paperlesstech.nimble.Group;
+import us.paperlesstech.nimble.Group
 
 class UploadServiceSpec extends UnitSpec {
 	UploadService service
-	AuthService authService = Mock()
+	AuthService authServiceProxy = Mock()
 	FileService fileService = Mock()
 	HandlerChain handlerChain = Mock()
 
 	def setup() {
 		mockLogging(UploadService)
 		service = new UploadService()
-		service.authService = authService
+		service.authServiceProxy = authServiceProxy
 		service.fileService = fileService
 		service.handlerChain = handlerChain
 	}
@@ -44,7 +44,7 @@ class UploadServiceSpec extends UnitSpec {
 
 		then:
 		thrown AssertionError
-		1 * authService.canUpload(group) >> false
+		1 * authServiceProxy.canUpload(group) >> false
 	}
 
 	def "uploadDocumentData doesn't return the document on error"() {
@@ -56,7 +56,7 @@ class UploadServiceSpec extends UnitSpec {
 		service.uploadDocument(bytes, group, "file.pdf", MimeType.PDF) == null
 
 		then:
-		1 * authService.canUpload(group) >> true
+		1 * authServiceProxy.canUpload(group) >> true
 		1 * handlerChain.importFile(_) >> { throw new RuntimeException("Error") }
 	}
 
@@ -71,7 +71,7 @@ class UploadServiceSpec extends UnitSpec {
 		def returnedDoc = service.uploadDocument(bytes, group, "file.pdf", MimeType.PDF)
 
 		then:
-		1 * authService.canUpload(group) >> true
+		1 * authServiceProxy.canUpload(group) >> true
 		// Capture the passed file and mock out save and files on it
 		1 * handlerChain.importFile({ capturedDoc = it.document }) >> {
 			capturedDoc.metaClass.save = { capturedDoc }

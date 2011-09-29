@@ -8,7 +8,7 @@ import us.paperlesstech.nimble.Group
 class UploadService {
 	static transactional = true
 
-	def authService
+	def authServiceProxy
 	def businessLogicService
 	def fileService
 	def handlerChain
@@ -24,7 +24,7 @@ class UploadService {
 	}
 
 	List<Document> uploadDocument(byte[] data, Group group, String name, MimeType mimeType) {
-		assert authService.canUpload(group)
+		assert authServiceProxy.canUpload(group)
 		assert data
 		assert mimeType
 		def pclInfo
