@@ -108,7 +108,7 @@
 		<a class="ui-button" href="#" title="<g:message code="document-vault.label.nextpage" />"><r:img uri="/css/lib/images/document-page-next-32x32.png" /></a>
 	</div>
 
-	<canvas id="can"></canvas>
+	<canvas id="can" class="vml"></canvas>
 </div>
 
 <g:render template="/alert" />

@@ -295,6 +295,9 @@ var Sign = {
 		$('div', $canvas).css('zoom', page.scale);
 
 		this._transform(canvas, page.scrollCanX, page.scrollCanY);
+		if (canvas.getContext('2d').xBackend === 'Silverlight') {
+			Draw.draw(canvas, page);
+		}
 	},
 
 	_zoomEvent: function(canvas, page, zoom) {

@@ -35,6 +35,10 @@ var Draw = {
 
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		canvas.width = canvas.width;
+		if (context.xBackend === 'Silverlight') {
+			context.scale(page.scale, page.scale);
+		}
+
 		if (page.background.src) {
 			var $canvas = $(canvas);
 			if (page.highlight) {
@@ -185,6 +189,10 @@ var Draw = {
 	},
 
 	undo: function(canvas, page) {
+		if (page.lines.length == 0) {
+			return;
+		}
+
 		var splicePoint = page.lines.length;
 		for (var i = page.lines.length - 2; i >= 0; i--) {
 			if (page.lines[i] === this.LINEBREAK || i === 0) {

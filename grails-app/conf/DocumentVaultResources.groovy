@@ -14,10 +14,14 @@ def jquiver = plugin.instance.JQUERYUI_VERSION
 modules = {
 	overrides {
 		'jquery' {
+			// Reverse the commenting of these lines to switch from cdn to local jquery
+			//resource url:[plugin:'jquery', dir:'js/jquery', file:"${jqver}.js"], disposition: 'head'
 			resource id: 'js', url:'https://ajax.googleapis.com/ajax/libs/jquery/'+jqver+'/jquery.min.js', disposition: 'head'
 		}
 		'jquery-ui' {
 			dependsOn 'jquery'
+			// Reverse the commenting of these lines to switch from cdn to local jquery-ui
+			//resource url:[plugin:'jquery-ui', dir:'js/jquery-ui', file:"$jquiver-custom.js"], disposition: 'head'
 			resource id: 'js', url: 'https://ajax.googleapis.com/ajax/libs/jqueryui/'+jquiver+'/jquery-ui.min.js', disposition: 'head'
 		}
 	}

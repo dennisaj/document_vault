@@ -106,7 +106,7 @@ var SignBox = {
 		var $signDialog = $('#sign-box');
 		$signDialog.append('<canvas id="sign-canvas"></canvas>');
 
-		var signCanvas = uu.canvas.create(width, height, "vml", uu.id("sign-canvas"));
+		var signCanvas = uu.canvas.create(width, height, 'vml', uu.id('sign-canvas'));
 		// uu.create.canvas removes the id of the placeholder for some reason so we have to reset it.
 		$(signCanvas).attr('id', 'sign-canvas');
 

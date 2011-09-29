@@ -3110,14 +3110,18 @@ function _stroke(ctx) {
 		ctx.__lineCap = (ctx.lineCap === "butt") ? "flat" : ctx.lineCap;
 		++modify;
 	}
-	if (modify) {
+
+	// Silverlight is losing line style information when we clear the canvas.
+	// This prevents that but might not be the best solution,
+	// TODO Check for updates to this library
+	//if (modify) { 
 		ctx._strokeCache =
 				'" StrokeLineJoin="'     + ctx._lineJoin +
 				'" StrokeThickness="'    + ctx.__lineWidth +
 				'" StrokeMiterLimit="'   + ctx._miterLimit +
 				'" StrokeStartLineCap="' + ctx.__lineCap +
 				'" StrokeEndLineCap="'   + ctx.__lineCap;
-	}
+	//}
 	return ctx._strokeCache;
 }
 uu.ie && uu.ver.silverlight && uu.lazy("init", function() {
