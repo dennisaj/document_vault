@@ -1,7 +1,5 @@
 package us.paperlesstech
 
-import org.apache.shiro.SecurityUtils
-
 import us.paperlesstech.auth.CodeToken
 import us.paperlesstech.nimble.User
 

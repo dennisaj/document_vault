@@ -26,17 +26,20 @@ import us.paperlesstech.helpers.InstanceGenerator
  * @author Bradley Beddoes
  */
 class UserController {
+	static navigation = [[group:'user', action:'list', isVisible: { authService.isAdmin() }, order:90, title:'Admin']]
+
 	static Map allowedMethods = [save: 'POST', update: 'POST', enable: 'POST', disable: 'POST', enableapi: 'POST', disableapi: 'POST',
 			savepassword: 'POST', validusername: 'POST', searchgroups: 'POST', grantgroup: 'POST', removegroup: 'POST',
 			createpermission: 'POST', removepermisson: 'POST', searchroles: 'POST', grantrole: 'POST', removerole: 'POST']
 
-	def userService
+	def authService
 	def groupService
-	def roleService
 	def permissionService
+	def roleService
+	def userService
 
 	def index = {
-		redirect action: list, params: params
+		redirect action:list, params:params
 	}
 
 	def list = {

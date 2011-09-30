@@ -11,7 +11,7 @@ import us.paperlesstech.helpers.ImageHelpers
 
 
 class Handler {
-	def authServiceProxy
+	def authService
 	def fileService
 	def grailsApplication
 
@@ -67,7 +67,7 @@ class Handler {
 	 */
 	def downloadPreview(Map input) {
 		def d = getDocument(input)
-		assert authServiceProxy.canTag(d) || authServiceProxy.canView(d) || authServiceProxy.canSign(d)
+		assert authService.canTag(d) || authService.canView(d) || authService.canSign(d)
 
 		def page = input.page
 		assert page, "This method requires a page number"
@@ -90,7 +90,7 @@ class Handler {
 	 */
 	def downloadThumbnail(Map input) {
 		def d = getDocument(input)
-		assert authServiceProxy.canTag(d) || authServiceProxy.canView(d) || authServiceProxy.canSign(d)
+		assert authService.canTag(d) || authService.canView(d) || authService.canSign(d)
 
 		def page = input.page
 		assert page, "This method requires a page number"
@@ -112,7 +112,7 @@ class Handler {
 	 */
 	def download(Map input) {
 		def d = getDocument(input)
-		assert authServiceProxy.canView(d) || authServiceProxy.canSign(d)
+		assert authService.canView(d) || authService.canSign(d)
 		def data = getDocumentData(input)
 
 		def filename = d.toString() + data.mimeType.getDownloadExtension()
@@ -128,7 +128,7 @@ class Handler {
 	 */
 	def saveNotes(Map input) {
 		def d = getDocument(input)
-		assert authServiceProxy.canNotes(d)
+		assert authService.canNotes(d)
 		def notes = input.notes
 		assert notes, "This method requires notes"
 
@@ -139,7 +139,7 @@ class Handler {
 		notes.each { entry->
 			assert entry.text || entry.lines, "A note must contain either text or lines"
 
-			def note = new Note(user:authServiceProxy.authenticatedUser, note:entry.text)
+			def note = new Note(user:authService.authenticatedUser, note:entry.text)
 
 			if (entry.pageNumber) {
 				note.pageNumber = entry.pageNumber
@@ -170,7 +170,7 @@ class Handler {
 	 */
 	def downloadNote(Map input) {
 		def d = getDocument(input)
-		assert authServiceProxy.canNotes(d)
+		assert authService.canNotes(d)
 
 		def note = input.note
 		assert note?.data, "This method requires a note with DocumentData"

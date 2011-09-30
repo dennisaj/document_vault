@@ -16,7 +16,7 @@ class HandlerChainSpec extends UnitSpec {
 
 	def setup() {
 		chain = new HandlerChain()
-		chain.authServiceProxy = authService
+		chain.authService = authService
 		chain.preferenceService = preferenceService
 	}
 

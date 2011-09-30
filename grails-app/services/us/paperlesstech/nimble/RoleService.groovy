@@ -24,6 +24,8 @@ package us.paperlesstech.nimble
 class RoleService {
 	boolean transactional = true
 
+	def authService
+
 	/**
 	 * Creates a new role.
 	 *
@@ -62,7 +64,7 @@ class RoleService {
 	}
 
 	/**
-	 * Deletes an exisiting Role.
+	 * Deletes an existing Role.
 	 *
 	 * @pre Passed role object must have been validated to ensure
 	 * that hibernate does not auto persist the objects to the repository prior to service invocation
@@ -72,10 +74,10 @@ class RoleService {
 	 * @throws RuntimeException When internal state requires transaction rollback
 	 */
 	def deleteRole(Role role) {
+		authService.resetCache(role)
+
 		// Remove all users from this role
-		def users = []
-		users.addAll(role.users)
-		users.each {
+		role.users.iterator().each {
 			it.removeFromRoles(role)
 			it.save()
 
@@ -90,9 +92,7 @@ class RoleService {
 		}
 
 		// Remove all groups from this role
-		def groups = []
-		groups.addAll(role.groups)
-		groups.each {
+		role.groups.iterator().each {
 			it.removeFromRoles(role)
 			it.save()
 
@@ -172,18 +172,19 @@ class RoleService {
 			throw new RuntimeException("Error updating user [$user.id]$user.username when adding role [$role.id]$role.name")
 		}
 
+		authService.resetCache(user)
 		log.info "Successfully added role [$role.id]$role.name to user [$user.id]$user.username"
 	}
 
 	/**
 	 * Removes a role from a user.
-	 * 
+	 *
 	 * @pre Passed role and user object must have been validated to ensure
 	 * that hibernate does not auto persist the objects to the repository prior to service invocation
 	 *
 	 * @param user The user whole the referenced role should be removed from
 	 * @param role The role to be assigned
-	 * 
+	 *
 	 * @throws RuntimeException When internal state requires transaction rollback
 	 */
 	def deleteMember(User user, Role role) {
@@ -211,6 +212,7 @@ class RoleService {
 			throw new RuntimeException("Error updating user [$user.id]$user.username when removing role [$role.id]$role.name")
 		}
 
+		authService.resetCache(user)
 		log.info "Successfully removed role [$role.id]$role.name to user [$user.id]$user.username"
 	}
 
@@ -246,19 +248,21 @@ class RoleService {
 				log.error it
 			}
 
-		 throw new RuntimeException("Error updating group [$group.id]$group.name when adding role [$role.id]$role.name")
+			throw new RuntimeException("Error updating group [$group.id]$group.name when adding role [$role.id]$role.name")
 		}
 
+		authService.resetCache(group)
+		authService.resetCache(role)
 		log.info "Successfully added role [$role.id]$role.name to group [$group.id]$group.name"
 	}
 
 	/**
 	 * Removes a role from a group.
-	 * 
+	 *
 	 * @pre Passed role and user object must have been validated to ensure
 	 * that hibernate does not auto persist the objects to the repository prior to service invocation
 	 *
-	 * @param group The gruop whole the referenced role should be removed from
+	 * @param group The group whole the referenced role should be removed from
 	 * @param role The role to be assigned
 	 *
 	 * @throws RuntimeException When internal state requires transaction rollback
@@ -287,6 +291,8 @@ class RoleService {
 			throw new RuntimeException("Error updating group [$group.id]$group.name when removing role [$role.id]$role.name")
 		}
 
+		authService.resetCache(group)
+		authService.resetCache(role)
 		log.info "Successfully removed role [$role.id]$role.name to group [$group.id]$group.name"
 	}
 }

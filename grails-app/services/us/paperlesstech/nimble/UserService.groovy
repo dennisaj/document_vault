@@ -16,11 +16,8 @@
  */
 package us.paperlesstech.nimble
 
-import java.util.Map
-
 import javax.servlet.http.HttpServletRequest
 
-import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha256Hash
 
 import us.paperlesstech.helpers.InstanceGenerator
@@ -36,6 +33,7 @@ class UserService {
 
 	boolean transactional = true
 
+	def authService
 	def grailsApplication
 	def permissionService
 	def roleService
@@ -328,7 +326,7 @@ class UserService {
 	 * Stores details of a successful login by a user.
 	 */
 	def createLoginRecord(HttpServletRequest request) {
-		def user = User.get(SecurityUtils.getSubject()?.getPrincipal())
+		def user = authService.authenticatedUser
 		if (!user) {
 			log.error "Attempt to create login record for unauthenticated session"
 			throw new RuntimeException("Attempt to create login record for unauthenticated session")
@@ -373,10 +371,7 @@ class UserService {
 	 * object. If the pass is valid it is encrypted and set as the value of user.passwd and
 	 * added to the password history
 	 */
-	public def validatePass(User user) {
-		return validatePass(user, false)
-	}
-	public def validatePass(User user, boolean checkOnly) {
+	public def validatePass(User user, boolean checkOnly=false) {
 		log.debug "Validating user entered password"
 
 		if (user.pass == null || user.pass.length() < grailsApplication.config.nimble.passwords.minlength) {

@@ -5,7 +5,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class HighlightService {
 	static transactional = true
 
-	def authServiceProxy
+	def authService
 
 	/**
 	* Sets {@link Highlight#accepted} dates to now.
@@ -16,7 +16,7 @@ class HighlightService {
 	*/
 	Highlight markAccepted(Highlight highlight) {
 		assert highlight
-		assert authServiceProxy.canSign(highlight.party.document) || authServiceProxy.canGetSigned(highlight.party.document)
+		assert authService.canSign(highlight.party.document) || authService.canGetSigned(highlight.party.document)
 
 		if (highlight.party.rejected || highlight.accepted) {
 			return highlight

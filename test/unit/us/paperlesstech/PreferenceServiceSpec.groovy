@@ -16,7 +16,7 @@ class PreferenceServiceSpec extends UnitSpec {
 	def setup() {
 		mockLogging(PreferenceService)
 		service = new PreferenceService()
-		service.authServiceProxy = authService
+		service.authService = authService
 	}
 
 	def "setPreference should throw an Assertion when the current User can't edit the passed in User"() {

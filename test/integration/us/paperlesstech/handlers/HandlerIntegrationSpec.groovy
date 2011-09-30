@@ -19,10 +19,10 @@ class HandlerIntegrationSpec extends BaseHandlerSpec {
 
 	@Override
 	def setup() {
-		handler.authServiceProxy = authServiceProxy
+		handler.authService = authService
 		handler.fileService = fileService
 		handler.grailsApplication = grailsApplication
-		defaultImageHandlerService.authServiceProxy = authServiceProxy
+		defaultImageHandlerService.authService = authService
 
 		def config = new ConfigObject()
 		config.document_vault.document.note.defaultWidth = 800

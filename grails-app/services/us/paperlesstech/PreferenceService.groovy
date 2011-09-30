@@ -8,14 +8,14 @@ class PreferenceService {
 
 	static transactional = true
 
-	def authServiceProxy
+	def authService
 
 	/**
 	 * If a preference with the given key is found, that value is updated.
 	 * If no existing preference matches the passed in key, a new preference is added.
 	 */
 	boolean setPreference(User user, String key, String value) {
-		assert authServiceProxy.authenticatedSubject.isPermitted("profile:edit:$user.id")
+		assert authService.authenticatedSubject.isPermitted("profile:edit:$user.id")
 
 		def preference = user.preferences.find { it.key == key }
 
@@ -42,7 +42,7 @@ class PreferenceService {
 	 * @return The value or null if the key does not exist
 	 */
 	def getPreference(User user, String key) {
-		assert authServiceProxy.authenticatedSubject.isPermitted("profile:edit:$user.id")
+		assert authService.authenticatedSubject.isPermitted("profile:edit:$user.id")
 
 		user.preferences.find { it.key == key }?.value
 	}

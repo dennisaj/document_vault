@@ -1,19 +1,21 @@
 package us.paperlesstech
 
 import java.util.concurrent.ConcurrentHashMap
+
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.permission.WildcardPermission
 import org.apache.shiro.subject.Subject
+
 import us.paperlesstech.nimble.AdminsService
 import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.Role
 import us.paperlesstech.nimble.User
 
 class AuthService {
-	static scope = "request"
 	static transactional = false
 
 	def grailsApplication
-	protected Map permissionsCache = [implied: [:], permitted: [:]] as ConcurrentHashMap
+	protected Map permissionsCache = [:] as ConcurrentHashMap
 	def testSubject
 
 	boolean canDelete(Document d) {
@@ -112,22 +114,24 @@ class AuthService {
 	}
 
 	private boolean checkPermission(def subject, String permission) {
-		def permitted = permissionsCache.permitted[permission]
+		def user = authenticatedUser
+		def cacheEntry = permissionsCache[authenticatedUser.id] ?: (permissionsCache[authenticatedUser.id] = new PermissionCacheEntry())
+		def permitted = cacheEntry.permitted[permission]
 		if (permitted == null) {
 			permitted = subject.isPermitted(permission)
 
 			// The parentheses around permission are required so that the value of the string is used as the key
-			permissionsCache.permitted << [(permission): permitted]
+			cacheEntry.permitted << [(permission): permitted]
 		}
 
 		permitted
 	}
 
 	/**
-	 * Returns all groups the user can perform the given permission on.
+	 * Returns all groups the user can perform the given permissions on.
 	 *
-	 * @param permission The permission to test
-	 * @return The set of all groups where the user can perform the indicated permission
+	 * @param permissions A list of permissions to test
+	 * @return The SortedSet of all groups where the user can perform the any of the given permissions
 	 */
 	SortedSet getGroupsWithPermission(List<DocumentPermission> permissions) {
 		if (!isLoggedIn()) {
@@ -137,7 +141,7 @@ class AuthService {
 		def groups = Group.list()
 
 		(isAdmin() ? groups : groups?.findAll { Group group ->
-			permissions.any {permission ->
+			permissions.any { permission ->
 				checkPermission(permission, group)
 			}
 		}) as SortedSet
@@ -147,15 +151,15 @@ class AuthService {
 	 * This is for getting the documents the user has one off permissions for.  For example this isn't for seeing if
 	 * the user has document:view:1:* it is for collecting the 5 in document:view:1:5 or document:view:*:5
 	 *
-	 * @param permission The permission to test
-	 * @return The set of all document ids where the user has specific permission to perform the indicated permission
+	 * @param permissions A list of permissions to test
+	 * @return The set of all document ids where the user has specific permission to perform any of the indicated permissions
 	 */
 	Set getIndividualDocumentsWithPermission(List<DocumentPermission> permissions) {
-		def subject = authenticatedSubject
-
 		if (!isLoggedIn()) {
 			return [] as Set
 		}
+
+		def subject = authenticatedSubject
 
 		if (testSubject) {
 			// TODO add better testing for roles
@@ -209,12 +213,15 @@ class AuthService {
 	 * @return true if the permission was implied
 	 */
 	private boolean isPermissionImplied(String permission) {
-		def subject = testSubject ?: authenticatedSubject
 		if (!isLoggedIn()) {
 			return false
 		}
 
-		def permitted = permissionsCache.implied[permission]
+		def subject = testSubject ?: authenticatedSubject
+		def user = authenticatedUser
+		def cacheEntry = permissionsCache[authenticatedUser.id] ?: (permissionsCache[authenticatedUser.id] = new PermissionCacheEntry())
+
+		def permitted = cacheEntry.implied[permission]
 		if (permitted != null) {
 			return permitted
 		}
@@ -225,10 +232,9 @@ class AuthService {
 
 		def wp = new WildcardPermission(permission)
 
-		def user = authenticatedUser
 		for (p in user.permissions) {
 			if (wp.implies(new WildcardPermission(p.target))) {
-				permissionsCache.implied << [(permission): true]
+				cacheEntry.implied << [(permission): true]
 				return true
 			}
 		}
@@ -236,7 +242,7 @@ class AuthService {
 		for (role in user.roles) {
 			for (p in role.permissions) {
 				if (wp.implies(new WildcardPermission(p.target))) {
-					permissionsCache.implied << [(permission): true]
+					cacheEntry.implied << [(permission): true]
 					return true
 				}
 			}
@@ -246,7 +252,7 @@ class AuthService {
 			for (role in group.roles) {
 				for (p in role.permissions) {
 					if (wp.implies(new WildcardPermission(p.target))) {
-						permissionsCache.implied << [(permission): true]
+						cacheEntry.implied << [(permission): true]
 						return true
 					}
 				}
@@ -254,7 +260,7 @@ class AuthService {
 
 			for (p in group.permissions) {
 				if (wp.implies(new WildcardPermission(p.target))) {
-					permissionsCache.implied << [(permission): true]
+					cacheEntry.implied << [(permission): true]
 					return true
 				}
 			}
@@ -306,5 +312,55 @@ class AuthService {
 
 	void login(token) {
 		SecurityUtils.subject.login(token)
+		// reset permissions on login
+		resetCache(authenticatedUser)
 	}
+
+	void logout() {
+		// reset permissions on logout
+		resetCache(authenticatedUser)
+		SecurityUtils.subject?.logout()
+	}
+
+	/**
+	 * Reset the permission cache entry for given user.
+	 */
+	void resetCache(User user) {
+		permissionsCache.remove(user?.id)
+	}
+
+	/**
+	 * Reset the permission cache entry for each of the users in the given role.
+	 */
+	void resetCache(Role role) {
+		role?.users?.each { user->
+			resetCache(user)
+		}
+
+		role?.groups?.each { group->
+			group.users?.each { user->
+				resetCache(user)
+			}
+		}
+	}
+
+	/**
+	 * Reset the permission cache entry for each of the users in the given group.
+	 */
+	void resetCache(Group group) {
+		group?.users?.each { user->
+			resetCache(user)
+		}
+
+		group?.roles?.each { role->
+			role.users?.each { user->
+				resetCache(user)
+			}
+		}
+	}
+}
+
+class PermissionCacheEntry {
+	Map implied = [:] as ConcurrentHashMap
+	Map permitted = [:] as ConcurrentHashMap
 }

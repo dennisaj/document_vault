@@ -24,6 +24,8 @@ package us.paperlesstech.nimble
 class GroupService {
 	boolean transactional = true
 
+	def authService
+
 	/**
 	 * Creates a new group.
 	 *
@@ -60,8 +62,8 @@ class GroupService {
 	}
 
 	/**
-	 * Deletes an exisiting group.
-	 * 
+	 * Deletes an existing group.
+	 *
 	 * @pre Passed group object must have been validated to ensure
 	 * that hibernate does not auto persist the objects to the repository prior to service invocation
 	 *
@@ -70,11 +72,10 @@ class GroupService {
 	 * @throws RuntimeException When internal state requires transaction rollback
 	 */
 	def deleteGroup(Group group) {
+		authService.resetCache(group)
 
 		// Terminate all roles associated with this group
-		def roles = []
-		roles.addAll(group.roles)
-		roles.each {
+		group.roles.iterator().each {
 			it.removeFromGroups(group)
 			it.save()
 
@@ -89,15 +90,13 @@ class GroupService {
 		}
 
 		// Remove all users from this group
-		def users = []
-		users.addAll(group.users)
-		users.each {
+		group.users.iterator().each {
 			it.removeFromGroups(group)
 			it.save()
 
 			if (it.hasErrors()) {
 				log.error "Error updating user [$it.id]$it.username to remove group [$group.id]$group.name"
-				it.errors.each {err ->
+				it.errors.each { err ->
 					log.error err
 				}
 
@@ -110,7 +109,7 @@ class GroupService {
 	}
 
 	/**
-	 * Updates group details in persistant storage.
+	 * Updates group details in persistent storage.
 	 *
 	 * @pre Passed group object must have been validated to ensure
 	 * that hibernate does not auto persist the objects to the repository prior to service invocation
@@ -171,6 +170,7 @@ class GroupService {
 			throw new RuntimeException("Unable to persist user [$user.id]$user.username when attempting to add user to group [$group.id]$group.name membership")
 		}
 
+		authService.resetCache(user)
 		log.info "Added user [$user.id]$user.username to group [$group.id]$group.name successfully"
 	}
 
@@ -211,6 +211,7 @@ class GroupService {
 			throw new RuntimeException("Unable to persist user [$user.id]$user.username when attempting to remove user from group [$group.id]$group.name membership")
 		}
 
+		authService.resetCache(user)
 		log.info "Removed user [$user.id]$user.username from group [$group.id]$group.name successfully"
 	}
 }

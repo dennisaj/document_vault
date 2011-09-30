@@ -11,7 +11,7 @@ import org.hibernate.criterion.Subqueries
 class TagService {
 	static transactional = true
 
-	def authServiceProxy
+	def authService
 
 	boolean addDocumentTag(long documentId, tag) {
 		return addDocumentTag(Document.get(documentId), tag)
@@ -28,7 +28,7 @@ class TagService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return A String that has been striped of commas and trailing slashes
 	 */
 	private String sanitize(String tag) {
@@ -47,7 +47,7 @@ class TagService {
 	 * This method will create a new tag that has not been assigned to any rows.
 	 *
 	 * This method should only be called if you don't plan on assigning this tag to any rows immediately.
-	 * Otherwise, use the injected addTag method for the row you are tagging. 
+	 * Otherwise, use the injected addTag method for the row you are tagging.
 	 *
 	 * @return The saved tag or a tag containing errors
 	 */
@@ -59,7 +59,7 @@ class TagService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return a list of tag names associated with a document that have had any html escaped.
 	 * If the documentId is invalid, an empty list is returned.
 	 */
@@ -78,8 +78,8 @@ class TagService {
 	}
 
 	List findAllByTag(String name) {
-		def allowedGroupIds = authServiceProxy.getGroupsWithPermission([DocumentPermission.Tag]).collect { it.id } ?: -1L
-		def specificDocs = authServiceProxy.getIndividualDocumentsWithPermission([DocumentPermission.Tag]) ?: -1L
+		def allowedGroupIds = authService.getGroupsWithPermission([DocumentPermission.Tag]).collect { it.id } ?: -1L
+		def specificDocs = authService.getIndividualDocumentsWithPermission([DocumentPermission.Tag]) ?: -1L
 
 		Document.findAllByTagWithCriteria(name) {
 			or {
@@ -120,8 +120,8 @@ class TagService {
 
 	List<Document> untaggedDocuments() {
 		def c = Document.createCriteria()
-		def allowedGroupIds = authServiceProxy.getGroupsWithPermission([DocumentPermission.Tag]).collect { it.id } ?: -1L
-		def specificDocs = authServiceProxy.getIndividualDocumentsWithPermission([DocumentPermission.Tag]) ?: -1L
+		def allowedGroupIds = authService.getGroupsWithPermission([DocumentPermission.Tag]).collect { it.id } ?: -1L
+		def specificDocs = authService.getIndividualDocumentsWithPermission([DocumentPermission.Tag]) ?: -1L
 
 		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(TagLink.class)
 				.add(Restrictions.eq("type", "document"))

@@ -14,7 +14,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	@Override
 	def setup() {
 		line = [a:[x:0,y:0], b:[x:100,y:100]]
-		defaultImageHandlerService.authServiceProxy = authServiceProxy
+		defaultImageHandlerService.authService = authService
 	}
 
 	def "imagethumbnail should be set"() {

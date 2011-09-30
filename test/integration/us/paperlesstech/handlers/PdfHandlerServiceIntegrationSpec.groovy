@@ -17,7 +17,7 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 
 	@Override
 	def setup() {
-		pdfHandlerService.authServiceProxy = authServiceProxy
+		pdfHandlerService.authService = authService
 		document = new Document()
 		document.group = DomainIntegrationSpec.group
 		pdfDocumentData = new DocumentData(mimeType: MimeType.PDF)

@@ -15,18 +15,18 @@ class HandlerChain extends Handler {
 	@Override
 	void importFile(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canUpload(document.group)
+		assert authService.canUpload(document.group)
 		byte[] bytes = input.bytes
 		assert bytes, "Data is required for import"
 
-		preferenceService.setPreference(authServiceProxy.authenticatedUser, PreferenceService.DEFAULT_UPLOAD_GROUP, document.group.id as String)
+		preferenceService.setPreference(authService.authenticatedUser, PreferenceService.DEFAULT_UPLOAD_GROUP, document.group.id as String)
 		handle("importFile", input)
 	}
 
 	@Override
 	void generatePreview(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canUpload(document.group) || authServiceProxy.canSign(document)
+		assert authService.canUpload(document.group) || authService.canSign(document)
 
 		handle("generatePreview", input)
 	}
@@ -35,17 +35,17 @@ class HandlerChain extends Handler {
 	boolean print(Map input) {
 		def document = getDocument(input)
 		assert input.printer instanceof Printer
-		assert authServiceProxy.canPrint(document)
-		assert !input.addNotes || authServiceProxy.canNotes(document)
+		assert authService.canPrint(document)
+		assert !input.addNotes || authService.canNotes(document)
 
-		preferenceService.setPreference(authServiceProxy.authenticatedUser, PreferenceService.DEFAULT_PRINTER, input.printer.id as String)
+		preferenceService.setPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER, input.printer.id as String)
 		handle("print", input)
 	}
 
 	@Override
 	void cursiveSign(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canSign(document)
+		assert authService.canSign(document)
 
 		handle("cursiveSign", input)
 	}
@@ -53,7 +53,7 @@ class HandlerChain extends Handler {
 	@Override
 	def downloadPreview(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canTag(document) || authServiceProxy.canView(document) || authServiceProxy.canSign(document)
+		assert authService.canTag(document) || authService.canView(document) || authService.canSign(document)
 
 		handle("downloadPreview", input)
 	}
@@ -61,7 +61,7 @@ class HandlerChain extends Handler {
 	@Override
 	def downloadThumbnail(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canTag(document) || authServiceProxy.canView(document) || authServiceProxy.canSign(document)
+		assert authService.canTag(document) || authService.canView(document) || authService.canSign(document)
 
 		handle("downloadThumbnail", input)
 	}
@@ -69,7 +69,7 @@ class HandlerChain extends Handler {
 	@Override
 	def download(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canView(document) || authServiceProxy.canSign(document)
+		assert authService.canView(document) || authService.canSign(document)
 
 		handle("download", input)
 	}
@@ -77,7 +77,7 @@ class HandlerChain extends Handler {
 	@Override
 	def saveNotes(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canNotes(document)
+		assert authService.canNotes(document)
 
 		handle("saveNotes", input)
 	}
@@ -85,7 +85,7 @@ class HandlerChain extends Handler {
 	@Override
 	def downloadNote(Map input) {
 		def document = getDocument(input)
-		assert authServiceProxy.canNotes(document)
+		assert authService.canNotes(document)
 
 		handle("downloadNote", input)
 	}

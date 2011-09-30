@@ -11,7 +11,7 @@ import us.paperlesstech.nimble.User
 class BaseHandlerSpec extends IntegrationSpec {
 	static User user
 
-	def authServiceProxy
+	def authService
 	Subject adminSubject = Mock()
 
 	def setupSpec() {
@@ -25,12 +25,12 @@ class BaseHandlerSpec extends IntegrationSpec {
 		adminSubject.authenticated >> true
 		adminSubject.remembered >> true
 		adminSubject.isPermitted(_) >> true
-		authServiceProxy.metaClass.isLoggedIn = {
+		authService.metaClass.isLoggedIn = {
 			true
 		}
-		authServiceProxy.metaClass.getAuthenticatedUser = {
+		authService.metaClass.getAuthenticatedUser = {
 			user
 		}
-		authServiceProxy.testSubject = adminSubject
+		authService.testSubject = adminSubject
 	}
 }

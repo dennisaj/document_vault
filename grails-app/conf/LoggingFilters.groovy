@@ -3,7 +3,7 @@ import us.paperlesstech.filters.ResponseWrapperFilter
 
 public class LoggingFilters {
 	def activityLogService
-	def authServiceProxy
+	def authService
 
 	def dependsOn = [TimingFilters, TenantFilters]
 
@@ -14,7 +14,7 @@ public class LoggingFilters {
 					log.error(e, e)
 				}
 
-				if (authServiceProxy.isLoggedIn()) {
+				if (authService.isLoggedIn()) {
 					ResponseWrapper ptResp = ResponseWrapperFilter.getResponseWrapper(response)
 					def status = ptResp?.getPTStatus() ?: 200
 					def logParams = params.clone()

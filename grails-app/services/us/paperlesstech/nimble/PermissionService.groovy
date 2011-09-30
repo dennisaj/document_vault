@@ -24,6 +24,8 @@ package us.paperlesstech.nimble
 class PermissionService {
 	boolean transactional = true
 
+	def authService
+
 	/**
 	 * Assigns a permission object to an owner and performs checks to ensure permission is correctly applied
 	 *
@@ -31,7 +33,7 @@ class PermissionService {
 	 * @param owner An object that extends PermissionOwner (e.g. User, Group, Role)
 	 *
 	 * @return A permission object. The saved object is all was successful or the permission object with error details if persistence fails.
-	 * 
+	 *
 	 * @throws RuntimeException if an unrecoverable/unexpected error occurs (Rolls back transaction)
 	 */
 	def createPermission(permission, owner) {
@@ -58,6 +60,7 @@ class PermissionService {
 			throw new RuntimeException("Unable to add permission $savedPermission.id to owner $owner.id")
 		}
 
+		authService.resetCache(owner)
 		log.info "Successfully added permission $savedPermission.id to owner $owner.id"
 		return savedPermission
 	}
@@ -69,22 +72,23 @@ class PermissionService {
 	 *
 	 * @throws RuntimeException if an unrecoverable/unexpected error occurs (Rolls back transaction)
 	 */
-	def deletePermission(permission) {
+	void deletePermission(permission) {
 		def owner = permission.owner
 
 		owner.removeFromPermissions(permission)
 		def savedOwner = owner.save()
 
 		if (!savedOwner) {
-			log.error "Unable to remove permission $savedPermission.id from user [$owner.id]$owner.name"
+			log.error "Unable to remove permission $permission.id from owner [$owner.id]$owner"
 			owner.errors.each {
 				log.error it
 			}
 
-			throw new RuntimeException("Unable to remove permission $savedPermission.id from user [$owner.id]$owner.name")
+			throw new RuntimeException("Unable to remove permission $permission.id from owner [$owner.id]$owner")
 		}
 
-		permission.delete();
+		permission.delete()
+		authService.resetCache(owner)
 		log.info "Successfully removed permission $permission.id from owner $owner.id"
 	}
 }

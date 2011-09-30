@@ -99,6 +99,11 @@ class User implements Comparable<User> {
 		preferences nullable:true
 	}
 
+	@Override
+	String toString() {
+		"User($id) $username"
+	}
+
 	/**
 	 * Sort by profile.fullName by fall back to username if profile.fullName is empty
 	 */

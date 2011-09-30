@@ -16,7 +16,7 @@ class HandlerSpec extends UnitSpec {
 	def line = [a:[x:0,y:0], b:[x:100,y:100]]
 
 	def setup() {
-		handler.authServiceProxy = authService
+		handler.authService = authService
 		handler.fileService = fileService
 	}
 

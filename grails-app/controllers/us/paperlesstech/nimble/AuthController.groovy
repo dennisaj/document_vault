@@ -18,7 +18,6 @@ package us.paperlesstech.nimble
 
 import javax.servlet.http.Cookie
 
-import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.IncorrectCredentialsException
@@ -54,7 +53,7 @@ class AuthController {
 	}
 
 	def index = {
-		redirect(action: 'login', params: params)
+		redirect(action:'login', params:params)
 	}
 
 	def login = {
@@ -90,8 +89,9 @@ class AuthController {
 			if (userService.events["login"]) {
 				log.info "Executing login callback"
 				def newUri = userService.events["login"](authService.authenticatedUser, targetUri, request)
-				if (newUri != null)
+				if (newUri != null) {
 					targetUri = newUri
+				}
 			}
 			log.info "Directing to content $targetUri"
 			redirect(uri: targetUri)
@@ -137,7 +137,7 @@ class AuthController {
 			userService.events["logout"](authService.authenticatedUser)
 		}
 
-		SecurityUtils.subject?.logout()
+		authService.logout()
 		redirect(uri: '/')
 	}
 

@@ -5,10 +5,10 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.json.JSONObject
 
-import us.paperlesstech.nimble.PermissionService;
-import us.paperlesstech.nimble.Profile;
-import us.paperlesstech.nimble.User;
-import us.paperlesstech.nimble.UserService;
+import us.paperlesstech.nimble.PermissionService
+import us.paperlesstech.nimble.Profile
+import us.paperlesstech.nimble.User
+import us.paperlesstech.nimble.UserService
 
 class PartyServiceSpec extends UnitSpec {
 	PartyService service
@@ -21,7 +21,7 @@ class PartyServiceSpec extends UnitSpec {
 	def setup() {
 		mockLogging(PartyService)
 		service = new PartyService()
-		service.authServiceProxy = authService
+		service.authService = authService
 		service.grailsApplication = grailsApplication
 		service.highlightService = highlightService
 		service.permissionService = permissionService

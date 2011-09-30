@@ -14,7 +14,7 @@ class PartyServiceIntegrationSpec extends IntegrationSpec {
 	AuthService authServiceMock = Mock()
 
 	def setup() {
-		partyService.authServiceProxy = authServiceMock
+		partyService.authService = authServiceMock
 		fileData = fileService.createDocumentData(mimeType: MimeType.PDF, bytes: new byte[1], dateCreated: new Date())
 	}
 

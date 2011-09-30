@@ -7,7 +7,7 @@ import us.paperlesstech.nimble.User
 class AuthTagLib {
 	static final namespace = "pt"
 
-	def authServiceProxy
+	def authService
 	def facebookService
 
 	/**
@@ -23,13 +23,13 @@ class AuthTagLib {
 	}
 
 	def isLoggedIn = { attrs, body ->
-		if (authServiceProxy.isLoggedIn()) {
+		if (authService.isLoggedIn()) {
 			out << body()
 		}
 	}
 
 	def username = { attrs, body ->
-		out << authServiceProxy.authenticatedUser?.username
+		out << authService.authenticatedUser?.username
 	}
 
 	def canDelete = { attrs, body->
@@ -39,7 +39,7 @@ class AuthTagLib {
 			throwTagError("Tag [canDelete] must have [document] attribute.")
 		}
 
-		outputBody(authServiceProxy.canDelete(d), body)
+		outputBody(authService.canDelete(d), body)
 	}
 
 	def canGetSigned = { attrs, body->
@@ -49,7 +49,7 @@ class AuthTagLib {
 			throwTagError("Tag [canGetSigned] must have [document] attribute.")
 		}
 
-		outputBody(authServiceProxy.canGetSigned(d), body)
+		outputBody(authService.canGetSigned(d), body)
 	}
 
 	def canNotes = { attrs, body->
@@ -59,11 +59,11 @@ class AuthTagLib {
 			throwTagError("Tag [canNotes] must have [document] attribute.")
 		}
 
-		outputBody(authServiceProxy.canNotes(d), body)
+		outputBody(authService.canNotes(d), body)
 	}
 
 	def canNotesAny = { attrs, body->
-		outputBody(authServiceProxy.canNotesAny(), body)
+		outputBody(authService.canNotesAny(), body)
 	}
 
 	def canPrint = { attrs, body->
@@ -73,11 +73,11 @@ class AuthTagLib {
 			throwTagError("Tag [canPrint] must have [document] attribute.")
 		}
 
-		outputBody(authServiceProxy.canPrint(d), body)
+		outputBody(authService.canPrint(d), body)
 	}
 
 	def canPrintAny = { attrs, body->
-		outputBody(authServiceProxy.canPrintAny(), body)
+		outputBody(authService.canPrintAny(), body)
 	}
 
 	def canSign = { attrs, body->
@@ -87,11 +87,11 @@ class AuthTagLib {
 			throwTagError("Tag [canSign] must have [document] attribute.")
 		}
 
-		outputBody(authServiceProxy.canSign(d), body)
+		outputBody(authService.canSign(d), body)
 	}
 
 	def canSignAny = { attrs, body->
-		outputBody(authServiceProxy.canSignAny(), body)
+		outputBody(authService.canSignAny(), body)
 	}
 
 	def canTag = { attrs, body->
@@ -101,11 +101,11 @@ class AuthTagLib {
 			throwTagError("Tag [canTag] must have [document] attribute.")
 		}
 
-		outputBody(authServiceProxy.canTag(d), body)
+		outputBody(authService.canTag(d), body)
 	}
 
 	def canTagAny = { attrs, body->
-		outputBody(authServiceProxy.canTagAny(), body)
+		outputBody(authService.canTagAny(), body)
 	}
 
 	def canUpload = { attrs, body->
@@ -115,11 +115,11 @@ class AuthTagLib {
 			throwTagError("Tag [canUpload] must have [group] attribute.")
 		}
 
-		outputBody(authServiceProxy.canUpload(group), body)
+		outputBody(authService.canUpload(group), body)
 	}
 
 	def canUploadAny = { attrs, body->
-		outputBody(authServiceProxy.canUploadAny(), body)
+		outputBody(authService.canUploadAny(), body)
 	}
 
 	def canView = { attrs, body->
@@ -129,15 +129,15 @@ class AuthTagLib {
 			throwTagError("Tag [canView] must have [document] attribute.")
 		}
 
-		outputBody(authServiceProxy.canView(d), body)
+		outputBody(authService.canView(d), body)
 	}
 
 	def canViewAny = { attrs, body->
-		outputBody(authServiceProxy.canViewAny(), body)
+		outputBody(authService.canViewAny(), body)
 	}
 
 	def isAdmin = { attrs, body->
-		outputBody(authServiceProxy.isAdmin(), body)
+		outputBody(authService.isAdmin(), body)
 	}
 
 	def facebookConnect = { attrs, body ->
@@ -151,7 +151,7 @@ class AuthTagLib {
 	}
 
 	def isRunAs = { attrs, body ->
-		if (authServiceProxy.authenticatedSubject.isRunAs()) {
+		if (authService.authenticatedSubject.isRunAs()) {
 			out << body()
 		}
 	}
@@ -163,18 +163,18 @@ class AuthTagLib {
 			throwTagError("Tag [canRunAs] must have [user] attribute.")
 		}
 
-		outputBody(authServiceProxy.canRunAs(u), body)
+		outputBody(authService.canRunAs(u), body)
 	}
 
 	def canRunAsAny = { attrs, body ->
-		outputBody(authServiceProxy.canRunAsAny(), body)
+		outputBody(authService.canRunAsAny(), body)
 	}
 
 	def runAsList = { attrs, body->
-		out << render(template: "/auth/runas", model: [delegators:authServiceProxy.authenticatedUser?.delegators])
+		out << render(template: "/auth/runas", model: [delegators:authService.authenticatedUser?.delegators])
 	}
 
 	def delegateUsername = {
-			out << authServiceProxy.delegateUser?.username
+			out << authService.delegateUser?.username
 	}
 }

@@ -9,7 +9,7 @@ import org.hibernate.sql.JoinFragment
 class DocumentService {
 	static transactional = true
 
-	def authServiceProxy
+	def authService
 	def tagService
 
 	def search(params) {
@@ -39,8 +39,8 @@ class DocumentService {
 			tagSearchResults = tagService.getRecentTags()
 		}
 
-		def allowedGroupIds = authServiceProxy.getGroupsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]).collect { it.id } ?: -1L
-		def specificDocs = authServiceProxy.getIndividualDocumentsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]) ?: -1L
+		def allowedGroupIds = authService.getGroupsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]).collect { it.id } ?: -1L
+		def specificDocs = authService.getIndividualDocumentsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]) ?: -1L
 
 		if (tagSearch) {
 			documentResults += Document.findAllByTagWithCriteria(tag) {

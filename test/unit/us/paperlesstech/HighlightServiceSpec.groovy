@@ -13,7 +13,7 @@ class HighlightServiceSpec extends UnitSpec {
 	def setup() {
 		mockLogging(HighlightService)
 		service = new HighlightService()
-		service.authServiceProxy = authService
+		service.authService = authService
 	}
 
 	def "test fromJsonList"() {

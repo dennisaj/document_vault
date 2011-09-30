@@ -3,7 +3,7 @@ package us.paperlesstech
 class ActivityLogService {
 	static transactional = false
 
-	def authServiceProxy
+	def authService
 	def requestService
 
 	/**
@@ -26,11 +26,11 @@ class ActivityLogService {
 
 		def activityLog = new ActivityLog(
 				action: "$controller:$action",
-				delegate: authServiceProxy.delegateUser,
+				delegate: authService.delegateUser,
 				document: document,
 				userAgent: requestService.getHeader("User-Agent"),
 				ip: requestService.getRemoteAddr(),
-				user: authServiceProxy.authenticatedUser,
+				user: authService.authenticatedUser,
 				pageNumber: pageNumber,
 				params: params.toString(),
 				status: status,

@@ -7,7 +7,7 @@ public class SecurityFilters {
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 
-	def authServiceProxy
+	def authService
 	def grailsApplication
 
 	def filters = {
@@ -25,49 +25,53 @@ public class SecurityFilters {
 				if (params.documentId) {
 					document = Document.get(params.long('documentId'))
 				}
-				accessControl (auth: false) {
+				accessControl(auth:false) {
+					if (!authService.authenticatedUser?.enabled) {
+						return false
+					}
+
 					def action = actionName ?: "index"
-					log.info("user:$authServiceProxy.authenticatedUser; resource:$controllerName:$action; document:$document")
+					log.info("user:$authService.authenticatedUser; resource:$controllerName:$action; document:$document")
 					switch (controllerName) {
 						case "document":
 							switch (action) {
 								case ["download", "image", "show"]:
-									return document && (authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document) || authServiceProxy.canView(document))
+									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
 								case ["downloadImage", "thumbnail"]:
-									return document && (authServiceProxy.canTag(document) || authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document) || authServiceProxy.canView(document))
+									return document && (authService.canTag(document) || authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
 								case ["index"]:
-									return authServiceProxy.canViewAny() || authServiceProxy.canSignAny()
+									return authService.canViewAny() || authService.canSignAny()
 								case ["sign"]:
-									return document && (authServiceProxy.canSign(document) || authServiceProxy.canGetSigned(document))
+									return document && (authService.canSign(document) || authService.canGetSigned(document))
 								default:
 									return false
 							}
 						case "party":
 							switch (action) {
 								case ["submitSignatures"]:
-									return document && authServiceProxy.canSign(document)
+									return document && authService.canSign(document)
 								case ["addParty", "submitParties", "removeParty", "resend"]:
-									return document && authServiceProxy.canGetSigned(document)
+									return document && authService.canGetSigned(document)
 								default:
 									return false
 							}
 						case "note":
-							return document && authServiceProxy.canNotes(document)
+							return document && authService.canNotes(document)
 						case "printQueue":
-							return document && authServiceProxy.canPrint(document)
+							return document && authService.canPrint(document)
 						case "tag":
-							return document ? authServiceProxy.canTag(document) : authServiceProxy.canTagAny()
+							return document ? authService.canTag(document) : authService.canTagAny()
 						case "upload":
-							return authServiceProxy.canUploadAny()
+							return authService.canUploadAny()
 						case "console":
 							return grails.util.Environment.current == grails.util.Environment.DEVELOPMENT
 						case "runAs":
 							switch (action) {
 								case "runas":
 									def u = User.get(params.long('userId'))
-									return authServiceProxy.canRunAs(u)
+									return authService.canRunAs(u)
 								case "release":
-									return authServiceProxy.authenticatedSubject.isRunAs()
+									return authService.authenticatedSubject.isRunAs()
 								default:
 									return false
 							}
