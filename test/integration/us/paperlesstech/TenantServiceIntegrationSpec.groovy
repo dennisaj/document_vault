@@ -7,7 +7,7 @@ import us.paperlesstech.nimble.Role
 import us.paperlesstech.nimble.User
 import us.paperlesstech.nimble.UserService
 
-class TenantServiceSpec extends IntegrationSpec {
+class TenantServiceIntegrationSpec extends IntegrationSpec {
 	def tenantService
 
 	def "test tenant initialization"() {

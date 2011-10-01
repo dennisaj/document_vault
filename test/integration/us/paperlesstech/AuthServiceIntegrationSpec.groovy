@@ -13,13 +13,14 @@ import us.paperlesstech.nimble.Profile
 import us.paperlesstech.nimble.Role
 import us.paperlesstech.nimble.User
 
-class AuthServiceSpec extends AbstractShiroIntegrationSpec {
+class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 	AuthService service
 	def localizedRealmInstance
 	def grailsApplication
 	def groupService
 	def roleService
 
+	@Override
 	def cleanup() {
 		DelegatingSubject.metaClass = null
 	}
@@ -170,14 +171,14 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 	}
 
 	@Unroll("Testing if user with permissions #permissions can delete any document")
-	def "canDeleteAny tests"() {
+	def "canDeleteAnyDocument tests"() {
 		def user = newUser(permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canDeleteAny() == result
+		service.canDeleteAnyDocument() == result
 
 		where:
 		permissions                                  | result
@@ -194,8 +195,8 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "document:*:1:1"]      | true
 	}
 
-	@Unroll("Testing if user with group permissions #permissions can delete any document ")
-	def "canDeleteAny group tests (for isPermissionImplied)"() {
+	@Unroll("Testing if user with group permissions #permissions can delete any document")
+	def "canDeleteAnyDocument group tests (for isPermissionImplied)"() {
 		def user = newUser()
 		def group = new Group(name: "group").save()
 		permissions.each {
@@ -210,7 +211,7 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canDeleteAny() == result
+		service.canDeleteAnyDocument() == result
 
 		where:
 		permissions                                  | result
@@ -227,8 +228,8 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "*"]                   | true
 	}
 
-	@Unroll("Testing if user with role permissions #permissions can delete any document ")
-	def "canDeleteAny role tests (for isPermissionImplied)"() {
+	@Unroll("Testing if user with role permissions #permissions can delete any document")
+	def "canDeleteAnyDocument role tests (for isPermissionImplied)"() {
 		def user = newUser()
 		def role = new Role(name: "role").save()
 		permissions.each {
@@ -243,7 +244,7 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canDeleteAny() == result
+		service.canDeleteAnyDocument() == result
 
 		where:
 		permissions                                  | result
@@ -260,8 +261,8 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "*"]                   | true
 	}
 
-	@Unroll("Testing if user with group-role permissions #permissions can delete any document ")
-	def "canDeleteAny group-role tests (for isPermissionImplied)"() {
+	@Unroll("Testing if user with group-role permissions #permissions can delete any document")
+	def "canDeleteAnyDocument group-role tests (for isPermissionImplied)"() {
 		def user = newUser()
 		def role = new Role(name: "role").save()
 		permissions.each {
@@ -278,7 +279,7 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canDeleteAny() == result
+		service.canDeleteAnyDocument() == result
 
 		where:
 		permissions                                  | result
@@ -355,14 +356,14 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 	}
 
 	@Unroll("Testing if user with permissions #permissions can leave notes on any document")
-	def "canNotesAny tests"() {
+	def "canNotesAnyDocument tests"() {
 		def user = newUser(permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canNotesAny() == result
+		service.canNotesAnyDocument() == result
 
 		where:
 		permissions                                 | result
@@ -414,14 +415,14 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 	}
 
 	@Unroll("Testing if user with permissions #permissions can print any document")
-	def "canPrintAny tests"() {
+	def "canPrintAnyDocument tests"() {
 		def user = newUser(permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canPrintAny() == result
+		service.canPrintAnyDocument() == result
 
 		where:
 		permissions                                 | result
@@ -468,14 +469,14 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 	}
 
 	@Unroll("Testing if user with permissions #permissions can sign any document")
-	def "canSignAny tests"() {
+	def "canSignAnyDocument tests"() {
 		def user = newUser(permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canSignAny() == result
+		service.canSignAnyDocument() == result
 
 		where:
 		permissions                                | result
@@ -492,58 +493,92 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "document:*:1:1"]      | true
 	}
 
-	@Unroll("Testing if user with permission #permission can tag document:#groupId:#documentId")
-	def "canTag tests"() {
+	@Unroll("Testing if user with permission #permission can create a folder for group #groupId")
+	def "canFolderCreate tests"() {
 		def user = newUser([permission])
-		def document = newDocument(documentId: documentId, groupId: groupId)
+		def group = new Group()
+		group.id = groupId
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canTag(document) == result
+		service.canFolderCreate(group) == result
 
 		where:
-		permission         | groupId | documentId | result
-		"*"                | 1L      | 1L         | true
-		"*"                | 2L      | 1L         | true
-		"document:tag:*"   | 1L      | 1L         | true
-		"document:tag:*"   | 2L      | 1L         | true
-		"document:tag:1"   | 1L      | 1L         | true
-		"document:tag:1"   | 2L      | 1L         | false
-		"document:tag:*:1" | 1L      | 1L         | true
-		"document:tag:*:1" | 2L      | 1L         | true
-		"document:tag:1:*" | 1L      | 1L         | true
-		"document:tag:1:*" | 2L      | 1L         | false
-		"document:tag:1:1" | 1L      | 1L         | true
-		"document:tag:1:1" | 2L      | 1L         | false
-		// Revisit sometime
-		// "document:*:1:1"      | 1L      | 1L         | true
+		permission                  | groupId  | result
+		"*"                         | 1L       | true
+		"*"                         | 2L       | true
+		"document:foldercreate:*"   | 1L       | true
+		"document:foldercreate:*"   | 2L       | true
+		"document:foldercreate:1"   | 1L       | true
+		"document:foldercreate:1"   | 2L       | false
 	}
 
-	@Unroll("Testing if user with permissions #permissions can tag any document")
-	def "canTagAny tests"() {
-		def user = newUser(permissions)
+	@Unroll("Testing if user with permission #permission can delete a folder for group #groupId")
+	def "canFolderDelete tests"() {
+		def user = newUser([permission])
+		def group = new Group()
+		group.id = groupId
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canTagAny() == result
+		service.canFolderDelete(group) == result
 
 		where:
-		permissions                               | result
-		["*"]                                     | true
-		["document:view:1:1", "*"]                | true
-		["document:view:1:1", "document:tag:*:1"] | true
-		["document:view:1:1", "document:tag:1:*"] | true
-		["document:view:1:1", "document:tag:1:1"] | true
-		["document:view:*"]                       | false
-		["document:view:1:*"]                     | false
-		["document:view:*:1"]                     | false
-		["document:view:1:1"]                     | false
-		// This should probably work but we don't use this form.  Need to revisit sometime
-		// ["document:view:1:1", "document:*:1:1"]      | true
+		permission                  | groupId  | result
+		"*"                         | 1L       | true
+		"*"                         | 2L       | true
+		"document:folderdelete:*"   | 1L       | true
+		"document:folderdelete:*"   | 2L       | true
+		"document:folderdelete:1"   | 1L       | true
+		"document:folderdelete:1"   | 2L       | false
+	}
+
+	@Unroll("Testing if user with permission #permission can move a document into a folder in group #groupId")
+	def "canFolderMoveInTo tests"() {
+		def user = newUser([permission])
+		def group = new Group()
+		group.id = groupId
+		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
+		subject.metaClass.getPrincipal = { user.id }
+		subject.metaClass.isAuthenticated = { true }
+
+		expect:
+		service.canFolderMoveInTo(group) == result
+
+		where:
+		permission                    | groupId  | result
+		"*"                           | 1L       | true
+		"*"                           | 2L       | true
+		"document:foldermoveinto:*"   | 1L       | true
+		"document:foldermoveinto:*"   | 2L       | true
+		"document:foldermoveinto:1"   | 1L       | true
+		"document:foldermoveinto:1"   | 2L       | false
+	}
+
+	@Unroll("Testing if user with permission #permission can move a document into a folder in group #groupId")
+	def "canFolderMoveOutOf tests"() {
+		def user = newUser([permission])
+		def group = new Group()
+		group.id = groupId
+		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
+		subject.metaClass.getPrincipal = { user.id }
+		subject.metaClass.isAuthenticated = { true }
+
+		expect:
+		service.canFolderMoveOutOf(group) == result
+
+		where:
+		permission                     | groupId  | result
+		"*"                            | 1L       | true
+		"*"                            | 2L       | true
+		"document:foldermoveoutof:*"   | 1L       | true
+		"document:foldermoveoutof:*"   | 2L       | true
+		"document:foldermoveoutof:1"   | 1L       | true
+		"document:foldermoveoutof:1"   | 2L       | false
 	}
 
 	@Unroll("Testing if user with permission #permission can upload to group #groupId")
@@ -575,14 +610,14 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 	}
 
 	@Unroll("Testing if user with permissions #permissions can upload any document")
-	def "canUploadAny tests"() {
+	def "canUploadAnyGroup tests"() {
 		def user = newUser(permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canUploadAny() == result
+		service.canUploadAnyGroup() == result
 
 		where:
 		permissions                                  | result
@@ -629,14 +664,14 @@ class AuthServiceSpec extends AbstractShiroIntegrationSpec {
 	}
 
 	@Unroll("Testing if user with permissions #permissions can view any document")
-	def "canViewAny tests"() {
+	def "canViewAnyDocument tests"() {
 		def user = newUser(permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canViewAny() == result
+		service.canViewAnyDocument() == result
 
 		where:
 		permissions                                  | result

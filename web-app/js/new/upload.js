@@ -21,12 +21,5 @@ var Upload = {
 				rp.find("span").text(loaded);
 			}
 		});
-
-		$('#tagbox').tagit({
-			tagSource: self.urls.list,
-			triggerKeys: ['enter', 'comma', 'tab'],
-			initialTags:[],
-			select: true
-		}).find('input').attr('placeholder', '+');
 	}
 };

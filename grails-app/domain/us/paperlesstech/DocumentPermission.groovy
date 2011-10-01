@@ -2,11 +2,14 @@ package us.paperlesstech
 
 public enum DocumentPermission {
 	Delete,
+	FolderCreate,
+	FolderDelete,
+	FolderMoveInTo,
+	FolderMoveOutOf,
 	GetSigned,
 	Notes,
 	Print,
 	Sign,
-	Tag,
 	Upload,
 	View
 

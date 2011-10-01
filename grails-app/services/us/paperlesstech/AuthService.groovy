@@ -18,11 +18,32 @@ class AuthService {
 	protected Map permissionsCache = [:] as ConcurrentHashMap
 	def testSubject
 
+	boolean canCreateBucket(Group group) {
+		assert group
+		def subject = testSubject ?: authenticatedSubject
+
+		if (!isLoggedIn()) {
+			return false
+		}
+
+		String pString = "bucket:${BucketPermission.Create.name().toLowerCase()}:${group.id}"
+
+		checkPermission(subject, pString)
+	}
+
+	boolean canDelete(Bucket b) {
+		checkPermission(BucketPermission.Delete, b)
+	}
+
 	boolean canDelete(Document d) {
 		checkPermission(DocumentPermission.Delete, d)
 	}
 
-	boolean canDeleteAny() {
+	boolean canDeleteAnyBucket() {
+		isPermissionImplied("bucket:delete")
+	}
+
+	boolean canDeleteAnyDocument() {
 		isPermissionImplied("document:delete")
 	}
 
@@ -30,11 +51,27 @@ class AuthService {
 		grailsApplication.config.document_vault.remoteSigning.enabled && checkPermission(DocumentPermission.GetSigned, d)
 	}
 
+	boolean canMoveInTo(Bucket b) {
+		checkPermission(BucketPermission.MoveInTo, b)
+	}
+
+	boolean canMoveInToAnyBucket() {
+		isPermissionImplied("bucket:moveinto")
+	}
+
+	boolean canMoveOutOf(Bucket b) {
+		checkPermission(BucketPermission.MoveOutOf, b)
+	}
+
+	boolean canMoveOutOfAnyBucket() {
+		isPermissionImplied("bucket:moveoutof")
+	}
+
 	boolean canNotes(Document d) {
 		checkPermission(DocumentPermission.Notes, d)
 	}
 
-	boolean canNotesAny() {
+	boolean canNotesAnyDocument() {
 		isPermissionImplied("document:notes")
 	}
 
@@ -43,7 +80,7 @@ class AuthService {
 		d.files.first().mimeType == MimeType.PDF && checkPermission(DocumentPermission.Print, d)
 	}
 
-	boolean canPrintAny() {
+	boolean canPrintAnyDocument() {
 		isPermissionImplied("document:print")
 	}
 
@@ -51,23 +88,43 @@ class AuthService {
 		checkPermission(DocumentPermission.Sign, d)
 	}
 
-	boolean canSignAny() {
+	boolean canSignAnyDocument() {
 		isPermissionImplied("document:sign")
 	}
 
-	boolean canTag(Document d) {
-		checkPermission(DocumentPermission.Tag, d)
+	/**
+	 * Returns true if the user can create folders in the given group.
+	 */
+	boolean canFolderCreate(Group group) {
+		checkPermission(DocumentPermission.FolderCreate, group)
 	}
 
-	boolean canTagAny() {
-		isPermissionImplied("document:tag")
+	/**
+	 * Returns true if the user can delete folders in the given group.
+	 */
+	boolean canFolderDelete(Group group) {
+		checkPermission(DocumentPermission.FolderDelete, group)
+	}
+
+	/**
+	 * Returns true if the user can move a document in to any folder in the given group.
+	 */
+	boolean canFolderMoveInTo(Group group) {
+		checkPermission(DocumentPermission.FolderMoveInTo, group)
+	}
+
+	/**
+	 * Returns true if the user can move a document out of any folder in the given group.
+	 */
+	boolean canFolderMoveOutOf(Group group) {
+		checkPermission(DocumentPermission.FolderMoveOutOf, group)
 	}
 
 	boolean canUpload(Group group) {
 		checkPermission(DocumentPermission.Upload, group)
 	}
 
-	boolean canUploadAny() {
+	boolean canUploadAnyGroup() {
 		isPermissionImplied("document:upload")
 	}
 
@@ -75,8 +132,16 @@ class AuthService {
 		checkPermission(DocumentPermission.View, d)
 	}
 
-	boolean canViewAny() {
+	boolean canViewAnyDocument() {
 		isPermissionImplied("document:view")
+	}
+
+	boolean canView(Bucket b) {
+		checkPermission(BucketPermission.View, b)
+	}
+
+	boolean canViewAnyBucket() {
+		isPermissionImplied("bucket:view")
 	}
 
 	boolean canRunAs(User u) {
@@ -96,6 +161,19 @@ class AuthService {
 		}
 
 		String pString = "document:${permission.name().toLowerCase()}:${d.group.id}:${d.id}"
+
+		checkPermission(subject, pString)
+	}
+
+	private boolean checkPermission(BucketPermission permission, Bucket b) {
+		assert b
+		def subject = testSubject ?: authenticatedSubject
+
+		if (!isLoggedIn()) {
+			return false
+		}
+
+		String pString = "bucket:${permission.name().toLowerCase()}:${b.group.id}:${b.id}"
 
 		checkPermission(subject, pString)
 	}

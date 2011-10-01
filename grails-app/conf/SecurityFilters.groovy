@@ -38,9 +38,9 @@ public class SecurityFilters {
 								case ["download", "image", "show"]:
 									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
 								case ["downloadImage", "thumbnail"]:
-									return document && (authService.canTag(document) || authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
+									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
 								case ["index"]:
-									return authService.canViewAny() || authService.canSignAny()
+									return authService.canViewAnyDocument() || authService.canSignAnyDocument()
 								case ["sign"]:
 									return document && (authService.canSign(document) || authService.canGetSigned(document))
 								default:
@@ -59,10 +59,8 @@ public class SecurityFilters {
 							return document && authService.canNotes(document)
 						case "printQueue":
 							return document && authService.canPrint(document)
-						case "tag":
-							return document ? authService.canTag(document) : authService.canTagAny()
 						case "upload":
-							return authService.canUploadAny()
+							return authService.canUploadAnyGroup()
 						case "console":
 							return grails.util.Environment.current == grails.util.Environment.DEVELOPMENT
 						case "runAs":

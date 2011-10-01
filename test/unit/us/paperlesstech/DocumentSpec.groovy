@@ -2,7 +2,7 @@ package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
 import spock.lang.Unroll
-import us.paperlesstech.nimble.Group;
+import us.paperlesstech.nimble.Group
 
 class DocumentSpec extends UnitSpec {
 	def setup() {}
@@ -18,7 +18,6 @@ class DocumentSpec extends UnitSpec {
 		if (file)
 			d.addToFiles(file)
 		def result = d.validate()
-
 		then:
 		result == expected
 
@@ -28,12 +27,12 @@ class DocumentSpec extends UnitSpec {
 		documentData() | null        | false
 		null           | new Group() | false
 		documentData() | new Group() | true
+		documentData() | new Group() | true
 	}
 
 	def documentData() {
 		new DocumentData(mimeType: MimeType.PDF, fileSize: 1, fileKey: "asdf")
 	}
-
 
 	def "test getting image data as a map"() {
 		given: "A document with images"
@@ -77,6 +76,5 @@ class DocumentSpec extends UnitSpec {
 		pageNumber = 5
 		width = 800
 		height = 600
-
 	}
 }

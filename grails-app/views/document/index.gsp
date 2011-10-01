@@ -5,7 +5,6 @@
 	<title>- <g:message code="document-vault.view.document.search.title" /></title>
 
 	<r:require module="documentSearch" />
-	<r:require module="dvTags" />
 	<r:require module="dvNotes" />
 
 	<nav:resources override="true" />
@@ -21,15 +20,6 @@
 				'sign': '${createLink(controller:"document", action:"sign")}/{0}',
 				'printWindow': '${createLink(controller:"p", action:"window")}/{0}'
 			});
-
-			Tagging.init({
-				'addTag': '${createLink(controller:"tag", action:"documentAdd")}',
-				'allTagged': '${createLink(controller:"tag", action:"documents")}/{0}',
-				'createTag': '${createLink(controller:"tag", action:"create")}/{0}',
-				'documentList': '${createLink(controller:"tag", action:"documentList")}/{0}',
-				'list': '${createLink(controller:"tag", action:"list")}',
-				'removeTag': '${createLink(controller:"tag", action:"documentRemove")}'
-			}, true);
 
 			$('.thumb').live('click', function(event) {
 				PreviewImage.show(event.currentTarget.href);

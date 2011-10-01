@@ -3,18 +3,16 @@ package us.paperlesstech
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
 import java.util.Date
-import java.util.List
 import java.util.SortedSet
-
-import org.grails.taggable.Taggable
 
 import us.paperlesstech.nimble.Group
 
 @MultiTenant
-class Document implements Taggable {
+class Document {
 	static searchable = {
-		only: ["dateCreated", "name", "tags", "searchFields"]
+		only: ["dateCreated", "name", "searchFields"]
 	}
+
 	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField", "signed"]
 	Date dateCreated
 	SortedSet files
@@ -23,20 +21,23 @@ class Document implements Taggable {
 	SortedSet notes
 	SortedSet previewImages
 
-	static hasMany = [previewImages: PreviewImage,
-			files: DocumentData,
+	static belongsTo = [folder:Folder]
+
+	static hasMany = [previewImages:PreviewImage,
+			files:DocumentData,
 			notes:Note,
-			searchFieldsCollection: DocumentSearchField,
-			otherFieldsCollection: DocumentOtherField,
+			searchFieldsCollection:DocumentSearchField,
+			otherFieldsCollection:DocumentOtherField,
 			parties:Party]
 
 	static constraints = {
 		// minSize won't fire on the initial save if files is null
-		files nullable: false, minSize: 1
-		group nullable: false
-		name nullable: true, blank: true
-		notes nullable: true
-		parties nullable: true
+		files nullable:false, minSize:1
+		folder nullable:true
+		group nullable:false
+		name nullable:true, blank:true
+		notes nullable:true
+		parties nullable:true
 	}
 
 	static mapping = {

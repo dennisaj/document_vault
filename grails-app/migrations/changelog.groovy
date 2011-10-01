@@ -1123,4 +1123,6 @@ databaseChangeLog = {
 	include file: '20110915_delegators.groovy'
 
 	include file: '20110919_activitylog_document.groovy'
+
+	include file: '20111004_bucket_folder.groovy'
 }

@@ -9,9 +9,7 @@
 	<r:script>
 		jQuery(function($) {
 			Upload.init({
-				'controller': '${createLink(controller:"upload", action:"ajaxSave")}',
-				'createTag': '${createLink(controller:"tag", action:"create")}/{0}',
-				'list': '${createLink(controller:"tag", action:"list")}'
+				'controller': '${createLink(controller:"upload", action:"ajaxSave")}'
 			});
 		});
 	</r:script>
@@ -47,12 +45,6 @@
 			</g:else>
 		</div>
 	</form>
-	
-	<pt:canTagAny>
-		<div id="tag-container">
-			<p><g:message code="document-vault.label.upload.tagging" />:</p> <ul class="taggable" id="tagbox" data-name="tags"></ul>
-		</div>
-	</pt:canTagAny>
 	
 	<div class="fileupload-content">
 		<ul class="files"></ul>

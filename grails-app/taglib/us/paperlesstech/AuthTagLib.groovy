@@ -62,8 +62,8 @@ class AuthTagLib {
 		outputBody(authService.canNotes(d), body)
 	}
 
-	def canNotesAny = { attrs, body->
-		outputBody(authService.canNotesAny(), body)
+	def canNotesAnyDocument = { attrs, body->
+		outputBody(authService.canNotesAnyDocument(), body)
 	}
 
 	def canPrint = { attrs, body->
@@ -76,8 +76,8 @@ class AuthTagLib {
 		outputBody(authService.canPrint(d), body)
 	}
 
-	def canPrintAny = { attrs, body->
-		outputBody(authService.canPrintAny(), body)
+	def canPrintAnyDocument = { attrs, body->
+		outputBody(authService.canPrintAnyDocument(), body)
 	}
 
 	def canSign = { attrs, body->
@@ -90,22 +90,8 @@ class AuthTagLib {
 		outputBody(authService.canSign(d), body)
 	}
 
-	def canSignAny = { attrs, body->
-		outputBody(authService.canSignAny(), body)
-	}
-
-	def canTag = { attrs, body->
-		def d = attrs.remove("document")
-
-		if (!d) {
-			throwTagError("Tag [canTag] must have [document] attribute.")
-		}
-
-		outputBody(authService.canTag(d), body)
-	}
-
-	def canTagAny = { attrs, body->
-		outputBody(authService.canTagAny(), body)
+	def canSignAnyDocument = { attrs, body->
+		outputBody(authService.canSignAnyDocument(), body)
 	}
 
 	def canUpload = { attrs, body->
@@ -118,8 +104,8 @@ class AuthTagLib {
 		outputBody(authService.canUpload(group), body)
 	}
 
-	def canUploadAny = { attrs, body->
-		outputBody(authService.canUploadAny(), body)
+	def canUploadAnyGroup = { attrs, body->
+		outputBody(authService.canUploadAnyGroup(), body)
 	}
 
 	def canView = { attrs, body->
@@ -132,8 +118,8 @@ class AuthTagLib {
 		outputBody(authService.canView(d), body)
 	}
 
-	def canViewAny = { attrs, body->
-		outputBody(authService.canViewAny(), body)
+	def canViewAnyDocument = { attrs, body->
+		outputBody(authService.canViewAnyDocument(), body)
 	}
 
 	def isAdmin = { attrs, body->

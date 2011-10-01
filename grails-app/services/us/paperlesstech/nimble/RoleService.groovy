@@ -76,33 +76,41 @@ class RoleService {
 	def deleteRole(Role role) {
 		authService.resetCache(role)
 
-		// Remove all users from this role
-		role.users.iterator().each {
-			it.removeFromRoles(role)
-			it.save()
+		if (role.users) {
+			// Remove all users from this role
+			def users = []
+			users.addAll(role.users)
+			users.each {
+				it.removeFromRoles(role)
+				it.save()
 
-			if (it.hasErrors()) {
-				log.error "Error updating user [$it.id]$it.name to remove role [$role.id]$role.name"
-				it.errors.each {err ->
-					log.error err
+				if (it.hasErrors()) {
+					log.error "Error updating user [$it.id]$it.name to remove role [$role.id]$role.name"
+					it.errors.each {err ->
+						log.error err
+					}
+
+					throw new RuntimeException("Error updating user [$it.id]$it.name to remove role [$role.id]$role.name")
 				}
-
-				throw new RuntimeException("Error updating user [$it.id]$it.name to remove role [$role.id]$role.name")
 			}
 		}
 
-		// Remove all groups from this role
-		role.groups.iterator().each {
-			it.removeFromRoles(role)
-			it.save()
+		if (role.groups) {
+			// Remove all groups from this role
+			def groups = []
+			groups.addAll(role.groups)
+			groups.each {
+				it.removeFromRoles(role)
+				it.save()
 
-			if (it.hasErrors()) {
-				log.error "Error updating group [$it.id]$it.name to remove role [$role.id]$role.name"
-				it.errors.each {err ->
-					log.error err
+				if (it.hasErrors()) {
+					log.error "Error updating group [$it.id]$it.name to remove role [$role.id]$role.name"
+					it.errors.each {err ->
+						log.error err
+					}
+
+					throw new RuntimeException("Error updating group [$it.id]$it.name to remove role [$role.id]$role.name")
 				}
-
-				throw new RuntimeException("Error updating group [$it.id]$it.name to remove role [$role.id]$role.name")
 			}
 		}
 

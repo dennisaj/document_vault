@@ -187,14 +187,14 @@ class UserService {
 		user.validate()
 
 		if (!user.external) {
-			if (validatePass(user))
-			generateValidationHash(user)
-			else
-			return user
+			if (validatePass(user)) {
+				generateValidationHash(user)
+			} else {
+				return user
+			}
 		}
 
 		if (!user.hasErrors()) {
-
 			// Add default role for users
 			def defaultRole = Role.findByName(UserService.USER_ROLE)
 

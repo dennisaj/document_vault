@@ -1,20 +1,18 @@
 package us.paperlesstech.handlers.business_logic
 
 import grails.plugin.spock.UnitSpec
+
 import org.springframework.core.io.ClassPathResource
-import us.paperlesstech.Document
-import us.paperlesstech.DocumentData
+
 import us.paperlesstech.handlers.PclHandlerService
 import us.paperlesstech.handlers.business_logic.FermanBusinessLogicService.FermanDocumentTypes
 import us.paperlesstech.helpers.PclDocument
-import us.paperlesstech.helpers.PclPage
-import us.paperlesstech.TagService
 import us.paperlesstech.helpers.PclInfo
+import us.paperlesstech.helpers.PclPage
 
 class FermanBusinessLogicServiceSpec extends UnitSpec {
 	FermanBusinessLogicService service
 	PclHandlerService pclHandlerService = Mock()
-	TagService tagService = Mock()
 	File custHard
 	File warrantyRepairOrder
 	File serviceInvoice
@@ -26,7 +24,6 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		mockLogging(FermanBusinessLogicService)
 		service = new FermanBusinessLogicService()
 		service.pclHandlerService = pclHandlerService
-		service.tagService = tagService
 
 		custHard = new ClassPathResource("dt_cust_hard.pcl").file
 		warrantyRepairOrder = new ClassPathResource("WarrantyRepairOrder.pcl").file
@@ -242,7 +239,8 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		multipleSlashes = /\one slash \two slash/
 	}
 
-	def "afterPclImportFile should tag the document and rename it"() {
+	// TODO Replace with some foldering
+	/*def "afterPclImportFile should tag the document and rename it"() {
 		setup:
 		def tags = []
 		mockDomain(Document)
@@ -262,5 +260,5 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		2 * tagService.createTag(_)
 		tags[0] == "RO_Number"
 		tags[1] == "VIN"
-	}
+	}*/
 }

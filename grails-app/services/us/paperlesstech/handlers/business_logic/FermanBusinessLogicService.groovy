@@ -1,16 +1,14 @@
 package us.paperlesstech.handlers.business_logic
 
+import java.util.regex.Pattern
+
 import us.paperlesstech.handlers.Handler
 import us.paperlesstech.handlers.PclHandlerService
 import us.paperlesstech.helpers.PclDocument
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-import us.paperlesstech.TagService
 
 class FermanBusinessLogicService {
 	static transactional = true
 	PclHandlerService pclHandlerService
-	TagService tagService
 
 	enum FermanDocumentTypes {
 		CustomerHardCopy(~/20901|20913/),
@@ -39,10 +37,9 @@ class FermanBusinessLogicService {
 			["RO_Number", "VIN"].each {
 				def value = savedDocument.searchField(it)
 				if (value) {
-					log.info "Creating tag $value"
-					tagService.createTag(value)
-					savedDocument.addTag(value)
-					log.info "Added tag $value to document $d"
+					//log.info "Creating tag $value"
+					//TODO Do some foldering here
+					//log.info "Added tag $value to document $d"
 				}
 			}
 

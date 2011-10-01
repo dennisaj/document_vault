@@ -4,7 +4,7 @@ import grails.plugin.spock.UnitSpec
 import static us.paperlesstech.MimeType.PDF
 
 class DocumentDataSpec extends UnitSpec {
-    def "test the constraints"() {
+	def "test the constraints"() {
 		given:
 		mockForConstraintsTests(DocumentData)
 
@@ -17,5 +17,5 @@ class DocumentDataSpec extends UnitSpec {
 		dd.errors.hasFieldErrors("fileKey")
 		dd.errors.hasFieldErrors("fileSize")
 		dd.errors.hasFieldErrors("mimeType")
-    }
+	}
 }

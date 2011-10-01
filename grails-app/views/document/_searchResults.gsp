@@ -13,12 +13,6 @@
 	</g:if>
 </div>
 
-<g:if test="${tagSearchResults && pt.canTagAny()}">
-<div id="tag-results">
-	<g:render template="/tag/tagSearchResults" model="${pageScope.variables}" />
-</div>
-</g:if>
-
 <g:if test="${documentResults}">
 <ul id="document-items">
 	<g:each var="document" in="${documentResults}" status="index">
@@ -38,12 +32,6 @@
 		</p>
 
 		<div class="ui-button-group document-actions">
-			<pt:canTag document="${document}">
-			<a href="#" class="ui-button tags" title="<g:message code="document-vault.label.tags" />" onclick="javascript:return Tagging.showTagbox('#tagbox-${document.id}', this);">
-				<g:message code="document-vault.label.tags" />
-			</a>
-			</pt:canTag>
-
 			<pt:canNotes document="${document}">
 			<a id="notes-button-${document.id}" href="#" class="ui-button notes" title="<g:message code="document-vault.label.notes" />" onclick="javascript:return DocumentNote.show('#notebox-${document.id}', this);" data-count="${document.notes.size()?:""}">
 				<g:message code="document-vault.label.notes" />
@@ -87,13 +75,6 @@
 			</g:form>
 		</div>
 		</pt:canNotes>
-
-		<pt:canTag document="${document}">
-		<div class="document-meta hidden">
-			<ul class="taggable" id="tagbox-${document.id}" data-documentid="${document.id}"></ul>
-		</div>
-		</pt:canTag>
-
 	</li>
 	</g:each>
 </ul>

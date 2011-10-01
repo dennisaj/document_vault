@@ -38,29 +38,11 @@ modules = {
 		resource url: '/css/lib/style.css'
 	}
 
-	tagit {
-		dependsOn 'less'
-
-		resource url: '/less/tag.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle:'tagit'
-		resource url: '/css/tagit-simple-blue.css', minify: true, nominify: false
-		resource url: '/js/lib/tagit.js'
-	}
-
-	dvTags {
-		dependsOn 'tagit'
-
-		resource url: '/js/lib/jquery.jcarousel.js'
-		resource url: '/js/document/tagging.js'
-		// TODO i18n text
-		resource url: '/images/tag-blue-delete.png', attrs: [alt:'Delete Tag'], disposition: 'inline'
-	}
-
 	dvNotes {
 		resource url: '/js/document/documentnote.js'
 	}
 
 	fileUpload {
-
 		resource url: '/js/lib/jquery.tmpl.js'
 		resource url: '/js/lib/jquery.iframe-transport.js'
 		resource url: '/js/lib/jquery.fileupload.js'
@@ -104,7 +86,7 @@ modules = {
 	}
 
 	documentUpload {
-		dependsOn 'documentBase, less, jquery-ui, fileUpload, tagit'
+		dependsOn 'documentBase, less, jquery-ui, fileUpload'
 
 		resource url: '/less/upload.less', attrs:[rel: 'stylesheet/less', type: 'css'], bundle: 'bundle_documentUpload'
 		resource url: '/js/new/upload.js'
@@ -136,11 +118,5 @@ modules = {
 
 	documentAlert {
 		resource url: '/js/HtmlAlert.js'
-	}
-
-	documentTagging {
-		dependsOn 'documentBase, jqueryShowSign, dvTags, documentPreview'
-
-		resource url: '/js/lib/jquery.ui.touch-punch.min.js'
 	}
 }

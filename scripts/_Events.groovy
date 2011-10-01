@@ -15,7 +15,7 @@ eventDefaultStart = {
 		createArtifact name: args["name"], suffix: "${args['suffix']}Spec", type: "Spec", path: "test/unit", superClass: superClass
 	}
 	createIntegrationTest = { Map args = [:] ->
-		createArtifact name: args["name"], suffix: "${args['suffix']}Spec", type: "Spec", path: "test/integration", superClass: "IntegrationSpec"
+		createArtifact name: args["name"], suffix: "${args['suffix']}IntegrationSpec", type: "Spec", path: "test/integration", superClass: "IntegrationSpec"
 	}
 }
 
