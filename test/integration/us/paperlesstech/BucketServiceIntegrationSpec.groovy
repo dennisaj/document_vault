@@ -9,11 +9,13 @@ class BucketServiceIntegrationSpec extends IntegrationSpec {
 
 	Bucket bucket1
 	Bucket bucket2
+	Bucket bucket3
 	Document document1
 	Document document2
 	Document document3
 	DocumentData dd
-	Group group
+	Group group1
+	Group group2
 	Folder folder1
 	Folder folder2
 	Folder folder3
@@ -23,23 +25,27 @@ class BucketServiceIntegrationSpec extends IntegrationSpec {
 		service.authService = authService
 
 		dd = new DocumentData(mimeType:MimeType.PNG, fileSize:1, fileKey:'1234abc')
-		dd.save(flush:true)
-		group = new Group(name:'group')
-		bucket1 = new Bucket(name:'bucket1', group:group)
-		bucket2 = new Bucket(name:'bucket2', group:group)
-		group.save(flush:true)
-		bucket1.save(flush:true)
-		bucket2.save(flush:true)
+		dd.save(failOnError:true)
+		group1 = new Group(name:'group1')
+		group2 = new Group(name:'group2')
+		bucket1 = new Bucket(name:'bucket1', group:group1)
+		bucket2 = new Bucket(name:'bucket2', group:group1)
+		bucket3 = new Bucket(name:'bucket3', group:group2)
+		group1.save(failOnError:true)
+		group2.save(failOnError:true)
+		bucket1.save(failOnError:true)
+		bucket2.save(failOnError:true)
+		bucket3.save(failOnError:true)
 
-		folder1 = new Folder(name:'folder1', group:group, bucket:bucket1)
-		folder2 = new Folder(name:'folder2', group:group, bucket:bucket1)
-		folder3 = new Folder(name:'folder3', group:group)
+		folder1 = new Folder(name:'folder1', group:group1, bucket:bucket1)
+		folder2 = new Folder(name:'folder2', group:group1, bucket:bucket1)
+		folder3 = new Folder(name:'folder3', group:group1)
 
-		document1 = new Document(group:group)
+		document1 = new Document(group:group1)
 		document1.addToFiles(dd)
-		document2 = new Document(group:group)
+		document2 = new Document(group:group1)
 		document2.addToFiles(dd)
-		document3 = new Document(group:group)
+		document3 = new Document(group:group1)
 		document3.addToFiles(dd)
 
 		folder1.addToDocuments(document1)
@@ -49,10 +55,10 @@ class BucketServiceIntegrationSpec extends IntegrationSpec {
 		bucket1.addToFolders(folder1)
 		bucket1.addToFolders(folder2)
 
-		folder1.save(flush:true)
-		folder2.save(flush:true)
-		folder3.save(flush:true)
-		bucket1.save(flush:true)
+		folder1.save(failOnError:true)
+		folder2.save(failOnError:true)
+		folder3.save(failOnError:true)
+		bucket1.save(failOnError:true)
 	}
 
 	def "deleteBucket should remove all of its folders before deleting the bucket"() {
@@ -101,5 +107,31 @@ class BucketServiceIntegrationSpec extends IntegrationSpec {
 		outFolder.id == folder1.id
 		!bucket1.folders.contains(outFolder)
 		!outFolder.bucket
+	}
+
+	def "search should return all available buckets when not given a group"() {
+		when:
+		def result = service.search([max:10, offset:0, sort:'name', order:'asc'])
+		then:
+		1 * authService.getIndividualBucketsWithPermission(BucketPermission.values() as List) >> ([] as Set)
+		1 * authService.getGroupsWithPermission(BucketPermission.values() as List) >> ([group1, group2] as SortedSet)
+		result.results.values()*.size().sum() == 3
+		result.results[(group1)].contains(bucket1)
+		result.results[(group1)].contains(bucket2)
+		result.results[(group2)].contains(bucket3)
+		result.total == 3
+	}
+
+	def "search should return only return buckets from the given group"() {
+		when:
+		def result = service.search(group1, [max:10, offset:0, sort:'name', order:'asc'])
+		then:
+		1 * authService.getIndividualBucketsWithPermission(BucketPermission.values() as List) >> ([] as Set)
+		1 * authService.getGroupsWithPermission(BucketPermission.values() as List) >> ([group1, group2] as SortedSet)
+		result.results.values()*.size().sum() == 2
+		result.results[(group1)].contains(bucket1)
+		result.results[(group1)].contains(bucket2)
+		!result.results[(group2)]
+		result.total == 2
 	}
 }

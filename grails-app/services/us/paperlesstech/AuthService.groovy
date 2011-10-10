@@ -96,32 +96,32 @@ class AuthService {
 	 * Returns true if the user can create folders in the given group.
 	 */
 	boolean canFolderCreate(Group group) {
-		checkPermission(DocumentPermission.FolderCreate, group)
+		checkGroupPermission(DocumentPermission.FolderCreate, group)
 	}
 
 	/**
 	 * Returns true if the user can delete folders in the given group.
 	 */
 	boolean canFolderDelete(Group group) {
-		checkPermission(DocumentPermission.FolderDelete, group)
+		checkGroupPermission(DocumentPermission.FolderDelete, group)
 	}
 
 	/**
 	 * Returns true if the user can move a document in to any folder in the given group.
 	 */
 	boolean canFolderMoveInTo(Group group) {
-		checkPermission(DocumentPermission.FolderMoveInTo, group)
+		checkGroupPermission(DocumentPermission.FolderMoveInTo, group)
 	}
 
 	/**
 	 * Returns true if the user can move a document out of any folder in the given group.
 	 */
 	boolean canFolderMoveOutOf(Group group) {
-		checkPermission(DocumentPermission.FolderMoveOutOf, group)
+		checkGroupPermission(DocumentPermission.FolderMoveOutOf, group)
 	}
 
 	boolean canUpload(Group group) {
-		checkPermission(DocumentPermission.Upload, group)
+		checkGroupPermission(DocumentPermission.Upload, group)
 	}
 
 	boolean canUploadAnyGroup() {
@@ -178,7 +178,7 @@ class AuthService {
 		checkPermission(subject, pString)
 	}
 
-	private boolean checkPermission(DocumentPermission permission, Group g) {
+	public boolean checkGroupPermission(DocumentPermission permission, Group g) {
 		assert g
 		def subject = testSubject ?: authenticatedSubject
 
@@ -187,6 +187,19 @@ class AuthService {
 		}
 
 		String pString = "document:${permission.name().toLowerCase()}:${g.id}"
+
+		checkPermission(subject, pString)
+	}
+
+	public boolean checkGroupPermission(BucketPermission permission, Group g) {
+		assert g
+		def subject = testSubject ?: authenticatedSubject
+
+		if (!isLoggedIn()) {
+			return false
+		}
+
+		String pString = "bucket:${permission.name().toLowerCase()}:${g.id}"
 
 		checkPermission(subject, pString)
 	}
@@ -211,7 +224,7 @@ class AuthService {
 	 * @param permissions A list of permissions to test
 	 * @return The SortedSet of all groups where the user can perform the any of the given permissions
 	 */
-	SortedSet getGroupsWithPermission(List<DocumentPermission> permissions) {
+	SortedSet getGroupsWithPermission(List<Enum> permissions) {
 		if (!isLoggedIn()) {
 			return [] as SortedSet
 		}
@@ -220,7 +233,7 @@ class AuthService {
 
 		(isAdmin() ? groups : groups?.findAll { Group group ->
 			permissions.any { permission ->
-				checkPermission(permission, group)
+				checkGroupPermission(permission, group)
 			}
 		}) as SortedSet
 	}
@@ -232,7 +245,22 @@ class AuthService {
 	 * @param permissions A list of permissions to test
 	 * @return The set of all document ids where the user has specific permission to perform any of the indicated permissions
 	 */
-	Set getIndividualDocumentsWithPermission(List<DocumentPermission> permissions) {
+	Set getIndividualDocumentsWithPermission(List<DocumentPermission> permissions, Group searchGroup=null) {
+		getIndividualItemsWithPermission(permissions, 'document', searchGroup)
+	}
+
+	/**
+	 * This is for getting the buckets the user has one off permissions for. For example this isn't for seeing if
+	 * the user has bucket:view:1:* it is for collecting the 5 in bucket:view:1:5 or bucket:view:*:5
+	 *
+	 * @param permissions A list of permissions to test
+	 * @return The set of all bucket ids where the user has specific permission to perform any of the indicated permissions.
+	 */
+	Set getIndividualBucketsWithPermission(List<BucketPermission> permissions) {
+		getIndividualItemsWithPermission(permissions, 'bucket')
+	}
+
+	private Set getIndividualItemsWithPermission(List<Enum> permissions, type, Group searchGroup=null) {
 		if (!isLoggedIn()) {
 			return [] as Set
 		}
@@ -244,8 +272,10 @@ class AuthService {
 			return true
 		}
 
+		def groupMatcher = searchGroup?.id ?: '\\d+|\\*'
 		String pString = permissions*.name().join("|").toLowerCase()
-		def matcher = ~/(?i)document:(?:$pString):(?:\d+|\*):(\d+)/
+
+		def matcher = ~/(?i)$type:(?:$pString):(?:$groupMatcher):(\d+)/
 		def match
 		def matches = [] as Set
 

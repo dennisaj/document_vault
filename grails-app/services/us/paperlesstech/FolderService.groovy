@@ -1,5 +1,13 @@
 package us.paperlesstech
 
+import java.util.Map
+
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
+import org.hibernate.sql.JoinFragment
+
 import us.paperlesstech.nimble.Group
 
 class FolderService {
@@ -98,5 +106,56 @@ class FolderService {
 		folder?.removeFromDocuments(document)
 		folder?.save(failOnError:true)
 		document
+	}
+
+	/**
+	 * List all of the folders a user can view in the given Bucket.
+	 * If filter is set, apply that filter to the name field of the folders <br><br>
+	 * @param params A {@link Map} containing the pagination information
+	 * @return a {@link Map} with two entries: results and total.
+	 */
+	def search(Bucket bucket, Map params, String filter=null) {
+		def groupPerms = [DocumentPermission.FolderCreate, DocumentPermission.FolderMoveInTo, DocumentPermission.FolderMoveOutOf,
+				DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]
+
+		// If the user has permission to view the whole bucket, paginate all folders.
+		if (groupPerms.any { authService.checkGroupPermission(it, bucket.group) }) {
+			return [results:Folder.createCriteria().list {
+					eq 'bucket', bucket
+					if (filter) {
+						ilike 'name', "%$filter%"
+					}
+					maxResults(params.max)
+					firstResult(params.offset)
+					order(params.sort, params.order)
+				}, total:bucket.folders.size()]
+		}
+
+		// If not, find the individual folders in this bucket that the user can view.
+		def documentPerms = [DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]
+		def specificDocuments = authService.getIndividualDocumentsWithPermission(documentPerms, bucket.group) ?: -1L
+
+		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Folder.class)
+			.createAlias('documents', 'd', JoinFragment.LEFT_OUTER_JOIN)
+			.setProjection(Projections.distinct(Projections.id()))
+			.add(Restrictions.in('d.id', specificDocuments))
+			.add(Restrictions.eq('bucket', bucket))
+
+		if (filter) {
+			detachedCriteria.add(Restrictions.ilike('name', "%$filter%"))
+		}
+
+		def total = Folder.createCriteria().count {
+			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
+		}
+
+		def folders = Folder.createCriteria().list {
+			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
+			maxResults(params.max)
+			firstResult(params.offset)
+			order(params.sort, params.order)
+		}
+
+		[results:folders, total:total]
 	}
 }

@@ -1,5 +1,11 @@
 package us.paperlesstech
 
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
+import org.hibernate.sql.JoinFragment
+
 import us.paperlesstech.nimble.Group
 
 class BucketService {
@@ -11,7 +17,7 @@ class BucketService {
 	 * Creates and returns bucket with the given name.
 	 * If the bucket already exists, it is returned.
 	 *
-	 * @pre The current user must have the {@link BucketPermission#Create} permission for document.
+	 * @pre The current user must have the {@link BucketPermission#Create} permission for the given group.
 	 * @throws RuntimeException if there is a problem saving
 	 *
 	 * @return The saved bucket if there were no problems or a bucket with errors if validation fails
@@ -33,7 +39,7 @@ class BucketService {
 	/**
 	 * Removes the folder from the given bucket then deletes it.
 	 *
-	 * @pre The current user must have the {@link BucketPermission#Delete} permission for document.
+	 * @pre The current user must have the {@link BucketPermission#Delete} permission for bucket.group.
 	 * @throws RuntimeException if there is a problem saving
 	 */
 	def deleteBucket(Bucket bucket) {
@@ -83,7 +89,7 @@ class BucketService {
 	 *
 	 * If folder.bucket is null, nothing happens.
 	 *
-	 * @pre The current user must have the {@link BucketPermission#MoveOut} permission for document.
+	 * @pre The current user must have the {@link BucketPermission#MoveOut} permission for folder.group.
 	 * @throws RuntimeException if there is a problem saving
 	 */
 	Folder removeFolderFromBucket(Folder folder) {
@@ -94,5 +100,46 @@ class BucketService {
 		bucket?.removeFromFolders(folder)
 		bucket?.save(failOnError:true)
 		folder
+	}
+
+	def search(Map params, String filter) {
+		search(null, params, filter)
+	}
+
+	/**
+	 * List all of the buckets a user can view. If group is set, restrict the search to that group.
+	 * If filter is set, apply that filter to the name field of the buckets <br><br>
+	 * @param params A {@link Map} containing the pagination information
+	 * @return a {@link Map} with two entries: results and total.
+	 */
+	def search(Group group=null, Map params, String filter=null) {
+		def allowedGroupIds = authService.getGroupsWithPermission(BucketPermission.values() as List).collect { it.id } ?: -1L
+		def specificBuckets = authService.getIndividualBucketsWithPermission(BucketPermission.values() as List) ?: -1L
+
+		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Bucket.class)
+			.createAlias('group', 'g', JoinFragment.LEFT_OUTER_JOIN)
+			.setProjection(Projections.distinct(Projections.id()))
+			.add(Restrictions.or(Restrictions.in('id', specificBuckets), Restrictions.in('g.id', allowedGroupIds)))
+
+		if (group) {
+			detachedCriteria.add(Restrictions.eq('group', group))
+		}
+
+		if (filter) {
+			detachedCriteria.add(Restrictions.ilike('name', "%$filter%"))
+		}
+
+		def total = Bucket.createCriteria().count {
+			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
+		}
+
+		def buckets = Bucket.createCriteria().list {
+			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
+			maxResults(params.max)
+			firstResult(params.offset)
+			order(params.sort, params.order)
+		}.groupBy { it.group }
+
+		[results:buckets, total:total]
 	}
 }
