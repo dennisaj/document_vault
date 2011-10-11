@@ -46,7 +46,7 @@ public class SecurityFilters {
 									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
 								case ["downloadImage", "thumbnail"]:
 									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
-								case ["index"]:
+								case ['index', 'list']:
 									return authService.canViewAnyDocument() || authService.canSignAnyDocument()
 								case ["sign"]:
 									return document && (authService.canSign(document) || authService.canGetSigned(document))

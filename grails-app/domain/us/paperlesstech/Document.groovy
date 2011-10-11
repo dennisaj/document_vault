@@ -13,7 +13,7 @@ class Document {
 		only: ["dateCreated", "name", "searchFields"]
 	}
 
-	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField", "signed"]
+	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField", "signed", 'asMap']
 	Date dateCreated
 	SortedSet files
 	Group group
@@ -152,6 +152,27 @@ class Document {
 	def signed = {
 		def signedList = parties.findAll { it.documentPermission == DocumentPermission.Sign }*.completelySigned()
 		signedList && signedList?.every { it }
+	}
+
+	def asMap() {
+		[
+			id:id,
+			name:name,
+			dateCreated:dateCreated,
+			data:[
+				size:files.first().fileSize,
+				pages:files.first().pages,
+				mimeType:files.first().mimeType.downloadExtension
+			],
+			group:[
+				id:group.id,
+				name:group.name
+			],
+			folder:[
+				id:folder?.id,
+				name:folder?.name
+			]
+		]
 	}
 
 	@Override

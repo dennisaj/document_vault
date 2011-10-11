@@ -10,7 +10,14 @@ class DocumentController {
 	def handlerChain
 
 	def index = {
-		def model = documentService.search(params)
+		def pagination = [:]
+		def max = params.int('max')
+		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
+		pagination.sort = params.sort ?: 'dateCreated'
+		pagination.order = params.order ?: 'asc'
+		pagination.offset = params.int('offset') ?: 0
+
+		def model = documentService.search(pagination, params.q?.trim())
 		if (request.xhr) {
 			render(template:"searchResults", model:model)
 		} else {
@@ -94,5 +101,20 @@ class DocumentController {
 		assert document
 
 		[document:document, parties:Party.findAllByDocument(document), colors:PartyColor.values(), permissions:Party.allowedPermissions]
+	}
+
+	def list = {
+		def searchFolder = Folder.load(params.long('folderId'))
+
+		def pagination = [:]
+		def max = params.int('max')
+		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
+		pagination.sort = params.sort ?: 'dateCreated'
+		pagination.order = params.order ?: 'asc'
+		pagination.offset = params.int('offset') ?: 0
+
+		def results = documentService.search(searchFolder, pagination, params.filter?.trim())
+
+		render([documents:results.documentResults*.asMap(), total:results.documentTotal] as JSON)
 	}
 }

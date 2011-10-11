@@ -13,10 +13,10 @@ class DocumentData implements Cloneable, Comparable {
 	int pages = 1
 
 	static constraints = {
-		fileKey(blank: false, nullable: false, unique: true)
-		fileSize(min: 1)
-		mimeType(blank: false, nullable: false)
-		pages(min: 1, max: 10000)
+		fileKey blank:false, nullable:false, unique:true
+		fileSize min:1
+		mimeType blank:false, nullable:false
+		pages min:1, max:10000
 	}
 
 	static mapping = {

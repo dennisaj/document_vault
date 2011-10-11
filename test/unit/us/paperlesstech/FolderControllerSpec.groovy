@@ -146,7 +146,7 @@ class FolderControllerSpec extends ControllerSpec {
 		filter << [null, 'filter']
 		bucketId << [null, '1']
 		bucket << [null, bucket1]
-		pagination << [[:], [sort:'name', order:'asc', max:10, offset:0]]
+		pagination << [[:], [sort:'name', order:'asc', max:'10', offset:'0']]
 	}
 
 	def "addDocument should throw an AssertionError when passed invalid data"() {

@@ -11,38 +11,32 @@ class DocumentService {
 
 	def authService
 
-	def search(params) {
-		def documentResults = []
-		def documentTotal = 0
-
-		params.q = params.q?.trim()
-		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		params.offset = params.offset ? params.int('offset') : 0
-		params.sort = params.sort ?: "dateCreated"
-		params.order = params.order ?: "desc"
-
+	def search(Folder folder=null, Map params, String filter) {
 		def allowedGroupIds = authService.getGroupsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]).collect { it.id } ?: -1L
 		def specificDocs = authService.getIndividualDocumentsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]) ?: -1L
 
 		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Document.class)
-			.createAlias("searchFieldsCollection", "sfc", JoinFragment.LEFT_OUTER_JOIN)
-			.createAlias("notes", "n", JoinFragment.LEFT_OUTER_JOIN)
+			.createAlias('searchFieldsCollection', 'sfc', JoinFragment.LEFT_OUTER_JOIN)
+			.createAlias('notes', 'n', JoinFragment.LEFT_OUTER_JOIN)
 			.setProjection(Projections.distinct(Projections.id()))
-			.add(Restrictions.or(Restrictions.in("id", specificDocs), Restrictions.in("group.id", allowedGroupIds)))
-		if (params.q) {
-			detachedCriteria.add(Restrictions.disjunction().add(Restrictions.ilike("name", "%$params.q%"))
-					.add(Restrictions.ilike("sfc.value", "%$params.q%"))
-					.add(Restrictions.ilike("n.note", "%$params.q%")))
+			.add(Restrictions.or(Restrictions.in('id', specificDocs), Restrictions.in('group.id', allowedGroupIds)))
+
+		if (filter) {
+			detachedCriteria.add(Restrictions.disjunction().add(Restrictions.ilike('name', "%$filter%"))
+					.add(Restrictions.ilike('sfc.value', "%$filter%"))
+					.add(Restrictions.ilike('n.note', "%$filter%")))
 		}
 
-		documentTotal = Document.createCriteria().count {
-			addToCriteria(Subqueries.propertyIn("id", detachedCriteria))
+		if (folder) {
+			detachedCriteria.add(Restrictions.eq('folder', folder))
 		}
 
-		def c = Document.createCriteria()
+		def documentTotal = Document.createCriteria().count {
+			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
+		}
 
-		documentResults += c.list {
-			addToCriteria(Subqueries.propertyIn("id", detachedCriteria))
+		def documentResults = Document.createCriteria().list {
+			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
 			maxResults(params.max)
 			firstResult(params.offset)
 			order(params.sort, params.order)
