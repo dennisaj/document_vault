@@ -1,5 +1,7 @@
+import us.paperlesstech.Bucket
 import us.paperlesstech.Document
 import us.paperlesstech.nimble.AdminsService
+import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
 
 public class SecurityFilters {
@@ -22,8 +24,12 @@ public class SecurityFilters {
 		secure(controller: "($openControllers|$adminControllers)", invert: true) {
 			before = {
 				def document
+				def group
 				if (params.documentId) {
 					document = Document.get(params.long('documentId'))
+				}
+				if (params.groupId) {
+					group = Group.load(params.long('groupId'))
 				}
 				accessControl(auth:false) {
 					if (!authService.authenticatedUser?.enabled) {
@@ -52,6 +58,24 @@ public class SecurityFilters {
 									return document && authService.canSign(document)
 								case ["addParty", "submitParties", "removeParty", "resend"]:
 									return document && authService.canGetSigned(document)
+								default:
+									return false
+							}
+						case 'bucket':
+							def bucket
+							if (params.bucketId) {
+								bucket = Bucket.get(params.long('bucketId'))
+							}
+
+							switch (action) {
+								case 'create':
+									return group && authService.canCreateBucket(group)
+								case 'delete':
+									return bucket && authService.canDelete(bucket)
+								case 'addFolder':
+									return bucket && authService.canMoveInTo(bucket)
+								case 'removeFolder':
+									return bucket && authService.canMoveOutOf(bucket)
 								default:
 									return false
 							}

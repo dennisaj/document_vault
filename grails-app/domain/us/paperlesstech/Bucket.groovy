@@ -14,10 +14,23 @@ class Bucket {
 	static constraints = {
 		folders nullable:true
 		group nullable:false
-		name blank:false, nullable:false
+		name blank:false, nullable:false//, unique:'group'
 	}
 
 	static mapping = {
 		folders cascade:'none'
+	}
+
+	static transients = ['asMap']
+
+	def asMap() {
+		[
+			id:id,
+			name:name,
+			group:[
+				id:group.id,
+				name:group.name
+			]
+		]
 	}
 }

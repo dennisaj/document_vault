@@ -102,17 +102,13 @@ class BucketService {
 		folder
 	}
 
-	def search(Map params, String filter) {
-		search(null, params, filter)
-	}
-
 	/**
-	 * List all of the buckets a user can view. If group is set, restrict the search to that group.
+	 * List all of the buckets a user can view. If group is set, restrict the list to that group.
 	 * If filter is set, apply that filter to the name field of the buckets <br><br>
 	 * @param params A {@link Map} containing the pagination information
-	 * @return a {@link Map} with two entries: results and total.
+	 * @return a {@link Map} of groups to their respective buckets.
 	 */
-	def search(Group group=null, Map params, String filter=null) {
+	def search(Group group=null, String filter=null) {
 		def allowedGroupIds = authService.getGroupsWithPermission(BucketPermission.values() as List).collect { it.id } ?: -1L
 		def specificBuckets = authService.getIndividualBucketsWithPermission(BucketPermission.values() as List) ?: -1L
 
@@ -133,13 +129,11 @@ class BucketService {
 			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
 		}
 
-		def buckets = Bucket.createCriteria().list {
+		def bucketsbyGroup = Bucket.createCriteria().list {
 			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
-			maxResults(params.max)
-			firstResult(params.offset)
-			order(params.sort, params.order)
+			order('name', 'asc')
 		}.groupBy { it.group }
 
-		[results:buckets, total:total]
+		bucketsbyGroup
 	}
 }

@@ -96,5 +96,9 @@ class UrlMappings {
 			controller = "runAs"
 			action = "release"
 		}
+
+		"/bucket/$action/$bucketId/$folderId?" {
+			controller = 'bucket'
+		}
 	}
 }

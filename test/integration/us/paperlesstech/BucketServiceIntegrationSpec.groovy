@@ -111,27 +111,25 @@ class BucketServiceIntegrationSpec extends IntegrationSpec {
 
 	def "search should return all available buckets when not given a group"() {
 		when:
-		def result = service.search([max:10, offset:0, sort:'name', order:'asc'])
+		def result = service.search()
 		then:
 		1 * authService.getIndividualBucketsWithPermission(BucketPermission.values() as List) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(BucketPermission.values() as List) >> ([group1, group2] as SortedSet)
-		result.results.values()*.size().sum() == 3
-		result.results[(group1)].contains(bucket1)
-		result.results[(group1)].contains(bucket2)
-		result.results[(group2)].contains(bucket3)
-		result.total == 3
+		result.values()*.size().sum() == 3
+		result[(group1)].contains(bucket1)
+		result[(group1)].contains(bucket2)
+		result[(group2)].contains(bucket3)
 	}
 
 	def "search should return only return buckets from the given group"() {
 		when:
-		def result = service.search(group1, [max:10, offset:0, sort:'name', order:'asc'])
+		def result = service.search(group1)
 		then:
 		1 * authService.getIndividualBucketsWithPermission(BucketPermission.values() as List) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(BucketPermission.values() as List) >> ([group1, group2] as SortedSet)
-		result.results.values()*.size().sum() == 2
-		result.results[(group1)].contains(bucket1)
-		result.results[(group1)].contains(bucket2)
-		!result.results[(group2)]
-		result.total == 2
+		result.values()*.size().sum() == 2
+		result[(group1)].contains(bucket1)
+		result[(group1)].contains(bucket2)
+		!result[(group2)]
 	}
 }

@@ -17,6 +17,19 @@ class Folder {
 		bucket nullable:true
 		documents nullable:false
 		group nullable:false
-		name blank:false, nullable:false
+		name blank:false, nullable:false//, unique:'group'
+	}
+
+	static transients = ['asMap']
+
+	def asMap() {
+		[
+			id:id,
+			name:name,
+			group:[
+				id:group.id,
+				name:group.name
+			]
+		]
 	}
 }
