@@ -56,40 +56,48 @@ class FolderServiceSpec extends UnitSpec {
 		document << [null, document3]
 	}
 
-	def "createFolder should throw an AssertionError when the user lacks the FolderCreate permission"() {
-		given:
-		1 * authService.canFolderCreate(document3.group) >> false
+	def "createFolder should throw an AssertionError when the user lacks the canView permission for the given document"() {
 		when:
 		service.createFolder(document3.group, 'name', document3)
 		then:
+		1 * authService.canView(document3) >> false
+		thrown(AssertionError)
+	}
+
+	def "createFolder should throw an AssertionError when the user lacks the FolderCreate permission"() {
+		when:
+		service.createFolder(document3.group, 'name', document3)
+		then:
+		1 * authService.canFolderCreate(document3.group) >> false
+		1 * authService.canView(document3) >> true
 		thrown(AssertionError)
 	}
 
 	def "createFolder should throw an AssertionError if the initialDocument is in a folder and the user can't move it out"() {
-		given:
-		1 * authService.canFolderCreate(group1) >> true
-		1 * authService.canFolderMoveOutOf(group1) >> false
 		when:
 		service.createFolder(group1, 'name', document2)
 		then:
+		1 * authService.canFolderCreate(group1) >> true
+		1 * authService.canFolderMoveOutOf(group1) >> false
+		1 * authService.canView(document2) >> true
 		thrown(AssertionError)
 	}
 
 	def "createFolder should not check canFolderMoveOutOf if the initialDocument isn't in a folder"() {
-		given:
-		1 * authService.canFolderCreate(document3.group) >> true
 		when:
 		service.createFolder(document3.group, 'name', document3)
 		then:
+		1 * authService.canView(document3) >> true
+		1 * authService.canFolderCreate(document3.group) >> true
 		0 * authService.canFolderMoveOutOf(_)
 	}
 
 	def "createFolder should return errors if validation fails"() {
-		given:
-		1 * authService.canFolderCreate(document3.group) >> true
 		when:
 		def savedFolder = service.createFolder(document3.group, '', document3)
 		then:
+		1 * authService.canView(document3) >> true
+		1 * authService.canFolderCreate(document3.group) >> true
 		savedFolder.errors
 	}
 

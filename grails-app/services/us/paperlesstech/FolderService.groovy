@@ -26,6 +26,7 @@ class FolderService {
 	Folder createFolder(Group group, String name, Document initialDocument) {
 		assert group
 		assert initialDocument?.group == group
+		assert authService.canView(initialDocument)
 		assert authService.canFolderCreate(initialDocument.group)
 		assert !initialDocument.folder || authService.canFolderMoveOutOf(initialDocument.group)
 
@@ -113,6 +114,7 @@ class FolderService {
 	 * If filter is set, apply that filter to the name field of the folders <br><br>
 	 * @param params A {@link Map} containing the pagination information
 	 * @return a {@link Map} with two entries: results and total.
+	 * Results is a list of paginated folders and total is the total count for the query
 	 */
 	def search(Bucket bucket, Map params, String filter=null) {
 		def groupPerms = [DocumentPermission.FolderCreate, DocumentPermission.FolderMoveInTo, DocumentPermission.FolderMoveOutOf,

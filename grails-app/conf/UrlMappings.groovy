@@ -100,5 +100,9 @@ class UrlMappings {
 		"/bucket/$action/$bucketId/$folderId?" {
 			controller = 'bucket'
 		}
+
+		"/folder/$action/$folderId/$documentId?" {
+			controller = 'folder'
+		}
 	}
 }

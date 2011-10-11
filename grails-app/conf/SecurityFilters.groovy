@@ -1,5 +1,6 @@
 import us.paperlesstech.Bucket
 import us.paperlesstech.Document
+import us.paperlesstech.Folder
 import us.paperlesstech.nimble.AdminsService
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
@@ -76,6 +77,24 @@ public class SecurityFilters {
 									return bucket && authService.canMoveInTo(bucket)
 								case 'removeFolder':
 									return bucket && authService.canMoveOutOf(bucket)
+								default:
+									return false
+							}
+						case 'folder':
+							def folder
+							if (params.folderId) {
+								folder = Folder.get(params.long('bucketId'))
+							}
+
+							switch (action) {
+								case 'create':
+									return group && authService.canFolderCreate(group)
+								case 'delete':
+									return folder && authService.canFolderDelete(folder)
+								case 'addDocument':
+									return folder && authService.canFolderMoveInTo(folder)
+								case 'removeDocument':
+									return folder && authService.canFolderMoveOutOf(folder)
 								default:
 									return false
 							}

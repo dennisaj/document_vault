@@ -9,5 +9,6 @@ class NotificationHelper {
 enum NotificationStatus {
 	Error,
 	Info,
-	Success
+	Success,
+	Warning
 }

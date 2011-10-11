@@ -69,7 +69,7 @@ class BucketController {
 		assert destination
 		def folder = Folder.get(params.long('folderId'))
 		assert folder
-		assert folder.bucket.id == params.long('currentBucketId')
+		assert folder.bucket?.id == params.long('currentBucketId')
 
 		bucketService.addFolderToBucket(destination, folder)
 
@@ -81,7 +81,7 @@ class BucketController {
 		assert bucket
 		def folder = Folder.get(params.long('folderId'))
 		assert folder
-		assert folder.bucket.id == bucket.id
+		assert folder.bucket?.id == bucket.id
 
 		bucketService.removeFolderFromBucket(folder)
 

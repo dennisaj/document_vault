@@ -45,29 +45,6 @@ class BucketControllerSpec extends ControllerSpec {
 		groupId << ['9', null]
 	}
 
-	def "delete should throw an AssertError when given an invalid bucket"() {
-		given:
-		controller.params.bucketId = bucketId
-		when:
-		controller.delete()
-		then:
-		0 * bucketService.deleteBucket(_)
-		thrown(AssertionError)
-		where:
-		bucketId << [null, '123']
-	}
-
-	def "delete should call deleteBucket and return a JSON object with a notification entry"() {
-		given:
-		controller.params.bucketId = '1'
-		when:
-		controller.delete()
-		def results = JSON.parse(mockResponse.contentAsString)
-		then:
-		1 * bucketService.deleteBucket(bucket1)
-		results.notification.status == NotificationStatus.Success.name()
-	}
-
 	def "create should render errors return by createBucket"() {
 		given:
 		controller.params.groupId = '1'
@@ -103,6 +80,29 @@ class BucketControllerSpec extends ControllerSpec {
 		results.bucket.name == 'new bucket2'
 		results.bucket.group.id == group1.id
 		results.bucket.group.name == group1.name
+	}
+
+	def "delete should throw an AssertError when given an invalid bucket"() {
+		given:
+		controller.params.bucketId = bucketId
+		when:
+		controller.delete()
+		then:
+		0 * bucketService.deleteBucket(_)
+		thrown(AssertionError)
+		where:
+		bucketId << [null, '123']
+	}
+
+	def "delete should call deleteBucket and return a JSON object with a notification entry"() {
+		given:
+		controller.params.bucketId = '1'
+		when:
+		controller.delete()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * bucketService.deleteBucket(bucket1)
+		results.notification.status == NotificationStatus.Success.name()
 	}
 
 	def "list should pass group and filter to search then return the results as JSON"() {
