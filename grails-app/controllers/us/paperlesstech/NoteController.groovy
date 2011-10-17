@@ -1,6 +1,8 @@
 package us.paperlesstech
 
 import grails.converters.JSON
+import us.paperlesstech.helpers.NotificationHelper
+import us.paperlesstech.helpers.NotificationStatus
 
 class NoteController {
 	static allowedMethods = [list:"POST", saveLines:"POST", saveText:"POST",]
@@ -39,7 +41,7 @@ class NoteController {
 			notes[it.id] = [url:url, note:it.note, pageNumber:it.pageNumber, left:it.left, top:it.top]
 		}
 
-		render(notes as JSON)
+		render([notification:NotificationHelper.notification('message', 'title', NotificationStatus.Success), notes:notes] as JSON)
 	}
 
 	def saveLines = {
@@ -60,7 +62,7 @@ class NoteController {
 		handlerChain.saveNotes(document:document, notes:notes)
 		document.save(flush:true)
 
-		render([status:'success'] as JSON)
+		render([notification:NotificationHelper.notification('message', 'title', NotificationStatus.Success)] as JSON)
 	}
 
 	def saveText = {

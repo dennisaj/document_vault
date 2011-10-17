@@ -121,7 +121,7 @@ class FolderService {
 				DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]
 
 		// If the user has permission to view the whole bucket, paginate all folders.
-		if (groupPerms.any { authService.checkGroupPermission(it, bucket.group) }) {
+		if (bucket && groupPerms.any { authService.checkGroupPermission(it, bucket.group) }) {
 			return [results:Folder.createCriteria().list {
 					eq 'bucket', bucket
 					if (filter) {
@@ -135,13 +135,18 @@ class FolderService {
 
 		// If not, find the individual folders in this bucket that the user can view.
 		def documentPerms = [DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]
-		def specificDocuments = authService.getIndividualDocumentsWithPermission(documentPerms, bucket.group) ?: -1L
+		def specificDocuments = authService.getIndividualDocumentsWithPermission(documentPerms, bucket?.group) ?: -1L
 
 		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Folder.class)
 			.createAlias('documents', 'd', JoinFragment.LEFT_OUTER_JOIN)
 			.setProjection(Projections.distinct(Projections.id()))
 			.add(Restrictions.in('d.id', specificDocuments))
-			.add(Restrictions.eq('bucket', bucket))
+
+		if (bucket) {
+			detachedCriteria.add(Restrictions.eq('bucket', bucket))
+		} else {
+			detachedCriteria.add(Restrictions.isNull('bucket'))
+		}
 
 		if (filter) {
 			detachedCriteria.add(Restrictions.ilike('name', "%$filter%"))

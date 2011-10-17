@@ -16,6 +16,7 @@ class BucketServiceIntegrationSpec extends IntegrationSpec {
 	DocumentData dd
 	Group group1
 	Group group2
+	Group group3
 	Folder folder1
 	Folder folder2
 	Folder folder3
@@ -28,11 +29,13 @@ class BucketServiceIntegrationSpec extends IntegrationSpec {
 		dd.save(failOnError:true)
 		group1 = new Group(name:'group1')
 		group2 = new Group(name:'group2')
+		group3 = new Group(name:'empty group')
 		bucket1 = new Bucket(name:'bucket1', group:group1)
 		bucket2 = new Bucket(name:'bucket2', group:group1)
 		bucket3 = new Bucket(name:'bucket3', group:group2)
 		group1.save(failOnError:true)
 		group2.save(failOnError:true)
+		group3.save(failOnError:true)
 		bucket1.save(failOnError:true)
 		bucket2.save(failOnError:true)
 		bucket3.save(failOnError:true)
@@ -131,5 +134,17 @@ class BucketServiceIntegrationSpec extends IntegrationSpec {
 		result[(group1)].contains(bucket1)
 		result[(group1)].contains(bucket2)
 		!result[(group2)]
+	}
+
+	def "search should return an empty group if the user had permission to the group but there are no buckets in it"() {
+		when:
+		def result = service.search()
+		then:
+		1 * authService.getIndividualBucketsWithPermission(BucketPermission.values() as List) >> ([] as Set)
+		1 * authService.getGroupsWithPermission(BucketPermission.values() as List) >> ([group1, group2, group3] as SortedSet)
+		result.values()*.size().sum() == 3
+		result[(group1)].contains(bucket1)
+		result[(group1)].contains(bucket2)
+		result[(group3)].isEmpty()
 	}
 }

@@ -14,6 +14,7 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 	Document document1
 	Document document2
 	Document document3
+	Document document4
 	Folder folder1
 	Folder folder2
 
@@ -35,6 +36,9 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		document2.addToFiles(dd)
 		document3 = new Document(group:group1, name:'document3')
 		document3.addToFiles(dd)
+		document4 = new Document(group:group1, name:'document4')
+		document4.addToFiles(dd)
+		document4.save(failOnError:true)
 
 		folder1.addToDocuments(document1)
 		folder2.addToDocuments(document2)
@@ -44,20 +48,16 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		folder2.save(failOnError:true)
 	}
 
-	def "search should return all available documents when not given a folder"() {
+	def "search should return documents without a folder when folder is null"() {
 		when:
 		def result = service.search(null, [sort:'name', order:'asc', max:10, offset:0], '')
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
-		result.documentResults.size() == 3
-		result.documentResults[0].id== document1.id
-		result.documentResults[0].name == document1.name
-		result.documentResults[1].id== document2.id
-		result.documentResults[1].name == document2.name
-		result.documentResults[2].id== document3.id
-		result.documentResults[2].name == document3.name
-		result.documentTotal == 3
+		result.documentResults.size() == 1
+		result.documentResults[0].id== document4.id
+		result.documentResults[0].name == document4.name
+		result.documentTotal == 1
 	}
 
 	def "search should limit by folder when one is given"() {
@@ -76,7 +76,7 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 
 	def "search should limit by document ids when getIndividualDocumentsWithPermission returns values"() {
 		when:
-		def result = service.search(null, [sort:'name', order:'asc', max:10, offset:0], '')
+		def result = service.search(document1.folder, [sort:'name', order:'asc', max:10, offset:0], '')
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([document1.id] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([] as SortedSet)
@@ -88,7 +88,7 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 
 	def "search should apply the filter when it is supplied"() {
 		when:
-		def result = service.search(null, [sort:'name', order:'asc', max:10, offset:0], 'document1')
+		def result = service.search(document1.folder, [sort:'name', order:'asc', max:10, offset:0], 'document1')
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)

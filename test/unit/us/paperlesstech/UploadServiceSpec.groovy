@@ -20,13 +20,13 @@ class UploadServiceSpec extends UnitSpec {
 
 	def "uploadInputStream only works if it has a mimeType"() {
 		expect:
-		service.uploadInputStream(null, new Group(), "file with no ext", "unknown content type") == null
+		service.uploadInputStream(null, new Group(), "file with no ext", "unknown content type") == []
 	}
 
 	def "uploadInputStream should pass through mimeType"() {
 		given:
 		def d = new Document()
-		service.metaClass.uploadDocument = { byte[] bytes, Group group, String name, MimeType mimeType -> [d] }
+		service.metaClass.uploadDocument = { byte[] bytes, Group group, String name, MimeType mimeType, Folder folder -> [d] }
 
 		when:
 		def result = service.uploadInputStream(null as InputStream, new Group(), "file.pdf", "application/pdf")

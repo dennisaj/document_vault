@@ -109,7 +109,8 @@ class BucketService {
 	 * @return a {@link Map} of groups to their respective buckets.
 	 */
 	def search(Group group=null, String filter=null) {
-		def allowedGroupIds = authService.getGroupsWithPermission(BucketPermission.values() as List).collect { it.id } ?: -1L
+		def allowedGroups = authService.getGroupsWithPermission(BucketPermission.values() as List)
+		def allowedGroupIds = allowedGroups.collect { it.id } ?: -1L
 		def specificBuckets = authService.getIndividualBucketsWithPermission(BucketPermission.values() as List) ?: -1L
 
 		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Bucket.class)
@@ -129,11 +130,17 @@ class BucketService {
 			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
 		}
 
-		def bucketsbyGroup = Bucket.createCriteria().list {
+		def bucketsByGroup = Bucket.createCriteria().list {
 			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
 			order('name', 'asc')
 		}.groupBy { it.group }
 
-		bucketsbyGroup
+		allowedGroups.each {
+			if (!(it in bucketsByGroup)) {
+				bucketsByGroup.put(it, [])
+			}
+		}
+
+		bucketsByGroup
 	}
 }

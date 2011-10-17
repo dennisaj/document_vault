@@ -12,12 +12,12 @@ class DocumentController {
 	def index = {
 		def pagination = [:]
 		def max = params.int('max')
-		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
-		pagination.sort = params.sort ?: 'dateCreated'
-		pagination.order = params.order ?: 'asc'
-		pagination.offset = params.int('offset') ?: 0
+		params.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
+		params.sort = params.sort ?: 'dateCreated'
+		params.order = params.order ?: 'asc'
+		params.offset = params.int('offset') ?: 0
 
-		def model = documentService.search(pagination, params.q?.trim())
+		def model = documentService.search(params, params.q?.trim())
 		if (request.xhr) {
 			render(template:"searchResults", model:model)
 		} else {

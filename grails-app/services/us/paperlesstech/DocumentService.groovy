@@ -29,6 +29,8 @@ class DocumentService {
 
 		if (folder) {
 			detachedCriteria.add(Restrictions.eq('folder', folder))
+		} else {
+			detachedCriteria.add(Restrictions.isNull('folder'))
 		}
 
 		def documentTotal = Document.createCriteria().count {

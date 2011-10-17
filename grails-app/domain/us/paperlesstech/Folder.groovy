@@ -26,6 +26,10 @@ class Folder {
 		[
 			id:id,
 			name:name,
+			bucket:[
+				id:bucket?.id,
+				name:bucket?.id
+			],
 			group:[
 				id:group.id,
 				name:group.name

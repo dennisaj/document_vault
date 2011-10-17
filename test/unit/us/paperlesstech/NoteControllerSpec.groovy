@@ -135,7 +135,7 @@ class NoteControllerSpec extends ControllerSpec {
 		when:
 		controller.saveLines()
 		then:
-		JSON.parse(mockResponse.contentAsString).status == 'success'
+		JSON.parse(mockResponse.contentAsString).notification.status == 'Success'
 		outputNotes.size() == 2
 		where:
 		notes = "['lines','more lines','']"
@@ -165,10 +165,10 @@ class NoteControllerSpec extends ControllerSpec {
 		controller.params.documentId = '2'
 		when:
 		controller.list()
-		def notes = JSON.parse(mockResponse.contentAsString)
+		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		notes.size() == 1
-		notes.'3'.url
+		results.notes.size() == 1
+		results.notes.'3'.url
 	}
 
 	def "download should throw an AssertionError when given an invalid noteDataId"() {

@@ -57,22 +57,21 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 
 	def "deleteFolder should remove all of its documents before deleting the folder"() {
 		given:
-		1 * authService.canFolderDelete(group) >> true
 		def folderId = folder1.id
 		when:
 		service.deleteFolder(folder1)
 		then:
+		1 * authService.canFolderDelete(group) >> true
 		!Folder.get(folderId)
 		!Document.get(document1.id).folder
 	}
 
 	def "addDocumentToFolder should move the document from one folder to another"() {
-		given:
-		1 * authService.canFolderMoveInTo(document1.group) >> true
-		1 * authService.canFolderMoveOutOf(document1.group) >> true
 		when:
 		def outDocument = service.addDocumentToFolder(folder2, document1)
 		then:
+		1 * authService.canFolderMoveInTo(document1.group) >> true
+		1 * authService.canFolderMoveOutOf(document1.group) >> true
 		outDocument.id == document1.id
 		!folder1.documents.contains(outDocument)
 		outDocument.folder == folder2
@@ -80,12 +79,11 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	def "addDocumentToFolder should work if the document is not in a current folder"() {
-		given:
-		1 * authService.canFolderMoveInTo(document3.group) >> true
-		0 * authService.canFolderMoveOutOf(_)
 		when:
 		def outDocument = service.addDocumentToFolder(folder1, document3)
 		then:
+		1 * authService.canFolderMoveInTo(document3.group) >> true
+		0 * authService.canFolderMoveOutOf(_)
 		outDocument.id == document3.id
 		outDocument.folder == folder1
 		folder1.documents.contains(outDocument)
@@ -93,21 +91,20 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 
 	def "removeDocumentFromFolder should set the document's folder to null"() {
 		given:
-		1 * authService.canFolderMoveOutOf(document1.group) >> true
 		when:
 		def outDocument = service.removeDocumentFromFolder(document1)
 		then:
+		1 * authService.canFolderMoveOutOf(document1.group) >> true
 		outDocument.id == document1.id
 		!folder1.documents.contains(outDocument)
 		!outDocument.folder
 	}
 
 	def "search should return all folders when the user has one of the group permissions"() {
-		given:
-		1 * authService.checkGroupPermission(DocumentPermission.FolderCreate, bucket.group) >> true
 		when:
 		def result = service.search(bucket, [max:10, offset:0, sort:'name', order:'asc'])
 		then:
+		1 * authService.checkGroupPermission(DocumentPermission.FolderCreate, bucket.group) >> true
 		result.results.size() == 2
 		result.results.contains(folder1)
 		result.results.contains(folder2)
@@ -115,15 +112,25 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	def "search should return only folders where a user has permission to containing documents when the user lacks permission to the whole group"() {
-		given:
-		6 * authService.checkGroupPermission(_, bucket.group) >> false
-		1 * authService.getIndividualDocumentsWithPermission(_, bucket.group) >> [document4.id]
 		when:
 		def result = service.search(bucket, [max:10, offset:0, sort:'name', order:'asc'])
 		then:
+		6 * authService.checkGroupPermission(_, bucket.group) >> false
+		1 * authService.getIndividualDocumentsWithPermission(_, bucket.group) >> [document4.id]
 		result.results.size() == 1
 		!result.results.contains(folder1)
 		result.results.contains(folder2)
+		result.total == 1
+	}
+
+	def "search should return folders without buckets when bucket is null"() {
+		when:
+		def result = service.search(null, [max:10, offset:0, sort:'name', order:'asc'])
+		then:
+		0 * authService.checkGroupPermission(_, _)
+		1 * authService.getIndividualDocumentsWithPermission(_, null) >> [document2.id]
+		result.results.size() == 1
+		result.results.contains(folder3)
 		result.total == 1
 	}
 }

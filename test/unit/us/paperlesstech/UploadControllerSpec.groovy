@@ -19,6 +19,8 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.authService = authService
 		controller.uploadService = uploadService
 		controller.preferenceService = preferenceService
+
+		mockDomain(Folder)
 	}
 
 	def "savePcl responds with a 500 error when the user can't upload to any group"() {
@@ -123,7 +125,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.save()
 
 		then:
-		1 * uploadService.uploadInputStream(_, group, _, _) >> null
+		1 * uploadService.uploadInputStream(_, group, _, _, _) >> null
 		if (ajax) {
 			def json = JSON.parse(mockResponse.contentAsString)
 			assert json.size() == 1
@@ -158,7 +160,7 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.save()
 
 		then:
-		1 * uploadService.uploadInputStream(_, group, _, _) >> [d]
+		1 * uploadService.uploadInputStream(_, group, _, _, _) >> [d]
 		if (ajax) {
 			def json = JSON.parse(mockResponse.contentAsString)
 			assert json.size() == 1

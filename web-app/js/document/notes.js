@@ -66,7 +66,7 @@ var Notes = {
 		return Document.getNotes().then(function(data) {
 			self.notes = [];
 
-			$.each(data, function(index, note) {
+			$.each(data.notes, function(index, note) {
 				self.notes[note.pageNumber] = self.notes[note.pageNumber] || {};
 				self.notes[note.pageNumber][index] = {
 					left: note.left,
