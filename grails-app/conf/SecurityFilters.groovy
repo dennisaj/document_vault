@@ -69,6 +69,8 @@ public class SecurityFilters {
 							}
 
 							switch (action) {
+								case 'list':
+									return true
 								case 'create':
 									return group && authService.canCreateBucket(group)
 								case 'delete':
@@ -87,6 +89,8 @@ public class SecurityFilters {
 							}
 
 							switch (action) {
+								case 'list':
+									return true
 								case 'create':
 									return group && authService.canFolderCreate(group)
 								case 'delete':
