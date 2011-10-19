@@ -29,7 +29,7 @@ environments {
         dataSource {
             username = "document_vault"
             password = ""
-			url = ""
+            url = "jdbc:mysql://localhost/document_vault"
             driverClassName = "com.mysql.jdbc.Driver"
             dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
             dbCreate = "none"

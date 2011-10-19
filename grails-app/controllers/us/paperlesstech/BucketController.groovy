@@ -2,7 +2,6 @@ package us.paperlesstech
 
 import grails.converters.JSON
 import us.paperlesstech.helpers.NotificationHelper
-import us.paperlesstech.helpers.NotificationStatus
 import us.paperlesstech.nimble.Group
 
 class BucketController {
@@ -18,7 +17,7 @@ class BucketController {
 		def returnMap = [:]
 
 		if (bucket.hasErrors()) {
-			returnMap.notification = NotificationHelper.notification('title', 'message', NotificationStatus.Error)
+			returnMap.notification = NotificationHelper.error('title', 'message')
 
 			// TODO replace with collectEntries with Groovy 1.8.0
 			returnMap.validation = [:].putAll(['group', 'name'].collect { field->
@@ -32,7 +31,7 @@ class BucketController {
 				)
 			})
 		} else {
-			returnMap.notification = NotificationHelper.notification('title', 'message', NotificationStatus.Success)
+			returnMap.notification = NotificationHelper.success('title', 'message')
 			returnMap.bucket = bucket.asMap()
 		}
 
@@ -45,7 +44,7 @@ class BucketController {
 
 		bucketService.deleteBucket(bucket)
 
-		render([notification:NotificationHelper.notification('title', 'message', NotificationStatus.Success)] as JSON)
+		render([notification:NotificationHelper.success('title', 'message')] as JSON)
 	}
 
 	def list = {
@@ -73,7 +72,7 @@ class BucketController {
 
 		bucketService.addFolderToBucket(destination, folder)
 
-		render([notification:NotificationHelper.notification('title', 'message', NotificationStatus.Success)] as JSON)
+		render([notification:NotificationHelper.success('title', 'message')] as JSON)
 	}
 
 	def removeFolder = {
@@ -85,6 +84,6 @@ class BucketController {
 
 		bucketService.removeFolderFromBucket(folder)
 
-		render([notification:NotificationHelper.notification('title', 'message', NotificationStatus.Success)] as JSON)
+		render([notification:NotificationHelper.success('title', 'message')] as JSON)
 	}
 }

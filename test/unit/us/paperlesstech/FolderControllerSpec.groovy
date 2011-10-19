@@ -75,7 +75,7 @@ class FolderControllerSpec extends ControllerSpec {
 			folder.errors.rejectValue('name', 'this.is.an.error.code.for.name')
 			folder
 		}
-		results.notification.status == NotificationStatus.Error.name()
+		results.notification.status == NotificationStatus.Error.name().toLowerCase()
 		results.validation.name.errors
 		!results.validation.name.valid
 		!results.validation.group.errors
@@ -95,7 +95,7 @@ class FolderControllerSpec extends ControllerSpec {
 			folder.addToDocuments(document)
 			folder
 		}
-		results.notification.status == NotificationStatus.Success.name()
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 		results.folder.id == 4
 		results.folder.name == 'new folder2'
 		results.folder.group.id == group1.id
@@ -124,7 +124,7 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.deleteFolder(folder1)
-		results.notification.status == NotificationStatus.Success.name()
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 	}
 
 	def "list should pass bucket, pagination and filter to search then return the results as JSON"() {
@@ -179,7 +179,7 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.addDocumentToFolder(folder2, document2)
-		results.notification.status == NotificationStatus.Success.name()
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 	}
 
 	def "removeDocument should throw an AssertionError when passed invalid data"() {
@@ -209,6 +209,6 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.removeDocumentFromFolder(document2)
-		results.notification.status == NotificationStatus.Success.name()
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 	}
 }

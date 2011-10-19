@@ -6,7 +6,7 @@ import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
 
 public class SecurityFilters {
-	private static String openControllers = "auth|logout|account|code"
+	private static String openControllers = "auth|logout|account|code|userInfo"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 

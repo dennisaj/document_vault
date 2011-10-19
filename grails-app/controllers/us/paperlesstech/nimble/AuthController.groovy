@@ -16,6 +16,8 @@
  */
 package us.paperlesstech.nimble
 
+import grails.converters.JSON
+
 import javax.servlet.http.Cookie
 
 import org.apache.shiro.authc.AuthenticationException
@@ -25,6 +27,7 @@ import org.apache.shiro.authc.UsernamePasswordToken
 import org.openid4java.message.ParameterList
 
 import us.paperlesstech.auth.nimble.FacebookConnectToken
+import us.paperlesstech.helpers.NotificationHelper
 
 /**
  * Manages all authentication processes including integration with OpenID, Facebook etc.
@@ -32,7 +35,7 @@ import us.paperlesstech.auth.nimble.FacebookConnectToken
  * @author Bradley Beddoes
  */
 class AuthController {
-	static Map allowedMethods = [signin: 'POST']
+	static Map allowedMethods = [ajaxlogin:'POST', signin:'POST']
 	static navigation = [[group: "user", action: "logout", isVisible: { authService.isLoggedIn() && !authService.authenticatedSubject.isRunAs() }, order: 100, title: "Logout"]]
 
 	private static String TARGET = 'AuthController.TARGET'
@@ -86,34 +89,27 @@ class AuthController {
 			session.removeAttribute(AuthController.TARGET)
 
 			log.info "Authenticated user, $params.username."
-			if (userService.events["login"]) {
-				log.info "Executing login callback"
-				def newUri = userService.events["login"](authService.authenticatedUser, targetUri, request)
-				if (newUri != null) {
-					targetUri = newUri
-				}
-			}
 			log.info "Directing to content $targetUri"
-			redirect(uri: targetUri)
+			redirect(uri:targetUri)
 			return
 		} catch (IncorrectCredentialsException e) {
 			log.info "Credentials failure for user '${params.username}'."
 			log.debug e
 
 			flash.type = 'error'
-			flash.message = message(code: "nimble.login.failed.credentials")
+			flash.message = g.message(code: "nimble.login.failed.credentials")
 		} catch (DisabledAccountException e) {
 			log.info "Attempt to login to disabled account for user '${params.username}'."
 			log.debug e
 
 			flash.type = 'error'
-			flash.message = message(code: "nimble.login.failed.disabled")
+			flash.message = g.message(code: "nimble.login.failed.disabled")
 		} catch (AuthenticationException e) {
 			log.info "General authentication failure for user '${params.username}'."
 			log.debug e
 
 			flash.type = 'error'
-			flash.message = message(code: "nimble.login.failed.general")
+			flash.message = g.message(code: "nimble.login.failed.general")
 		}
 
 		params.remove('password')
@@ -124,21 +120,54 @@ class AuthController {
 		signout()
 	}
 
+	def ajaxlogin = {
+		def authToken = new UsernamePasswordToken(params.username, params.password)
+		def notification
+
+		if (params.rememberme) {
+			authToken.rememberMe = true
+		}
+
+		log.info("Attempting to authenticate user, $params.username. RememberMe is $authToken.rememberMe")
+
+		try {
+			authService.login(authToken)
+			userService.createLoginRecord(request)
+
+			log.info "Authenticated user, $params.username."
+
+			render([notification:NotificationHelper.success('title', 'message')] as JSON)
+			return
+		} catch (IncorrectCredentialsException e) {
+			log.info "Credentials failure for user '${params.username}'."
+			log.debug e
+
+			notification = 'nimble.login.failed.credentials'
+		} catch (DisabledAccountException e) {
+			log.info "Attempt to login to disabled account for user '${params.username}'."
+			log.debug e
+
+			notification = 'nimble.login.failed.disabled'
+		} catch (AuthenticationException e) {
+			log.info "General authentication failure for user '${params.username}'."
+			log.debug e
+
+			notification = 'nimble.login.failed.general'
+		}
+
+		render([notification:NotificationHelper.error('title', notification)] as JSON)
+	}
+
 	def signout = {
 		log.info("Signing out user ${authService.authenticatedUser?.username}")
 
-		if (authService.authenticatedSubject.isRunAs()) {
+		if (authService.authenticatedSubject?.isRunAs()) {
 			redirect(controller:"runAs", action:"release")
 			return
 		}
 
-		if (userService.events["logout"]) {
-			log.info("Executing logout callback")
-			userService.events["logout"](authService.authenticatedUser)
-		}
-
 		authService.logout()
-		redirect(uri: '/')
+		request.xhr ? render([notification:NotificationHelper.success('title', 'message')] as JSON) : redirect(uri: '/')
 	}
 
 	def unauthorized = {

@@ -58,7 +58,7 @@ class BucketControllerSpec extends ControllerSpec {
 			bucket.errors.rejectValue('name', 'this.is.an.error.code.for.name')
 			bucket
 		}
-		results.notification.status == NotificationStatus.Error.name()
+		results.notification.status == NotificationStatus.Error.name().toLowerCase()
 		results.validation.name.errors
 		!results.validation.name.valid
 		!results.validation.group.errors
@@ -75,7 +75,7 @@ class BucketControllerSpec extends ControllerSpec {
 		1 * bucketService.createBucket(group1, 'new bucket2') >> { group, name->
 			new Bucket(id:4, group:group, name:name)
 		}
-		results.notification.status == NotificationStatus.Success.name()
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 		results.bucket.id == 4
 		results.bucket.name == 'new bucket2'
 		results.bucket.group.id == group1.id
@@ -102,7 +102,7 @@ class BucketControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * bucketService.deleteBucket(bucket1)
-		results.notification.status == NotificationStatus.Success.name()
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 	}
 
 	def "list should pass group and filter to search then return the results as JSON"() {
@@ -156,7 +156,7 @@ class BucketControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * bucketService.addFolderToBucket(bucket2, folder1)
-		results.notification.status == NotificationStatus.Success.name()
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 	}
 
 	def "removeFolder should throw an AssertionError when passed invalid data"() {
@@ -186,6 +186,6 @@ class BucketControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * bucketService.removeFolderFromBucket(folder1)
-		results.notification.status == NotificationStatus.Success.name()
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 	}
 }

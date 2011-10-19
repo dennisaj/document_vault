@@ -6,7 +6,7 @@ import us.paperlesstech.nimble.User
 
 class RunAsController {
 	static def allowedMethods = [runas:"POST", release:"GET"]
-	static def navigation = [[group: 'user', action:'release', isVisible: { authService.authenticatedSubject?.isRunAs() }, order:0, title:'Release', params:[targetUri:"/"]]]
+	static def navigation = [[group:'user', action:'release', isVisible: { authService.authenticatedSubject?.isRunAs() }, order:0, title:'Release', params:[targetUri:"/"]]]
 
 	def authService
 

@@ -168,6 +168,7 @@ environments {
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp"
 		document_vault.forceSSL = false
+		grails.converters.json.pretty.print = true
 	}
 	test {
 		document_vault.remoteSigning.enabled = false

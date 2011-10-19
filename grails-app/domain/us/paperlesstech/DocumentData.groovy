@@ -15,7 +15,7 @@ class DocumentData implements Cloneable, Comparable {
 	static constraints = {
 		fileKey blank:false, nullable:false, unique:true
 		fileSize min:1
-		mimeType blank:false, nullable:false
+		mimeType nullable:false
 		pages min:1, max:10000
 	}
 

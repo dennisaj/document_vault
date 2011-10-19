@@ -6,6 +6,7 @@ import grails.plugin.spock.ControllerSpec
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 
 import us.paperlesstech.handlers.Handler
+import us.paperlesstech.helpers.NotificationStatus
 
 class NoteControllerSpec extends ControllerSpec {
 	Handler handlerChain = Mock()
@@ -135,7 +136,7 @@ class NoteControllerSpec extends ControllerSpec {
 		when:
 		controller.saveLines()
 		then:
-		JSON.parse(mockResponse.contentAsString).notification.status == 'Success'
+		JSON.parse(mockResponse.contentAsString).notification.status == NotificationStatus.Success.name().toLowerCase()
 		outputNotes.size() == 2
 		where:
 		notes = "['lines','more lines','']"

@@ -1,5 +1,6 @@
-import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+
+import com.mchange.v2.c3p0.ComboPooledDataSource
 
 beans = {
 	dataSource(ComboPooledDataSource) { bean ->

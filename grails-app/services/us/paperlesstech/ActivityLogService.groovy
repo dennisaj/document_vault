@@ -18,7 +18,7 @@ class ActivityLogService {
 	 */
 	ActivityLog addLog(String controller, String action, int status, Map params = [:]) {
 		action = action ?: "index"
-		def document = Document.get(params.remove("documentId"))
+		def document = Document.load(params.remove("documentId"))
 		def pageNumber = params.remove("pageNumber")
 		// Don't log signature line or document notes data
 		params.remove("lines")

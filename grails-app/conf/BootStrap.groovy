@@ -106,6 +106,5 @@ class BootStrap {
 				serviceBean.nimbleInit()
 			}
 		}
-	
 	}
 }

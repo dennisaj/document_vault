@@ -2,7 +2,6 @@ package us.paperlesstech
 
 import grails.converters.JSON
 import us.paperlesstech.helpers.NotificationHelper
-import us.paperlesstech.helpers.NotificationStatus
 import us.paperlesstech.nimble.Group
 
 class FolderController {
@@ -18,7 +17,7 @@ class FolderController {
 		def returnMap = [:]
 
 		if (folder.hasErrors()) {
-			returnMap.notification = NotificationHelper.notification('title', 'message', NotificationStatus.Error)
+			returnMap.notification = NotificationHelper.error('title', 'message')
 
 			// TODO replace with collectEntries with Groovy 1.8.0
 			returnMap.validation = [:].putAll(['group', 'name', 'documents'].collect { field->
@@ -32,7 +31,7 @@ class FolderController {
 				)
 			})
 		} else {
-			returnMap.notification = NotificationHelper.notification('title', 'message', NotificationStatus.Success)
+			returnMap.notification = NotificationHelper.success('title', 'message')
 			returnMap.folder = folder.asMap()
 			returnMap.folder.documents = [
 				[
@@ -51,7 +50,7 @@ class FolderController {
 
 		folderService.deleteFolder(folder)
 
-		render([notification:NotificationHelper.notification('title', 'message', NotificationStatus.Success)] as JSON)
+		render([notification:NotificationHelper.success('title', 'message')] as JSON)
 	}
 
 	def list = {
@@ -78,7 +77,7 @@ class FolderController {
 
 		folderService.addDocumentToFolder(destination, document)
 
-		render([notification:NotificationHelper.notification('title', 'message', NotificationStatus.Success)] as JSON)
+		render([notification:NotificationHelper.success('title', 'message')] as JSON)
 	}
 
 	def removeDocument = {
@@ -90,6 +89,6 @@ class FolderController {
 
 		folderService.removeDocumentFromFolder(document)
 
-		render([notification:NotificationHelper.notification('title', 'message', NotificationStatus.Success)] as JSON)
+		render([notification:NotificationHelper.success('title', 'message')] as JSON)
 	}
 }
