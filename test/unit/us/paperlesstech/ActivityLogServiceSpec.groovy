@@ -1,9 +1,7 @@
 package us.paperlesstech
 
-import us.paperlesstech.nimble.User
 import grails.plugin.spock.UnitSpec
-import groovy.mock.interceptor.MockFor
-import grails.converters.JSON
+import us.paperlesstech.nimble.User
 
 class ActivityLogServiceSpec extends UnitSpec {
 	AuthService authService = Mock()

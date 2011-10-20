@@ -2,14 +2,12 @@ package us.paperlesstech.handlers
 
 import org.springframework.core.io.ClassPathResource
 
-import us.paperlesstech.AuthService
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.MimeType
 import us.paperlesstech.PreferenceService
 import us.paperlesstech.helpers.PclInfo
-import us.paperlesstech.nimble.User
 
 class PclHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def fileService

@@ -1,7 +1,5 @@
 package us.paperlesstech
 
-import java.util.Map
-
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions

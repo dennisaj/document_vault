@@ -10,7 +10,6 @@ class DocumentController {
 	def handlerChain
 
 	def index = {
-		def pagination = [:]
 		def max = params.int('max')
 		params.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
 		params.sort = params.sort ?: 'dateCreated'

@@ -1,14 +1,11 @@
 package us.paperlesstech.helpers
 
-import java.io.File
-
 import us.paperlesstech.Document
 import us.paperlesstech.DocumentData
 
 import com.lowagie.text.PageSize
 import com.lowagie.text.Paragraph
 import com.lowagie.text.Rectangle
-import com.lowagie.text.pdf.BaseFont
 import com.lowagie.text.pdf.ColumnText
 import com.lowagie.text.pdf.PdfContentByte
 import com.lowagie.text.pdf.PdfReader
@@ -22,7 +19,6 @@ class PdfHelpers {
 		def notesByPage = d.notes.groupBy { it.pageNumber }
 
 		try {
-			BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED)
 			pdfReader = new PdfReader(pdfPath)
 			pdfStamper = new PdfStamper(pdfReader, output)
 

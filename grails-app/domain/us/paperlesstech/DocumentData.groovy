@@ -2,8 +2,6 @@ package us.paperlesstech
 
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
-import java.util.Date
-
 @MultiTenant
 class DocumentData implements Cloneable, Comparable {
 	Date dateCreated

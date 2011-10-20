@@ -1,9 +1,6 @@
 package us.paperlesstech
 
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
-
-import java.util.Date
-
 import us.paperlesstech.nimble.User
 
 @MultiTenant

@@ -1,9 +1,9 @@
 package us.paperlesstech.handlers
 
+import org.springframework.core.io.ClassPathResource
+
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
-import org.springframework.core.io.ClassPathResource
-import us.paperlesstech.helpers.FileHelpers
 import us.paperlesstech.helpers.PclDocument
 
 class PclHandlerService extends Handler {

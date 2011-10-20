@@ -1,8 +1,5 @@
 package us.paperlesstech
 
-import java.util.List
-import java.util.Map
-
 import us.paperlesstech.helpers.FileHelpers
 
 public enum MimeType {

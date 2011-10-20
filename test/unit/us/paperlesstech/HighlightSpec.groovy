@@ -1,10 +1,6 @@
 package us.paperlesstech
 
-import grails.plugin.spock.*
-
-import org.codehaus.groovy.grails.web.json.JSONObject
-
-import spock.lang.*
+import grails.plugin.spock.UnitSpec
 
 class HighlightSpec extends UnitSpec {
 	def "test toMap"() {

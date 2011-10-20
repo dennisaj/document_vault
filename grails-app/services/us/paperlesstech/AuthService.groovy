@@ -206,7 +206,7 @@ class AuthService {
 
 	private boolean checkPermission(def subject, String permission) {
 		def user = authenticatedUser
-		def cacheEntry = permissionsCache[authenticatedUser.id] ?: (permissionsCache[authenticatedUser.id] = new PermissionCacheEntry())
+		def cacheEntry = permissionsCache[user.id] ?: (permissionsCache[user.id] = new PermissionCacheEntry())
 		def permitted = cacheEntry.permitted[permission]
 		if (permitted == null) {
 			permitted = subject.isPermitted(permission)
@@ -264,8 +264,6 @@ class AuthService {
 		if (!isLoggedIn()) {
 			return [] as Set
 		}
-
-		def subject = authenticatedSubject
 
 		if (testSubject) {
 			// TODO add better testing for roles

@@ -4,7 +4,6 @@ import grails.plugin.spock.IntegrationSpec
 
 import org.apache.shiro.subject.Subject
 
-import spock.lang.Shared
 import us.paperlesstech.nimble.Profile
 import us.paperlesstech.nimble.User
 

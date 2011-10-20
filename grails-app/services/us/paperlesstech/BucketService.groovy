@@ -126,10 +126,6 @@ class BucketService {
 			detachedCriteria.add(Restrictions.ilike('name', "%$filter%"))
 		}
 
-		def total = Bucket.createCriteria().count {
-			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
-		}
-
 		def bucketsByGroup = Bucket.createCriteria().list {
 			addToCriteria(Subqueries.propertyIn('id', detachedCriteria))
 			order('name', 'asc')

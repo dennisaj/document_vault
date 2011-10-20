@@ -1,7 +1,6 @@
 package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
-import static us.paperlesstech.MimeType.PDF
 
 class DocumentDataSpec extends UnitSpec {
 	def "test the constraints"() {

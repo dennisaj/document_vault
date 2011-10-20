@@ -2,9 +2,6 @@ package us.paperlesstech
 
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
-import java.util.Date
-import java.util.Map
-
 @MultiTenant
 class Highlight {
 	Date accepted

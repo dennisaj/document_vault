@@ -50,7 +50,7 @@ class BucketServiceSpec extends UnitSpec {
 		given:
 		1 * authService.canCreateBucket(group1) >> false
 		when:
-		def bucket = service.createBucket(group1, 'name')
+		service.createBucket(group1, 'name')
 		then:
 		thrown(AssertionError)
 	}

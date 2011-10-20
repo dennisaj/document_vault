@@ -18,8 +18,6 @@ package us.paperlesstech.nimble
 
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
-import java.util.Date
-
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 /**
