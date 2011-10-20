@@ -493,8 +493,8 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "document:*:1:1"]      | true
 	}
 
-	@Unroll("Testing if user with permission #permission can create a folder for group #groupId")
-	def "canFolderCreate tests"() {
+	@Unroll("Testing if user with permission #permission can manager folders in group #groupId")
+	def "canManageFolders tests"() {
 		def user = newUser([permission])
 		def group = new Group()
 		group.id = groupId
@@ -503,82 +503,16 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		subject.metaClass.isAuthenticated = { true }
 
 		expect:
-		service.canFolderCreate(group) == result
+		service.canManageFolders(group) == result
 
 		where:
-		permission                  | groupId  | result
-		"*"                         | 1L       | true
-		"*"                         | 2L       | true
-		"document:foldercreate:*"   | 1L       | true
-		"document:foldercreate:*"   | 2L       | true
-		"document:foldercreate:1"   | 1L       | true
-		"document:foldercreate:1"   | 2L       | false
-	}
-
-	@Unroll("Testing if user with permission #permission can delete a folder for group #groupId")
-	def "canFolderDelete tests"() {
-		def user = newUser([permission])
-		def group = new Group()
-		group.id = groupId
-		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
-		subject.metaClass.getPrincipal = { user.id }
-		subject.metaClass.isAuthenticated = { true }
-
-		expect:
-		service.canFolderDelete(group) == result
-
-		where:
-		permission                  | groupId  | result
-		"*"                         | 1L       | true
-		"*"                         | 2L       | true
-		"document:folderdelete:*"   | 1L       | true
-		"document:folderdelete:*"   | 2L       | true
-		"document:folderdelete:1"   | 1L       | true
-		"document:folderdelete:1"   | 2L       | false
-	}
-
-	@Unroll("Testing if user with permission #permission can move a document into a folder in group #groupId")
-	def "canFolderMoveInTo tests"() {
-		def user = newUser([permission])
-		def group = new Group()
-		group.id = groupId
-		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
-		subject.metaClass.getPrincipal = { user.id }
-		subject.metaClass.isAuthenticated = { true }
-
-		expect:
-		service.canFolderMoveInTo(group) == result
-
-		where:
-		permission                    | groupId  | result
-		"*"                           | 1L       | true
-		"*"                           | 2L       | true
-		"document:foldermoveinto:*"   | 1L       | true
-		"document:foldermoveinto:*"   | 2L       | true
-		"document:foldermoveinto:1"   | 1L       | true
-		"document:foldermoveinto:1"   | 2L       | false
-	}
-
-	@Unroll("Testing if user with permission #permission can move a document into a folder in group #groupId")
-	def "canFolderMoveOutOf tests"() {
-		def user = newUser([permission])
-		def group = new Group()
-		group.id = groupId
-		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
-		subject.metaClass.getPrincipal = { user.id }
-		subject.metaClass.isAuthenticated = { true }
-
-		expect:
-		service.canFolderMoveOutOf(group) == result
-
-		where:
-		permission                     | groupId  | result
-		"*"                            | 1L       | true
-		"*"                            | 2L       | true
-		"document:foldermoveoutof:*"   | 1L       | true
-		"document:foldermoveoutof:*"   | 2L       | true
-		"document:foldermoveoutof:1"   | 1L       | true
-		"document:foldermoveoutof:1"   | 2L       | false
+		permission                   | groupId  | result
+		"*"                          | 1L       | true
+		"*"                          | 2L       | true
+		"document:managefolders:*"   | 1L       | true
+		"document:managefolders:*"   | 2L       | true
+		"document:managefolders:1"   | 1L       | true
+		"document:managefolders:1"   | 2L       | false
 	}
 
 	@Unroll("Testing if user with permission #permission can upload to group #groupId")

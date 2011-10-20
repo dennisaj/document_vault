@@ -18,6 +18,11 @@ class FolderServiceSpec extends UnitSpec {
 	Folder folder2 = new Folder(id:2, name:'folder2')
 	Folder folder3 = new Folder(id:3, name:'folder3')
 
+	Folder parent1 = new Folder(id:4, name:'parent1')
+	@Shared
+	Folder parent2 = new Folder(id:5, name:'parent2')
+	Folder parent3 = new Folder(id:5, name:'parent3')
+
 	def setup() {
 		mockLogging(FolderService)
 		service = new FolderService()
@@ -30,75 +35,62 @@ class FolderServiceSpec extends UnitSpec {
 		document2.group = group1
 		document3.group = group2
 
+		parent1.group = group1
+		parent2.group = group2
+		parent3.group = group1
+
 		mockDomain(Document, [document1, document2, document3])
-		mockDomain(Folder, [folder1, folder2, folder3])
+		mockDomain(Folder, [folder1, folder2, folder3, parent1, parent2, parent3])
 		mockDomain(Group, [group1, group2])
 
 		document1.folder = folder1
 		document2.folder = folder2
 		folder1.addToDocuments(document1)
 		folder2.addToDocuments(document2)
+
+		parent1.addToChildren(folder1)
+		folder1.parent = parent1
 	}
 
 	def "createFolder should require a group"() {
 		when:
-		service.createFolder(null, 'name', document3)
+		service.createFolder(null, 'name')
 		then:
 		thrown(AssertionError)
 	}
 
-	def "createFolder should require the given document to be in the given group"() {
+	def "createFolder should require the given parent to be in the given group"() {
 		when:
-		service.createFolder(group1, 'name', document)
+		service.createFolder(group1, parent, 'name')
 		then:
 		thrown(AssertionError)
 		where:
-		document << [null, document3]
+		parent << [null, parent2]
 	}
 
-	def "createFolder should throw an AssertionError when the user lacks the canView permission for the given document"() {
+	def "createFolder should throw an AssertionError when the user lacks the ManageFolders permission"() {
 		when:
-		service.createFolder(document3.group, 'name', document3)
+		service.createFolder(document3.group, 'name')
 		then:
-		1 * authService.canView(document3) >> false
+		1 * authService.canManageFolders(document3.group) >> false
 		thrown(AssertionError)
-	}
-
-	def "createFolder should throw an AssertionError when the user lacks the FolderCreate permission"() {
-		when:
-		service.createFolder(document3.group, 'name', document3)
-		then:
-		1 * authService.canFolderCreate(document3.group) >> false
-		1 * authService.canView(document3) >> true
-		thrown(AssertionError)
-	}
-
-	def "createFolder should throw an AssertionError if the initialDocument is in a folder and the user can't move it out"() {
-		when:
-		service.createFolder(group1, 'name', document2)
-		then:
-		1 * authService.canFolderCreate(group1) >> true
-		1 * authService.canFolderMoveOutOf(group1) >> false
-		1 * authService.canView(document2) >> true
-		thrown(AssertionError)
-	}
-
-	def "createFolder should not check canFolderMoveOutOf if the initialDocument isn't in a folder"() {
-		when:
-		service.createFolder(document3.group, 'name', document3)
-		then:
-		1 * authService.canView(document3) >> true
-		1 * authService.canFolderCreate(document3.group) >> true
-		0 * authService.canFolderMoveOutOf(_)
 	}
 
 	def "createFolder should return errors if validation fails"() {
 		when:
-		def savedFolder = service.createFolder(document3.group, '', document3)
+		def savedFolder = service.createFolder(group1, '')
 		then:
-		1 * authService.canView(document3) >> true
-		1 * authService.canFolderCreate(document3.group) >> true
+		1 * authService.canManageFolders(group1) >> true
 		savedFolder.errors
+	}
+
+	def "createFolder should set the parent if it is passed in"() {
+		when:
+		def savedFolder = service.createFolder(parent1.group, parent1, 'new folder')
+		then:
+		1 * authService.canManageFolders(parent1.group) >> true
+		savedFolder.parent == parent1
+		parent1.children.contains(savedFolder)
 	}
 
 	def "deleteFolder should require a folder"() {
@@ -109,11 +101,10 @@ class FolderServiceSpec extends UnitSpec {
 	}
 
 	def "deleteFolder should throw an Assertion error when the user lacks the correct permissions"() {
-		given:
-		1 * authService.canFolderDelete(folder1.group) >> false
 		when:
 		service.deleteFolder(folder1)
 		then:
+		1 * authService.canManageFolders(folder1.group) >> false
 		thrown(AssertionError)
 	}
 
@@ -138,51 +129,27 @@ class FolderServiceSpec extends UnitSpec {
 		thrown(AssertionError)
 	}
 
-	def "addDocumentToFolder should throw an Assertion error when the user lacks the canFolderMoveInTo permission"() {
-		given:
-		1 * authService.canFolderMoveInTo(document2.group) >> false
+	def "addDocumentToFolder should throw an Assertion error when the user lacks the ManageFolders permission"() {
 		when:
 		service.addDocumentToFolder(folder1, document2)
 		then:
+		1 * authService.canManageFolders(document2.group) >> false
 		thrown(AssertionError)
 	}
 
 	def "addDocumentToFolder should return if the destination folder is the same as the current folder"() {
-		given:
-		0 * authService.canFolderMoveInTo(_)
 		when:
 		def outDocument = service.addDocumentToFolder(document2.folder, document2)
 		then:
+		0 * authService.canManageFolders(document2.group)
 		outDocument.is document2
 	}
 
-	def "addDocumentToFolder should not check the canFolderMoveOutOf permission if the document has no folder"() {
-		given:
-		document2.folder = null
-		1 * authService.canFolderMoveInTo(document2.group) >> true
+	def "addDocumentToFolder should check the ManageFolders permission if the document has a folder and continue if the user is permitted"() {
 		when:
 		service.addDocumentToFolder(folder1, document2)
 		then:
-		0 * authService.canFolderMoveOutOf(_)
-	}
-
-	def "addDocumentToFolder should check the canFolderMoveOutOf permission if the document has a folder and throw an AssertError if the user is denied"() {
-		given:
-		1 * authService.canFolderMoveInTo(document2.group) >> true
-		1 * authService.canFolderMoveOutOf(document2.group) >> false
-		when:
-		service.addDocumentToFolder(folder1, document2)
-		then:
-		thrown(AssertionError)
-	}
-
-	def "addDocumentToFolder should check the canFolderMoveOutOf permission if the document has a folder and continue if the user is permitted"() {
-		given:
-		1 * authService.canFolderMoveInTo(document2.group) >> true
-		when:
-		service.addDocumentToFolder(folder1, document2)
-		then:
-		1 * authService.canFolderMoveOutOf(document2.group) >> true
+		1 * authService.canManageFolders(document2.group) >> true
 	}
 
 	def "removeDocumentFromFolder should require a document"() {
@@ -192,26 +159,55 @@ class FolderServiceSpec extends UnitSpec {
 		thrown(AssertionError)
 	}
 
-	def "removeDocumentFromFolder should not check the canFolderMoveOutOf permission if the document has no folder"() {
-		when:
-		service.removeDocumentFromFolder(document3)
-		then:
-		0 * authService.canFolderMoveOutOf(_)
-	}
-
-	def "removeDocumentFromFolder should check the canFolderMoveOutOf permission if the document has a folder and throw an AssertError if the user is denied"() {
-		given:
-		1 * authService.canFolderMoveOutOf(document1.group) >> false
+	def "removeDocumentFromFolder should check the ManageFolders permission if the document has a folder and throw an AssertError if the user is denied"() {
 		when:
 		service.removeDocumentFromFolder(document1)
+		then:
+		1 * authService.canManageFolders(document1.group) >> false
+		thrown(AssertionError)
+	}
+
+	def "addChildToFolder should require a parent"() {
+		when:
+		service.addChildToFolder(null, folder1)
 		then:
 		thrown(AssertionError)
 	}
 
-	def "removeDocumentFromFolder should check the canFolderMoveOutOf permission if the document has a folder and continue if the user is permitted"() {
+	def "addChildToFolder should require a child"() {
 		when:
-		service.removeDocumentFromFolder(document1)
+		service.addChildToFolder(parent3, null)
 		then:
-		1 * authService.canFolderMoveOutOf(document1.group) >> true
+		thrown(AssertionError)
+	}
+
+	def "addChildToFolder should require the parent to be in the same group as the child folder"() {
+		when:
+		service.addChildToFolder(parent2, folder1)
+		then:
+		thrown(AssertionError)
+	}
+
+	def "addChildToFolder should return if the parent folder is the same as the current parent"() {
+		when:
+		def outDocument = service.addChildToFolder(folder1.parent, folder1)
+		then:
+		0 * authService.canManageFolders(folder1.parent)
+		outDocument.is folder1
+	}
+
+	def "addChildToFolder should throw an Assertion error when the user lacks the ManageFolders permission"() {
+		when:
+		service.addChildToFolder(parent3, folder1)
+		then:
+		1 * authService.canManageFolders(parent3.group) >> false
+		thrown(AssertionError)
+	}
+
+	def "addChildToFolder should check the ManageFolders permission if the document has a folder and continue if the user is permitted"() {
+		when:
+		service.addChildToFolder(parent3, folder1)
+		then:
+		1 * authService.canManageFolders(parent3.group) >> true
 	}
 }

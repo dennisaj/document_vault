@@ -18,29 +18,8 @@ class AuthService {
 	protected Map permissionsCache = [:] as ConcurrentHashMap
 	def testSubject
 
-	boolean canCreateBucket(Group group) {
-		assert group
-		def subject = testSubject ?: authenticatedSubject
-
-		if (!isLoggedIn()) {
-			return false
-		}
-
-		String pString = "bucket:${BucketPermission.Create.name().toLowerCase()}:${group.id}"
-
-		checkPermission(subject, pString)
-	}
-
-	boolean canDelete(Bucket b) {
-		checkPermission(BucketPermission.Delete, b)
-	}
-
 	boolean canDelete(Document d) {
 		checkPermission(DocumentPermission.Delete, d)
-	}
-
-	boolean canDeleteAnyBucket() {
-		isPermissionImplied("bucket:delete")
 	}
 
 	boolean canDeleteAnyDocument() {
@@ -49,22 +28,6 @@ class AuthService {
 
 	boolean canGetSigned(Document d) {
 		grailsApplication.config.document_vault.remoteSigning.enabled && checkPermission(DocumentPermission.GetSigned, d)
-	}
-
-	boolean canMoveInTo(Bucket b) {
-		checkPermission(BucketPermission.MoveInTo, b)
-	}
-
-	boolean canMoveInToAnyBucket() {
-		isPermissionImplied("bucket:moveinto")
-	}
-
-	boolean canMoveOutOf(Bucket b) {
-		checkPermission(BucketPermission.MoveOutOf, b)
-	}
-
-	boolean canMoveOutOfAnyBucket() {
-		isPermissionImplied("bucket:moveoutof")
 	}
 
 	boolean canNotes(Document d) {
@@ -93,31 +56,10 @@ class AuthService {
 	}
 
 	/**
-	 * Returns true if the user can create folders in the given group.
+	 * Returns true if the user can manage folders in the given group.
 	 */
-	boolean canFolderCreate(Group group) {
-		checkGroupPermission(DocumentPermission.FolderCreate, group)
-	}
-
-	/**
-	 * Returns true if the user can delete folders in the given group.
-	 */
-	boolean canFolderDelete(Group group) {
-		checkGroupPermission(DocumentPermission.FolderDelete, group)
-	}
-
-	/**
-	 * Returns true if the user can move a document in to any folder in the given group.
-	 */
-	boolean canFolderMoveInTo(Group group) {
-		checkGroupPermission(DocumentPermission.FolderMoveInTo, group)
-	}
-
-	/**
-	 * Returns true if the user can move a document out of any folder in the given group.
-	 */
-	boolean canFolderMoveOutOf(Group group) {
-		checkGroupPermission(DocumentPermission.FolderMoveOutOf, group)
+	boolean canManageFolders(Group group) {
+		checkGroupPermission(DocumentPermission.ManageFolders, group)
 	}
 
 	boolean canUpload(Group group) {
@@ -134,14 +76,6 @@ class AuthService {
 
 	boolean canViewAnyDocument() {
 		isPermissionImplied("document:view")
-	}
-
-	boolean canView(Bucket b) {
-		checkPermission(BucketPermission.View, b)
-	}
-
-	boolean canViewAnyBucket() {
-		isPermissionImplied("bucket:view")
 	}
 
 	boolean canRunAs(User u) {
@@ -165,19 +99,6 @@ class AuthService {
 		checkPermission(subject, pString)
 	}
 
-	private boolean checkPermission(BucketPermission permission, Bucket b) {
-		assert b
-		def subject = testSubject ?: authenticatedSubject
-
-		if (!isLoggedIn()) {
-			return false
-		}
-
-		String pString = "bucket:${permission.name().toLowerCase()}:${b.group.id}:${b.id}"
-
-		checkPermission(subject, pString)
-	}
-
 	public boolean checkGroupPermission(DocumentPermission permission, Group g) {
 		assert g
 		def subject = testSubject ?: authenticatedSubject
@@ -187,19 +108,6 @@ class AuthService {
 		}
 
 		String pString = "document:${permission.name().toLowerCase()}:${g.id}"
-
-		checkPermission(subject, pString)
-	}
-
-	public boolean checkGroupPermission(BucketPermission permission, Group g) {
-		assert g
-		def subject = testSubject ?: authenticatedSubject
-
-		if (!isLoggedIn()) {
-			return false
-		}
-
-		String pString = "bucket:${permission.name().toLowerCase()}:${g.id}"
 
 		checkPermission(subject, pString)
 	}
@@ -245,22 +153,7 @@ class AuthService {
 	 * @param permissions A list of permissions to test
 	 * @return The set of all document ids where the user has specific permission to perform any of the indicated permissions
 	 */
-	Set getIndividualDocumentsWithPermission(List<DocumentPermission> permissions, Group searchGroup=null) {
-		getIndividualItemsWithPermission(permissions, 'document', searchGroup)
-	}
-
-	/**
-	 * This is for getting the buckets the user has one off permissions for. For example this isn't for seeing if
-	 * the user has bucket:view:1:* it is for collecting the 5 in bucket:view:1:5 or bucket:view:*:5
-	 *
-	 * @param permissions A list of permissions to test
-	 * @return The set of all bucket ids where the user has specific permission to perform any of the indicated permissions.
-	 */
-	Set getIndividualBucketsWithPermission(List<BucketPermission> permissions) {
-		getIndividualItemsWithPermission(permissions, 'bucket')
-	}
-
-	private Set getIndividualItemsWithPermission(List<Enum> permissions, type, Group searchGroup=null) {
+	Set getIndividualDocumentsWithPermission(List<Enum> permissions, Group searchGroup=null) {
 		if (!isLoggedIn()) {
 			return [] as Set
 		}
@@ -273,7 +166,7 @@ class AuthService {
 		def groupMatcher = searchGroup?.id ?: '\\d+|\\*'
 		String pString = permissions*.name().join("|").toLowerCase()
 
-		def matcher = ~/(?i)$type:(?:$pString):(?:$groupMatcher):(\d+)/
+		def matcher = ~/(?i)document:(?:$pString):(?:$groupMatcher):(\d+)/
 		def match
 		def matches = [] as Set
 

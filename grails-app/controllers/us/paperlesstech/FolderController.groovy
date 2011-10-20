@@ -10,10 +10,9 @@ class FolderController {
 	def create = {
 		def group = Group.load(params.long('groupId'))
 		assert group
-		def initialDocument = Document.load(params.long('documentId'))
-		assert initialDocument
+		def parent = Folder.load(params.long('parentId'))
 
-		def folder = folderService.createFolder(group, params.name?.trim(), initialDocument)
+		def folder = folderService.createFolder(group, parent, params.name?.trim())
 		def returnMap = [:]
 
 		if (folder.hasErrors()) {
@@ -33,12 +32,7 @@ class FolderController {
 		} else {
 			returnMap.notification = NotificationHelper.success('title', 'message')
 			returnMap.folder = folder.asMap()
-			returnMap.folder.documents = [
-				[
-					id:initialDocument.id,
-					name:initialDocument.name
-				]
-			]
+			returnMap.folder.documents = []
 		}
 
 		render(returnMap as JSON)
@@ -54,7 +48,7 @@ class FolderController {
 	}
 
 	def list = {
-		def searchBucket = Bucket.load(params.long('bucketId'))
+		def searchFolder = Folder.load(params.long('folderId'))
 
 		def pagination = [:]
 		def max = params.int('max')
@@ -63,7 +57,7 @@ class FolderController {
 		pagination.order = params.order ?: 'asc'
 		pagination.offset = params.int('offset') ?: 0
 
-		def results = folderService.search(searchBucket, pagination, params.filter?.trim())
+		def results = folderService.search(searchFolder, pagination, params.filter?.trim())
 
 		render([folders:results.results*.asMap(), total:results.total] as JSON)
 	}
@@ -88,6 +82,20 @@ class FolderController {
 		assert document.folder?.id == folder.id
 
 		folderService.removeDocumentFromFolder(document)
+
+		render([notification:NotificationHelper.success('title', 'message')] as JSON)
+	}
+
+	def addFolder = {
+		def parent = Folder.load(params.long('parentId'))
+		assert parent
+		def child = Folder.load(params.long('childId'))
+		assert child
+
+		def currentParent = Folder.load(params.long('currentParentId'))
+		assert currentParent == child.parent
+
+		folderService.addChildToFolder(parent, child)
 
 		render([notification:NotificationHelper.success('title', 'message')] as JSON)
 	}

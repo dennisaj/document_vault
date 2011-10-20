@@ -1,4 +1,3 @@
-import us.paperlesstech.Bucket
 import us.paperlesstech.Document
 import us.paperlesstech.Folder
 import us.paperlesstech.nimble.AdminsService
@@ -25,12 +24,8 @@ public class SecurityFilters {
 		secure(controller: "($openControllers|$adminControllers)", invert: true) {
 			before = {
 				def document
-				def group
 				if (params.documentId) {
 					document = Document.get(params.long('documentId'))
-				}
-				if (params.groupId) {
-					group = Group.load(params.long('groupId'))
 				}
 				accessControl(auth:false) {
 					if (!authService.authenticatedUser?.enabled) {
@@ -62,43 +57,28 @@ public class SecurityFilters {
 								default:
 									return false
 							}
-						case 'bucket':
-							def bucket
-							if (params.bucketId) {
-								bucket = Bucket.get(params.long('bucketId'))
-							}
-
-							switch (action) {
-								case 'list':
-									return true
-								case 'create':
-									return group && authService.canCreateBucket(group)
-								case 'delete':
-									return bucket && authService.canDelete(bucket)
-								case 'addFolder':
-									return bucket && authService.canMoveInTo(bucket)
-								case 'removeFolder':
-									return bucket && authService.canMoveOutOf(bucket)
-								default:
-									return false
-							}
 						case 'folder':
 							def folder
+							def group
 							if (params.folderId) {
-								folder = Folder.get(params.long('bucketId'))
+								folder = Folder.get(params.long('folderId'))
+							}
+
+							if (params.groupId) {
+								group = Group.load(params.long('groupId'))
 							}
 
 							switch (action) {
 								case 'list':
 									return true
 								case 'create':
-									return group && authService.canFolderCreate(group)
+									return group && authService.canManageFolders(group)
 								case 'delete':
-									return folder && authService.canFolderDelete(folder)
+									return folder && authService.canManageFolders(folder.group)
 								case 'addDocument':
-									return folder && authService.canFolderMoveInTo(folder)
+									return folder && authService.canManageFolders(folder.group)
 								case 'removeDocument':
-									return folder && authService.canFolderMoveOutOf(folder)
+									return folder && authService.canManageFolders(folder.group)
 								default:
 									return false
 							}

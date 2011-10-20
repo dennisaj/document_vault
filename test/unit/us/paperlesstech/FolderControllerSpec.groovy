@@ -18,22 +18,22 @@ class FolderControllerSpec extends ControllerSpec {
 	def document2 = new Document(id:2, name:'document2')
 	def document3 = new Document(id:3, name:'document3')
 	@Shared
-	def bucket1 = new Bucket(id:1, name:'bucket1')
+	def parent1 = new Folder(id:4, name:'parent1')
+	def parent2 = new Folder(id:5, name:'parent2')
 
 	def setup() {
 		controller.folderService = folderService
 		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
 
 		mockDomain(Group, [group1, group2])
-		mockDomain(Bucket, [bucket1])
-		mockDomain(Folder, [folder1, folder2, folder3])
+		mockDomain(Folder, [folder1, folder2, folder3, parent1, parent2])
 		mockDomain(Document, [document1, document2, document3])
 
 		folder1.group = group1
 		folder2.group = group1
 		folder3.group = group2
 
-		bucket1.group = group1
+		parent1.group = group1
 
 		document1.group = group1
 		document2.group = group1
@@ -41,35 +41,32 @@ class FolderControllerSpec extends ControllerSpec {
 
 		document2.folder = folder1
 		folder1.addToDocuments(document2)
+
+		parent1.addToChildren(folder1)
+		folder1.parent = parent1
 	}
 
 	def "create should throw an AssertError when given invalid input"() {
 		given:
 		controller.params.groupId = groupId
-		controller.params.documentId = documentId
 		when:
 		controller.create()
 		then:
 		0 * folderService.createFolder(_, _, _)
 		thrown(AssertionError)
 		where:
-		groupId  | documentId
-		'9'      | '1'      // Bad groupId
-		null     | '1'      // Bad groupId
-		'1'      | '4'      // Bad documentId
-		'1'      | null     // Bad documentId
+		groupId  << ['9', null]
 	}
 
 	def "create should render errors return by createFolder"() {
 		given:
 		controller.params.groupId = '1'
-		controller.params.documentId = '1'
 		controller.params.name = '   new folder   '
 		when:
 		controller.create()
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		1 * folderService.createFolder(group1, 'new folder', document1) >> { group, name, document->
+		1 * folderService.createFolder(group1, null, 'new folder') >> { group, name, document->
 			def folder = new Folder(group:group, name:name)
 			folder.addToDocuments(document)
 			folder.errors.rejectValue('name', 'this.is.an.error.code.for.name')
@@ -84,15 +81,13 @@ class FolderControllerSpec extends ControllerSpec {
 
 	def "create should render the saved folder when there are no errors returned by createFolder"() {
 		controller.params.groupId = '1'
-		controller.params.documentId = '1'
 		controller.params.name = '   new folder2   '
 		when:
 		controller.create()
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		1 * folderService.createFolder(group1, 'new folder2', document1) >> { group, name, document->
-			def folder = new Folder(id:4, group:group, name:name)
-			folder.addToDocuments(document)
+		1 * folderService.createFolder(group1, null, 'new folder2') >> { group, parent, name->
+			def folder = new Folder(id:4, group:group, name:name, parent:parent)
 			folder
 		}
 		results.notification.status == NotificationStatus.Success.name().toLowerCase()
@@ -100,8 +95,7 @@ class FolderControllerSpec extends ControllerSpec {
 		results.folder.name == 'new folder2'
 		results.folder.group.id == group1.id
 		results.folder.group.name == group1.name
-		results.folder.documents[0].id == document1.id
-		results.folder.documents[0].name == document1.name
+		results.folder.documents == []
 	}
 
 	def "delete should throw an AssertError when given an invalid folder"() {
@@ -127,16 +121,16 @@ class FolderControllerSpec extends ControllerSpec {
 		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 	}
 
-	def "list should pass bucket, pagination and filter to search then return the results as JSON"() {
+	def "list should pass parent, pagination and filter to search then return the results as JSON"() {
 		given:
-		controller.params.bucketId = bucketId
+		controller.params.folderId = folderId
 		controller.params.filter = filter
 		controller.params.putAll(pagination)
 		when:
 		controller.list()
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		1 * folderService.search(bucket, _, filter) >> [results:[folder1, folder2], total:2]
+		1 * folderService.search(parent, _, filter) >> [results:[folder1, folder2], total:2]
 		results.folders[0].id == folder1.id
 		results.folders[0].name == folder1.name
 		results.folders[1].id == folder2.id
@@ -144,8 +138,8 @@ class FolderControllerSpec extends ControllerSpec {
 		results.total == 2
 		where:
 		filter << [null, 'filter']
-		bucketId << [null, '1']
-		bucket << [null, bucket1]
+		folderId << [null, '4']
+		parent << [null, parent1]
 		pagination << [[:], [sort:'name', order:'asc', max:'10', offset:'0']]
 	}
 
@@ -200,7 +194,7 @@ class FolderControllerSpec extends ControllerSpec {
 		'2'      | '2'      // Bad current folder
 	}
 
-	def "removeDocument should addFolderToBucket when given valid data"() {
+	def "removeDocument should removeDocumentFromFolder when given valid data"() {
 		given:
 		controller.params.folderId = '1'
 		controller.params.documentId = '2'
@@ -209,6 +203,39 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.removeDocumentFromFolder(document2)
+		results.notification.status == NotificationStatus.Success.name().toLowerCase()
+	}
+
+	def "addFolder should throw an AssertionError when passed invalid data"() {
+		given:
+		controller.params.parentId = parentId
+		controller.params.childId = childId
+		controller.params.currentParentId = currentParentId
+		when:
+		controller.addFolder()
+		then:
+		0 * folderService.addChildToFolder(_, _)
+		thrown(AssertionError)
+		where:
+		parentId | childId    | currentParentId
+		'9'      | '1'        | '4'             // Bad parentId
+		null     | '1'        | '4'             // Bad parentId
+		'5'      | '9'        | '4'             // Bad childId
+		'5'      | null       | '4'             // Bad childId
+		'5'      | '1'        | '5'             // Incorrect currentParentId
+		'5'      | '1'        | null            // Incorrect currentParentId
+	}
+
+	def "addFolder should addDocumentToFolder when given valid data"() {
+		given:
+		controller.params.parentId = '5'
+		controller.params.childId = '1'
+		controller.params.currentParentId = '4'
+		when:
+		controller.addFolder()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * folderService.addChildToFolder(parent2, folder1)
 		results.notification.status == NotificationStatus.Success.name().toLowerCase()
 	}
 }
