@@ -158,12 +158,14 @@ authcBasic.applicationName = Document Vault API
 
 environments {
 	production {
+		document_vault.activity_log.enabled = true
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/var/cache/document_vault/files"
 		document_vault.forceSSL = true
 	}
 	development {
+		document_vault.activity_log.enabled = false
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp"
@@ -171,6 +173,7 @@ environments {
 		grails.converters.json.pretty.print = true
 	}
 	test {
+		document_vault.activity_log.enabled = true
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp"
@@ -191,6 +194,11 @@ document_vault {
 		s3 {
 			bucket = "pt_docvault_dev"
 			cachePath = "/dv/cache"
+		}
+		sqs {
+			logQueue = "https://queue.amazonaws.com/014589724006/dev-log-queue"
+			// This must be 1-10
+			logBatchSize = 10
 		}
 	}
 }

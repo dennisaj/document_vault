@@ -52,9 +52,11 @@ grails.project.dependency.resolution = {
 		runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'
 		compile group:'com.sun.media', name:'jai-codec', version:'1.1.3'
 		compile group:'net.java.dev.jai-imageio', name:'jai-imageio-core-standalone', version:'1.2-pre-dr-b04-2011-07-04'
-		compile group:'com.amazonaws', name:'aws-java-sdk', version:'1.2.6', {
+		compile group:'com.amazonaws', name:'aws-java-sdk', version:'1.2.9', {
 			excludes([group: "javax.mail", name: "mail"])
 		}
+		// AWS depends on this but isn't pulling it in
+		compile group:'stax', name:'stax', version:'1.2.0'
 		compile group:'c3p0', name:'c3p0', version:'0.9.1.2'
 		test group:'org.objenesis', name:'objenesis', version:'1.2'
 
