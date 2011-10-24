@@ -35,10 +35,8 @@ import us.paperlesstech.helpers.NotificationHelper
  * @author Bradley Beddoes
  */
 class AuthController {
-	static Map allowedMethods = [ajaxlogin:'POST', signin:'POST']
-	static navigation = [[group: "user", action: "logout", isVisible: { authService.isLoggedIn() && !authService.authenticatedSubject.isRunAs() }, order: 100, title: "Logout"]]
-
 	private static String TARGET = 'AuthController.TARGET'
+	static Map allowedMethods = [ajaxlogin:'POST', signin:'POST']
 
 	def authService
 	def facebookService
@@ -162,11 +160,10 @@ class AuthController {
 		log.info("Signing out user ${authService.authenticatedUser?.username}")
 
 		if (authService.authenticatedSubject?.isRunAs()) {
-			redirect(controller:"runAs", action:"release")
-			return
+			authService.authenticatedSubject.releaseRunAs()
+		} else {
+			authService.logout()
 		}
-
-		authService.logout()
 		request.xhr ? render([notification:NotificationHelper.success('title', 'message')] as JSON) : redirect(uri: '/')
 	}
 

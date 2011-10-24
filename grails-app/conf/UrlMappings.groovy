@@ -87,7 +87,7 @@ class UrlMappings {
 			action = "printWindow"
 		}
 
-		"/r/ra/$userId" {
+		"/r/ra/$userId?" {
 			controller = "runAs"
 			action = "runas"
 		}
