@@ -1,5 +1,6 @@
 package us.paperlesstech
 
+import grails.converters.JSON
 import grails.plugin.spock.ControllerSpec
 
 import org.apache.shiro.subject.SimplePrincipalCollection
@@ -53,24 +54,15 @@ class RunAsControllerSpec extends ControllerSpec {
 		1 * subject.releaseRunAs() >> new SimplePrincipalCollection()
 	}
 
-	def "afterInterceptor should redirect to the targetUri when it is set"() {
+	def "afterInterceptor should return the targetUri in the output when it is set, otherwise it should return slash"() {
 		when:
 		controller.params.targetUri = targetUri
 		controller.afterInterceptor()
-
+		def result = JSON.parse(mockResponse.contentAsString)
 		then:
-		controller.redirectArgs.uri == targetUri
+		result.uri == expected
 		where:
-		targetUri = '/'
-	}
-
-	def "afterInterceptor should redirect to the document index"() {
-		when:
-		controller.params.targetUri = null
-		controller.afterInterceptor()
-
-		then:
-		controller.redirectArgs.controller == 'document'
-		controller.redirectArgs.action == 'index'
+		targetUri << [null,  '/some/url']
+		expected << ['/', '/some/url']
 	}
 }

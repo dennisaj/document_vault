@@ -11,26 +11,43 @@ class UserInfoController {
 		def n = grailsApplication.mainContext.getBean('NavigationTagLib')
 		def user = authService.authenticatedUser
 		if (user) {
-			def menu = [:]
+			def returnMap = [:]
+			returnMap.menu = []
 			n.eachItem([group:'user']) {
-				menu[(g.message(code:'navigation.user.' + it.title, default:it.title, encodeAs:'HTML'))] = it.link
+				returnMap.menu << [
+					title:g.message(code:'navigation.user.' + it.title, default:it.title, encodeAs:'HTML'),
+					url:it.link
+				]
 			}
 
-			def delegators = [:]
-			user.delegators.each {
-				delegators[(it.id)] = it.profile.fullName ?: it.username
+			returnMap.user = [
+				id:user.id,
+				name:user.profile?.fullName,
+				username:user.username
+			]
+
+			if (user.delegators) {
+				returnMap.user.delegators = []
+				user.delegators.each {
+					returnMap.user.delegators << [
+						id:it.id,
+						name:it.profile.fullName ?: it.username
+					]
+				}
 			}
 
-			render([
-				notification:NotificationHelper.success('title', 'message'),
-				user:[
-					id:user.id,
-					delegators:delegators,
-					name:user.profile?.fullName,
-					username:user.username
-				],
-				menu:menu
-			] as JSON)
+			def delegateUser = authService.delegateUser
+			if (delegateUser) {
+				returnMap.user.delegateUser = [
+					id:authService.delegateUser?.id,
+					name:authService.delegateUser?.profile?.fullName,
+					username:authService.delegateUser?.username
+				]
+			}
+
+			returnMap.notification = NotificationHelper.success('title', 'message')
+
+			render(returnMap as JSON)
 		} else {
 			render([notification:NotificationHelper.error('title', 'message')] as JSON)
 		}

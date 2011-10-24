@@ -1,21 +1,19 @@
 package us.paperlesstech
 
+import grails.converters.JSON
+
 import org.apache.shiro.subject.SimplePrincipalCollection
 
+import us.paperlesstech.helpers.NotificationHelper
 import us.paperlesstech.nimble.User
 
 class RunAsController {
-	static def allowedMethods = [runas:"POST", release:"GET"]
-	static def navigation = [[group:'user', action:'release', isVisible: { authService.authenticatedSubject?.isRunAs() }, order:0, title:'Release', params:[targetUri:"/"]]]
+	static def allowedMethods = [runas:'POST', release:'GET']
 
 	def authService
 
 	def afterInterceptor = {
-		if (params.targetUri) {
-			redirect(uri:params.targetUri)
-		} else {
-			redirect(controller:"document", action:"index")
-		}
+		render([notification:NotificationHelper.success('title', 'message'), uri:params.targetUri?:'/'] as JSON)
 	}
 
 	def runas = {
