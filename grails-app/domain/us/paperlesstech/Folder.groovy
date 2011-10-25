@@ -45,6 +45,7 @@ class Folder {
 		[
 			id:id,
 			name:name,
+			dateCreated:dateCreated,
 			parent:[
 				id:parent?.id,
 				name:parent?.name

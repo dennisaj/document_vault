@@ -166,11 +166,12 @@ class FolderService {
 		// If not, find the individual folders in this parent that the user can view.
 		def documentPerms = [DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]
 		def specificDocuments = authService.getIndividualDocumentsWithPermission(documentPerms, parent?.group) ?: -1L
+		def specificGroups = authService.getGroupsWithPermission(groupPerms) ?: [null]
 
 		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Folder.class)
 			.createAlias('documents', 'd', JoinFragment.LEFT_OUTER_JOIN)
 			.setProjection(Projections.distinct(Projections.id()))
-			.add(Restrictions.in('d.id', specificDocuments))
+			.add(Restrictions.or(Restrictions.in('d.id', specificDocuments), Restrictions.in('group', specificGroups)))
 
 		if (parent) {
 			detachedCriteria.add(Restrictions.eq('parent', parent))
