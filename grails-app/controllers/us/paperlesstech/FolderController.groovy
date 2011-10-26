@@ -1,11 +1,11 @@
 package us.paperlesstech
 
 import grails.converters.JSON
-import us.paperlesstech.helpers.NotificationHelper
 import us.paperlesstech.nimble.Group
 
 class FolderController {
 	def folderService
+	def notificationService
 
 	def create = {
 		def group = Group.load(params.long('groupId'))
@@ -16,7 +16,7 @@ class FolderController {
 		def returnMap = [:]
 
 		if (folder.hasErrors()) {
-			returnMap.notification = NotificationHelper.error('title', 'message')
+			returnMap.notification = notificationService.error('message')
 
 			// TODO replace with collectEntries with Groovy 1.8.0
 			returnMap.validation = [:].putAll(['group', 'name', 'documents'].collect { field->
@@ -30,7 +30,7 @@ class FolderController {
 				)
 			})
 		} else {
-			returnMap.notification = NotificationHelper.success('title', 'message')
+			returnMap.notification = notificationService.success('message')
 			returnMap.folder = folder.asMap()
 		}
 
@@ -43,7 +43,7 @@ class FolderController {
 
 		folderService.deleteFolder(folder)
 
-		render([notification:NotificationHelper.success('title', 'message')] as JSON)
+		render([notification:notificationService.success('message')] as JSON)
 	}
 
 	def list = {
@@ -70,7 +70,7 @@ class FolderController {
 
 		folderService.addDocumentToFolder(destination, document)
 
-		render([notification:NotificationHelper.success('title', 'message')] as JSON)
+		render([notification:notificationService.success('message')] as JSON)
 	}
 
 	def removeDocument = {
@@ -82,7 +82,7 @@ class FolderController {
 
 		folderService.removeDocumentFromFolder(document)
 
-		render([notification:NotificationHelper.success('title', 'message')] as JSON)
+		render([notification:notificationService.success('message')] as JSON)
 	}
 
 	def addFolder = {
@@ -96,6 +96,6 @@ class FolderController {
 
 		folderService.addChildToFolder(parent, child)
 
-		render([notification:NotificationHelper.success('title', 'message')] as JSON)
+		render([notification:notificationService.success('message')] as JSON)
 	}
 }

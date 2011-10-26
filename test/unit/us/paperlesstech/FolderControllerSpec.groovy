@@ -3,11 +3,11 @@ package us.paperlesstech
 import grails.converters.JSON
 import grails.plugin.spock.ControllerSpec
 import spock.lang.Shared
-import us.paperlesstech.helpers.NotificationStatus
 import us.paperlesstech.nimble.Group
 
 class FolderControllerSpec extends ControllerSpec {
 	FolderService folderService = Mock()
+	NotificationService notificationService = Mock()
 
 	def group1 = new Group(id:1, name:'group1')
 	def group2 = new Group(id:2, name:'group2')
@@ -23,7 +23,8 @@ class FolderControllerSpec extends ControllerSpec {
 
 	def setup() {
 		controller.folderService = folderService
-		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
+		controller.notificationService = notificationService
+		controller.metaClass.message = { LinkedHashMap arg1-> 'this is stupid' }
 
 		mockDomain(Group, [group1, group2])
 		mockDomain(Folder, [folder1, folder2, folder3, parent1, parent2])
@@ -72,7 +73,7 @@ class FolderControllerSpec extends ControllerSpec {
 			folder.errors.rejectValue('name', 'this.is.an.error.code.for.name')
 			folder
 		}
-		results.notification.status == NotificationStatus.Error.name().toLowerCase()
+		1 * notificationService.error(_)
 		results.validation.name.errors
 		!results.validation.name.valid
 		!results.validation.group.errors
@@ -90,7 +91,7 @@ class FolderControllerSpec extends ControllerSpec {
 			def folder = new Folder(id:4, group:group, name:name, parent:parent)
 			folder
 		}
-		results.notification.status == NotificationStatus.Success.name().toLowerCase()
+		1 * notificationService.success(_)
 		results.folder.id == 4
 		results.folder.name == 'new folder2'
 		results.folder.group.id == group1.id
@@ -117,7 +118,7 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.deleteFolder(folder1)
-		results.notification.status == NotificationStatus.Success.name().toLowerCase()
+		1 * notificationService.success(_)
 	}
 
 	def "list should pass parent, pagination and filter to search then return the results as JSON"() {
@@ -172,7 +173,7 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.addDocumentToFolder(folder2, document2)
-		results.notification.status == NotificationStatus.Success.name().toLowerCase()
+		1 * notificationService.success(_)
 	}
 
 	def "removeDocument should throw an AssertionError when passed invalid data"() {
@@ -202,7 +203,7 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.removeDocumentFromFolder(document2)
-		results.notification.status == NotificationStatus.Success.name().toLowerCase()
+		1 * notificationService.success(_)
 	}
 
 	def "addFolder should throw an AssertionError when passed invalid data"() {
@@ -235,6 +236,6 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.addChildToFolder(parent2, folder1)
-		results.notification.status == NotificationStatus.Success.name().toLowerCase()
+		1 * notificationService.success(_)
 	}
 }

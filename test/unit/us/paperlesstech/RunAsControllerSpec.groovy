@@ -10,11 +10,16 @@ import us.paperlesstech.nimble.User
 
 class RunAsControllerSpec extends ControllerSpec {
 	AuthService authService = Mock()
+	NotificationService notificationService = Mock()
+
 	Subject subject = Mock()
+
 	def user = new User(id:1)
 
 	def setup() {
 		controller.authService = authService
+		controller.notificationService = notificationService
+
 		mockDomain(User, [user])
 	}
 
@@ -60,6 +65,7 @@ class RunAsControllerSpec extends ControllerSpec {
 		controller.afterInterceptor()
 		def result = JSON.parse(mockResponse.contentAsString)
 		then:
+		1 * notificationService.success(_)
 		result.uri == expected
 		where:
 		targetUri << [null,  '/some/url']

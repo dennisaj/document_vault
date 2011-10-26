@@ -27,7 +27,6 @@ import org.apache.shiro.authc.UsernamePasswordToken
 import org.openid4java.message.ParameterList
 
 import us.paperlesstech.auth.nimble.FacebookConnectToken
-import us.paperlesstech.helpers.NotificationHelper
 
 /**
  * Manages all authentication processes including integration with OpenID, Facebook etc.
@@ -41,6 +40,7 @@ class AuthController {
 	def authService
 	def facebookService
 	def grailsApplication
+	def notificationService
 	def openIDService
 	def shiroSecurityManager
 	def userService
@@ -134,7 +134,7 @@ class AuthController {
 
 			log.info "Authenticated user, $params.username."
 
-			render([notification:NotificationHelper.success('title', 'message')] as JSON)
+			render([notification:notificationService.success('message')] as JSON)
 			return
 		} catch (IncorrectCredentialsException e) {
 			log.info "Credentials failure for user '${params.username}'."
@@ -153,7 +153,7 @@ class AuthController {
 			notification = 'nimble.login.failed.general'
 		}
 
-		render([notification:NotificationHelper.error('title', notification)] as JSON)
+		render([notification:notificationService.error(notification)] as JSON)
 	}
 
 	def signout = {
@@ -164,7 +164,7 @@ class AuthController {
 		} else {
 			authService.logout()
 		}
-		request.xhr ? render([notification:NotificationHelper.success('title', 'message')] as JSON) : redirect(uri: '/')
+		request.xhr ? render([notification:notificationService.success('message')] as JSON) : redirect(uri: '/')
 	}
 
 	def unauthorized = {

@@ -6,10 +6,10 @@ import grails.plugin.spock.ControllerSpec
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 
 import us.paperlesstech.handlers.Handler
-import us.paperlesstech.helpers.NotificationStatus
 
 class NoteControllerSpec extends ControllerSpec {
 	Handler handlerChain = Mock()
+	NotificationService notificationService = Mock()
 
 	def documentData = new DocumentData(id:1, pages:4, dateCreated: new Date())
 	def note1 = new Note(id:1, document:document1, dateCreated: new Date() - 1)
@@ -21,6 +21,7 @@ class NoteControllerSpec extends ControllerSpec {
 	def setup() {
 		controller.metaClass.createLink = { LinkedHashMap arg1 -> 'this is stupid' }
 		controller.handlerChain = handlerChain
+		controller.notificationService = notificationService
 
 		mockDomain(Document, [document1, document2])
 		mockDomain(DocumentData, [documentData])
@@ -132,11 +133,11 @@ class NoteControllerSpec extends ControllerSpec {
 		def outputNotes = null
 		controller.params.notes = notes
 		controller.params.documentId = '1'
-		1 * handlerChain.saveNotes(_) >> { LinkedHashMap arg1 -> outputNotes = arg1.notes }
 		when:
 		controller.saveLines()
 		then:
-		JSON.parse(mockResponse.contentAsString).notification.status == NotificationStatus.Success.name().toLowerCase()
+		1 * handlerChain.saveNotes(_) >> { LinkedHashMap arg1-> outputNotes = arg1.notes }
+		1 * notificationService.success(_)
 		outputNotes.size() == 2
 		where:
 		notes = "['lines','more lines','']"
@@ -200,10 +201,10 @@ class NoteControllerSpec extends ControllerSpec {
 		controller.metaClass.cache = { LinkedHashMap arg1 -> 'this is stupid' }
 		controller.params.documentId = '2'
 		controller.params.noteDataId = '1'
-		1 * handlerChain.downloadNote([document:document2, note:note3]) >> { LinkedHashMap-> ['filename', new ByteArrayInputStream([1] as byte[]), MimeType.PNG.downloadContentType, 1] }
 		when:
 		controller.download()
 		then:
+		1 * handlerChain.downloadNote([document:document2, note:note3]) >> { LinkedHashMap-> ['filename', new ByteArrayInputStream([1] as byte[]), MimeType.PNG.downloadContentType, 1] }
 		mockResponse.status == 200
 	}
 }

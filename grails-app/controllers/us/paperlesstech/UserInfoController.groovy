@@ -1,11 +1,11 @@
 package us.paperlesstech
 
 import grails.converters.JSON
-import us.paperlesstech.helpers.NotificationHelper
 
 class UserInfoController {
 	def authService
 	def grailsApplication
+	def notificationService
 
 	def index = {
 		def n = grailsApplication.mainContext.getBean('NavigationTagLib')
@@ -50,11 +50,11 @@ class UserInfoController {
 			returnMap.user.groups.upload = authService.getGroupsWithPermission([DocumentPermission.Upload])*.asMap()
 			returnMap.user.groups.manageFolders = authService.getGroupsWithPermission([DocumentPermission.ManageFolders])*.asMap()
 
-			returnMap.notification = NotificationHelper.success('title', 'message')
+			returnMap.notification = notificationService.success('message')
 
 			render(returnMap as JSON)
 		} else {
-			render([notification:NotificationHelper.error('title', 'message')] as JSON)
+			render([notification:notificationService.error('message')] as JSON)
 		}
 	}
 }

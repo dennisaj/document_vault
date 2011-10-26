@@ -4,16 +4,16 @@ import grails.converters.JSON
 
 import org.apache.shiro.subject.SimplePrincipalCollection
 
-import us.paperlesstech.helpers.NotificationHelper
 import us.paperlesstech.nimble.User
 
 class RunAsController {
 	static def allowedMethods = [runas:'POST', release:'GET']
 
 	def authService
+	def notificationService
 
 	def afterInterceptor = {
-		render([notification:NotificationHelper.success('title', 'message'), uri:params.targetUri?:'/'] as JSON)
+		render([notification:notificationService.success('message'), uri:params.targetUri?:'/'] as JSON)
 	}
 
 	def runas = {
