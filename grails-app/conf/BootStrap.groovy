@@ -18,9 +18,15 @@ class BootStrap {
 		assert new File("/usr/local/bin/pcl6")?.canExecute(), "Cannot execute /usr/local/bin/pcl6"
 		assert new File("/usr/local/bin/gs")?.canExecute(), "Cannot execute /usr/local/bin/gs"
 		assert new File("/usr/local/bin/convert")?.canExecute(), "Cannot execute /usr/local/bin/convert"
-		assert new File(grailsApplication.config.document_vault.files.cache)?.isDirectory(), "Cache isn't a directory"
-		assert new File(grailsApplication.config.document_vault.files.cache)?.canWrite(), "Can't write to cache"
-		assert new File(grailsApplication.config.document_vault.files.cache)?.canRead(), "Can't read from cache"
+
+		def cache = new File(grailsApplication.config.document_vault.files.cache)
+		if (!cache.exists()) {
+			cache.mkdirs()
+		}
+
+		assert cache.isDirectory(), "Cache isn't a directory"
+		assert cache.canWrite(), "Can't write to cache"
+		assert cache.canRead(), "Can't read from cache"
 
 		// Disable JAI native acceleration layer
 		System.setProperty('com.sun.media.jai.disableMediaLib', 'true')
@@ -36,6 +42,7 @@ class BootStrap {
 		}
 
 		if (Environment.currentEnvironment == Environment.DEVELOPMENT) {
+			System.setProperty('java.io.tmpdir', cache.absolutePath)
 			if (DomainTenantMap.count() == 0) {
 				new DomainTenantMap(domainName:"localhost", mappedTenantId:1, name:"default").save()
 
