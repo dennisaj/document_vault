@@ -58,7 +58,7 @@ class FolderController {
 
 		def results = folderService.search(searchFolder, pagination, params.filter?.trim())
 
-		render([folders:results.results*.asMap(), total:results.total] as JSON)
+		render([searchFolder:searchFolder?.asMap(), folders:results.results*.asMap(), total:results.total] as JSON)
 	}
 
 	def addDocument = {
