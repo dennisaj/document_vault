@@ -46,20 +46,19 @@ class Folder {
 			id:id,
 			name:name,
 			dateCreated:dateCreated,
-			parent:[
-				id:parent?.id,
-				name:parent?.name
+			data: [
+				childrenCount:children?.size(),
+				documentCount:documents?.size(),
+				mimeType:'folder'
 			],
 			group:[
 				id:group.id,
 				name:group.name
 			],
-			children:children?.collect {
-				[
-					id:it.id,
-					name:it.name
-				]
-			}
+			parent:[
+				id:parent?.id,
+				name:parent?.name
+			]
 		]
 	}
 }

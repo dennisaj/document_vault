@@ -32,7 +32,6 @@ class FolderController {
 		} else {
 			returnMap.notification = NotificationHelper.success('title', 'message')
 			returnMap.folder = folder.asMap()
-			returnMap.folder.documents = []
 		}
 
 		render(returnMap as JSON)

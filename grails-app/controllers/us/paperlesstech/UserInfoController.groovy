@@ -45,6 +45,11 @@ class UserInfoController {
 				]
 			}
 
+			returnMap.user.groups = [:]
+
+			returnMap.user.groups.upload = authService.getGroupsWithPermission([DocumentPermission.Upload])*.asMap()
+			returnMap.user.groups.manageFolders = authService.getGroupsWithPermission([DocumentPermission.ManageFolders])*.asMap()
+
 			returnMap.notification = NotificationHelper.success('title', 'message')
 
 			render(returnMap as JSON)

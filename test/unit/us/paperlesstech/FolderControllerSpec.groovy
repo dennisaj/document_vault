@@ -95,7 +95,6 @@ class FolderControllerSpec extends ControllerSpec {
 		results.folder.name == 'new folder2'
 		results.folder.group.id == group1.id
 		results.folder.group.name == group1.name
-		results.folder.documents == []
 	}
 
 	def "delete should throw an AssertError when given an invalid folder"() {

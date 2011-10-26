@@ -76,4 +76,12 @@ class Group implements Comparable<Group> {
 	String toString() {
 		"Group($id) - $name"
 	}
+
+	Map asMap() {
+		[
+			id:id,
+			name:name,
+			description:description
+		]
+	}
 }

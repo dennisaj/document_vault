@@ -155,16 +155,17 @@ class Document {
 			id:id,
 			name:name,
 			dateCreated:dateCreated,
-			data:[
+			data: [
+				id:files.first().id,
 				size:files.first().fileSize,
 				pages:files.first().pages,
 				mimeType:files.first().mimeType.downloadExtension
 			],
-			group:[
+			group: [
 				id:group.id,
 				name:group.name
 			],
-			folder:[
+			parent: [
 				id:folder?.id,
 				name:folder?.name
 			]
