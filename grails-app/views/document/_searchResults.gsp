@@ -44,10 +44,6 @@
 			</a>
 			</pt:canPrint>
 
-			<a href="${createLink(action: 'show', params:[documentId: document.id])}" class="ui-button show" title="<g:message code="document-vault.label.view" />">
-				<g:message code="document-vault.label.view" />
-			</a>
-
 			<a href="${createLink(action: 'download', params:[documentId: document.id, documentDataId: document.files.first().id])}" class="ui-button download" title="<g:message code="document-vault.label.download" />">
 				<g:message code="document-vault.label.download" />
 			</a>

@@ -151,9 +151,10 @@ class DocumentControllerSpec extends ControllerSpec {
 		given:
 		controller.params.documentId = '1'
 		when:
-		def model = controller.show()
+		controller.show()
+		def documentJSON = JSON.parse(mockResponse.contentAsString)
 		then:
-		model.document == document1
+		documentJSON.document.id == document1.id
 	}
 
 	def "image should throw an AssertionError when given an invalid documentId"() {

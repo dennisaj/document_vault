@@ -37,8 +37,6 @@
 	</pt:canNotes>
 </head>
 <body>
-<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
-<input type="hidden" id="documentId" value="${document?.id}" />
 
 <div id="button-panel">
 	<input type="hidden" id="pageCount" value="${document?.previewImages?.size()}" />
