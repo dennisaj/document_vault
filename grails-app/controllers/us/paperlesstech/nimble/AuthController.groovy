@@ -134,7 +134,7 @@ class AuthController {
 
 			log.info "Authenticated user, $params.username."
 
-			render([notification:notificationService.success('message')] as JSON)
+			render([notification:notificationService.success('document-vault.api.login.success')] as JSON)
 			return
 		} catch (IncorrectCredentialsException e) {
 			log.info "Credentials failure for user '${params.username}'."
@@ -164,7 +164,7 @@ class AuthController {
 		} else {
 			authService.logout()
 		}
-		request.xhr ? render([notification:notificationService.success('message')] as JSON) : redirect(uri: '/')
+		request.xhr ? render([notification:notificationService.success('document-vault.api.logout.success')] as JSON) : redirect(uri: '/')
 	}
 
 	def unauthorized = {

@@ -13,7 +13,7 @@ class RunAsController {
 	def notificationService
 
 	def afterInterceptor = {
-		render([notification:notificationService.success('message'), uri:params.targetUri?:'/'] as JSON)
+		render([notification:notificationService.success('document-vault.api.runas.success'), uri:params.targetUri?:'/'] as JSON)
 	}
 
 	def runas = {

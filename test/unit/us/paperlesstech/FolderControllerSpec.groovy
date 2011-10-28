@@ -91,7 +91,7 @@ class FolderControllerSpec extends ControllerSpec {
 			def folder = new Folder(id:4, group:group, name:name, parent:parent)
 			folder
 		}
-		1 * notificationService.success(_)
+		1 * notificationService.success(_, _)
 		results.folder.id == 4
 		results.folder.name == 'new folder2'
 		results.folder.group.id == group1.id
@@ -118,7 +118,7 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.deleteFolder(folder1)
-		1 * notificationService.success(_)
+		1 * notificationService.success(_, _)
 	}
 
 	def "list should pass parent, pagination and filter to search then return the results as JSON"() {
@@ -173,7 +173,7 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.addDocumentToFolder(folder2, document2)
-		1 * notificationService.success(_)
+		1 * notificationService.success(_, _)
 	}
 
 	def "removeDocument should throw an AssertionError when passed invalid data"() {
@@ -203,7 +203,7 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.removeDocumentFromFolder(document2)
-		1 * notificationService.success(_)
+		1 * notificationService.success(_, _)
 	}
 
 	def "addFolder should throw an AssertionError when passed invalid data"() {
@@ -236,6 +236,6 @@ class FolderControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		1 * folderService.addChildToFolder(parent2, folder1)
-		1 * notificationService.success(_)
+		1 * notificationService.success(_, _)
 	}
 }

@@ -50,11 +50,11 @@ class UserInfoController {
 			returnMap.user.groups.upload = authService.getGroupsWithPermission([DocumentPermission.Upload])*.asMap()
 			returnMap.user.groups.manageFolders = authService.getGroupsWithPermission([DocumentPermission.ManageFolders])*.asMap()
 
-			returnMap.notification = notificationService.success('message')
+			returnMap.notification = notificationService.success('document-vault.api.userinfo.userfound')
 
 			render(returnMap as JSON)
 		} else {
-			render([notification:notificationService.error('message')] as JSON)
+			render([notification:notificationService.error('document-vault.api.userinfo.usernotfound')] as JSON)
 		}
 	}
 }

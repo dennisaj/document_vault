@@ -157,9 +157,9 @@ class NoteControllerSpec extends ControllerSpec {
 		controller.params.documentId = '1'
 		when:
 		controller.list()
-		def notes = JSON.parse(mockResponse.contentAsString)
+		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		notes.size() == 2
+		results.notes.size() == 2
 	}
 
 	def "list should include a url if a note contains DocumentData"() {

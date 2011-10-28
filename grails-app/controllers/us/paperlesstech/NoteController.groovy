@@ -40,7 +40,7 @@ class NoteController {
 			notes[it.id] = [url:url, note:it.note, pageNumber:it.pageNumber, left:it.left, top:it.top]
 		}
 
-		render([notification:notificationService.success('message'), notes:notes] as JSON)
+		render([notes:notes] as JSON)
 	}
 
 	def saveLines = {
@@ -61,7 +61,7 @@ class NoteController {
 		handlerChain.saveNotes(document:document, notes:notes)
 		document.save(flush:true)
 
-		render([notification:notificationService.success('message')] as JSON)
+		render([notification:notificationService.success('document-vault.api.notes.saveLines.success')] as JSON)
 	}
 
 	def saveText = {

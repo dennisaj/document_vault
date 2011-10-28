@@ -16,7 +16,7 @@ class FolderController {
 		def returnMap = [:]
 
 		if (folder.hasErrors()) {
-			returnMap.notification = notificationService.error('message')
+			returnMap.notification = notificationService.error('document-vault.api.folder.create.error')
 
 			// TODO replace with collectEntries with Groovy 1.8.0
 			returnMap.validation = [:].putAll(['group', 'name', 'documents'].collect { field->
@@ -30,7 +30,7 @@ class FolderController {
 				)
 			})
 		} else {
-			returnMap.notification = notificationService.success('message')
+			returnMap.notification = notificationService.success('document-vault.api.folder.create.success', [folder.name])
 			returnMap.folder = folder.asMap()
 		}
 
@@ -38,12 +38,13 @@ class FolderController {
 	}
 
 	def delete = {
-		def folder = Folder.load(params.long('folderId'))
+		def folder = Folder.get(params.long('folderId'))
 		assert folder
 
+		def folderName = folder.name
 		folderService.deleteFolder(folder)
 
-		render([notification:notificationService.success('message')] as JSON)
+		render([notification:notificationService.success('document-vault.api.folder.delete.success', [folderName])] as JSON)
 	}
 
 	def list = {
@@ -62,7 +63,7 @@ class FolderController {
 	}
 
 	def addDocument = {
-		def destination = Folder.load(params.long('folderId'))
+		def destination = Folder.get(params.long('folderId'))
 		assert destination
 		def document = Document.get(params.long('documentId'))
 		assert document
@@ -70,11 +71,11 @@ class FolderController {
 
 		folderService.addDocumentToFolder(destination, document)
 
-		render([notification:notificationService.success('message')] as JSON)
+		render([notification:notificationService.success('document-vault.api.folder.addDocument.success', [document.name, destination.name])] as JSON)
 	}
 
 	def removeDocument = {
-		def folder = Folder.load(params.long('folderId'))
+		def folder = Folder.get(params.long('folderId'))
 		assert folder
 		def document = Document.get(params.long('documentId'))
 		assert document
@@ -82,13 +83,13 @@ class FolderController {
 
 		folderService.removeDocumentFromFolder(document)
 
-		render([notification:notificationService.success('message')] as JSON)
+		render([notification:notificationService.success('document-vault.api.folder.removeDocument.success', [document.name, folder.name])] as JSON)
 	}
 
 	def addFolder = {
-		def parent = Folder.load(params.long('parentId'))
+		def parent = Folder.get(params.long('parentId'))
 		assert parent
-		def child = Folder.load(params.long('childId'))
+		def child = Folder.get(params.long('childId'))
 		assert child
 
 		def currentParent = Folder.load(params.long('currentParentId'))
@@ -96,6 +97,6 @@ class FolderController {
 
 		folderService.addChildToFolder(parent, child)
 
-		render([notification:notificationService.success('message')] as JSON)
+		render([notification:notificationService.success('document-vault.api.folder.addFolder.success', [child.name, parent.name])] as JSON)
 	}
 }
