@@ -61,10 +61,6 @@ grails.project.dependency.resolution = {
 		test group:'org.objenesis', name:'objenesis', version:'1.2'
 
 		// Nimble integration dependencies
-		compile group:'com.google.code.facebookapi', name:'facebook-java-api', version:'3.0.2'
-		// There is a newer version of this library. Nimble is not compatible with it.
-		compile group:'org.openid4java', name:'openid4java-consumer', version:'0.9.5'
-		compile group:'net.tanesha.recaptcha4j', name:'recaptcha4j', version:'0.0.7'
 		compile group:'org.apache.santuario', name:'xmlsec', version:'1.4.5'
 	}
 }

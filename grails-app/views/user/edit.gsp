@@ -42,20 +42,6 @@
       </tr>
 
       <tr>
-        <th><g:message code="nimble.label.federatedaccount" /></th>
-        <td>
-          <g:if test="${user.federated}">
-            <input type="radio" name="federated" value="true" checked="checked"/><g:message code="nimble.label.true" />
-            <input type="radio" name="federated" value="false"/><g:message code="nimble.label.false" />
-          </g:if>
-          <g:else>
-            <input type="radio" name="federated" value="true"/><g:message code="nimble.label.true" />
-            <input type="radio" name="federated" value="false" checked="checked"/><g:message code="nimble.label.false" />
-          </g:else>
-        </td>
-      </tr>
-
-      <tr>
         <td/>
         <td>
           <div class="buttons">

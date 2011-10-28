@@ -29,7 +29,7 @@ import us.paperlesstech.Preference
  */
 @MultiTenant
 class User implements Comparable<User> {
-	static final String SIGNATOR_USER_ROLE = "SIGNATOR_USER"
+	static final String SIGNATOR_USER_ROLE = 'SIGNATOR_USER'
 
 	String username
 	String realm
@@ -37,10 +37,8 @@ class User implements Comparable<User> {
 	String actionHash
 	boolean enabled
 	boolean external
-	boolean federated
 	boolean remoteapi = false
 
-	FederationProvider federationProvider
 	Profile profile
 
 	Date expiration
@@ -55,8 +53,6 @@ class User implements Comparable<User> {
 	static hasMany = [
 		passwdHistory: String,
 		loginRecords: LoginRecord,
-		follows: User,
-		followers: User,
 		roles: Role,
 		groups: Group,
 		permissions: Permission,
@@ -68,16 +64,17 @@ class User implements Comparable<User> {
 		sort username:'desc'
 
 		cache usage: 'read-write', include: 'all'
-		table ConfigurationHolder.config?.nimble?.tablenames?.user
+		table '_user'
 
 		profile lazy: false
 
-		roles cache: true, cascade: 'none'
-		groups cache: true, cascade: 'none'
+		roles cache: true, cascade: 'none', joinTable: [name: '_role_to_user']
+		groups cache: true, cascade: 'none', joinTable: [name: '_group_to_user']
 		permissions cache: true
-		externalId index: "user_external_id_idx"
+		external column: '_external'
+		externalId index: 'user_external_id_idx'
 		preferences cache:true
-		delegators nullable:true, joinTable:[name:'users_delegators']
+		delegators nullable:true, joinTable:[name:'_user_to_delegators']
 	}
 
 	static constraints = {
@@ -86,7 +83,6 @@ class User implements Comparable<User> {
 		actionHash nullable: true, blank: false
 		realm nullable: true, blank: false
 
-		federationProvider nullable: true
 		profile nullable:false
 
 		expiration nullable: true

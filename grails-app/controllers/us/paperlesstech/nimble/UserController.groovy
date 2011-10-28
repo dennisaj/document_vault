@@ -410,7 +410,7 @@ class UserController {
 			render g.message(code: 'nimble.user.nonexistant', args: [params.id])
 			response.status = 500
 		} else {
-			LevelPermission permission = new LevelPermission()
+			Permission permission = new Permission()
 			permission.populate(params.first, params.second, params.third, params.fourth, params.fifth, params.sixth)
 			permission.managed = false
 

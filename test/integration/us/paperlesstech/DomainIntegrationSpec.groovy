@@ -2,8 +2,12 @@ package us.paperlesstech
 
 import grails.plugin.spock.IntegrationSpec
 import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.User
+import us.paperlesstech.nimble.Profile
 
 class DomainIntegrationSpec extends IntegrationSpec {
+	AuthService authService = Mock()
+	def user = new User(username:"user", profile:new Profile())
 	def sessionFactory
 	def previewImageData
 	def fileData
@@ -12,6 +16,11 @@ class DomainIntegrationSpec extends IntegrationSpec {
 	def secondDateCreated = new GregorianCalendar(2010, 1, 1).time
 
 	def setup() {
+		user.save(failOnError: true)
+		authService.authenticatedUser >>> user
+		Document.authService = authService
+		Folder.authService = authService
+
 		previewImageData = new DocumentData(mimeType: MimeType.PDF, fileKey: "previewImageDataKey", fileSize: 1,
 				dateCreated: firstDateCreated)
 		previewImageData.save()
@@ -32,6 +41,11 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		d.addToFiles(fileData)
 		d.group = group
 		d
+	}
+
+	def getFolder() {
+		def f = new Folder(name: 'folder name', group: group)
+		f
 	}
 
 	def "can add to document maps"() {
@@ -237,5 +251,69 @@ class DomainIntegrationSpec extends IntegrationSpec {
 		Document.get(d.id).files.first() == fileData
 		DocumentData.count() == 2
 		Document.count() == 1
+	}
+
+	def "document should store the createdBy on save"() {
+		def d = getDocument()
+
+		when:
+		d.save()
+
+		then:
+		d.createdBy == user
+		d.lastUpdatedBy == user
+		d.dateCreated != null
+		d.lastUpdated != null
+	}
+
+	def "document should store the lastUpdatedBy on update"() {
+		def d = getDocument()
+
+		when:
+		d.save(flush: true)
+		d = Document.get(d.id)
+		def origLastUpdated = d.lastUpdated
+
+		d.name = 'new name'
+		d.lastUpdatedBy = null
+		d.save(flush: true)
+
+		then:
+		d.createdBy == user
+		d.lastUpdatedBy == user
+		d.dateCreated != null
+		d.lastUpdated != origLastUpdated
+	}
+
+	def "folder should store the createdBy on save"() {
+		def f = getFolder()
+
+		when:
+		f.save(failOnError: true, flush: true)
+
+		then:
+		f.createdBy == user
+		f.lastUpdatedBy == user
+		f.dateCreated != null
+		f.lastUpdated != null
+	}
+
+	def "folder should store the lastUpdatedBy on update"() {
+		def f = getFolder()
+
+		when:
+		f.save(failOnError: true, flush: true)
+		f = Folder.get(f.id)
+		def origLastUpdated = f.lastUpdated
+
+		f.name = 'new name'
+		f.lastUpdatedBy = null
+		f.save(fialOnError: true, flush: true)
+
+		then:
+		f.createdBy == user
+		f.lastUpdatedBy == user
+		f.dateCreated != null
+		f.lastUpdated != origLastUpdated
 	}
 }

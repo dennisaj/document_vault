@@ -31,10 +31,9 @@ class Url {
 	String description
 	String location
 
-	static belongsTo = [Details, Profile]
+	static belongsTo = [Profile]
 
 	static mapping = {
-		table ConfigurationHolder.config.nimble.tablenames.url
 	}
 
 	static constraints = {

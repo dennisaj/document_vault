@@ -68,15 +68,6 @@ nimble.changeLogin = function(ident) {
   $("#" + ident).show("highlight");
 };
 
-nimble.enableFacebookContinue = function() {
-  $("#loginfacebookcontinue").show();
-  $("#loginfacebookenable").hide();
-};
-
-nimble.disableFacebookContinue = function() {
-  $("#loginfacebookcontinue").hide();
-};
-
 // Session Termination
 $(function() {
     $('<div id="sessionterminateddialog" style="display:none">'+

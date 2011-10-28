@@ -28,10 +28,8 @@ class UserTests extends GrailsUnitTestCase {
     def actionHash 
     def enabled 
     def external 
-    def federated 
     def remoteapi 
     def expiration 
-    def federationProvider 
     def profile 
     def role1 
     def role2 
@@ -41,11 +39,7 @@ class UserTests extends GrailsUnitTestCase {
     def pw2 
     def login1 
     def login2 
-    def follows1 
-    def follows2 
-    def follower1 
-    def follower2 
-    def dateCreated 
+    def dateCreated
     def lastUpdated 
         
     protected void setUp() {
@@ -56,11 +50,9 @@ class UserTests extends GrailsUnitTestCase {
         actionHash = 'actionHash'
         enabled = true
         external = true
-        federated = true
         remoteapi = true
         expiration = new Date()
 
-        federationProvider = new FederationProvider()
         profile = new Profile()
 
         role1 = new Role()
@@ -75,12 +67,6 @@ class UserTests extends GrailsUnitTestCase {
         login1 = new LoginRecord()
         login2 = new LoginRecord()
 
-        follows1 = new User()
-        follows2 = new User()
-
-        follower1 = new User()
-        follower2 = new User()
-
         dateCreated = new Date()
         lastUpdated = new Date()
     }
@@ -91,10 +77,9 @@ class UserTests extends GrailsUnitTestCase {
 
     User createValidUser() {
         def user = new User(username:username, passwordHash:passwordHash, actionHash:actionHash, enabled:enabled,
-            external:external, federated:federated, remoteapi:remoteapi, expiration:expiration,
-            federationProvider:federationProvider, profile:profile, roles:[role1,role2],
+            external:external, remoteapi:remoteapi, expiration:expiration,
+            profile:profile, roles:[role1,role2],
             groups:[group1,group2], passwdHistory:[pw1,pw2], loginRecords:[login1,login2], 
-            follows:[follows1,follows2], followers:[follower1,follower2],
             dateCreated:dateCreated, lastUpdated:lastUpdated)
 
         return user
@@ -108,10 +93,8 @@ class UserTests extends GrailsUnitTestCase {
         assertEquals actionHash, user.actionHash
         assertEquals enabled, user.enabled
         assertEquals external, user.external
-        assertEquals federated, user.federated
         assertEquals remoteapi, user.remoteapi
         assertEquals expiration, user.expiration
-        assertEquals federationProvider, user.federationProvider
         assertEquals profile, user.profile
         assertEquals dateCreated, user.dateCreated
         assertEquals lastUpdated, user.lastUpdated
@@ -120,8 +103,6 @@ class UserTests extends GrailsUnitTestCase {
         assertTrue user.groups.containsAll([group1,group2])
         assertTrue user.passwdHistory.containsAll([pw1,pw2])
         assertTrue user.loginRecords.containsAll([login1,login2])
-        assertTrue user.follows.containsAll([follows1,follows2])
-        assertTrue user.followers.containsAll([follower1,follower2])
     }
 
     void testUsernameConstraint() {
@@ -191,16 +172,6 @@ class UserTests extends GrailsUnitTestCase {
 
         user.actionHash = ''
         assertFalse user.validate()
-    }
-
-    void testFederationProviderConstraint() {
-        mockForConstraintsTests(User)
-
-        def user = createValidUser()
-        assertTrue user.validate()
-
-        user.federationProvider = null
-        assertTrue user.validate()
     }
 
     void testProfileConstraint() {

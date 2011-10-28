@@ -17,7 +17,6 @@
 package us.paperlesstech.nimble
 
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
-
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 /**
@@ -32,7 +31,7 @@ class Permission implements Serializable {
 	static public final String wildcardPerm = "org.apache.shiro.authz.permission.WildcardPermission"
 	static public final String adminPerm = "org.apache.shiro.authz.permission.AllPermission"
 
-	String type
+	String type = defaultPerm
 	String possibleActions = "*"
 	String actions = "*"
 	String target
@@ -44,15 +43,14 @@ class Permission implements Serializable {
 
 	Date dateCreated
 
-	static belongsTo = [user: User, role: Role, group:Group]
+	static belongsTo = [user: User, role: Role, group: Group]
 
-	static transients = [ "owner" ]
+	static transients = ["owner"]
 
 	static mapping = {
-		sort dateCreated:'asc'
+		sort dateCreated: 'asc'
 
 		cache usage: 'read-write', include: 'all'
-		table ConfigurationHolder.config.nimble.tablenames.permission
 	}
 
 	static constraints = {
@@ -61,14 +59,14 @@ class Permission implements Serializable {
 		actions nullable: false, blank: false
 		target nullable: false, blank: false
 
-		user nullable:true
-		role nullable:true
-		group nullable:true
+		user nullable: true
+		role nullable: true
+		group nullable: true
 
 		dateCreated nullable: true
 	}
 
-	def setOwner (def owner) {
+	def setOwner(def owner) {
 		if (owner instanceof User) {
 			this.user = owner
 		}
@@ -96,5 +94,29 @@ class Permission implements Serializable {
 		}
 
 		null
+	}
+
+	def populate(String first, String second, String third, String fourth, String fifth, String sixth) {
+		first = first?.trim()
+
+		if (!first) {
+			this.errors.reject('nimble.permission.create.error')
+			return
+		}
+
+		target = first
+		boolean stop = false
+		[second, third, fourth, fifth, sixth].each {
+			if (stop) {
+				return
+			}
+
+			def tmp = it?.trim()
+			if (tmp) {
+				target += ":$tmp"
+			} else {
+				stop = true
+			}
+		}
 	}
 }

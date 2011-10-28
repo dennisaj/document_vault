@@ -57,19 +57,6 @@ class AccountControllerTests extends ControllerUnitTestCase {
 		return user
 	}
 
-	def createValidRecaptchaMock() {
-		def rsMock = mockFor(RecaptchaService)
-		rsMock.demand.verifyAnswer {session, request, params ->
-			assertEquals mockSession, session
-			assertEquals mockRequest.getRemoteAddr(), request
-
-			return true
-		}
-		controller.recaptchaService = rsMock.createMock()
-
-		return rsMock
-	}
-
 	def createValidUserServiceMock() {
 		def usMock = mockFor(UserService)
 		return usMock
@@ -114,8 +101,6 @@ class AccountControllerTests extends ControllerUnitTestCase {
 		def user = createValidUser()
 		asMock.demand.getAuthenticatedUser {-> return user}
 
-		def rsMock = createValidRecaptchaMock()
-
 		def usMock = createValidUserServiceMock()
 		 usMock.demand.validatePass {u, b->
 			assertEquals user, u
@@ -138,7 +123,6 @@ class AccountControllerTests extends ControllerUnitTestCase {
 		assertEquals 200, mockResponse.status
 		assertEquals 'changedpassword', controller.redirectArgs.action
 
-		rsMock.verify()
 		usMock.verify()
 		asMock.verify()
 	}
@@ -180,31 +164,6 @@ class AccountControllerTests extends ControllerUnitTestCase {
 		asMock.verify()
 	}
 
-	void testUpdatePasswordNotHuman() {
-		def user = createValidUser()
-		assertFalse user.hasErrors()
-		asMock.demand.getAuthenticatedUser {-> return user}
-
-		def rsMock = mockFor(RecaptchaService)
-		rsMock.demand.verifyAnswer {session, request, params ->
-			assertEquals mockSession, session
-			assertEquals mockRequest.getRemoteAddr(), request
-
-			return false
-		}
-		controller.recaptchaService = rsMock.createMock()
-
-		mockParams.putAll( [pass:pass, passConfirm:passConfirm, currentPassword:currentPassword] )
-		controller.updatepassword()
-
-		assertEquals user.id, controller.renderArgs.model.user.id
-		assertEquals 'changepassword', controller.renderArgs.view
-		assertTrue user.hasErrors()
-
-		rsMock.verify()
-		asMock.verify()
-	}
-
 	void testUpdatePasswordEmptyCurrent() {
 		def user = createValidUser()
 		asMock.demand.getAuthenticatedUser {-> return user}
@@ -224,8 +183,6 @@ class AccountControllerTests extends ControllerUnitTestCase {
 	void testUpdatePasswordInvalidPass() {
 		def user = createValidUser()
 		asMock.demand.getAuthenticatedUser {-> return user}
-
-		def rsMock = createValidRecaptchaMock()
 
 		def usMock = createValidUserServiceMock()
 		 usMock.demand.validatePass {u, b->
@@ -253,7 +210,6 @@ class AccountControllerTests extends ControllerUnitTestCase {
 		assertTrue user.hasErrors()
 
 		usMock.verify()
-		rsMock.verify()
 		asMock.verify()
 	}
 

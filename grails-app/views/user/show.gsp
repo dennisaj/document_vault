@@ -74,9 +74,6 @@
 	<div id="tabs">
 		<ul>
 			<li><a href="#tab-extendedinfo" class="icon icon_user"><g:message code="nimble.label.extendedinformation" /></a></li>
-		<g:if test="${user.federated}">
-			<li><a href="#tab-federation" class="icon icon_world"><g:message code="nimble.label.federatedaccount" /></a></li>
-		</g:if>
 			<li><a href="#tab-permissions" class="icon icon_lock"><g:message code="nimble.label.permissions" /></a></li>
 			<li><a href="#tab-roles" class="icon icon_cog"><g:message code="nimble.label.roles" /></a></li>
 			<li><a href="#tab-groups" class="icon icon_group"><g:message code="nimble.label.groups" /></a></li>
@@ -87,12 +84,6 @@
 		<div id="tab-extendedinfo">
 			<g:render template="/templates/nimble/user/extendedinformation" contextPath="/" model="[user:user]" />
 		</div>
-
-		<g:if test="${user.federated}">
-			<div id="tab-federation">
-			<g:render template="/templates/nimble/user/federationinformation" contextPath="/" model="[user:user]" />
-			</div>
-		</g:if>
 
 		<div id="tab-permissions">
 			<g:render template="/templates/admin/permissions" contextPath="${pluginContextPath}" model="[parent:user]" />

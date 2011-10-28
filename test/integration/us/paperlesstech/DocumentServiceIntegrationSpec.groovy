@@ -21,6 +21,8 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 	def setup() {
 		service = new DocumentService()
 		service.authService = authService
+		Document.authService = authService
+		Folder.authService = authService
 
 		dd = new DocumentData(mimeType:MimeType.PNG, fileSize:1, fileKey:'1234abc')
 		dd.save(failOnError:true)

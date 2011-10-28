@@ -1,6 +1,182 @@
 databaseChangeLog = {
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-1") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-1") {
+		createTable(tableName: "_group") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "_groupPK")
+			}
+
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "date_created", type: "timestamp")
+
+			column(name: "description", type: "varchar(255)")
+
+			column(name: "_external", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "external_id", type: "varchar(255)")
+
+			column(name: "last_updated", type: "timestamp")
+
+			column(name: "name", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "protect", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "realm", type: "varchar(255)")
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-2") {
+		createTable(tableName: "_group_to_role") {
+			column(name: "role_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "group_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-3") {
+		createTable(tableName: "_group_to_user") {
+			column(name: "group_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "user_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-4") {
+		createTable(tableName: "_role") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "_rolePK")
+			}
+
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "date_created", type: "timestamp")
+
+			column(name: "description", type: "varchar(255)")
+
+			column(name: "_external", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "last_updated", type: "timestamp")
+
+			column(name: "name", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "protect", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "realm", type: "varchar(255)")
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-5") {
+		createTable(tableName: "_role_to_user") {
+			column(name: "role_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "user_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-6") {
+		createTable(tableName: "_user") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "_userPK")
+			}
+
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "action_hash", type: "varchar(255)")
+
+			column(name: "date_created", type: "timestamp")
+
+			column(name: "enabled", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "expiration", type: "timestamp")
+
+			column(name: "_external", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "external_id", type: "varchar(255)")
+
+			column(name: "last_updated", type: "timestamp")
+
+			column(name: "password_hash", type: "varchar(255)")
+
+			column(name: "profile_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "realm", type: "varchar(255)")
+
+			column(name: "remoteapi", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "username", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-7") {
+		createTable(tableName: "_user_passwd_history") {
+			column(name: "user_id", type: "bigint")
+
+			column(name: "passwd_history_string", type: "varchar(255)")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-8") {
+		createTable(tableName: "_user_to_delegators") {
+			column(name: "user_delegators_id", type: "bigint")
+
+			column(name: "user_id", type: "bigint")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-9") {
 		createTable(tableName: "activity_log") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "activity_logPK")
@@ -10,7 +186,7 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "tenant_id", type: "integer") {
+			column(name: "action", type: "varchar(255)") {
 				constraints(nullable: "false")
 			}
 
@@ -18,11 +194,25 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
+			column(name: "delegate_id", type: "bigint")
+
+			column(name: "document_id", type: "bigint")
+
 			column(name: "ip", type: "varchar(255)") {
 				constraints(nullable: "false")
 			}
 
+			column(name: "page_number", type: "varchar(255)")
+
 			column(name: "params", type: "varchar(4096)")
+
+			column(name: "status", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
 
 			column(name: "uri", type: "varchar(4096)") {
 				constraints(nullable: "false")
@@ -33,46 +223,10 @@ databaseChangeLog = {
 			column(name: "user_agent", type: "varchar(255)") {
 				constraints(nullable: "false")
 			}
-
-			column(name: "action", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "document", type: "varchar(255)")
-
-			column(name: "page_number", type: "varchar(255)")
-
-			column(name: "status", type: "integer") {
-				constraints(nullable: "false")
-			}
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-2") {
-		createTable(tableName: "details") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "detailsPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "description", type: "varchar(255)")
-
-			column(name: "display_name", type: "varchar(255)")
-
-			column(name: "logo", type: "varchar(255)")
-
-			column(name: "logo_small", type: "varchar(255)")
-
-			column(name: "name", type: "varchar(255)")
-
-			column(name: "url_id", type: "bigint")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-3") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-10") {
 		createTable(tableName: "document") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "documentPK")
@@ -82,23 +236,33 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
+			column(name: "created_by_id", type: "bigint")
 
 			column(name: "date_created", type: "timestamp") {
 				constraints(nullable: "false")
 			}
 
+			column(name: "folder_id", type: "bigint")
+
 			column(name: "group_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
+			column(name: "last_updated", type: "timestamp") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "last_updated_by_id", type: "bigint")
+
 			column(name: "name", type: "varchar(255)")
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-4") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-11") {
 		createTable(tableName: "document_data") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "document_dataPK")
@@ -108,11 +272,15 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "tenant_id", type: "integer") {
+			column(name: "date_created", type: "timestamp") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "date_created", type: "timestamp") {
+			column(name: "file_key", type: "varchar(255)") {
+				constraints(nullable: "false", unique: "true")
+			}
+
+			column(name: "file_size", type: "integer") {
 				constraints(nullable: "false")
 			}
 
@@ -124,27 +292,13 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "file_key", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "file_size", type: "integer") {
+			column(name: "tenant_id", type: "integer") {
 				constraints(nullable: "false")
 			}
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-5") {
-		createTable(tableName: "document_document_data") {
-			column(name: "document_files_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "document_data_id", type: "bigint")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-6") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-12") {
 		createTable(tableName: "document_other_field") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "document_othePK")
@@ -154,21 +308,21 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
 			column(name: "document_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
 			column(name: "_key", type: "varchar(255)")
 
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+
 			column(name: "_value", type: "varchar(4096)")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-7") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-13") {
 		createTable(tableName: "document_search_field") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "document_searPK")
@@ -178,21 +332,31 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
 			column(name: "document_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
 			column(name: "_key", type: "varchar(255)")
 
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+
 			column(name: "_value", type: "varchar(4096)")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-8") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-14") {
+		createTable(tableName: "document_to_document_data") {
+			column(name: "document_files_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "document_data_id", type: "bigint")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-15") {
 		createTable(tableName: "domain_tenant_map") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "domain_tenantPK")
@@ -216,49 +380,73 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-9") {
-		createTable(tableName: "federation_provider") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-16") {
+		createTable(tableName: "folder") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "federation_prPK")
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "folderPK")
 			}
 
 			column(name: "version", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "auto_provision", type: "bit") {
+			column(name: "created_by_id", type: "bigint")
+
+			column(name: "date_created", type: "timestamp") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "details_id", type: "bigint") {
+			column(name: "group_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "uid", type: "varchar(255)") {
+			column(name: "last_updated", type: "timestamp") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "last_updated_by_id", type: "bigint")
+
+			column(name: "name", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "parent_id", type: "bigint")
+
+			column(name: "tenant_id", type: "integer") {
 				constraints(nullable: "false")
 			}
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-10") {
-		createTable(tableName: "federation_provider_props") {
-			column(name: "props", type: "bigint")
-
-			column(name: "props_idx", type: "varchar(255)")
-
-			column(name: "props_elt", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-11") {
-		createTable(tableName: "groups") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-17") {
+		createTable(tableName: "highlight") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "groupsPK")
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "highlightPK")
 			}
 
 			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "accepted", type: "timestamp")
+
+			column(name: "height", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "_left", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "page_number", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "party_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "required", type: "bit") {
 				constraints(nullable: "false")
 			}
 
@@ -266,107 +454,17 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "date_created", type: "timestamp")
-
-			column(name: "description", type: "varchar(255)")
-
-			column(name: "external", type: "bit") {
+			column(name: "_top", type: "integer") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "external_id", type: "varchar(255)")
-
-			column(name: "last_updated", type: "timestamp")
-
-			column(name: "name", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "protect", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "realm", type: "varchar(255)")
-		}
-
-		modifySql() {
-			replace(replace: '"external"', with: "external")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-12") {
-		createTable(tableName: "groups_roles") {
-			column(name: "group_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "role_id", type: "bigint") {
+			column(name: "width", type: "integer") {
 				constraints(nullable: "false")
 			}
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-13") {
-		createTable(tableName: "groups_users") {
-			column(name: "user_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "group_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-14") {
-		createTable(tableName: "level_permission_fifth") {
-			column(name: "level_permission_id", type: "bigint")
-
-			column(name: "fifth_string", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-15") {
-		createTable(tableName: "level_permission_first") {
-			column(name: "level_permission_id", type: "bigint")
-
-			column(name: "first_string", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-16") {
-		createTable(tableName: "level_permission_fourth") {
-			column(name: "level_permission_id", type: "bigint")
-
-			column(name: "fourth_string", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-17") {
-		createTable(tableName: "level_permission_second") {
-			column(name: "level_permission_id", type: "bigint")
-
-			column(name: "second_string", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-18") {
-		createTable(tableName: "level_permission_sixth") {
-			column(name: "level_permission_id", type: "bigint")
-
-			column(name: "sixth_string", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-19") {
-		createTable(tableName: "level_permission_third") {
-			column(name: "level_permission_id", type: "bigint")
-
-			column(name: "third_string", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-20") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-18") {
 		createTable(tableName: "login_record") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "login_recordPK")
@@ -398,71 +496,17 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-21") {
-		createTable(tableName: "permission") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-19") {
+		createTable(tableName: "note") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "permissionPK")
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "notePK")
 			}
 
 			column(name: "version", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "actions", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "date_created", type: "timestamp")
-
-			column(name: "group_id", type: "bigint")
-
-			column(name: "managed", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "possible_actions", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "role_id", type: "bigint")
-
-			column(name: "target", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "type", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "user_id", type: "bigint")
-
-			column(name: "class", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-22") {
-		createTable(tableName: "preview_image") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "preview_imagePK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "data_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
+			column(name: "data_id", type: "bigint")
 
 			column(name: "date_created", type: "timestamp") {
 				constraints(nullable: "false")
@@ -472,291 +516,13 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "source_height", type: "integer") {
+			column(name: "_left", type: "integer") {
 				constraints(nullable: "false")
 			}
+
+			column(name: "note", type: "varchar(4096)")
 
 			column(name: "page_number", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "source_width", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "thumbnail_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-24") {
-		createTable(tableName: "printer") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "printerPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "device_type", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "host", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "name", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "port", type: "integer") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-25") {
-		createTable(tableName: "profile_base") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "profile_basePK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "date_created", type: "timestamp")
-
-			column(name: "email", type: "varchar(255)")
-
-			column(name: "email_hash", type: "varchar(255)")
-
-			column(name: "full_name", type: "varchar(255)")
-
-			column(name: "last_updated", type: "timestamp")
-
-			column(name: "nick_name", type: "varchar(255)")
-
-			column(name: "non_verified_email", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-26") {
-		createTable(tableName: "roles") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "rolesPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "date_created", type: "timestamp")
-
-			column(name: "description", type: "varchar(255)")
-
-			column(name: "external", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "last_updated", type: "timestamp")
-
-			column(name: "name", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "protect", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "realm", type: "varchar(255)")
-		}
-
-		modifySql() {
-			replace(replace: '"external"', with: "external")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-27") {
-		createTable(tableName: "roles_users") {
-			column(name: "user_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "role_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-29") {
-		createTable(tableName: "tag_links") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "tag_linksPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tag_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tag_ref", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "type", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-30") {
-		createTable(tableName: "tags") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "tagsPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "name", type: "varchar(255)") {
-				constraints(nullable: "false", unique: "true")
-			}
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-31") {
-		createTable(tableName: "url") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "urlPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "alt_text", type: "varchar(255)")
-
-			column(name: "description", type: "varchar(255)")
-
-			column(name: "location", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "name", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-32") {
-		createTable(tableName: "users") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "usersPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "action_hash", type: "varchar(255)")
-
-			column(name: "date_created", type: "timestamp")
-
-			column(name: "enabled", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "expiration", type: "timestamp")
-
-			column(name: "external", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "external_id", type: "varchar(255)")
-
-			column(name: "federated", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "federation_provider_id", type: "bigint")
-
-			column(name: "last_updated", type: "timestamp")
-
-			column(name: "password_hash", type: "varchar(255)")
-
-			column(name: "profile_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "realm", type: "varchar(255)")
-
-			column(name: "remoteapi", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "username", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-		}
-
-		modifySql() {
-			replace(replace: '"external"', with: "external")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-33") {
-		createTable(tableName: "users_passwd_history") {
-			column(name: "user_id", type: "bigint")
-
-			column(name: "passwd_history_string", type: "varchar(255)")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-34") {
-		createTable(tableName: "users_users") {
-			column(name: "user_followers_id", type: "bigint")
-
-			column(name: "user_id", type: "bigint")
-
-			column(name: "user_follows_id", type: "bigint")
-		}
-	}
-
-	changeSet(author: "seth (generated)", id: "1308779031843-1") {
-		createTable(tableName: "highlight") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "highlightPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "accepted", type: "timestamp")
-
-			column(name: "_left", type: "integer") {
 				constraints(nullable: "false")
 			}
 
@@ -764,33 +530,13 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "page_number", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "party_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "required", type: "bit") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "tenant_id", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "width", type: "integer") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "height", type: "integer") {
+			column(name: "user_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 		}
 	}
 
-	changeSet(author: "seth (generated)", id: "1308779031843-2") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-20") {
 		createTable(tableName: "party") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "partyPK")
@@ -844,287 +590,489 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-35") {
-		addPrimaryKey(columnNames: "group_id, role_id", tableName: "groups_roles")
-	}
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-21") {
+		createTable(tableName: "permission") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "permissionPK")
+			}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-36") {
-		addPrimaryKey(columnNames: "group_id, user_id", tableName: "groups_users")
-	}
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
 
-	changeSet(author: "dbwatson (generated)", id: "1307476009700-37") {
-		addPrimaryKey(columnNames: "role_id, user_id", tableName: "roles_users")
-	}
+			column(name: "actions", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-38") {
-		createIndex(indexName: "unique_document_other_fields", tableName: "document_other_field") {
-			column(name: "document_id")
+			column(name: "date_created", type: "timestamp")
 
-			column(name: "_key")
+			column(name: "group_id", type: "bigint")
+
+			column(name: "managed", type: "bit") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "possible_actions", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "role_id", type: "bigint")
+
+			column(name: "target", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "type", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "user_id", type: "bigint")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-39") {
-		createIndex(indexName: "unique_document_search_fields", tableName: "document_search_field") {
-			column(name: "document_id")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-22") {
+		createTable(tableName: "preference") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "preferencePK")
+			}
 
-			column(name: "_key")
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "_key", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "user_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "_value", type: "varchar(4096)")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-40") {
-		createIndex(indexName: "unique_group", tableName: "groups") {
-			column(name: "tenant_id")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-23") {
+		createTable(tableName: "preview_image") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "preview_imagePK")
+			}
 
-			column(name: "name")
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "data_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "date_created", type: "timestamp") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "document_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "page_number", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "source_height", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "source_width", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "thumbnail_id", type: "bigint") {
+				constraints(nullable: "false")
+			}
 		}
+	}
 
-		createIndex(indexName: "group_description_idx", tableName: "groups") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-24") {
+		createTable(tableName: "printer") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "printerPK")
+			}
+
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "device_type", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "host", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "name", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "port", type: "integer") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-25") {
+		createTable(tableName: "profile") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "profilePK")
+			}
+
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "date_created", type: "timestamp")
+
+			column(name: "email", type: "varchar(255)")
+
+			column(name: "email_hash", type: "varchar(255)")
+
+			column(name: "full_name", type: "varchar(255)")
+
+			column(name: "last_updated", type: "timestamp")
+
+			column(name: "nick_name", type: "varchar(255)")
+
+			column(name: "non_verified_email", type: "varchar(255)")
+
+			column(name: "tenant_id", type: "integer") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-26") {
+		createTable(tableName: "url") {
+			column(autoIncrement: "true", name: "id", type: "bigint") {
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "urlPK")
+			}
+
+			column(name: "version", type: "bigint") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "alt_text", type: "varchar(255)")
+
+			column(name: "description", type: "varchar(255)")
+
+			column(name: "location", type: "varchar(255)") {
+				constraints(nullable: "false")
+			}
+
+			column(name: "name", type: "varchar(255)")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-27") {
+		addPrimaryKey(columnNames: "group_id, role_id", tableName: "_group_to_role")
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-28") {
+		addPrimaryKey(columnNames: "group_id, user_id", tableName: "_group_to_user")
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-29") {
+		addPrimaryKey(columnNames: "role_id, user_id", tableName: "_role_to_user")
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-30") {
+		createIndex(indexName: "group_description_idx", tableName: "_group") {
 			column(name: "description")
 		}
+	}
 
-		createIndex(indexName: "group_external_id_idx", tableName: "groups") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-31") {
+		createIndex(indexName: "group_external_id_idx", tableName: "_group") {
 			column(name: "external_id")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-41") {
-		createIndex(indexName: "unique_preview_image", tableName: "preview_image") {
-			column(name: "document_id")
-
-			column(name: "page_number")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-42") {
-		createIndex(indexName: "unique_printer", tableName: "printer") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-32") {
+		createIndex(indexName: "unique_group_name", tableName: "_group") {
 			column(name: "tenant_id")
 
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-43") {
-		createIndex(indexName: "unique_profile_base", tableName: "profile_base") {
-			column(name: "tenant_id")
-
-			column(name: "email")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-44") {
-		createIndex(indexName: "unique_role", tableName: "roles") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-33") {
+		createIndex(indexName: "unique_role_name", tableName: "_role") {
 			column(name: "tenant_id")
 
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-47") {
-		createIndex(indexName: "unique_tag_name", tableName: "tags", unique: "true") {
-			column(name: "name")
-		}
-	}
-
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-48") {
-		createIndex(indexName: "unique_user", tableName: "users") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-34") {
+		createIndex(indexName: "unique_username", tableName: "_user") {
 			column(name: "tenant_id")
 
 			column(name: "username")
 		}
+	}
 
-		createIndex(indexName: "user_external_id_idx", tableName: "users") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-35") {
+		createIndex(indexName: "user_external_id_idx", tableName: "_user") {
 			column(name: "external_id")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1309894626393-3") {
-		createIndex(indexName: "file_key_unique_idx", tableName: "document_data", unique: "true") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-36") {
+		createIndex(indexName: "activity_log_document_idx", tableName: "activity_log") {
+			column(name: "document_id")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-37") {
+		createIndex(indexName: "file_key_unique_1319809075797", tableName: "document_data", unique: "true") {
 			column(name: "file_key")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307560218168-1") {
-		createIndex(indexName: "activity_log_document_idx", tableName: "activity_log") {
-			column(name: "document")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-38") {
+		createIndex(indexName: "unique_document_other_key", tableName: "document_other_field") {
+			column(name: "document_id")
+
+			column(name: "_key")
 		}
 	}
 
-	changeSet(author: "seth (generated)", id: "1308779031843-3") {
-		createIndex(indexName: "unique_party_code", tableName: "party", unique: "true") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-39") {
+		createIndex(indexName: "unique_document_search_key", tableName: "document_search_field") {
+			column(name: "document_id")
+
+			column(name: "_key")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-40") {
+		createIndex(indexName: "unique_folder_name", tableName: "folder") {
+			column(name: "parent_id")
+
+			column(name: "name")
+		}
+	}
+
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-41") {
+		createIndex(indexName: "code_unique_1319809075821", tableName: "party", unique: "true") {
 			column(name: "code")
 		}
 	}
 
-	changeSet(author: "seth (generated)", id: "1308779031843-4") {
-		createIndex(indexName: "unique_document_signator", tableName: "party") {
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-42") {
+		createIndex(indexName: "unique_signator_id", tableName: "party") {
 			column(name: "document_id")
 
 			column(name: "signator_id")
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-49") {
-		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "activity_log", constraintName: "FK_ACTIVITY_LOG_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-43") {
+		createIndex(indexName: "unique__key", tableName: "preference") {
+			column(name: "user_id")
+
+			column(name: "_key")
+		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-50") {
-		addForeignKeyConstraint(baseColumnNames: "url_id", baseTableName: "details", constraintName: "FK_DETAILS_URL", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "url", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-44") {
+		createIndex(indexName: "unique_page_number", tableName: "preview_image") {
+			column(name: "document_id")
+
+			column(name: "page_number")
+		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-51") {
-		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "document", constraintName: "FK_DOCUMENT_GROUP", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "groups", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-45") {
+		createIndex(indexName: "unique_printer_name", tableName: "printer") {
+			column(name: "tenant_id")
+
+			column(name: "name")
+		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-52") {
-		addForeignKeyConstraint(baseColumnNames: "document_data_id", baseTableName: "document_document_data", constraintName: "FK_DDDATA_DDATA", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-46") {
+		createIndex(indexName: "unique_email", tableName: "profile") {
+			column(name: "tenant_id")
+
+			column(name: "email")
+		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-53") {
-		addForeignKeyConstraint(baseColumnNames: "document_files_id", baseTableName: "document_document_data", constraintName: "FK_DDDATA_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-47") {
+		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "_group_to_role", constraintName: "FK8F887FFB44DB1038", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-54") {
-		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "document_other_field", constraintName: "FK_DOTHER_FIELD_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-48") {
+		addForeignKeyConstraint(baseColumnNames: "role_id", baseTableName: "_group_to_role", constraintName: "FK8F887FFBAE2C9F5C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_role", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-55") {
-		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "document_search_field", constraintName: "FK_DSEARCH_FIELD_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-49") {
+		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "_group_to_user", constraintName: "FK8F89EB5044DB1038", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-56") {
-		addForeignKeyConstraint(baseColumnNames: "details_id", baseTableName: "federation_provider", constraintName: "FK_FED_PROVIDER_DETAILS", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "details", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-50") {
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "_group_to_user", constraintName: "FK8F89EB505357633C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-57") {
-		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "groups_roles", constraintName: "FK_GROUP_ROLES_GROUP", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "groups", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-51") {
+		addForeignKeyConstraint(baseColumnNames: "role_id", baseTableName: "_role_to_user", constraintName: "FK549E2625AE2C9F5C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_role", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-58") {
-		addForeignKeyConstraint(baseColumnNames: "role_id", baseTableName: "groups_roles", constraintName: "FK_GROUP_ROLES_ROLE", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "roles", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-52") {
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "_role_to_user", constraintName: "FK549E26255357633C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-59") {
-		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "groups_users", constraintName: "FK_GROUP_USERS_GROUP", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "groups", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-53") {
+		addForeignKeyConstraint(baseColumnNames: "profile_id", baseTableName: "_user", constraintName: "FK571A4AAC8440878", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "profile", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-60") {
-		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "groups_users", constraintName: "FK_GROUP_USERS_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-54") {
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "_user_passwd_history", constraintName: "FKA4C160285357633C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-61") {
-		addForeignKeyConstraint(baseColumnNames: "level_permission_id", baseTableName: "level_permission_fifth", constraintName: "FK_LP5_PERMISSION", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "permission", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-55") {
+		addForeignKeyConstraint(baseColumnNames: "user_delegators_id", baseTableName: "_user_to_delegators", constraintName: "FK35DDC57F6874A763", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-62") {
-		addForeignKeyConstraint(baseColumnNames: "level_permission_id", baseTableName: "level_permission_first", constraintName: "FK_LP1_PERMISSION", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "permission", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-56") {
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "_user_to_delegators", constraintName: "FK35DDC57F5357633C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-63") {
-		addForeignKeyConstraint(baseColumnNames: "level_permission_id", baseTableName: "level_permission_fourth", constraintName: "FK_LP4_PERMISSION", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "permission", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-57") {
+		addForeignKeyConstraint(baseColumnNames: "delegate_id", baseTableName: "activity_log", constraintName: "FK611AA61463DB5F42", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-64") {
-		addForeignKeyConstraint(baseColumnNames: "level_permission_id", baseTableName: "level_permission_second", constraintName: "FK_LP2_PERMISSION", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "permission", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-58") {
+		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "activity_log", constraintName: "FK611AA6145AFED49D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-65") {
-		addForeignKeyConstraint(baseColumnNames: "level_permission_id", baseTableName: "level_permission_sixth", constraintName: "FK_LP6_PERMISSION", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "permission", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-59") {
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "activity_log", constraintName: "FK611AA6145357633C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-66") {
-		addForeignKeyConstraint(baseColumnNames: "level_permission_id", baseTableName: "level_permission_third", constraintName: "FK_LP3_PERMISSION", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "permission", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-60") {
+		addForeignKeyConstraint(baseColumnNames: "created_by_id", baseTableName: "document", constraintName: "FK335CD11BD073FB19", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-67") {
-		addForeignKeyConstraint(baseColumnNames: "owner_id", baseTableName: "login_record", constraintName: "FK_LOGIN_RECORD_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-61") {
+		addForeignKeyConstraint(baseColumnNames: "folder_id", baseTableName: "document", constraintName: "FK335CD11B443B047D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "folder", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-68") {
-		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "permission", constraintName: "FK_PERMISSION_GROUP", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "groups", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-62") {
+		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "document", constraintName: "FK335CD11B44DB1038", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-69") {
-		addForeignKeyConstraint(baseColumnNames: "role_id", baseTableName: "permission", constraintName: "FK_PERMISSION_ROLE", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "roles", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-63") {
+		addForeignKeyConstraint(baseColumnNames: "last_updated_by_id", baseTableName: "document", constraintName: "FK335CD11B4C8B98C3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-70") {
-		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "permission", constraintName: "FK_PERMISSION_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-64") {
+		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "document_other_field", constraintName: "FKB2EF55E75AFED49D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-71") {
-		addForeignKeyConstraint(baseColumnNames: "data_id", baseTableName: "preview_image", constraintName: "FK_PREVIEW_IMAGE_DDATA", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-65") {
+		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "document_search_field", constraintName: "FKA39F08475AFED49D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-72") {
-		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "preview_image", constraintName: "FK_PREVIEW_IMAGE_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-66") {
+		addForeignKeyConstraint(baseColumnNames: "document_data_id", baseTableName: "document_to_document_data", constraintName: "FK902F482E2A5E6954", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-76") {
-		addForeignKeyConstraint(baseColumnNames: "role_id", baseTableName: "roles_users", constraintName: "FK_ROLE_USERS_ROLE", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "roles", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-67") {
+		addForeignKeyConstraint(baseColumnNames: "document_files_id", baseTableName: "document_to_document_data", constraintName: "FK902F482EA3A48C65", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-77") {
-		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "roles_users", constraintName: "FK_ROLE_USERS_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-68") {
+		addForeignKeyConstraint(baseColumnNames: "created_by_id", baseTableName: "folder", constraintName: "FKB45D1C6ED073FB19", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-79") {
-		addForeignKeyConstraint(baseColumnNames: "tag_id", baseTableName: "tag_links", constraintName: "FK_TAG_LINKS_TAGS", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "tags", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-69") {
+		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "folder", constraintName: "FKB45D1C6E44DB1038", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-80") {
-		addForeignKeyConstraint(baseColumnNames: "federation_provider_id", baseTableName: "users", constraintName: "FK_USER_FED_PROVIDER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "federation_provider", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-70") {
+		addForeignKeyConstraint(baseColumnNames: "last_updated_by_id", baseTableName: "folder", constraintName: "FKB45D1C6E4C8B98C3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-81") {
-		addForeignKeyConstraint(baseColumnNames: "profile_id", baseTableName: "users", constraintName: "FK_USER_PROFILE_BASE", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "profile_base", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-71") {
+		addForeignKeyConstraint(baseColumnNames: "parent_id", baseTableName: "folder", constraintName: "FKB45D1C6EA030DEC1", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "folder", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-82") {
-		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "users_passwd_history", constraintName: "FK_USER_PASS_HIST_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-72") {
+		addForeignKeyConstraint(baseColumnNames: "party_id", baseTableName: "highlight", constraintName: "FKD7658CB4B3F4F217", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "party", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-83") {
-		addForeignKeyConstraint(baseColumnNames: "user_followers_id", baseTableName: "users_users", constraintName: "FK_users_users_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-73") {
+		addForeignKeyConstraint(baseColumnNames: "owner_id", baseTableName: "login_record", constraintName: "FKF43101E7BF3E1354", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-84") {
-		addForeignKeyConstraint(baseColumnNames: "user_follows_id", baseTableName: "users_users", constraintName: "FK_users_users_USER2", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-74") {
+		addForeignKeyConstraint(baseColumnNames: "data_id", baseTableName: "note", constraintName: "FK33AFF249B3C78", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1307406573455-85") {
-		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "users_users", constraintName: "FK_users_users_USER3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-75") {
+		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "note", constraintName: "FK33AFF25AFED49D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "seth (generated)", id: "1308779031843-5") {
-		addForeignKeyConstraint(baseColumnNames: "party_id", baseTableName: "highlight", constraintName: "FK_HIGHLIGHT_PARTY", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "party", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-76") {
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "note", constraintName: "FK33AFF25357633C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "seth (generated)", id: "1308779031843-6") {
-		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "party", constraintName: "FK_PARTY_DOCUMENT", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-77") {
+		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "party", constraintName: "FK6581AE65AFED49D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "seth (generated)", id: "1308779031843-7") {
-		addForeignKeyConstraint(baseColumnNames: "signator_id", baseTableName: "party", constraintName: "FK_PARTY_USER", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "users", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-78") {
+		addForeignKeyConstraint(baseColumnNames: "signator_id", baseTableName: "party", constraintName: "FK6581AE692C22974", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "smiller (generated)", id: "1310613985698-3") {
-		addForeignKeyConstraint(baseColumnNames: "thumbnail_id", baseTableName: "preview_image", constraintName: "FK_PREVIEW_IMAGE_THUMBNAIL", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-79") {
+		addForeignKeyConstraint(baseColumnNames: "group_id", baseTableName: "permission", constraintName: "FKE125C5CF44DB1038", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_group", referencesUniqueColumn: "false")
 	}
 
-	include file: '20110805_documentNote.groovy'
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-80") {
+		addForeignKeyConstraint(baseColumnNames: "role_id", baseTableName: "permission", constraintName: "FKE125C5CFAE2C9F5C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_role", referencesUniqueColumn: "false")
+	}
 
-	include file: '20110816_preferences.groovy'
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-81") {
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "permission", constraintName: "FKE125C5CF5357633C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
+	}
 
-	include file: '20110818_notes.groovy'
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-82") {
+		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "preference", constraintName: "FKA8FCBCDB5357633C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "_user", referencesUniqueColumn: "false")
+	}
 
-	include file: '20110825_notes.groovy'
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-83") {
+		addForeignKeyConstraint(baseColumnNames: "data_id", baseTableName: "preview_image", constraintName: "FK2987FA2449B3C78", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
+	}
 
-	include file: '20110915_delegators.groovy'
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-84") {
+		addForeignKeyConstraint(baseColumnNames: "document_id", baseTableName: "preview_image", constraintName: "FK2987FA245AFED49D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document", referencesUniqueColumn: "false")
+	}
 
-	include file: '20110919_activitylog_document.groovy'
-
-	include file: '20111004_bucket_folder.groovy'
-
-	include file: '20111020_remove_bucket.groovy'
+	changeSet(author: "dbwatson (generated)", id: "1319809075898-85") {
+		addForeignKeyConstraint(baseColumnNames: "thumbnail_id", baseTableName: "preview_image", constraintName: "FK2987FA2499523BF6", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
+	}
 }

@@ -21,6 +21,8 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 	def setup() {
 		service = new FolderService()
 		service.authService = authService
+		Document.authService = authService
+		Folder.authService = authService
 
 		dd = new DocumentData(mimeType:MimeType.PNG, fileSize:1, fileKey:'1234abc')
 		dd.save(flush:true)

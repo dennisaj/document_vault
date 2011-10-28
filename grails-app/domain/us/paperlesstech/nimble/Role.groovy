@@ -47,10 +47,11 @@ class Role {
 
 	static mapping = {
 		cache usage: 'read-write', include: 'all'
-		table ConfigurationHolder.config?.nimble?.tablenames?.role
+		table '_role'
 
-		users cache: true
-		groups cache: true
+		external column: '_external'
+		users cache: true, joinTable: [name: '_role_to_user']
+		groups cache: true, joinTable: [name: '_group_to_role']
 		permissions cache: true
 	}
 

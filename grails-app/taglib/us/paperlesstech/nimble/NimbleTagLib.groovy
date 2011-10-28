@@ -24,8 +24,6 @@ package us.paperlesstech.nimble
 class NimbleTagLib {
 	static namespace = "n"
 
-	def recaptchaService
-
 	/**
 	 * Provides an inline output of the Grails application message in flash scope
 	 */
@@ -49,33 +47,6 @@ class NimbleTagLib {
 		out << render(template: "/templates/errors", contextPath: pluginContextPath, model: [bean: bean])
 		else
 		out << render("Error: Details not supplied to generate error content")
-	}
-
-	/**
-	 * Provides markup to render a ReCaptcha instance. Supports the following attributes:
-	 *
-	 * theme - Can be one of 'red','white','blackglass','clean','custom'
-	 * lang  - Can be one of 'en','nl','fr','de','pt','ru','es','tr'
-	 * tabindex - Sets a tabindex for the ReCaptcha box
-	 * custom_theme_widget - Used when specifying a custom theme.
-	 */
-	def recaptcha = { attrs ->
-		def props = new Properties()
-		attrs.each {
-			if (attrs[it]) {
-				props.setProperty(it, attrs[it])
-			}
-		}
-		out << recaptchaService.createCaptcha(session, props)
-	}
-
-	/**
-	 * Renders body if captcha is currently required
-	 */
-	def recaptcharequired = { attrs, body ->
-		if (recaptchaService.enabled) {
-			out << body()
-		}
 	}
 
 	/**

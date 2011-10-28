@@ -1,26 +1,19 @@
 package us.paperlesstech.nimble
 
 import grails.plugin.spock.UnitSpec
-
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
 import us.paperlesstech.AuthService
 
 class RoleServiceSpec extends UnitSpec {
 	AuthService authService = Mock()
 	RoleService roleService
-	User user = new User(id:1, username:'user', profile:new Profile(id:1))
-	Role role = new Role(id:1, name:'role')
-	Group group = new Group(id:1, name:'group')
+	User user = new User(id: 1, username: 'user', profile: new Profile(id: 1))
+	Role role = new Role(id: 1, name: 'role')
+	Group group = new Group(id: 1, name: 'group')
 
 	def setup() {
 		mockLogging(RoleService)
 		roleService = new RoleService()
 		roleService.authService = authService
-
-		ConfigurationHolder.config = new ConfigObject()
-		ConfigurationHolder.config.nimble.tablenames.role = 'r'
-		ConfigurationHolder.config.nimble.tablenames.group = 'g'
 
 		mockDomain(Profile, [user.profile])
 		mockDomain(User, [user])

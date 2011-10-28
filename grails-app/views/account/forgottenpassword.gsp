@@ -22,15 +22,6 @@
 				</td>
 			</tr>
 
-			<n:recaptcharequired>
-				<tr>
-					<th><g:message code="nimble.label.captcha" /></th>
-					<td>
-						<n:recaptcha/>
-					</td>
-				</tr>
-			</n:recaptcharequired>
-
 			</tbody>
 		</table>
 

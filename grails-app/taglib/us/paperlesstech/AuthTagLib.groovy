@@ -8,7 +8,6 @@ class AuthTagLib {
 	static final namespace = "pt"
 
 	def authService
-	def facebookService
 
 	/**
 	 *
@@ -124,16 +123,6 @@ class AuthTagLib {
 
 	def isAdmin = { attrs, body->
 		outputBody(authService.isAdmin(), body)
-	}
-
-	def facebookConnect = { attrs, body ->
-		def facebook = grailsApplication.config.nimble.facebook.federationprovider.enabled
-
-		if (attrs['secure']?.equals('true')) {
-			out << render(template:"/templates/auth/facebookjs", model:[facebook:facebook, secure: true, apikey:facebookService.apiKey])
-		} else {
-			out << render(template:"/templates/auth/facebookjs", model:[facebook:facebook, secure: false, apikey:facebookService.apiKey])
-		}
 	}
 
 	def isRunAs = { attrs, body ->

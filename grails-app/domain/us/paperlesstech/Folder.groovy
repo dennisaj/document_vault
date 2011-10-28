@@ -2,11 +2,18 @@ package us.paperlesstech
 
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.User
 
 @MultiTenant
 class Folder {
+	static def authService
+	def grailsApplication
+
+	User createdBy
 	Date dateCreated
 	Group group
+	Date lastUpdated
+	User lastUpdatedBy
 	String name
 
 	static hasMany = [children:Folder, documents:Document]
@@ -15,6 +22,8 @@ class Folder {
 
 	static constraints = {
 		children nullable:true
+		createdBy nullable: true
+		lastUpdatedBy nullable: true
 		parent nullable:true, validator: { val, obj->
 			// If parent is null, return null to indicate valid.
 			if (!val) {
@@ -60,5 +69,22 @@ class Folder {
 				name:parent?.name
 			]
 		]
+	}
+
+	def beforeInsert() {
+		if (!authService) {
+			authService = grailsApplication?.mainContext?.getBean(AuthService.class)
+		}
+
+		createdBy = authService?.authenticatedUser
+		lastUpdatedBy = createdBy
+	}
+
+	def beforeUpdate() {
+		if (!authService) {
+			authService = grailsApplication?.mainContext?.getBean(AuthService.class)
+		}
+
+		lastUpdatedBy = authService?.authenticatedUser
 	}
 }

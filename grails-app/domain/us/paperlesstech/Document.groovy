@@ -2,16 +2,20 @@ package us.paperlesstech
 
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.User
 
 @MultiTenant
 class Document {
-	static searchable = {
-		only: ["dateCreated", "name", "searchFields"]
-	}
+	static def authService
+	def grailsApplication
 
 	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField", "signed", 'asMap']
+	User createdBy
 	Date dateCreated
+	Date lastUpdated
+	User lastUpdatedBy
 	SortedSet files
+	Folder folder
 	Group group
 	String name
 	SortedSet notes
@@ -27,18 +31,38 @@ class Document {
 			parties:Party]
 
 	static constraints = {
+		createdBy nullable: true
 		// minSize won't fire on the initial save if files is null
 		files nullable:false, minSize:1
 		folder nullable:true
 		group nullable:false
+		lastUpdatedBy nullable: true
 		name nullable:true, blank:true
 		notes nullable:true
 		parties nullable:true
 	}
 
 	static mapping = {
+		files joinTable: [name: 'document_to_document_data']
 		otherFieldsCollection cascade: "all, all-delete-orphan"
 		searchFieldsCollection cascade: "all, all-delete-orphan"
+	}
+
+	def beforeInsert() {
+		if (!authService) {
+			authService = grailsApplication?.mainContext?.getBean(AuthService.class)
+		}
+
+		createdBy = authService?.authenticatedUser
+		lastUpdatedBy = createdBy
+	}
+
+	def beforeUpdate() {
+		if (!authService) {
+			authService = grailsApplication?.mainContext?.getBean(AuthService.class)
+		}
+
+		lastUpdatedBy = authService?.authenticatedUser
 	}
 
 	/**

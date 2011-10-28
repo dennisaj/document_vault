@@ -30,7 +30,6 @@ class AccountController {
 
 	def authService
 	def grailsApplication
-	def recaptchaService
 	def userService
 
 	def changepassword = {
@@ -64,39 +63,30 @@ class AccountController {
 		def pwEnc = new Sha256Hash(params.currentPassword)
 		def crypt = pwEnc.toHex()
 
-		def human = recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)
-		if (human) {
-			if (!crypt.equals(user.passwordHash)) {
-				log.warn "User [$user.id]$user.username attempting to change password but has supplied invalid current password"
-				user.errors.reject('nimble.user.password.nomatch')
-				render (view:"changepassword", model:[user:user])
-				return
-			}
-
-			user.pass = params.pass
-			user.passConfirm = params.passConfirm
-
-			if (user.validate() && userService.validatePass(user, true)) {
-				userService.changePassword(user)
-				if (!user.hasErrors()) {
-					log.info "Changed password for user [$user.id]$user.username successfully"
-					redirect action: "changedpassword"
-					return
-				}
-			}
-
-			log.error "User [$user.id]$user.username password change was considered invalid"
-			user.errors.allErrors.each {
-				log.debug it
-			}
+		if (!crypt.equals(user.passwordHash)) {
+			log.warn "User [$user.id]$user.username attempting to change password but has supplied invalid current password"
+			user.errors.reject('nimble.user.password.nomatch')
 			render (view:"changepassword", model:[user:user])
 			return
 		}
 
-		log.debug "Captcha entry was invalid for user account creation"
-		resetNewUser(user)
-		user.errors.reject('nimble.invalid.captcha')
-		render(view: 'changepassword', model: [user: user])
+		user.pass = params.pass
+		user.passConfirm = params.passConfirm
+
+		if (user.validate() && userService.validatePass(user, true)) {
+			userService.changePassword(user)
+			if (!user.hasErrors()) {
+				log.info "Changed password for user [$user.id]$user.username successfully"
+				redirect action: "changedpassword"
+				return
+			}
+		}
+
+		log.error "User [$user.id]$user.username password change was considered invalid"
+		user.errors.allErrors.each {
+			log.debug it
+		}
+		render (view:"changepassword", model:[user:user])
 		return
 	}
 
@@ -166,21 +156,10 @@ class AccountController {
 			return
 		}
 
-		def savedUser
-		def human = recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)
-
-		if (human) {
-			savedUser = userService.createUser(user)
-			if (savedUser.hasErrors()) {
-				log.debug "UserService returned invalid account details when attempting account creation"
-				resetNewUser(user)
-				render(view: 'createuser', model: [user: user])
-				return
-			}
-		} else {
-			log.debug "Captcha entry was invalid for user account creation"
+		def savedUser = userService.createUser(user)
+		if (savedUser.hasErrors()) {
+			log.debug "UserService returned invalid account details when attempting account creation"
 			resetNewUser(user)
-			user.errors.reject('nimble.invalid.captcha')
 			render(view: 'createuser', model: [user: user])
 			return
 		}
@@ -290,8 +269,8 @@ class AccountController {
 		if (profile) {
 			def user = profile.owner
 
-			if (user.external || user.federated) {
-				log.info "User identified by [$user.id]$user.username is external or federated"
+			if (user.external) {
+				log.info "User identified by [$user.id]$user.username is external"
 
 				log.info "Sending account password reset email to $user.profile.email with subject $grailsApplication.config.nimble.messaging.passwordreset.external.subject"
 				if(grailsApplication.config.nimble.messaging.enabled) {
@@ -308,32 +287,23 @@ class AccountController {
 				return
 			}
 
-			def human = recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)
-			if (human) {
+			userService.setRandomPassword(user)
 
-				userService.setRandomPassword(user)
-
-				log.info "Sending account password reset email to $user.profile.email with subject $grailsApplication.config.nimble.messaging.passwordreset.subject"
-				if(grailsApplication.config.nimble.messaging.enabled && !grailsApplication.config.nimble.provision.active) {
-					sendMail {
-						to user.profile.email
-						subject grailsApplication.config.nimble.messaging.passwordreset.subject
-						html g.render(template: "/templates/nimble/mail/forgottenpassword_email", model: [user: user]).toString()
-					}
-				} else {
-					log.debug "Messaging disabled would have sent: \n${user.profile.email} \n Message: \n ${g.render(template: "/templates/nimble/mail/forgottenpassword_email", model: [user: user]).toString()}"
+			log.info "Sending account password reset email to $user.profile.email with subject $grailsApplication.config.nimble.messaging.passwordreset.subject"
+			if(grailsApplication.config.nimble.messaging.enabled && !grailsApplication.config.nimble.provision.active) {
+				sendMail {
+					to user.profile.email
+					subject grailsApplication.config.nimble.messaging.passwordreset.subject
+					html g.render(template: "/templates/nimble/mail/forgottenpassword_email", model: [user: user]).toString()
 				}
-
-				log.info "Successful password reset for user identified as [$user.id]$user.username"
-
-				redirect(action: "forgottenpasswordcomplete")
-				return
 			} else {
-				log.debug "Captcha entry was invalid when attempting to process forgotten password for user identified by [$user.id]$user.username"
-				flash.type = "error"
-				flash.message = g.message(code: 'nimble.invalid.captcha')
-				redirect(action: "forgottenpassword")
+				log.debug "Messaging disabled would have sent: \n${user.profile.email} \n Message: \n ${g.render(template: "/templates/nimble/mail/forgottenpassword_email", model: [user: user]).toString()}"
 			}
+
+			log.info "Successful password reset for user identified as [$user.id]$user.username"
+
+			redirect(action: "forgottenpasswordcomplete")
+			return
 		} else {
 			log.debug "User account for supplied email address $params.email was not found when attempting to process forgotten password"
 			flash.type = "error"

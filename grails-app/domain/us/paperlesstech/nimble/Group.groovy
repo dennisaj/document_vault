@@ -47,14 +47,15 @@ class Group implements Comparable<Group> {
 
 	static mapping = {
 		cache usage: 'read-write', include: 'all'
-		table ConfigurationHolder.config?.nimble?.tablenames?.group
+		table '_group'
 
-		users cache: true
-		roles cache: true
+		users cache: true, joinTable: [name: '_group_to_user']
+		roles cache: true, joinTable: [name: '_group_to_role']
 		permissions cache: true
 
-		description index: "group_description_idx"
-		externalId index: "group_external_id_idx"
+		description index: 'group_description_idx'
+		externalId index: 'group_external_id_idx'
+		external column: '_external'
 	}
 
 	static constraints = {
