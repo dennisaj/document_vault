@@ -159,8 +159,9 @@ class Document {
 				id:files.first().id,
 				size:files.first().fileSize,
 				pages:files.first().pages,
-				mimeType:files.first().mimeType.downloadExtension
+				mimeType:files.first().mimeType.name().toLowerCase()
 			],
+			thumbnail: previewImage(1).thumbnail.id,
 			group: [
 				id:group.id,
 				name:group.name
