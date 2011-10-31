@@ -25,7 +25,7 @@ class UploadService {
 
 	List<Document> uploadDocument(byte[] data, Group group, String name, MimeType mimeType, Folder folder=null) {
 		assert authService.canUpload(group)
-		assert !folder || authService.canFolderMoveInTo(group)
+		assert !folder || authService.canManageFolders(group)
 		assert data
 		assert mimeType
 		def pclInfo

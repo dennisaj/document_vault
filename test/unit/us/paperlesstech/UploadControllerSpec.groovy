@@ -149,9 +149,9 @@ class UploadControllerSpec extends ControllerSpec {
 		controller.params.ajax = ajax
 		controller.metaClass.createLink = { "mooLink" }
 		mockRequest.metaClass.getMultiFileMap = { ["testFiles": [testFile]]}
-		def dd = new DocumentData(fileSize: fileSize)
+		def dd = new DocumentData(fileSize: fileSize, mimeType: MimeType.BMP)
 		mockDomain(Document)
-		def d = new Document(name: "docName")
+		def d = new Document(name: "docName", group: group)
 		d.addToFiles(dd)
 		d.addToPreviewImages(new PreviewImage(data:dd, pageNumber:1, thumbnail:dd))
 		def resultMap = [:]
@@ -172,8 +172,8 @@ class UploadControllerSpec extends ControllerSpec {
 		}
 		!resultMap.error
 		resultMap.name == "docName"
-		resultMap.size == fileSize
-		resultMap.url == "mooLink"
+		resultMap.data.size == fileSize
+		resultMap.data.mimeType == "bmp"
 
 		where:
 		ajax << [true, false]

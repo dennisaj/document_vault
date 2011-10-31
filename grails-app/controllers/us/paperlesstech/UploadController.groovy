@@ -40,7 +40,8 @@ class UploadController {
 							documents.each { document ->
 								def url = g.createLink(controller:"document", action:"sign", params:[documentId:document.id])
 								def thumbnail_url = g.createLink(controller:"document", action:"thumbnail", params:[documentId:document.id, pageNumber:1, documentDataId:document.previewImage(1).thumbnail.id])
-								results.add([name:document.toString(), size:document.files.first().fileSize, url:url,thumbnail_url:thumbnail_url])
+								results.add(document.asMap())
+								
 							}
 						} else {
 							def error = g.message(code:"document-vault.upload.error.unsupportedfile", args:[FileHelpers.getExtension(mpf.originalFilename)])
