@@ -16,6 +16,7 @@ class NoteController {
 		def note = document?.notes?.find { it.data?.id == noteDataId }
 		if (!document || !note) {
 			response.status = 404
+			render text:'File not found'
 			return
 		}
 

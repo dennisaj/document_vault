@@ -28,6 +28,7 @@ class DocumentController {
 		def document = Document.get(params.long("documentId"))
 		if (!document) {
 			response.status = 404
+			render text:'File not found'
 			return
 		}
 
@@ -44,6 +45,7 @@ class DocumentController {
 		def documentData = document?.files?.find { it.id == params.long("documentDataId")}
 		if (!document || !documentData) {
 			response.status = 404
+			render text:'File not found'
 			return
 		}
 
@@ -63,6 +65,7 @@ class DocumentController {
 		def documentData = document?.previewImages?.find { it.thumbnail.id == params.long("documentDataId") }
 		if (!document || !documentData) {
 			response.status = 404
+			render text:'File not found'
 			return
 		}
 

@@ -8,7 +8,7 @@ class UrlMappings {
 		}
 
 		"/"(controller:"document", action:"index")
-		"500"(view:"/error")
+		"500"(controller:'error', action:'index')
 		"/api/upload/savePcl" {
 			controller = "upload"
 			action = "savePcl"

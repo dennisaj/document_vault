@@ -103,7 +103,7 @@ $(function() {
 	});
 
 	$().ajaxError(function (event, xhr, ajaxOptions, thrownError) {
-	  if ((xhr.status == 403) && (xhr.getResponseHeader("X-Nim-Session-Invalid") != null)) {
+	  if ((xhr.status == 401)) {
         $("#sessionterminateddialogmsg").text($('#sessionterminatedmsg').val());
         $("#sessionterminatedbtn").text($('#sessionterminatedlogin').val());
 	    $("#sessionterminateddialog").dialog('open','title', $('#sessionterminatedtitle').val());

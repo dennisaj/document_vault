@@ -38,10 +38,11 @@ class UserInfoController {
 
 			def delegateUser = authService.delegateUser
 			if (delegateUser) {
+				returnMap.user.delegators = []
 				returnMap.user.delegateUser = [
-					id:authService.delegateUser?.id,
-					name:authService.delegateUser?.profile?.fullName,
-					username:authService.delegateUser?.username
+					id:delegateUser?.id,
+					name:delegateUser?.profile?.fullName,
+					username:delegateUser?.username
 				]
 			}
 
