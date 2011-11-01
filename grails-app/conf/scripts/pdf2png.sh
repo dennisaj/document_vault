@@ -24,7 +24,7 @@ for i in $(ls $BASENAME*.png)  ; do
 		echo "Unable to resize file $i"
 		exit 1
 	fi
-	/usr/local/bin/convert $i -resize 80 -black-threshold 75% $THUMB_NAME 
+	/usr/local/bin/convert $i -resize 240 $THUMB_NAME 
 	if [[ $? != 0 ]]; then
 		echo "Unable to create thumbnail for $i"
 		exit 1
