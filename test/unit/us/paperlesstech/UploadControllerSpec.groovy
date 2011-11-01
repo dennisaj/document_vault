@@ -9,7 +9,6 @@ import us.paperlesstech.nimble.Group
 class UploadControllerSpec extends ControllerSpec {
 	AuthService authService = Mock()
 	UploadService uploadService = Mock()
-	PreferenceService preferenceService = Mock()
 	File testFile = new ClassPathResource("dt_cust_hard.pcl").file
 
 	def setup() {
@@ -18,7 +17,6 @@ class UploadControllerSpec extends ControllerSpec {
 		testFile.metaClass.getInputStream = { Mock(InputStream) }
 		controller.authService = authService
 		controller.uploadService = uploadService
-		controller.preferenceService = preferenceService
 
 		mockDomain(Folder)
 	}
@@ -55,20 +53,6 @@ class UploadControllerSpec extends ControllerSpec {
 		1 * uploadService.uploadDocument(_, _, _, _) >> [doc]
 		mockResponse.status == 200
 		mockResponse.contentAsString.contains("42")
-	}
-
-	def "index should return the groups that the user can upload to"() {
-		when:
-		1 * preferenceService.getPreference(_, _) >> defaultGroup
-		1 * authService.getGroupsWithPermission([DocumentPermission.Upload]) >> groups
-		def model = controller.index()
-
-		then:
-		model == [groups: groups, defaultGroup:defaultGroup]
-
-		where:
-		groups = ["moo"] as SortedSet
-		defaultGroup << ["group"]
 	}
 
 	def "ajaxSave should call the real save with ajax set to true"() {

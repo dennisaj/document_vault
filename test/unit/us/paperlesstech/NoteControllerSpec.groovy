@@ -82,10 +82,9 @@ class NoteControllerSpec extends ControllerSpec {
 		controller.params.value = 'valid'
 		controller.params.pageNumber = '1'
 		when:
-		def model = controller.saveText()
+		controller.saveText()
 		then:
-		model.document.id == 1
-		controller.renderArgs.template == 'textNotes'
+		1 * notificationService.success(_)
 	}
 
 	def "saveLines should throw an NullPointerException when given null notes"() {

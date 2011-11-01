@@ -37,29 +37,6 @@ class DocumentControllerSpec extends ControllerSpec {
 		folder1.group = group1
 	}
 
-	def "index should render a template when called from ajax"() {
-		given:
-		mockRequest.makeAjaxRequest()
-		1 * documentService.search(_, _) >> { params-> model }
-		when:
-		controller.index()
-		then:
-		controller.renderArgs.template == 'searchResults'
-		controller.renderArgs.model == model
-		where:
-		model = [here:'is the model']
-	}
-
-	def "index should return a model when not called from ajax"() {
-		when:
-		def outModel = controller.index()
-		then:
-		1 * documentService.search(_, _) >> { params-> model }
-		outModel == model
-		where:
-		model = [here:'is the model']
-	}
-
 	def "downloadImage should return a 404 when given invalid documentId"() {
 		given:
 		controller.params.documentId = documentId
@@ -198,27 +175,6 @@ class DocumentControllerSpec extends ControllerSpec {
 		pageNumber = 1
 		canGetSigned << [true, false]
 		canSign << [false, true]
-	}
-
-	def "sign should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.documentId = null
-		when:
-		controller.sign()
-		then:
-		thrown(AssertionError)
-	}
-
-	def "sign should a model when given valid input"() {
-		given:
-		controller.params.documentId = '1'
-		when:
-		def model = controller.sign()
-		then:
-		model.document == document1
-		model.colors == PartyColor.values()
-		model.permissions == Party.allowedPermissions
-		model.parties == [party]
 	}
 
 	def "list should pass folder, pagination and filter to search then return the results as JSON"() {

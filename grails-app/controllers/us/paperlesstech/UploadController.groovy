@@ -6,16 +6,10 @@ import us.paperlesstech.nimble.Group
 
 class UploadController {
 	static allowedMethods = [save:'POST', saveAjax:'POST']
-	static navigation = [[group: 'tabs', action: 'index', isVisible: {authService.canUploadAnyGroup()}, order: 10, title: 'Upload']]
+	static navigation = [[group:'tabs', action:'index', isVisible: { authService.canUploadAnyGroup() }, order:10, title:'Upload']]
 
 	def authService
-	def preferenceService
 	def uploadService
-
-	def index = {
-		[groups:authService.getGroupsWithPermission([DocumentPermission.Upload]),
-			defaultGroup:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_UPLOAD_GROUP)]
-	}
 
 	def ajaxSave = {
 		params.ajax = true
@@ -41,9 +35,10 @@ class UploadController {
 								def url = g.createLink(controller:"document", action:"sign", params:[documentId:document.id])
 								def thumbnail_url = g.createLink(controller:"document", action:"thumbnail", params:[documentId:document.id, pageNumber:1, documentDataId:document.previewImage(1).thumbnail.id])
 								results.add(document.asMap())
-								
+
 							}
 						} else {
+							response.status = 500
 							def error = g.message(code:"document-vault.upload.error.unsupportedfile", args:[FileHelpers.getExtension(mpf.originalFilename)])
 							results.add([name:mpf.originalFilename, size:0, error:error])
 						}

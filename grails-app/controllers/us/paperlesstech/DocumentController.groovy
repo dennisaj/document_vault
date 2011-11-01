@@ -9,21 +9,6 @@ class DocumentController {
 	def documentService
 	def handlerChain
 
-	def index = {
-		def max = params.int('max')
-		params.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
-		params.sort = params.sort ?: 'dateCreated'
-		params.order = params.order ?: 'asc'
-		params.offset = params.int('offset') ?: 0
-
-		def model = documentService.search(params, params.q?.trim())
-		if (request.xhr) {
-			render(template:"searchResults", model:model)
-		} else {
-			model
-		}
-	}
-
 	def downloadImage = {
 		def document = Document.get(params.long("documentId"))
 		if (!document) {
@@ -105,13 +90,6 @@ class DocumentController {
 		map.highlights = (authService.canGetSigned(d) || authService.canSign(d) ? d.highlightsAsMap(pageNumber) : [:])
 
 		render(map as JSON)
-	}
-
-	def sign = {
-		def document = Document.get(params.long("documentId"))
-		assert document
-
-		[document:document, parties:Party.findAllByDocument(document), colors:PartyColor.values(), permissions:Party.allowedPermissions]
 	}
 
 	def list = {

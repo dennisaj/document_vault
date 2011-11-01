@@ -81,6 +81,6 @@ class NoteController {
 		handlerChain.saveNotes(document:document, notes:[[text:value, left:left, top:top, pageNumber:pageNumber]])
 		document.save(flush:true)
 
-		render template:"textNotes", model:[document:document]
+		render ([notification:notificationService.success('document-vault.api.notes.saveNote.success')] as JSON)
 	}
 }

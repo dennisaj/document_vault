@@ -38,12 +38,6 @@ grails.project.dependency.resolution = {
 		//mavenRepo "http://snapshots.repository.codehaus.org"
 	}
 
-	plugins {
-		runtime(':lesscss-resources:0.6.1') {
-			excludes "js"
-		}
-	}
-
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 		compile group:'us.paperlesstech', name:'flea', version:'0.9.4'
