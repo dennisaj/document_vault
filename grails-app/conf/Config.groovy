@@ -162,14 +162,12 @@ environments {
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/var/cache/document_vault/files"
-		document_vault.forceSSL = true
 	}
 	development {
 		document_vault.activity_log.enabled = false
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp/dv"
-		document_vault.forceSSL = false
 		grails.converters.json.pretty.print = true
 	}
 	test {
@@ -177,7 +175,6 @@ environments {
 		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp/dv"
-		document_vault.forceSSL = false
 	}
 }
 
