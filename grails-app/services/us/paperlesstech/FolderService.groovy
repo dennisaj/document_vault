@@ -28,7 +28,7 @@ class FolderService {
 		def folder = new Folder(group:group, name:name, parent:parent)
 
 		if (!folder.validate()) {
-			log.debug "Folder failed validation"
+			log.debug 'Folder failed validation'
 			return folder
 		}
 
@@ -41,7 +41,7 @@ class FolderService {
 	/**
 	 * Removes all documents and folder from the given folder and deletes it.
 	 *
-	 * @pre The current user must have the {@link DocumentPermission#FolderDelete} permission for document.
+	 * @pre The current user must have the {@link DocumentPermission#ManageFolders} permission for document.
 	 * @throws RuntimeException if there is a problem saving
 	 */
 	def deleteFolder(Folder folder) {
@@ -68,6 +68,20 @@ class FolderService {
 		folder.parent?.save(failOnError:true)
 
 		folder.delete(flush:true)
+	}
+
+	def renameFolder(Folder folder, String name) {
+		assert folder
+		assert authService.canManageFolders(folder.group)
+
+		folder.name = name
+
+		if (!folder.validate()) {
+			log.debug 'Folder failed validation'
+			return folder
+		}
+
+		folder.save(failOnError:true)
 	}
 
 	/**
@@ -100,7 +114,7 @@ class FolderService {
 	 *
 	 * If document.folder is null, nothing happens.
 	 *
-	 * @pre The current user must have the {@link DocumentPermission#FolderMoveOutOf} permission for document.group.
+	 * @pre The current user must have the {@link DocumentPermission#ManageFolders} permission for document.group.
 	 * @throws RuntimeException if there is a problem saving
 	 */
 	Document removeDocumentFromFolder(Document document) {
@@ -147,7 +161,15 @@ class FolderService {
 	 * @return a {@link Map} with two entries: results and total.
 	 * Results is a list of paginated folders and total is the total count for the query
 	 */
-	def search(Folder parent, Map params, String filter=null) {
+	def filter(Folder parent=null, Map params, String filter) {
+		commonQuery(parent, params, filter, true)
+	}
+
+	def search(Map params, String filter) {
+		commonQuery(params, filter, false)
+	}
+
+	private def commonQuery(Folder parent=null, Map params, String filter, boolean useParent) {
 		def groupPerms = [DocumentPermission.ManageFolders, DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]
 
 		// If the user has permission to view the whole parent, paginate all folders.
@@ -173,10 +195,12 @@ class FolderService {
 			.setProjection(Projections.distinct(Projections.id()))
 			.add(Restrictions.or(Restrictions.in('d.id', specificDocuments), Restrictions.in('group', specificGroups)))
 
-		if (parent) {
-			detachedCriteria.add(Restrictions.eq('parent', parent))
-		} else {
-			detachedCriteria.add(Restrictions.isNull('parent'))
+		if (useParent) {
+			if (parent) {
+				detachedCriteria.add(Restrictions.eq('parent', parent))
+			} else {
+				detachedCriteria.add(Restrictions.isNull('parent'))
+			}
 		}
 
 		if (filter) {

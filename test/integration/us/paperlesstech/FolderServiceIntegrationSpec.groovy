@@ -114,9 +114,9 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 		!outDocument.folder
 	}
 
-	def "search should return all folders when the user has one of the group permissions"() {
+	def "filter should return all folders when the user has one of the group permissions"() {
 		when:
-		def result = service.search(parent1, [max:10, offset:0, sort:'name', order:'asc'])
+		def result = service.filter(parent1, [max:10, offset:0, sort:'name', order:'asc'], '')
 		then:
 		1 * authService.checkGroupPermission(DocumentPermission.ManageFolders, parent1.group) >> true
 		result.results.size() == 2
@@ -125,9 +125,9 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 		result.total == 2
 	}
 
-	def "search should return only folders where a user has permission to the contained documents when the user lacks permission to the whole group"() {
+	def "filter should return only folders where a user has permission to the contained documents when the user lacks permission to the whole group"() {
 		when:
-		def result = service.search(parent1, [max:10, offset:0, sort:'name', order:'asc'])
+		def result = service.filter(parent1, [max:10, offset:0, sort:'name', order:'asc'], '')
 		then:
 		4 * authService.checkGroupPermission(_, parent1.group) >> false
 		1 * authService.getIndividualDocumentsWithPermission(_, parent1.group) >> [document4.id]
@@ -137,14 +137,28 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 		result.total == 1
 	}
 
-	def "search should return folders without a parent when parent is null"() {
+	def "filter should return folders without a parent when parent is null"() {
 		when:
-		def result = service.search(null, [max:10, offset:0, sort:'name', order:'asc'])
+		def result = service.filter(null, [max:10, offset:0, sort:'name', order:'asc'], '')
 		then:
 		0 * authService.checkGroupPermission(_, _)
 		1 * authService.getIndividualDocumentsWithPermission(_, null) >> [document2.id]
 		result.results.size() == 1
 		result.results.contains(folder3)
 		result.total == 1
+	}
+
+	def "search should return folders regardless of their respective parent"() {
+		when:
+		def result = service.search([max:10, offset:0, sort:'name', order:'asc'], 'folder')
+		then:
+		0 * authService.checkGroupPermission(_, _)
+		1 * authService.getIndividualDocumentsWithPermission(_, null) >> []
+		1 * authService.getGroupsWithPermission(_) >> ([group] as SortedSet)
+		result.results.size() == 3
+		result.results.contains(folder1)
+		result.results.contains(folder2)
+		result.results.contains(folder3)
+		result.total == 3
 	}
 }

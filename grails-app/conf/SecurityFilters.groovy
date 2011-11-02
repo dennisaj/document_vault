@@ -6,7 +6,7 @@ import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
 
 public class SecurityFilters {
-	private static String openControllers = "auth|logout|account|code|userInfo|error"
+	private static String openControllers = "auth|logout|account|code|userInfo|error|home"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 
@@ -42,8 +42,8 @@ public class SecurityFilters {
 									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
 								case ["downloadImage", "thumbnail"]:
 									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
-								case ['list']:
-									return authService.canViewAnyDocument() || authService.canSignAnyDocument()
+								case ['list', 'search']:
+									return true
 								default:
 									return false
 							}
@@ -68,15 +68,11 @@ public class SecurityFilters {
 							}
 
 							switch (action) {
-								case 'list':
+								case ['list', 'search']:
 									return true
 								case 'create':
 									return group && authService.canManageFolders(group)
-								case 'delete':
-									return folder && authService.canManageFolders(folder.group)
-								case 'addDocument':
-									return folder && authService.canManageFolders(folder.group)
-								case 'removeDocument':
+								case ['delete', 'addDocument', 'removeDocument', 'update']:
 									return folder && authService.canManageFolders(folder.group)
 								default:
 									return false
@@ -145,6 +141,6 @@ public class SecurityFilters {
 			targetUri += query
 		}
 
-		filter.redirect(controller: 'auth', action: 'login', params: [targetUri: targetUri])
+		redirect(controller:'home')
 	}
 }

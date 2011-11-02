@@ -67,9 +67,9 @@ class FolderControllerSpec extends ControllerSpec {
 		controller.create()
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		1 * folderService.createFolder(group1, null, 'new folder') >> { group, name, document->
+		1 * folderService.createFolder(group1, null, 'new folder') >> { group, parent, name->
 			def folder = new Folder(group:group, name:name)
-			folder.addToDocuments(document)
+			folder.parent = parent
 			folder.errors.rejectValue('name', 'this.is.an.error.code.for.name')
 			folder
 		}
@@ -121,7 +121,7 @@ class FolderControllerSpec extends ControllerSpec {
 		1 * notificationService.success(_, _)
 	}
 
-	def "list should pass parent, pagination and filter to search then return the results as JSON"() {
+	def "list should pass parent, pagination and filter to folderService filter then return the results as JSON"() {
 		given:
 		controller.params.folderId = folderId
 		controller.params.filter = filter
@@ -130,7 +130,7 @@ class FolderControllerSpec extends ControllerSpec {
 		controller.list()
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		1 * folderService.search(parent, _, filter) >> [results:[folder1, folder2], total:2]
+		1 * folderService.filter(parent, _, filter) >> [results:[folder1, folder2], total:2]
 		results.folders[0].id == folder1.id
 		results.folders[0].name == folder1.name
 		results.folders[1].id == folder2.id
@@ -237,5 +237,53 @@ class FolderControllerSpec extends ControllerSpec {
 		then:
 		1 * folderService.addChildToFolder(parent2, folder1)
 		1 * notificationService.success(_, _)
+	}
+
+	def "update should throw an AssertError when given invalid input"() {
+		given:
+		controller.params.folderId = folderId
+		when:
+		controller.update()
+		then:
+		0 * folderService.renameFolder(_, _)
+		thrown(AssertionError)
+		where:
+		folderId  << ['9', null]
+	}
+
+	def "update should render errors return by createFolder"() {
+		given:
+		controller.params.folderId = '1'
+		controller.params.name = ''
+		when:
+		controller.update()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * folderService.renameFolder(folder1, '') >> { folder, name ->
+			folder.name = name
+			folder.errors.rejectValue('name', 'this.is.an.error.code.for.name')
+			folder
+		}
+		1 * notificationService.error(_)
+		results.validation.name.errors
+		!results.validation.name.valid
+		!results.validation.group.errors
+		results.validation.group.valid
+	}
+
+	def "update should render the saved folder when there are no errors returned by createFolder"() {
+		controller.params.folderId = '1'
+		controller.params.name = '   new folder2   '
+		when:
+		controller.update()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * folderService.renameFolder(folder1, 'new folder2') >> { folder, name->
+			folder.name = name
+			folder
+		}
+		1 * notificationService.success(_, _)
+		results.folder.id == 1
+		results.folder.name == 'new folder2'
 	}
 }

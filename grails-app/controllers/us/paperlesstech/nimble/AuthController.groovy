@@ -44,23 +44,8 @@ class AuthController {
 
 	def loggedInCheck() {
 		if (authService.isLoggedIn()) {
-			redirect(controller:"document", action:"index")
+			redirect(controller:'home')
 		}
-	}
-
-	def index = {
-		redirect(action:'login', params:params)
-	}
-
-	def login = {
-		def local = grailsApplication.config.nimble.localusers.authentication.enabled
-		def registration = grailsApplication.config.nimble.localusers.registration.enabled
-
-		if (params.targetUri) {
-			session.setAttribute(AuthController.TARGET, params.targetUri)
-		}
-
-		render(template: "/templates/nimble/login/login", model: [local: local, registration: registration, username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri])
 	}
 
 	def signin = {
@@ -157,7 +142,8 @@ class AuthController {
 		} else {
 			authService.logout()
 		}
-		request.xhr ? render([notification:notificationService.success('document-vault.api.logout.success')] as JSON) : redirect(uri: '/')
+
+		request.xhr ? render([notification:notificationService.success('document-vault.api.logout.success')] as JSON) : redirect(controller:'home')
 	}
 
 	def unauthorized = {

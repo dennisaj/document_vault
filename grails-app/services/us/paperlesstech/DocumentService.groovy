@@ -11,7 +11,15 @@ class DocumentService {
 
 	def authService
 
-	def search(Folder folder=null, Map params, String filter) {
+	def filter(Folder folder=null, Map params, String filter) {
+		commonQuery(folder, params, filter, true)
+	}
+
+	def search(Map params, String filter) {
+		commonQuery(params, filter, false)
+	}
+
+	private def commonQuery(Folder folder=null, Map params, String filter, boolean includeFolder) {
 		def allowedGroupIds = authService.getGroupsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]).collect { it.id } ?: -1L
 		def specificDocs = authService.getIndividualDocumentsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]) ?: -1L
 
@@ -27,10 +35,12 @@ class DocumentService {
 					.add(Restrictions.ilike('n.note', "%$filter%")))
 		}
 
-		if (folder) {
-			detachedCriteria.add(Restrictions.eq('folder', folder))
-		} else {
-			detachedCriteria.add(Restrictions.isNull('folder'))
+		if (includeFolder) {
+			if (folder) {
+				detachedCriteria.add(Restrictions.eq('folder', folder))
+			} else {
+				detachedCriteria.add(Restrictions.isNull('folder'))
+			}
 		}
 
 		def documentTotal = Document.createCriteria().count {

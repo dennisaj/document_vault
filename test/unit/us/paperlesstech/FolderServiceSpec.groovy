@@ -210,4 +210,28 @@ class FolderServiceSpec extends UnitSpec {
 		then:
 		1 * authService.canManageFolders(parent3.group) >> true
 	}
+
+	def "renameFolder should throw an AssertionError when the user lacks the ManageFolders permission"() {
+		when:
+		service.renameFolder(folder1, 'name')
+		then:
+		1 * authService.canManageFolders(folder1.group) >> false
+		thrown(AssertionError)
+	}
+
+	def "renameFolder should return errors if validation fails"() {
+		when:
+		def savedFolder = service.renameFolder(folder1, '')
+		then:
+		1 * authService.canManageFolders(folder1.group) >> true
+		savedFolder.errors
+	}
+
+	def "renameFolder should set the name when no error occur"() {
+		when:
+		def savedFolder = service.renameFolder(folder1, 'new folder')
+		then:
+		1 * authService.canManageFolders(folder1.group) >> true
+		folder1.name == 'new folder'
+	}
 }

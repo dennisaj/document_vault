@@ -50,9 +50,9 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		folder2.save(failOnError:true)
 	}
 
-	def "search should return documents without a folder when folder is null"() {
+	def "filter should return documents without a folder when folder is null"() {
 		when:
-		def result = service.search(null, [sort:'name', order:'asc', max:10, offset:0], '')
+		def result = service.filter(null, [sort:'name', order:'asc', max:10, offset:0], '')
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
@@ -62,9 +62,9 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		result.documentTotal == 1
 	}
 
-	def "search should limit by folder when one is given"() {
+	def "filter should limit by folder when one is given"() {
 		when:
-		def result = service.search(folder2, [sort:'name', order:'asc', max:10, offset:0], '')
+		def result = service.filter(folder2, [sort:'name', order:'asc', max:10, offset:0], '')
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
@@ -76,9 +76,9 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		result.documentTotal == 2
 	}
 
-	def "search should limit by document ids when getIndividualDocumentsWithPermission returns values"() {
+	def "filter should limit by document ids when getIndividualDocumentsWithPermission returns values"() {
 		when:
-		def result = service.search(document1.folder, [sort:'name', order:'asc', max:10, offset:0], '')
+		def result = service.filter(document1.folder, [sort:'name', order:'asc', max:10, offset:0], '')
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([document1.id] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([] as SortedSet)
@@ -88,9 +88,9 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		result.documentTotal == 1
 	}
 
-	def "search should apply the filter when it is supplied"() {
+	def "filter should apply the filter when it is supplied"() {
 		when:
-		def result = service.search(document1.folder, [sort:'name', order:'asc', max:10, offset:0], 'document1')
+		def result = service.filter(document1.folder, [sort:'name', order:'asc', max:10, offset:0], 'document1')
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)

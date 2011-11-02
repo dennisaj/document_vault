@@ -141,7 +141,7 @@
 			&nbsp;
 		</li>
 		<li>
-			<g:link controller="document" class="icon icon_arrow_left"><g:message code="document-vault.link.leaveadmin" /></g:link>
+			<a href="/" class="icon icon_arrow_left"><g:message code="document-vault.link.leaveadmin" /></a>
 		</li>
 	</ul>
 </div>

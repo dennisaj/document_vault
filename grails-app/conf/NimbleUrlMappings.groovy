@@ -96,11 +96,6 @@ class NimbleUrlMappings {
 			action = "forgottenpasswordexternal"
 		}
 
-		"/login" {
-			controller = "auth"
-			action = "login"
-		}
-
 		"/logout" {
 			controller = "auth"
 			action = "logout"

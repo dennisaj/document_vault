@@ -102,8 +102,21 @@ class DocumentController {
 		pagination.order = params.order ?: 'asc'
 		pagination.offset = params.int('offset') ?: 0
 
-		def results = documentService.search(searchFolder, pagination, params.filter?.trim())
+		def results = documentService.filter(searchFolder, pagination, params.filter?.trim())
 
 		render([searchFolder:searchFolder?.asMap(), documents:results.documentResults*.asMap(), total:results.documentTotal] as JSON)
+	}
+
+	def search = {
+		def pagination = [:]
+		def max = params.int('max')
+		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
+		pagination.sort = params.sort ?: 'dateCreated'
+		pagination.order = params.order ?: 'asc'
+		pagination.offset = params.int('offset') ?: 0
+
+		def results = documentService.search(pagination, params.filter?.trim())
+
+		render([documents:results.documentResults*.asMap(), total:results.documentTotal] as JSON)
 	}
 }

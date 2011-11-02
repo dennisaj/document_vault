@@ -186,7 +186,7 @@ class DocumentControllerSpec extends ControllerSpec {
 		controller.list()
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		1 * documentService.search(folder, _, filter) >> [documentResults:[document1, document2], documentTotal:2]
+		1 * documentService.filter(folder, _, filter) >> [documentResults:[document1, document2], documentTotal:2]
 		results.documents[0].id == document1.id
 		results.documents[0].name == document1.name
 		results.documents[1].id == document2.id

@@ -3,6 +3,7 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class ErrorController {
+	def notificationService
 
 	def index = {
 		def error = [:]
@@ -24,9 +25,9 @@ class ErrorController {
 				}
 			}
 		} catch (Exception e) {
-			println e
+			log.error e, e
 		}
 
-		render(error as JSON)
+		render([notification:notificationService.error('document-vault.api.error.error'), error:error] as JSON)
 	}
 }
