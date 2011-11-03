@@ -1,5 +1,7 @@
 package us.paperlesstech.handlers
 
+import java.awt.Color
+
 import org.springframework.core.io.ClassPathResource
 
 import us.paperlesstech.DocumentData

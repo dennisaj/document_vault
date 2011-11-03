@@ -5,6 +5,7 @@ import grails.converters.JSON
 class PrintQueueController {
 	def authService
 	def handlerChain
+	def notificationService
 	def preferenceService
 
 	def push = {
@@ -18,16 +19,23 @@ class PrintQueueController {
 		}
 
 		if (printed) {
-			render([status:"success"] as JSON)
+			render([notification:notificationService.success('document-vault.api.printqueue.push.success')] as JSON)
 		} else {
-			render([status:"error"] as JSON)
+			render([notification:notificationService.error('document-vault.api.printqueue.push.success')] as JSON)
 		}
 	}
 
-	def printWindow = {
+	def details = {
 		def document = Document.load(params.documentId)
 		assert document
 
-		render(template:"printerDialog", model:[document:document], defaultPrinter:preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER))
+		render([
+			printing: [
+				documentId: document.id,
+				printers: Printer.list()*.asMap(),
+				showNotesOption: authService.canNotes(document),
+				defaultPrinterId: preferenceService.getPreference(authService.authenticatedUser, PreferenceService.DEFAULT_PRINTER)
+			]
+		] as JSON)
 	}
 }

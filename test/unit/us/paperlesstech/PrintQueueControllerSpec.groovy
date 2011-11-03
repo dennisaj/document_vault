@@ -7,6 +7,7 @@ import us.paperlesstech.handlers.Handler
 class PrintQueueControllerSpec extends ControllerSpec {
 	AuthService authService = Mock()
 	Handler handlerChain = Mock()
+	NotificationService notificationService = Mock()
 	PreferenceService preferenceService = Mock()
 
 	def document = new Document(id:1)
@@ -16,6 +17,7 @@ class PrintQueueControllerSpec extends ControllerSpec {
 		controller.authService = authService
 		controller.handlerChain = handlerChain
 		controller.preferenceService = preferenceService
+		controller.notificationService = notificationService
 
 		mockDomain(Document, [document])
 		mockDomain(Printer, [printer])
@@ -25,9 +27,10 @@ class PrintQueueControllerSpec extends ControllerSpec {
 		given:
 		controller.params.documentId = null
 		when:
-		controller.printWindow()
+		controller.details()
 		then:
 		thrown(AssertionError)
+		0 * notificationService.success(_)
 	}
 
 	def "printWindow should retrieve the requested document and also get the printer preference"() {
@@ -35,10 +38,10 @@ class PrintQueueControllerSpec extends ControllerSpec {
 		controller.params.documentId = 1
 		1 * preferenceService.getPreference(_, PreferenceService.DEFAULT_PRINTER) >> '1'
 		when:
-		def model = controller.printWindow()
+		controller.details()
+		def results = JSON.parse(mockResponse.contentAsString)
 		then:
-		model.document.id == 1
-		controller.renderArgs.template == 'printerDialog'
+		results.printing.documentId == 1
 	}
 
 	def "push should call print if a valid printer and document are given"() {
@@ -51,7 +54,7 @@ class PrintQueueControllerSpec extends ControllerSpec {
 		when:
 		def ret = controller.push()
 		then:
-		JSON.parse(mockResponse.contentAsString).status == 'success'
+		1 * notificationService.success(_)
 		where:
 		addNotes << ['true', 'false']
 	}
@@ -66,7 +69,7 @@ class PrintQueueControllerSpec extends ControllerSpec {
 		when:
 		def ret = controller.push()
 		then:
-		JSON.parse(mockResponse.contentAsString).status == 'error'
+		1 * notificationService.error(_)
 		where:
 		documentId << [1, 2, 2]
 		printerId << [2, 1, 2]

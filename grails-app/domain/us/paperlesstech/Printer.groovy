@@ -16,6 +16,15 @@ class Printer {
 		port range:0..65535
 	}
 
+	def asMap() {
+		[
+			id:id,
+			name:name,
+			deviceType:deviceType,
+			port:port
+		]
+	}
+
 	@Override
 	String toString() {
 		"Printer (${id}) - ${name} - ${host}:${port}"

@@ -12,6 +12,7 @@ public class SecurityFilters {
 
 	def authService
 	def grailsApplication
+	def notificationService
 
 	def filters = {
 		remoteSigning(controller: "code") {
@@ -116,7 +117,7 @@ public class SecurityFilters {
 
 	def onUnauthorized(subject, filter) {
 		filter.response.status = 403
-		filter.render([error:[statusCode:403]] as JSON)
+		filter.render([error:[statusCode:403], notification:notificationService.error('document-vault.api.securityfilters.403.error')] as JSON)
 	}
 
 	/**
@@ -128,17 +129,8 @@ public class SecurityFilters {
 
 		if (request.xhr) {
 			response.status = 401
+			render([error:[statusCode:401], notification:notificationService.error('document-vault.api.securityfilters.401.error')] as JSON)
 			return false
-		}
-
-		// Default behavior is to redirect to the login page.
-		def targetUri = request.forwardURI - request.contextPath
-		def query = request.queryString
-		if (query) {
-			if (!query.startsWith('?')) {
-				query = '?' + query
-			}
-			targetUri += query
 		}
 
 		redirect(controller:'home')

@@ -84,9 +84,14 @@ class UrlMappings {
 			action = "printWindow"
 		}
 
-		"/p/window/$documentId" {
+		"/p/details/$documentId?" {
 			controller = "printQueue"
-			action = "printWindow"
+			action = "details"
+		}
+
+		"/p/print/$documentId?/$printerId?" {
+			controller = "printQueue"
+			action = "push"
 		}
 
 		"/r/ra/$userId?" {

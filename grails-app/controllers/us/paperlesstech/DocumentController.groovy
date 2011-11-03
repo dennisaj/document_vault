@@ -99,7 +99,7 @@ class DocumentController {
 		def max = params.int('max')
 		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
 		pagination.sort = params.sort ?: 'dateCreated'
-		pagination.order = params.order ?: 'asc'
+		pagination.order = params.order ?: 'desc'
 		pagination.offset = params.int('offset') ?: 0
 
 		def results = documentService.filter(searchFolder, pagination, params.filter?.trim())
