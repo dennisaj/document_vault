@@ -9,9 +9,15 @@ import us.paperlesstech.handlers.business_logic.FermanBusinessLogicService.Ferma
 import us.paperlesstech.helpers.PclDocument
 import us.paperlesstech.helpers.PclInfo
 import us.paperlesstech.helpers.PclPage
+import us.paperlesstech.Folder
+import us.paperlesstech.FolderService
+import us.paperlesstech.nimble.Group
+import us.paperlesstech.Document
+import us.paperlesstech.DocumentSearchField
 
 class FermanBusinessLogicServiceSpec extends UnitSpec {
 	FermanBusinessLogicService service
+	FolderService folderService = Mock()
 	PclHandlerService pclHandlerService = Mock()
 	File custHard
 	File warrantyRepairOrder
@@ -23,6 +29,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 	def setup() {
 		mockLogging(FermanBusinessLogicService)
 		service = new FermanBusinessLogicService()
+		service.folderService = folderService
 		service.pclHandlerService = pclHandlerService
 
 		custHard = new ClassPathResource("dt_cust_hard.pcl").file
@@ -66,7 +73,8 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		"45555" == m["Current_Mileage"]
 		"45556" == m["Mileage_Out"]
 		"100.00" == m["Estimate_Of_Repairs"]
-		"ARKONA SUPPORT/" == m["Service_Advisor"]
+		"ARKONA SUPPORT" == m["Service_Advisor"]
+		"" == m["Key_Tag_Number"]
 		"ABC DISTRIBUTING INC" == m["Customer_Name"]
 		"3525056434" == m["Work_Phone"]
 		"123456LLL" == m["VIN"]
@@ -129,7 +137,8 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		"Final" == m["Status"]
 		"49721" == m["Mileage_In"]
 		"49726" == m["Mileage_Out"]
-		"Chris Csercsics/3284*W*" == m["Service_Advisor"]
+		"Chris Csercsics" == m["Service_Advisor"]
+		"3284*W*" == m["Key_Tag_Number"]
 		"JULIO ALONSO" == m["Customer_Name"]
 		"3840 N LAKE DR UNIT 127\nTAMPA, FL  336142044" == m["Customer_Address"]
 		"999-999-9999" == m["Work_Phone"]
@@ -239,26 +248,155 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		multipleSlashes = /\one slash \two slash/
 	}
 
-	// TODO Replace with some foldering
-	/*def "afterPclImportFile should tag the document and rename it"() {
-		setup:
-		def tags = []
-		mockDomain(Document)
-		def d = new Document()
-		d.metaClass.save = { d }
-		d.metaClass.addTag = { it -> tags << it }
-		d.searchField("RO_Number", "RO_Number")
-		d.searchField("VIN", "VIN")
-		d.searchField("Customer_Name", "NAME")
-		d.searchField("Key_Tag_Number", "TAG")
+	def "findFolder should do nothing if there is no roNumber"() {
+		expect:
+		service.findFolder(roNumber: null) == null
+	}
+
+	def "findFolder returns null if there are no matching folders"() {
+		given:
+		def myCriteria = [
+				list: {Closure cls -> []}
+		]
+		Folder.metaClass.static.createCriteria = { myCriteria }
+
+		expect:
+		service.findFolder(roNumber: "RO1") == null
+	}
+
+	def "findFolder should return a folder that starts with the RO#"() {
+		given:
+		def f123 = new Folder(name: "RO123")
+		def f12 = new Folder(name: "RO12")
+		def f1 = new Folder(name: "RO1")
+		def myCriteria = [
+				list: {Closure cls -> [f123, f12, f1]}
+		]
+		Folder.metaClass.static.createCriteria = { myCriteria }
+
+		expect:
+		service.findFolder(roNumber: "RO1") == f1
+	}
+
+	def "getFolderName formats the folder name"() {
+		expect:
+		service.getFolderName(roNumber: roNumber, tag: tag, name: name) == result
+
+		where:
+		roNumber | tag  | name | result
+		null     | null | null | ''
+		null     | null | 'a'  | 'a'
+		null     | 'b'  | null | 'b'
+		null     | 'c'  | 'd'  | 'c - d'
+		'e'      | null | null | 'e'
+		'f'      | null | 'g'  | 'f - g'
+		'h'      | 'i'  | null | 'h - i'
+		'j'      | 'k'  | 'l'  | 'j - k - l'
+	}
+
+	def "createFolderAndAddOrphans does not add documents to the folder if there is no vin"() {
+		def folder = new Folder()
+		def group = new Group()
 
 		when:
-		service.afterPCLImportFile(document: d)
+		def created = service.createFolderAndAddOrphans(folderName: "folderName", vin: "", group: group)
 
 		then:
-		d.name == "NAME - TAG"
-		2 * tagService.createTag(_)
-		tags[0] == "RO_Number"
-		tags[1] == "VIN"
-	}*/
+		1 * folderService.createFolder(group, null, "folderName") >> folder
+		created == folder
+	}
+
+	def "createFolderAndAddOrphans adds matching documents to the created folder"() {
+		def folder = new Folder()
+		folder.documents = [] as Set
+		folder.metaClass.addToDocuments = { Document d -> folder.documents << d }
+		def group = new Group()
+		def d1 = new Document()
+		def d2 = new Document()
+		def myCriteria = [
+				list: {Closure cls -> [d1, d2]}
+		]
+		mockDomain(Document)
+		mockDomain(Folder)
+		Document.metaClass.static.createCriteria = { myCriteria }
+
+		when:
+		def created = service.createFolderAndAddOrphans(folderName: folderName, vin: vin, group: group)
+
+		then:
+		1 * folderService.createFolder(group, null, folderName) >> folder
+		created == folder
+		created.documents.size() == 2
+		created.documents.contains(d1)
+		created.documents.contains(d2)
+
+		where:
+		folderName = "folderName"
+		vin = "vin"
+	}
+
+	def "rename folder should not shorten the folder name"() {
+		def folder = new Folder(name: "a long name")
+
+		when:
+		service.renameFolder(folder: folder, folderName: "short")
+
+		then:
+		folder.name == "a long name"
+	}
+
+	def "rename folder should rename the folder if the new name is longer"() {
+		def folder = new Folder(name: "a long name")
+
+		when:
+		service.renameFolder(folder: folder, folderName: "a longer name")
+
+		then:
+		folder.name == "a longer name"
+	}
+
+	def "rename document should use the document type if the document is in a folder"() {
+		def document = new Document(name: 'orig')
+		document.searchFieldsCollection = [] as Set
+		document.metaClass.addToSearchFieldsCollection = { DocumentSearchField it -> document.searchFieldsCollection << it }
+		document.searchField('DocumentType', 'Other')
+		document.folder = new Folder()
+
+		when:
+		service.renameDocument(document: document)
+
+		then:
+		document.name == FermanDocumentTypes.Other.displayName
+	}
+
+	def "rename document should use the name or tag to rename the document if there is no folder"() {
+		def document = new Document(name: 'orig')
+		document.searchFieldsCollection = [] as Set
+		document.metaClass.addToSearchFieldsCollection = { DocumentSearchField it -> document.searchFieldsCollection << it }
+		document.searchField('DocumentType', 'Other')
+
+		when:
+		service.renameDocument(document: document, name: name, tag: tag)
+
+		then:
+		document.name == result
+
+		where:
+		name | tag  | result
+		null | null | 'orig'
+		null | 'a'  | 'a'
+		'b'  | null | 'b'
+		'c'  | 'd'  | 'c - d'
+	}
+
+	def "splitKeyTag should always return a two entry list"() {
+		expect:
+		service.splitKeyTag(entry) == result
+
+		where:
+		entry           | result
+		'Daniel / 4123' | ['Daniel', '4123']
+		'Daniel'        | ['Daniel', '']
+		''              | ['', '']
+	}
 }
