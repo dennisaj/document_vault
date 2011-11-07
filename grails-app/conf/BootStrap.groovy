@@ -1,3 +1,4 @@
+import grails.converters.JSON
 import grails.util.Environment
 import us.paperlesstech.DomainTenantMap
 import us.paperlesstech.Printer
@@ -14,6 +15,11 @@ class BootStrap {
 	def init = { servletContext ->
 		// Setup nimble Realms
 		nimbleInit()
+
+		// Feed IE8 dates that it can parse
+		JSON.registerObjectMarshaller(Date) { Date d->
+			d?.format('EEE, d MMM yyyy HH:mm:ss Z')
+		}
 
 		assert new File("/usr/local/bin/pcl6")?.canExecute(), "Cannot execute /usr/local/bin/pcl6"
 		assert new File("/usr/local/bin/gs")?.canExecute(), "Cannot execute /usr/local/bin/gs"
