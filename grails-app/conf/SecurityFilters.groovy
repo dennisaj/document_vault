@@ -73,7 +73,7 @@ public class SecurityFilters {
 									return true
 								case 'create':
 									return group && authService.canManageFolders(group)
-								case ['delete', 'addDocument', 'removeDocument', 'update']:
+								case ['delete', 'addDocument', 'removeDocument', 'update', 'addFolder', 'removeFolder']:
 									return folder && authService.canManageFolders(folder.group)
 								default:
 									return false

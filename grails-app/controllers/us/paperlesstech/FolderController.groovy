@@ -127,7 +127,7 @@ class FolderController {
 	def addFolder = {
 		def parent = Folder.get(params.long('parentId'))
 		assert parent
-		def child = Folder.get(params.long('childId'))
+		def child = Folder.get(params.long('folderId'))
 		assert child
 
 		def currentParent = Folder.load(params.long('currentParentId'))
@@ -136,6 +136,19 @@ class FolderController {
 		folderService.addChildToFolder(parent, child)
 
 		render([notification:notificationService.success('document-vault.api.folder.addFolder.success', [child.name, parent.name])] as JSON)
+	}
+
+	def removeFolder = {
+		def parent = Folder.get(params.long('parentId'))
+		assert parent
+		def child = Folder.get(params.long('folderId'))
+		assert child
+
+		assert parent == child.parent
+
+		folderService.removeChildFromFolder(child)
+
+		render([notification:notificationService.success('document-vault.api.folder.removeFolder.success', [child.name, parent.name])] as JSON)
 	}
 
 	def search = {

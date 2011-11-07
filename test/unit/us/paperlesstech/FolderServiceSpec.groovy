@@ -1,6 +1,7 @@
 package us.paperlesstech
 
 import grails.plugin.spock.UnitSpec
+import grails.validation.ValidationException
 import spock.lang.Shared
 import us.paperlesstech.nimble.Group
 
@@ -211,6 +212,14 @@ class FolderServiceSpec extends UnitSpec {
 		1 * authService.canManageFolders(parent3.group) >> true
 	}
 
+	def "addChildToFolder should freak out when trying to add a parent to its child"() {
+		when:
+		service.addChildToFolder(folder1, parent1)
+		then:
+		1 * authService.canManageFolders(parent3.group) >> true
+		thrown(ValidationException)
+	}
+
 	def "renameFolder should throw an AssertionError when the user lacks the ManageFolders permission"() {
 		when:
 		service.renameFolder(folder1, 'name')
@@ -233,5 +242,39 @@ class FolderServiceSpec extends UnitSpec {
 		then:
 		1 * authService.canManageFolders(folder1.group) >> true
 		folder1.name == 'new folder'
+	}
+
+	def "removeChildFromFolder should require a child"() {
+		when:
+		def savedFolder = service.removeChildFromFolder(null)
+		then:
+		thrown(AssertionError)
+	}
+
+	def "removeChildFromFolder should throw an AssertionError when the user lacks the ManageFolders permission"() {
+		when:
+		def savedFolder = service.removeChildFromFolder(folder1)
+		then:
+		1 * authService.canManageFolders(folder1.group) >> false
+		thrown(AssertionError)
+	}
+
+	def "removeChildFromFolder should return the child when the parent is null"() {
+		when:
+		def savedFolder = service.removeChildFromFolder(folder2)
+		then:
+		1 * authService.canManageFolders(folder2.group) >> true
+		savedFolder.is folder2
+	}
+
+	def "removeChildFromFolder should remove the child from its parent when there are not other problems"() {
+		given:
+		def parent = folder1.parent
+		when:
+		def savedFolder = service.removeChildFromFolder(folder1)
+		then:
+		1 * authService.canManageFolders(folder1.group) >> true
+		savedFolder.parent == null
+		!parent.children.contains(savedFolder)
 	}
 }

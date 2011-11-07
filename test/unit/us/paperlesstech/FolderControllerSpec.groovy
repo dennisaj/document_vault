@@ -229,7 +229,7 @@ class FolderControllerSpec extends ControllerSpec {
 	def "addFolder should addDocumentToFolder when given valid data"() {
 		given:
 		controller.params.parentId = '5'
-		controller.params.childId = '1'
+		controller.params.folderId = '1'
 		controller.params.currentParentId = '4'
 		when:
 		controller.addFolder()
@@ -285,5 +285,35 @@ class FolderControllerSpec extends ControllerSpec {
 		1 * notificationService.success(_, _)
 		results.folder.id == 1
 		results.folder.name == 'new folder2'
+	}
+
+	def "removeFolder should throw an AssertionError when passed invalid data"() {
+		given:
+		controller.params.folderId = folderId
+		controller.params.parentId = parentId
+		when:
+		controller.removeFolder()
+		then:
+		0 * folderService.removeChildFromFolder(_)
+		thrown(AssertionError)
+		where:
+		folderId | parentId
+		'9'      | '2'      // Bad folderId
+		null     | '2'      // Bad folderId
+		'2'      | '9'      // Bad parentId
+		'2'      | null     // Bad parentId
+		'2'      | '2'      // Bad current folder
+	}
+
+	def "removeFolder should removeDocumentFromFolder when given valid data"() {
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.parentId = folder1.parent.id
+		when:
+		controller.removeFolder()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * folderService.removeChildFromFolder(folder1)
+		1 * notificationService.success(_, _)
 	}
 }

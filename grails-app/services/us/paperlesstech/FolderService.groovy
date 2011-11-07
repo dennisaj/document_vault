@@ -134,6 +134,7 @@ class FolderService {
 	 * @pre The current user must have the {@link DocumentPermission#ManageFolders} permission for document.group.
 	 * @pre parent.group must equal child.group
 	 * @throws RuntimeException if there is a problem saving
+	 * @throws ValidationException if the parent is a descendant of child.
 	 */
 	Folder addChildToFolder(Folder parent, Folder child) {
 		assert parent
@@ -150,6 +151,27 @@ class FolderService {
 		parent.addToChildren(child)
 		child.parent = parent
 		child.parent?.save(failOnError:true)
+		parent.save(failOnError:true)
+		child
+	}
+
+	/**
+	* Sets the given child's parent to null and remove the child from the parent.
+	*
+	* @pre The current user must have the {@link DocumentPermission#ManageFolders} permission for child.group.
+	* @throws RuntimeException if there is a problem saving
+	*/
+	Folder removeChildFromFolder(Folder child) {
+		assert child
+		assert authService.canManageFolders(child.group)
+
+		if (child.parent == null) {
+			return child
+		}
+
+		def parent = child.parent
+		child.parent = null
+		parent.removeFromChildren(child)
 		parent.save(failOnError:true)
 		child
 	}
