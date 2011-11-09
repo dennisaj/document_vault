@@ -87,7 +87,8 @@ class DocumentController {
 		assert d
 
 		def map = d.previewImageAsMap(pageNumber)
-		map.highlights = (authService.canGetSigned(d) || authService.canSign(d) ? d.highlightsAsMap(pageNumber) : [:])
+		map.background = g.createLink(action:'downloadImage', params:[documentId:d.id, pageNumber:pageNumber])
+		map.savedHighlights = (authService.canGetSigned(d) || authService.canSign(d) ? d.highlightsAsMap(pageNumber) : [:])
 
 		render(map as JSON)
 	}

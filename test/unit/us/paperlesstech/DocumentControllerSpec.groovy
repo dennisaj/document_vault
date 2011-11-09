@@ -21,6 +21,7 @@ class DocumentControllerSpec extends ControllerSpec {
 	def folder1 = new Folder(id:1, name:'folder1')
 
 	def setup() {
+		controller.metaClass.createLink = { LinkedHashMap arg1 -> 'this is stupid' }
 		controller.authService = authService
 		controller.documentService = documentService
 		controller.handlerChain = handlerChain
@@ -153,12 +154,12 @@ class DocumentControllerSpec extends ControllerSpec {
 		def previewImageMap = JSON.parse(mockResponse.contentAsString)
 		then:
 		previewImageMap.pageNumber == pageNumber
-		!previewImageMap.highlights
+		!previewImageMap.savedHighlights
 		where:
 		pageNumber = 1
 	}
 
-	def "image should include highlights when the user canSign or canGetSigned"() {
+	def "image should include savedHighlights when the user canSign or canGetSigned"() {
 		given:
 		document1.metaClass.highlightsAsMap = { int pageNumber -> [1:'highlight'] }
 		controller.params.documentId = '1'
@@ -170,7 +171,7 @@ class DocumentControllerSpec extends ControllerSpec {
 		def previewImageMap = JSON.parse(mockResponse.contentAsString)
 		then:
 		previewImageMap.pageNumber == pageNumber
-		previewImageMap.highlights
+		previewImageMap.savedHighlights
 		where:
 		pageNumber = 1
 		canGetSigned << [true, false]
