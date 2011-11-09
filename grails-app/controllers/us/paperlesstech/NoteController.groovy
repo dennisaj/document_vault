@@ -35,13 +35,7 @@ class NoteController {
 		def document = Document.get(params.documentId)
 		assert document
 
-		def notes = [:]
-		document.notes.each {
-			def url = (it.data ? g.createLink(action:"download", params:[documentId:document.id, noteDataId:it.data.id]) : "")
-			notes[it.id] = [url:url, note:it.note, pageNumber:it.pageNumber, left:it.left, top:it.top]
-		}
-
-		render([notes:notes] as JSON)
+		render([notes:document.notes*.asMap()] as JSON)
 	}
 
 	def saveLines = {
@@ -69,8 +63,8 @@ class NoteController {
 		def document = Document.get(params.long('documentId'))
 		assert document
 
-		def value = params.value?.trim()
-		assert value
+		def text = params.text?.trim()
+		assert text
 
 		def pageNumber = Math.max(params.int('pageNumber') ?: 0, 0)
 		assert pageNumber <= document.files.first().pages
@@ -78,7 +72,7 @@ class NoteController {
 		def left = params.float('left') as int ?: 0
 		def top = params.float('top') as int ?: 0
 
-		handlerChain.saveNotes(document:document, notes:[[text:value, left:left, top:top, pageNumber:pageNumber]])
+		handlerChain.saveNotes(document:document, notes:[[text:text, left:left, top:top, pageNumber:pageNumber]])
 		document.save(flush:true)
 
 		render ([notification:notificationService.success('document-vault.api.notes.saveNote.success')] as JSON)

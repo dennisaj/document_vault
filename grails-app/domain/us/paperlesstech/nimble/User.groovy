@@ -110,6 +110,14 @@ class User implements Comparable<User> {
 		(profile?.fullName ?: username).toLowerCase() <=> (other?.profile?.fullName ?: other?.username).toLowerCase()
 	}
 
+	def asMap() {
+		[
+			id:id,
+			username:username,
+			fullName:profile.fullName
+		]
+	}
+
 	// Transients
 	static transients = ['pass', 'passConfirm']
 	String pass

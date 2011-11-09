@@ -6,6 +6,8 @@ import grails.plugin.spock.ControllerSpec
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 
 import us.paperlesstech.handlers.Handler
+import us.paperlesstech.nimble.Profile
+import us.paperlesstech.nimble.User
 
 class NoteControllerSpec extends ControllerSpec {
 	Handler handlerChain = Mock()
@@ -17,6 +19,7 @@ class NoteControllerSpec extends ControllerSpec {
 	def note3 = new Note(id:3, document:document2, dateCreated: new Date(), data:documentData)
 	def document1 = new Document(id:1, files:([documentData] as SortedSet), notes:([note1, note2] as SortedSet))
 	def document2 = new Document(id:2, files:([documentData] as SortedSet), notes:([note3] as SortedSet))
+	def user = new User(id:1, profile:new Profile(id:1, fullName:'Bob'))
 
 	def setup() {
 		controller.metaClass.createLink = { LinkedHashMap arg1 -> 'this is stupid' }
@@ -26,6 +29,11 @@ class NoteControllerSpec extends ControllerSpec {
 		mockDomain(Document, [document1, document2])
 		mockDomain(DocumentData, [documentData])
 		mockDomain(Note, [note1, note2, note3])
+		mockDomain(User, [user])
+
+		note1.user = user
+		note2.user = user
+		note3.user = user
 	}
 
 	def "saveText should throw an AssertionError when given an invalid documentId"() {
@@ -40,7 +48,7 @@ class NoteControllerSpec extends ControllerSpec {
 	def "saveText should throw an AssertionError when given an invalid value"() {
 		given:
 		controller.params.documentId = '1'
-		controller.params.value = null
+		controller.params.text = null
 		when:
 		controller.saveText()
 		then:
@@ -50,7 +58,7 @@ class NoteControllerSpec extends ControllerSpec {
 	def "saveText should throw an AssertionError when given an invalid page"() {
 		given:
 		controller.params.documentId = '1'
-		controller.params.value = 'valid'
+		controller.params.text = 'valid'
 		controller.params.pageNumber = '100'
 		when:
 		controller.saveText()
@@ -61,16 +69,16 @@ class NoteControllerSpec extends ControllerSpec {
 	def "saveText should default pageNumbers below 0 or empty pageNumbers to 0"() {
 		given:
 		controller.params.documentId = '1'
-		controller.params.value = value
+		controller.params.text = text
 		controller.params.pageNumber = pageNumber
 		controller.params.left = left
 		controller.params.top = top
 		when:
 		controller.saveText()
 		then:
-		1 * handlerChain.saveNotes([document:document1, notes:[[text:value, left:left, top:top, pageNumber:0]]])
+		1 * handlerChain.saveNotes([document:document1, notes:[[text:text, left:left, top:top, pageNumber:0]]])
 		where:
-		value = 'valid'
+		text = 'valid'
 		left = 100
 		top = 100
 		pageNumber << ['-1', null]
@@ -79,7 +87,7 @@ class NoteControllerSpec extends ControllerSpec {
 	def "saveText should call handerChain's saveNotes when given valid values"() {
 		given:
 		controller.params.documentId = '1'
-		controller.params.value = 'valid'
+		controller.params.text = 'valid'
 		controller.params.pageNumber = '1'
 		when:
 		controller.saveText()
@@ -159,17 +167,6 @@ class NoteControllerSpec extends ControllerSpec {
 		def results = JSON.parse(mockResponse.contentAsString)
 		then:
 		results.notes.size() == 2
-	}
-
-	def "list should include a url if a note contains DocumentData"() {
-		given:
-		controller.params.documentId = '2'
-		when:
-		controller.list()
-		def results = JSON.parse(mockResponse.contentAsString)
-		then:
-		results.notes.size() == 1
-		results.notes.'3'.url
 	}
 
 	def "download should throw an AssertionError when given an invalid noteDataId"() {

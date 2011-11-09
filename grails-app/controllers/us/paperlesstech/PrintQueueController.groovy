@@ -21,7 +21,7 @@ class PrintQueueController {
 		if (printed) {
 			render([notification:notificationService.success('document-vault.api.printqueue.push.success')] as JSON)
 		} else {
-			render([notification:notificationService.error('document-vault.api.printqueue.push.success')] as JSON)
+			render([notification:notificationService.error('document-vault.api.printqueue.push.error')] as JSON)
 		}
 	}
 

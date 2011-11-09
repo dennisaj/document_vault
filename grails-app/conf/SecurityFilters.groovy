@@ -79,7 +79,13 @@ public class SecurityFilters {
 									return false
 							}
 						case "note":
-							return document && authService.canNotes(document)
+							switch (action) {
+								case ['download', 'saveLines']:
+									// Disable handwritten notes for now.
+									return false
+								default:
+									return document && authService.canNotes(document)
+							}
 						case "printQueue":
 							return document && authService.canPrint(document)
 						case "upload":

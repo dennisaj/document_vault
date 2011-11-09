@@ -193,7 +193,8 @@ class Document {
 			parent: [
 				id:folder?.id,
 				name:folder?.name
-			]
+			],
+			notes: notes*.asMap()
 		]
 	}
 

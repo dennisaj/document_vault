@@ -28,11 +28,23 @@ class Note implements Comparable<Note> {
 
 	@Override
 	int compareTo(Note other) {
-		other?.dateCreated <=> dateCreated
+		dateCreated <=> other?.dateCreated
 	}
 
 	@Override
 	String toString() {
 		"Note($id)"
+	}
+
+	def asMap() {
+		[
+			id:id,
+			dateCreated:dateCreated,
+			note:note,
+			pageNumber:pageNumber,
+			left:left,
+			top:top,
+			user:user.asMap()
+		]
 	}
 }
