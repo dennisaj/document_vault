@@ -51,6 +51,8 @@ class UserInfoController {
 			returnMap.user.groups.upload = authService.getGroupsWithPermission([DocumentPermission.Upload])*.asMap()
 			returnMap.user.groups.manageFolders = authService.getGroupsWithPermission([DocumentPermission.ManageFolders])*.asMap()
 
+			returnMap.pinnedFolders = user.pinnedFolders*.asMap()
+
 			returnMap.notification = notificationService.success('document-vault.api.userinfo.userfound')
 
 			render(returnMap as JSON)

@@ -1075,4 +1075,6 @@ databaseChangeLog = {
 	changeSet(author: "dbwatson (generated)", id: "1319809075898-85") {
 		addForeignKeyConstraint(baseColumnNames: "thumbnail_id", baseTableName: "preview_image", constraintName: "FK2987FA2499523BF6", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "document_data", referencesUniqueColumn: "false")
 	}
+
+	include file: '20111109_pinned_folder.groovy'
 }

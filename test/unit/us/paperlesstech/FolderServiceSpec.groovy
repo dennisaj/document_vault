@@ -4,6 +4,7 @@ import grails.plugin.spock.UnitSpec
 import grails.validation.ValidationException
 import spock.lang.Shared
 import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.User
 
 class FolderServiceSpec extends UnitSpec {
 	AuthService authService = Mock()
@@ -276,5 +277,58 @@ class FolderServiceSpec extends UnitSpec {
 		1 * authService.canManageFolders(folder1.group) >> true
 		savedFolder.parent == null
 		!parent.children.contains(savedFolder)
+	}
+
+	def "pinFolder should do nothing if the folder is already pinned"() {
+		def user = new User()
+		def pinned = new PinnedFolder(user: user, folder: folder1)
+		mockDomain(PinnedFolder, [pinned])
+
+		when:
+		service.pinFolder(folder1)
+
+		then:
+		1 * authService.authenticatedUser >> user
+		PinnedFolder.list().size() == 1
+		PinnedFolder.list()[0].folder == folder1
+	}
+
+	def "pinFolder should pin the folder for the user and up the count"() {
+		def user = new User()
+		def pinned = new PinnedFolder(user: user, folder: folder1)
+		mockDomain(PinnedFolder, [pinned])
+
+		when:
+		service.pinFolder(folder2)
+
+		then:
+		1 * authService.authenticatedUser >> user
+		PinnedFolder.list().size() == 2
+		PinnedFolder.list()[1].folder == folder2
+	}
+
+	def "unpinFolder should do nothing if the folder is not pinned"() {
+		def user = new User()
+		mockDomain(PinnedFolder)
+
+		when:
+		service.unpinFolder(folder1)
+
+		then:
+		1 * authService.authenticatedUser >> user
+		PinnedFolder.list().size() == 0
+	}
+
+	def "unpinFolder should delete the matching pinnedFolder"() {
+		def user = new User()
+		def pinned = new PinnedFolder(user: user, folder: folder1)
+		mockDomain(PinnedFolder, [pinned])
+
+		when:
+		service.unpinFolder(folder1)
+
+		then:
+		1 * authService.authenticatedUser >> user
+		PinnedFolder.list().size() == 0
 	}
 }

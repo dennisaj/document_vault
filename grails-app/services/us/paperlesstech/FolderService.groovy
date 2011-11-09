@@ -7,6 +7,7 @@ import org.hibernate.criterion.Subqueries
 import org.hibernate.sql.JoinFragment
 
 import us.paperlesstech.nimble.Group
+import us.paperlesstech.nimble.User
 
 class FolderService {
 
@@ -134,7 +135,7 @@ class FolderService {
 	 * @pre The current user must have the {@link DocumentPermission#ManageFolders} permission for document.group.
 	 * @pre parent.group must equal child.group
 	 * @throws RuntimeException if there is a problem saving
-	 * @throws ValidationException if the parent is a descendant of child.
+	 * @throws grails.validation.ValidationException if the parent is a descendant of child.
 	 */
 	Folder addChildToFolder(Folder parent, Folder child) {
 		assert parent
@@ -174,6 +175,39 @@ class FolderService {
 		parent.removeFromChildren(child)
 		parent.save(failOnError:true)
 		child
+	}
+
+	/**
+	 * Pins the passed folder for the current user
+	 *
+	 * @param folder The folder to pin
+	 */
+	void pinFolder(Folder folder) {
+		User user = authService.authenticatedUser
+
+		def pinned = PinnedFolder.findByFolderAndUser(folder, user)
+		if (pinned) {
+			return
+		}
+
+		pinned = new PinnedFolder(folder: folder, user: user)
+		pinned.save(failOnError: true)
+	}
+
+	/**
+	 * Unpins the passed folder from the current user
+	 *
+	 * @param folder The folder to unpin
+	 */
+	void unpinFolder(Folder folder) {
+		User user = authService.authenticatedUser
+
+		def pinned = PinnedFolder.findByFolderAndUser(folder, user)
+		if (!pinned) {
+			return
+		}
+
+		pinned.delete()
 	}
 
 	/**

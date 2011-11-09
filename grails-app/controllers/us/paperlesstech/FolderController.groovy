@@ -4,7 +4,8 @@ import grails.converters.JSON
 import us.paperlesstech.nimble.Group
 
 class FolderController {
-	static def allowedMethods = [create:'POST', delete:'POST', update:'POST', addDocument:'POST', removeDocument:'POST', addFolder:'POST']
+	static def allowedMethods = [create: 'POST', delete: 'POST', update: 'POST', addDocument: 'POST', removeDocument: 'POST', addFolder: 'POST',
+			pinFolder: 'POST', unpinFolder: 'POST']
 
 	def folderService
 	def notificationService
@@ -162,5 +163,27 @@ class FolderController {
 		def results = folderService.search(pagination, params.filter?.trim())
 
 		render([folders:results.results*.asMap(), total:results.total] as JSON)
+	}
+
+	def pinFolder = {
+		def folder = Folder.get(params.long('folderId'))
+
+		folderService.pinFolder(folder)
+
+		def returnMap = [:]
+		returnMap.notification = notificationService.success('document-vault.api.folder.pin.success', [folder.name])
+
+		render(returnMap as JSON)
+	}
+
+	def unpinFolder = {
+		def folder = Folder.get(params.long('folderId'))
+
+		folderService.unpinFolder(folder)
+
+		def returnMap = [:]
+		returnMap.notification = notificationService.success('document-vault.api.folder.unpin.success', [folder.name])
+
+		render(returnMap as JSON)
 	}
 }

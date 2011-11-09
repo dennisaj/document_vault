@@ -21,6 +21,8 @@ import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import us.paperlesstech.Preference
+import us.paperlesstech.Folder
+import us.paperlesstech.PinnedFolder
 
 /**
  * Represents a user within a Nimble Application
@@ -112,4 +114,8 @@ class User implements Comparable<User> {
 	static transients = ['pass', 'passConfirm']
 	String pass
 	String passConfirm
+
+	List<Folder> getPinnedFolders() {
+		PinnedFolder.findAllByUser(this, [max: 100, sort: 'folder.name', order: 'asc'])
+	}
 }

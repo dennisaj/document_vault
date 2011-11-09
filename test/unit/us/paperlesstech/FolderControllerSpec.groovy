@@ -316,4 +316,26 @@ class FolderControllerSpec extends ControllerSpec {
 		1 * folderService.removeChildFromFolder(folder1)
 		1 * notificationService.success(_, _)
 	}
+
+	def 'pinFolder should use the folderService to pin the folder'() {
+		given:
+		controller.params.folderId = folder1.id
+		when:
+		controller.pinFolder()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * folderService.pinFolder(folder1)
+		1 * notificationService.success(_, _)
+	}
+
+	def 'unpinFolder should use the folderService to unpin the folder'() {
+		given:
+		controller.params.folderId = folder1.id
+		when:
+		controller.unpinFolder()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * folderService.unpinFolder(folder1)
+		1 * notificationService.success(_, _)
+	}
 }
