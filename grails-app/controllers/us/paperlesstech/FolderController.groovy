@@ -131,7 +131,7 @@ class FolderController {
 		def child = Folder.get(params.long('folderId'))
 		assert child
 
-		def currentParent = Folder.load(params.long('currentParentId'))
+		def currentParent = Folder.get(params.long('currentParentId'))
 		assert currentParent == child.parent
 
 		folderService.addChildToFolder(parent, child)

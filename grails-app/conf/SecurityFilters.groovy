@@ -99,7 +99,7 @@ public class SecurityFilters {
 							switch (action) {
 								case "runas":
 									def u = User.get(params.long('userId'))
-									return authService.canRunAs(u)
+									return u && authService.canRunAs(u)
 								case "release":
 									return authService.authenticatedSubject.isRunAs()
 								default:
