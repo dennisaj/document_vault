@@ -182,7 +182,7 @@ class FolderService {
 	 *
 	 * @param folder The folder to pin
 	 */
-	void pinFolder(Folder folder) {
+	void pin(Folder folder) {
 		User user = authService.authenticatedUser
 
 		def pinned = PinnedFolder.findByFolderAndUser(folder, user)
@@ -199,7 +199,7 @@ class FolderService {
 	 *
 	 * @param folder The folder to unpin
 	 */
-	void unpinFolder(Folder folder) {
+	void unpin(Folder folder) {
 		User user = authService.authenticatedUser
 
 		def pinned = PinnedFolder.findByFolderAndUser(folder, user)

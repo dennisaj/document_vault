@@ -47,9 +47,9 @@ class UserInfoControllerSpec extends ControllerSpec {
 
 		then:
 		results.notification
-		results.pinnedFolders
-		results.pinnedFolders[0].name == folder1.name
-		results.pinnedFolders[0].id == folder1.id
+		results.user.pinnedFolders
+		results.user.pinnedFolders[0].name == folder1.name
+		results.user.pinnedFolders[0].id == folder1.id
 		1 * user.pinnedFolders >> [folder1]
 		1 * authService.authenticatedUser >> user
 		1 * notificationService.success(_)

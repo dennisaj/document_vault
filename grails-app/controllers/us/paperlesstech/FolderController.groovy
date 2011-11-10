@@ -5,7 +5,7 @@ import us.paperlesstech.nimble.Group
 
 class FolderController {
 	static def allowedMethods = [create: 'POST', delete: 'POST', update: 'POST', addDocument: 'POST', removeDocument: 'POST', addFolder: 'POST',
-			pinFolder: 'POST', unpinFolder: 'POST']
+			pin: 'POST', unpin: 'POST']
 
 	def folderService
 	def notificationService
@@ -165,21 +165,22 @@ class FolderController {
 		render([folders:results.results*.asMap(), total:results.total] as JSON)
 	}
 
-	def pinFolder = {
+	def pin = {
 		def folder = Folder.get(params.long('folderId'))
 
-		folderService.pinFolder(folder)
+		folderService.pin(folder)
 
 		def returnMap = [:]
 		returnMap.notification = notificationService.success('document-vault.api.folder.pin.success', [folder.name])
+		returnMap.folder = folder.asMap()
 
 		render(returnMap as JSON)
 	}
 
-	def unpinFolder = {
+	def unpin = {
 		def folder = Folder.get(params.long('folderId'))
 
-		folderService.unpinFolder(folder)
+		folderService.unpin(folder)
 
 		def returnMap = [:]
 		returnMap.notification = notificationService.success('document-vault.api.folder.unpin.success', [folder.name])

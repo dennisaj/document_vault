@@ -69,7 +69,10 @@ public class SecurityFilters {
 							}
 
 							switch (action) {
-								case ['list', 'search']:
+								case 'pin':
+									// TODO: Do an actual security check here.
+									return true
+								case ['list', 'search', 'unpin']:
 									return true
 								case 'create':
 									return group && authService.canManageFolders(group)

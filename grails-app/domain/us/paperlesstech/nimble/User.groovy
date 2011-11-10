@@ -124,6 +124,6 @@ class User implements Comparable<User> {
 	String passConfirm
 
 	List<Folder> getPinnedFolders() {
-		PinnedFolder.findAllByUser(this, [max: 100, sort: 'folder.name', order: 'asc'])
+		PinnedFolder.findAllByUser(this, [max: 100, sort: 'folder.name', order: 'asc'])*.folder
 	}
 }

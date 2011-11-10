@@ -279,13 +279,13 @@ class FolderServiceSpec extends UnitSpec {
 		!parent.children.contains(savedFolder)
 	}
 
-	def "pinFolder should do nothing if the folder is already pinned"() {
+	def "pin should do nothing if the folder is already pinned"() {
 		def user = new User()
 		def pinned = new PinnedFolder(user: user, folder: folder1)
 		mockDomain(PinnedFolder, [pinned])
 
 		when:
-		service.pinFolder(folder1)
+		service.pin(folder1)
 
 		then:
 		1 * authService.authenticatedUser >> user
@@ -293,13 +293,13 @@ class FolderServiceSpec extends UnitSpec {
 		PinnedFolder.list()[0].folder == folder1
 	}
 
-	def "pinFolder should pin the folder for the user and up the count"() {
+	def "pin should pin the folder for the user and up the count"() {
 		def user = new User()
 		def pinned = new PinnedFolder(user: user, folder: folder1)
 		mockDomain(PinnedFolder, [pinned])
 
 		when:
-		service.pinFolder(folder2)
+		service.pin(folder2)
 
 		then:
 		1 * authService.authenticatedUser >> user
@@ -307,25 +307,25 @@ class FolderServiceSpec extends UnitSpec {
 		PinnedFolder.list()[1].folder == folder2
 	}
 
-	def "unpinFolder should do nothing if the folder is not pinned"() {
+	def "unpin should do nothing if the folder is not pinned"() {
 		def user = new User()
 		mockDomain(PinnedFolder)
 
 		when:
-		service.unpinFolder(folder1)
+		service.unpin(folder1)
 
 		then:
 		1 * authService.authenticatedUser >> user
 		PinnedFolder.list().size() == 0
 	}
 
-	def "unpinFolder should delete the matching pinnedFolder"() {
+	def "unpin should delete the matching pinnedFolder"() {
 		def user = new User()
 		def pinned = new PinnedFolder(user: user, folder: folder1)
 		mockDomain(PinnedFolder, [pinned])
 
 		when:
-		service.unpinFolder(folder1)
+		service.unpin(folder1)
 
 		then:
 		1 * authService.authenticatedUser >> user
