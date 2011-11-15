@@ -331,4 +331,20 @@ class FolderServiceSpec extends UnitSpec {
 		1 * authService.authenticatedUser >> user
 		PinnedFolder.list().size() == 0
 	}
+
+	def "ancestry should return an empty list for a folder with no parents"() {
+		folder1.parent = null
+
+		expect:
+		service.ancestry(folder1) == []
+	}
+
+	def "ancestry should return the ancestry in order of highest level first"() {
+		folder1.parent = parent1
+		parent1.parent = parent2
+		parent2.parent = parent3
+
+		expect:
+		service.ancestry(folder1) == [parent3, parent2, parent1]
+	}
 }

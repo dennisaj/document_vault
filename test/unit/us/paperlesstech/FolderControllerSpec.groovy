@@ -6,6 +6,7 @@ import spock.lang.Shared
 import us.paperlesstech.nimble.Group
 
 class FolderControllerSpec extends ControllerSpec {
+	DocumentService documentService = Mock()
 	FolderService folderService = Mock()
 	NotificationService notificationService = Mock()
 
@@ -14,14 +15,17 @@ class FolderControllerSpec extends ControllerSpec {
 	def folder1 = new Folder(id:1, name:'folder1')
 	def folder2 = new Folder(id:2, name:'folder2')
 	def folder3 = new Folder(id:3, name:'folder3')
-	def document1 = new Document(id:1, name:'document1')
-	def document2 = new Document(id:2, name:'document2')
-	def document3 = new Document(id:3, name:'document3')
+	def documentData = new DocumentData(id:1, pages:4, dateCreated:new Date(), mimeType:MimeType.PNG, fileSize:123)
+	def previewImage = new PreviewImage(id:1, pageNumber:1, sourceHeight:100, sourceWidth:100, data:documentData, thumbnail:documentData)
+	def document1 = new Document(id:1, name:'document1', files: [documentData] as SortedSet, previewImages: [previewImage] as SortedSet)
+	def document2 = new Document(id:2, name:'document2', files: [documentData] as SortedSet, previewImages: [previewImage] as SortedSet)
+	def document3 = new Document(id:3, name:'document3', files: [documentData] as SortedSet, previewImages: [previewImage] as SortedSet)
 	@Shared
 	def parent1 = new Folder(id:4, name:'parent1')
 	def parent2 = new Folder(id:5, name:'parent2')
 
 	def setup() {
+		controller.documentService = documentService
 		controller.folderService = folderService
 		controller.notificationService = notificationService
 		controller.metaClass.message = { LinkedHashMap arg1-> 'this is stupid' }
@@ -35,6 +39,7 @@ class FolderControllerSpec extends ControllerSpec {
 		folder3.group = group2
 
 		parent1.group = group1
+		parent2.group = group2
 
 		document1.group = group1
 		document2.group = group1
@@ -337,5 +342,29 @@ class FolderControllerSpec extends ControllerSpec {
 		then:
 		1 * folderService.unpin(folder1)
 		1 * notificationService.success(_, _)
+	}
+
+	def "show should call the default folder_list document_list and folder_ancestry"() {
+		given:
+		controller.params.folderId = parent1.id
+		when:
+		controller.show()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * folderService.ancestry(parent1) >> [parent2]
+		1 * folderService.filter(parent1, _, null) >> [results:[folder1, folder2], total:2]
+		1 * documentService.filter(parent1, _, null) >> [documentResults:[document2, document3], documentTotal:2]
+		results.folderTotal == 2
+		results.folders[0].id == folder1.id
+		results.folders[0].name == folder1.name
+		results.folders[1].id == folder2.id
+		results.folders[1].name == folder2.name
+		results.documentTotal == 2
+		results.documents[0].id == document2.id
+		results.documents[0].name == document2.name
+		results.documents[1].id == document3.id
+		results.documents[1].name == document3.name
+		results.ancestry[0].id == parent2.id
+		results.ancestry[0].name == parent2.name
 	}
 }

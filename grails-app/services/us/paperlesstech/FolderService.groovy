@@ -16,6 +16,23 @@ class FolderService {
 	def authService
 
 	/**
+	 * Returns the ancestry of the given folder.  This is all of the parents up to the root.
+	 *
+	 * @param folder The folder to find the parents for
+	 * @return A list of Folders with the highest level first
+	 */
+	List<Folder> ancestry(Folder folder) {
+		def folders = []
+
+		while (folder.parent) {
+			folder = folder.parent
+			folders << folder
+		}
+
+		folders.reverse()
+	}
+
+	/**
 	 * Creates a new folder with given name in the given Group. If the new folder's parent is set if parent is not null.
 	 *
 	 * @pre The current user must have the {@link DocumentPermission#ManageFolders} permission for group.
