@@ -56,10 +56,10 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
-		result.documentResults.size() == 1
-		result.documentResults[0].id== document4.id
-		result.documentResults[0].name == document4.name
-		result.documentTotal == 1
+		result.results.size() == 1
+		result.results[0].id== document4.id
+		result.results[0].name == document4.name
+		result.total == 1
 	}
 
 	def "filter should limit by folder when one is given"() {
@@ -68,12 +68,12 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
-		result.documentResults.size() == 2
-		result.documentResults[0].id== document2.id
-		result.documentResults[0].name == document2.name
-		result.documentResults[1].id== document3.id
-		result.documentResults[1].name == document3.name
-		result.documentTotal == 2
+		result.results.size() == 2
+		result.results[0].id== document2.id
+		result.results[0].name == document2.name
+		result.results[1].id== document3.id
+		result.results[1].name == document3.name
+		result.total == 2
 	}
 
 	def "filter should limit by document ids when getIndividualDocumentsWithPermission returns values"() {
@@ -82,10 +82,10 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([document1.id] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([] as SortedSet)
-		result.documentResults.size() == 1
-		result.documentResults[0].id== document1.id
-		result.documentResults[0].name == document1.name
-		result.documentTotal == 1
+		result.results.size() == 1
+		result.results[0].id== document1.id
+		result.results[0].name == document1.name
+		result.total == 1
 	}
 
 	def "filter should apply the filter when it is supplied"() {
@@ -94,9 +94,9 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		then:
 		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
-		result.documentResults.size() == 1
-		result.documentResults[0].id== document1.id
-		result.documentResults[0].name == document1.name
-		result.documentTotal == 1
+		result.results.size() == 1
+		result.results[0].id== document1.id
+		result.results[0].name == document1.name
+		result.total == 1
 	}
 }

@@ -54,6 +54,6 @@ class DocumentService {
 			order(params.sort, params.order)
 		}
 
-		[documentResults:documentResults, documentTotal:documentTotal]
+		[results:documentResults, total:documentTotal]
 	}
 }

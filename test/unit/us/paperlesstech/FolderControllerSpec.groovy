@@ -353,7 +353,7 @@ class FolderControllerSpec extends ControllerSpec {
 		then:
 		1 * folderService.ancestry(parent1) >> [parent2]
 		1 * folderService.filter(parent1, _, null) >> [results:[folder1, folder2], total:2]
-		1 * documentService.filter(parent1, _, null) >> [documentResults:[document2, document3], documentTotal:2]
+		1 * documentService.filter(parent1, _, null) >> [results:[document2, document3], total:2]
 		results.folderTotal == 2
 		results.folders[0].id == folder1.id
 		results.folders[0].name == folder1.name
@@ -364,7 +364,7 @@ class FolderControllerSpec extends ControllerSpec {
 		results.documents[0].name == document2.name
 		results.documents[1].id == document3.id
 		results.documents[1].name == document3.name
-		results.ancestry[0].id == parent2.id
-		results.ancestry[0].name == parent2.name
+		results.searchFolder.ancestry[0].id == parent2.id
+		results.searchFolder.ancestry[0].name == parent2.name
 	}
 }

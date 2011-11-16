@@ -72,7 +72,7 @@ public class SecurityFilters {
 								case 'pin':
 									// TODO: Do an actual security check here.
 									return true
-								case ['list', 'search', 'unpin']:
+								case ['list', 'search', 'unpin', 'show']:
 									return true
 								case 'create':
 									return group && authService.canManageFolders(group)

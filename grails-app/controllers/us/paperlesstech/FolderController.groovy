@@ -5,7 +5,7 @@ import us.paperlesstech.nimble.Group
 
 class FolderController {
 	static def allowedMethods = [create: 'POST', delete: 'POST', update: 'POST', addDocument: 'POST', removeDocument: 'POST', addFolder: 'POST',
-			pin: 'POST', unpin: 'POST', show: 'POST']
+			pin: 'POST', unpin: 'POST', show: 'GET']
 
 	def documentService
 	def folderService
@@ -58,10 +58,14 @@ class FolderController {
 		def docResults = documentService.filter(searchFolder, pagination, null)
 
 		def ancestry = folderService.ancestry(searchFolder)
+		def searchFolderMap = searchFolder.asMap()
+		searchFolderMap.ancestry = ancestry*.asMap()
 
-		render([searchFolder: searchFolder?.asMap(), ancestry: ancestry*.asMap(),
-				folders: folderResults.results*.asMap(), folderTotal: folderResults.total,
-				documents: docResults.documentResults*.asMap(), documentTotal: docResults.documentTotal] as JSON)
+		render([searchFolder: searchFolderMap,
+				folders: folderResults.results*.asMap(),
+				folderTotal: folderResults.total,
+				documents: docResults.results*.asMap(),
+				documentTotal: docResults.total] as JSON)
 	}
 
 	def update = {
@@ -179,7 +183,7 @@ class FolderController {
 
 		def results = folderService.search(pagination, params.filter?.trim())
 
-		render([folders:results.results*.asMap(), total:results.total] as JSON)
+		render([folders:results.results*.asMap(), folderTotal:results.total] as JSON)
 	}
 
 	def pin = {

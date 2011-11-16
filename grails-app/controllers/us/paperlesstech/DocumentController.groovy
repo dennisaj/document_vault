@@ -105,7 +105,7 @@ class DocumentController {
 
 		def results = documentService.filter(searchFolder, pagination, params.filter?.trim())
 
-		render([searchFolder:searchFolder?.asMap(), documents:results.documentResults*.asMap(), total:results.documentTotal] as JSON)
+		render([searchFolder:searchFolder?.asMap(), documents:results.results*.asMap(), documentTotal:results.total] as JSON)
 	}
 
 	def search = {
@@ -118,6 +118,6 @@ class DocumentController {
 
 		def results = documentService.search(pagination, params.filter?.trim())
 
-		render([documents:results.documentResults*.asMap(), total:results.documentTotal] as JSON)
+		render([documents:results.results*.asMap(), documentTotal:results.total] as JSON)
 	}
 }
