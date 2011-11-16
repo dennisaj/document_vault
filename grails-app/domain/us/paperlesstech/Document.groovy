@@ -195,7 +195,7 @@ class Document {
 				name:folder?.name
 			],
 			notes: notes*.asMap(),
-			signed: signed
+			signed: signed()
 		]
 	}
 
