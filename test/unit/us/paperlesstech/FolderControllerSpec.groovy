@@ -140,7 +140,7 @@ class FolderControllerSpec extends ControllerSpec {
 		results.folders[0].name == folder1.name
 		results.folders[1].id == folder2.id
 		results.folders[1].name == folder2.name
-		results.total == 2
+		results.folderTotal == 2
 		where:
 		filter << [null, 'filter']
 		folderId << [null, '4']
