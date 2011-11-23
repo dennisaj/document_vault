@@ -4,25 +4,22 @@ import us.paperlesstech.Folder
 import us.paperlesstech.nimble.AdminsService
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
+import org.springframework.context.ApplicationContextAware
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import org.springframework.context.ApplicationContext
 
-public class SecurityFilters {
-	private static String openControllers = "auth|logout|account|code|userInfo|error|home"
+public class SecurityFilters implements ApplicationContextAware {
+	private static String openControllers = "auth|logout|account|code|userInfo|error"
 	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
 	def dependsOn = [LoggingFilters]
 
+	private ApplicationTagLib g
 	def authService
 	def grailsApplication
 	def notificationService
+	def requestService
 
 	def filters = {
-		remoteSigning(controller: "code") {
-			before = {
-				if (!grailsApplication.config.document_vault.remoteSigning.enabled) {
-					response.sendError(403)
-				}
-			}
-		}
-
 		secure(controller: "($openControllers|$adminControllers)", invert: true) {
 			before = {
 				def document
@@ -50,9 +47,7 @@ public class SecurityFilters {
 							}
 						case "party":
 							switch (action) {
-								case ["submitSignatures"]:
-									return document && authService.canSign(document)
-								case ["addParty", "submitParties", "removeParty", "resend"]:
+								case ["emailDocument"]:
 									return document && authService.canGetSigned(document)
 								default:
 									return false
@@ -125,8 +120,17 @@ public class SecurityFilters {
 	}
 
 	def onUnauthorized(subject, filter) {
-		filter.response.status = 403
-		filter.render([error:[statusCode:403], notification:notificationService.error('document-vault.api.securityfilters.403.error')] as JSON)
+		def request = filter.request
+		def response = filter.response
+
+		if (request.xhr) {
+			response.status = 403
+			render([error: [statusCode: 403], notification: notificationService.error('document-vault.api.securityfilters.403.error')] as JSON)
+			return false
+		}
+
+		def url = g.createLink(mapping: 'homePage', base: requestService.baseAddr)
+		filter.redirect url: url
 	}
 
 	/**
@@ -142,6 +146,11 @@ public class SecurityFilters {
 			return false
 		}
 
-		redirect(controller:'home')
+		def url = g.createLink(mapping: 'homePage', base: requestService.baseAddr)
+		filter.redirect url: url
+	}
+
+	void setApplicationContext(ApplicationContext applicationContext) {
+		g = applicationContext.getBean(ApplicationTagLib)
 	}
 }

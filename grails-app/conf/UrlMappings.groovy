@@ -9,7 +9,11 @@ class UrlMappings {
 
 		"500"(controller:'error', action:'index')
 
-		"/"(controller:'home')
+		name homePage: "/index.html" {
+		}
+
+		name signPage: "/sign.html" {
+		}
 
 		"/api/upload/savePcl" {
 			controller = "upload"

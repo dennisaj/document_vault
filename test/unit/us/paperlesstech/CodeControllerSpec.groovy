@@ -10,13 +10,16 @@ import us.paperlesstech.nimble.UserService
 
 class CodeControllerSpec extends ControllerSpec {
 	AuthService authService = Mock()
+	RequestService requestService = Mock()
 	UserService userService = Mock()
 	def party = new Party(id:1, code:'code123', document:new Document(id:1))
 	def generatedUser = new User(id:1, roles:[new Role(name:User.SIGNATOR_USER_ROLE)])
 	def normalUser = new User(id:2, roles:[new Role(name:'Some Other role')])
 
 	def setup() {
+		controller.metaClass.createLink = { LinkedHashMap arg1 -> 'this is stupid' }
 		controller.authService = authService
+		controller.requestService = requestService
 		controller.userService = userService
 		mockDomain(Party, [party])
 		mockDomain(User, [generatedUser, normalUser])
@@ -29,12 +32,13 @@ class CodeControllerSpec extends ControllerSpec {
 		thrown(AssertionError)
 	}
 
-	def "index throws AssertionError when an invalid party is given"() {
+	def "index redirects the request when an invalid party is given"() {
 		when:
 		controller.params.code = 'bad-code'
 		controller.index()
 		then:
-		thrown(AssertionError)
+		1 * requestService.baseAddr >> 'base'
+		controller.redirectArgs.url
 	}
 
 	def "normal users should not be logged in automatically"() {
@@ -67,14 +71,13 @@ class CodeControllerSpec extends ControllerSpec {
 		controller.params.code = 'code123'
 		controller.index()
 		then:
-		controller.redirectArgs.controller == 'document'
-		controller.redirectArgs.action == action
+		controller.redirectArgs.url
 		where:
 		perm << [DocumentPermission.Sign, DocumentPermission.View]
 		action << ['sign', 'show']
 	}
 
-	def "exceptions should redirect the user to the unauthorized page"() {
+	def "exceptions should redirect the user to the home page"() {
 		given:
 		party.signator = generatedUser
 		1 * authService.login(_) >> { token-> throw new AuthenticationException() }
@@ -82,8 +85,7 @@ class CodeControllerSpec extends ControllerSpec {
 		controller.params.code = 'code123'
 		controller.index()
 		then:
-		controller.redirectArgs.controller == 'auth'
-		controller.redirectArgs.action == 'unauthorized'
-		mockResponse.status == 403
+		controller.redirectArgs.url
+		mockResponse.status == 200
 	}
 }

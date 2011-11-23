@@ -27,7 +27,7 @@ class AuthService {
 	}
 
 	boolean canGetSigned(Document d) {
-		grailsApplication.config.document_vault.remoteSigning.enabled && checkPermission(DocumentPermission.GetSigned, d)
+		checkPermission(DocumentPermission.GetSigned, d)
 	}
 
 	boolean canNotes(Document d) {

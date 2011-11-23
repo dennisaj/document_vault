@@ -5,13 +5,16 @@ import us.paperlesstech.nimble.User
 
 class CodeController {
 	static def allowedMethods = [index: "GET"]
+	static def allowedPermissions = [DocumentPermission.Sign, DocumentPermission.View] as Set
 
 	def authService
+	def requestService
 	def userService
 
 	def index = {
-		def codeToken = new CodeToken(code:params.code)
+		def codeToken = new CodeToken(code: params.code)
 		assert codeToken.code
+		String url
 
 		try {
 			def party = Party.findByCode(codeToken.code)
@@ -23,19 +26,17 @@ class CodeController {
 				userService.createLoginRecord(request)
 			}
 
-			switch (party.documentPermission) {
-				case DocumentPermission.Sign:
-					redirect(controller:"document", action:"sign", params:[documentId:party.document.id])
-					return
-				case DocumentPermission.View:
-					redirect(controller:"document", action:"show", params:[documentId:party.document.id])
-					return
+			if (party.documentPermission in allowedPermissions) {
+				def fragment = "${party.document.id},1"
+				url = g.createLink(mapping: 'signPage', fragment: fragment, base: requestService.baseAddr)
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			log.error "Error authenticating code $codeToken.code"
 		}
 
-		response.status = 403
-		redirect controller:"auth", action:"unauthorized"
+		if (!url) {
+			url = g.createLink(mapping: 'homePage', base: requestService.baseAddr)
+		}
+		redirect url: url
 	}
 }

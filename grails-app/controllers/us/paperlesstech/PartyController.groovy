@@ -3,8 +3,10 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class PartyController {
-	static def allowedMethods = [addParty:"POST", image:"POST", removeParty:"POST", resend:"POST", submitParties:"POST", submitSignatures:"POST"]
+	static def allowedMethods = [addParty: "POST", image: "POST", removeParty: "POST", resend: "POST",
+			submitParties: "POST", submitSignatures: "POST", emailDocument: "POST"]
 
+	def notificationService
 	def partyService
 
 	def addParty = {
@@ -63,5 +65,36 @@ class PartyController {
 		partyService.sendCode(party)
 
 		render([status:"success"] as JSON)
+	}
+
+	def emailDocument = {
+		def document = Document.get(params.long("documentId"))
+		assert document
+		def email = params.email?.trim()?.toLowerCase()
+		assert email
+
+		def party = document.parties.find {
+			it.signator.profile.email == email
+		}
+
+		if (party) {
+			party = partyService.sendCode(party)
+		} else {
+			party = partyService.createParty(document,
+					[email: email, permission: DocumentPermission.View.name(), color: PartyColor.Beige.name()])
+		}
+
+		def returnMap = [:]
+		if (party && !party.hasErrors()) {
+			if (!document.parties.contains(party)) {
+				document.addToParties(party)
+			}
+			document.save()
+			returnMap.notification = notificationService.success('document-vault.api.party.email.success', [email])
+		} else {
+			returnMap.notification = notificationService.error('document-vault.api.party.email.error', [email])
+		}
+
+		render returnMap as JSON
 	}
 }

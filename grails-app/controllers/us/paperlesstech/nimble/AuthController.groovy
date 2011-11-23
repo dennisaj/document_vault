@@ -18,8 +18,6 @@ package us.paperlesstech.nimble
 
 import grails.converters.JSON
 
-import javax.servlet.http.Cookie
-
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.IncorrectCredentialsException
@@ -37,6 +35,7 @@ class AuthController {
 	def authService
 	def grailsApplication
 	def notificationService
+	def requestService
 	def shiroSecurityManager
 	def userService
 
@@ -44,7 +43,8 @@ class AuthController {
 
 	def loggedInCheck() {
 		if (authService.isLoggedIn()) {
-			redirect(controller:'home')
+			def url = g.createLink(mapping: 'homePage', base: requestService.baseAddr)
+			redirect url: url
 		}
 	}
 
@@ -143,7 +143,12 @@ class AuthController {
 			authService.logout()
 		}
 
-		request.xhr ? render([notification:notificationService.success('document-vault.api.logout.success')] as JSON) : redirect(controller:'home')
+		if (request.xhr) {
+			render([notification: notificationService.success('document-vault.api.logout.success')] as JSON)
+		} else {
+			def url = g.createLink(mapping: 'homePage', base: requestService.baseAddr)
+			redirect url: url
+		}
 	}
 
 	def unauthorized = {

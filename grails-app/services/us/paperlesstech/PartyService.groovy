@@ -17,6 +17,7 @@ class PartyService {
 	def handlerChain
 	def highlightService
 	def permissionService
+	def requestService
 	def userService
 
 	/**
@@ -235,20 +236,20 @@ class PartyService {
 		sendMail {
 			to party.signator.profile.email
 			subject "Document Vault Signature Code" // TODO: i18n
-			body (view: "/email", model:[party:party])
+			body(view: "/email", model: [party: party, baseAddr: requestService.baseAddr])
 		}
 
 		if (!party.sent) {
 			party.sent = true
 			def savedParty = party.save()
-			if (savedParty) {
-				return savedParty
+			if (!savedParty) {
+				throw new RuntimeException("Unable to mark Party(${party.id}) sent.")
 			}
-		} else {
-			return party
+
+			party = savedParty
 		}
 
-		throw new RuntimeException("Unable to mark Party(${party.id}) sent.")
+		return party
 	}
 
 	/**

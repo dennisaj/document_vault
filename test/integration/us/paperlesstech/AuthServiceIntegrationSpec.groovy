@@ -303,7 +303,6 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
-		service.grailsApplication.config.document_vault.remoteSigning.enabled = true
 
 		expect:
 		service.canGetSigned(document) == result

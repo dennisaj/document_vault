@@ -107,4 +107,20 @@ class RequestServiceSpec extends UnitSpec {
 		where:
 		addr = "127.0.0.1"
 	}
+
+	def 'getBaseAddr should parse the host from the Host header'() {
+		service.testRequest = request
+
+		when:
+		def result = service.baseAddr
+
+		then:
+		result == output
+		request.getHeader(HttpHeaders.HOST) >> host
+
+		where:
+		host            | output
+		'localhost:80'  | 'http://localhost'
+		'localhost:443' | 'https://localhost'
+	}
 }

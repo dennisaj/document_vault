@@ -8,6 +8,20 @@ class RequestService {
 	static transactional = false
 	def testRequest
 
+	String getBaseAddr() {
+		def host = getHeader(HttpHeaders.HOST)
+		assert host
+
+		def parts = host.split(':')
+		assert parts.size() == 2
+
+		if (parts[1] == '443') {
+			return "https://${parts[0]}"
+		} else {
+			return "http://${parts[0]}"
+		}
+	}
+
 	def getRealRequest() {
 		def request = testRequest ?: ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		assert request, "A request is required"

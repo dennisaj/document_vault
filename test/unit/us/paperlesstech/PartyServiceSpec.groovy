@@ -187,4 +187,31 @@ class PartyServiceSpec extends UnitSpec {
 		map.username == email
 		map.addSignatorRole == true
 	}
+
+	def "sendCode calls sendMail and returns the party if it has been sent"() {
+		service.metaClass.sendMail = { Closure closure -> assert closure }
+		def party = new Party(document: new Document())
+		party.sent = true
+
+		when:
+		service.sendCode(party) == party
+
+		then:
+		1 * authService.canGetSigned(party.document) >> true
+	}
+
+	def "sendCode calls sendMail and marks the party as sent"() {
+		service.metaClass.sendMail = { Closure closure -> assert closure }
+		def party = new Party(document: new Document())
+		def savedParty = new Party()
+		party.metaClass.save = {-> savedParty }
+
+		when:
+		def result = service.sendCode(party)
+
+		then:
+		1 * authService.canGetSigned(party.document) >> true
+		result == savedParty
+
+	}
 }

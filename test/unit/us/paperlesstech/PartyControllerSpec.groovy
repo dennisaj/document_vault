@@ -2,16 +2,20 @@ package us.paperlesstech
 
 import grails.converters.JSON
 import grails.plugin.spock.ControllerSpec
+import us.paperlesstech.nimble.User
+import us.paperlesstech.nimble.Profile
 
 class PartyControllerSpec extends ControllerSpec {
+	NotificationService notificationService = Mock()
 	PartyService partyService = Mock()
 
-	def document1 = new Document(id:1)
+	def document1 = new Document(id:1, parties: [] as Set)
 	def document2 = new Document(id:2)
 	def party1 = new Party(id:1, document:document1)
 	def party2 = new Party(id:2, document:document1)
 
 	def setup() {
+		controller.notificationService = notificationService
 		controller.partyService = partyService
 
 		mockDomain(Party,[party1, party2])
@@ -182,5 +186,77 @@ class PartyControllerSpec extends ControllerSpec {
 		controller.renderArgs.model.parties == outParties
 		where:
 		outParties = ['outParties']
+	}
+
+	def "email parties throws an error if there is no document or no email address"() {
+		given:
+		controller.params.documentId = documentId
+		controller.params.email = email
+
+		when:
+		controller.emailDocument()
+
+		then:
+		thrown(AssertionError)
+
+		where:
+		documentId | email
+		null       | null
+		''         | null
+		null       | ''
+		1          | null
+		1          | ''
+		null       | 'test@example.com'
+		''         | 'test@example.com'
+	}
+
+	def "email creates a party if there is not one with the given email address"() {
+		given:
+		controller.params.documentId = 1
+		controller.params.email = 'test@example.com'
+
+		when:
+		controller.emailDocument()
+		def results = JSON.parse(mockResponse.contentAsString)
+
+		then:
+		1 * partyService.createParty(document1, _) >> party1
+		1 * notificationService.success(_, _) >> [message:'message']
+		results.notification.message == 'message'
+		document1.parties.contains(party1)
+	}
+
+	def "email resends the code if a party with the email address already exists"() {
+		given:
+		controller.params.documentId = 1
+		controller.params.email = 'test@example.com'
+		document1.parties = [party1, party2] as Set
+		party1.signator = new User(profile: new Profile(email: 'test@example.co'))
+		party2.signator = new User(profile: new Profile(email: 'test@example.com'))
+
+		when:
+		controller.emailDocument()
+		def results = JSON.parse(mockResponse.contentAsString)
+
+		then:
+		1 * partyService.sendCode(party2) >> party2
+		1 * notificationService.success(_, _) >> [message:'message']
+		results.notification.message == 'message'
+	}
+
+	def "email returns an error if a party can't be created"() {
+		given:
+		controller.params.documentId = 1
+		controller.params.email = 'test@example.com'
+
+		when:
+		controller.emailDocument()
+		def results = JSON.parse(mockResponse.contentAsString)
+
+		then:
+		1 * partyService.createParty(document1, _) >> null
+		1 * notificationService.error(_, _) >> [message:'message']
+		results.notification.message == 'message'
+		document1.parties.size() == 0
 	}
 }

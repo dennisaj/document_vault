@@ -159,20 +159,17 @@ authcBasic.applicationName = Document Vault API
 environments {
 	production {
 		document_vault.activity_log.enabled = true
-		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/var/cache/document_vault/files"
 	}
 	development {
 		document_vault.activity_log.enabled = false
-		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp/dv"
 		grails.converters.json.pretty.print = true
 	}
 	test {
 		document_vault.activity_log.enabled = true
-		document_vault.remoteSigning.enabled = false
 		document_vault.timing.enabled = true
 		document_vault.files.cache = "/tmp/dv"
 	}
