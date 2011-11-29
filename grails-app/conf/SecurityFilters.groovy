@@ -47,6 +47,8 @@ public class SecurityFilters implements ApplicationContextAware {
 							}
 						case "party":
 							switch (action) {
+								case ["submitSignatures"]:
+									return document && authService.canSign(document)
 								case ["emailDocument"]:
 									return document && authService.canGetSigned(document)
 								default:
@@ -125,7 +127,7 @@ public class SecurityFilters implements ApplicationContextAware {
 
 		if (request.xhr) {
 			response.status = 403
-			render([error: [statusCode: 403], notification: notificationService.error('document-vault.api.securityfilters.403.error')] as JSON)
+			filter.render([error: [statusCode: 403], notification: notificationService.error('document-vault.api.securityfilters.403.error')] as JSON)
 			return false
 		}
 
@@ -142,7 +144,7 @@ public class SecurityFilters implements ApplicationContextAware {
 
 		if (request.xhr) {
 			response.status = 401
-			render([error:[statusCode:401], notification:notificationService.error('document-vault.api.securityfilters.401.error')] as JSON)
+			filter.render([error:[statusCode:401], notification:notificationService.error('document-vault.api.securityfilters.401.error')] as JSON)
 			return false
 		}
 

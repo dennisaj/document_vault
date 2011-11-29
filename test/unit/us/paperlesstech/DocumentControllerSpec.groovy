@@ -128,6 +128,7 @@ class DocumentControllerSpec extends ControllerSpec {
 	def "show should return the document for the given documentId"() {
 		given:
 		controller.params.documentId = '1'
+		document1.metaClass.previewImageAsMap = { int pageNumber-> [:] }
 		when:
 		controller.show()
 		def documentJSON = JSON.parse(mockResponse.contentAsString)

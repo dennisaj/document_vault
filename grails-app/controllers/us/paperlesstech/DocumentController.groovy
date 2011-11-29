@@ -73,12 +73,23 @@ class DocumentController {
 		map.permissions = [:]
 		map.permissions.sign = authService.canSign(document)
 		map.permissions.getSigned = authService.canGetSigned(document)
-		map.permissions.notes= authService.canNotes(document)
-		map.permissions.print= authService.canPrint(document)
+		map.permissions.notes = authService.canNotes(document)
+		map.permissions.print = authService.canPrint(document)
 		// We cannot get to this action if this is false but we will include it for the sake of completeness.
 		map.permissions.view = authService.canView(document)
 
-		render([document:map] as JSON)
+		def pages = (1..map.data.pages).collect { pageNumber->
+			def image = document.previewImageAsMap(pageNumber)
+			image.background = g.createLink(action:'downloadImage', params:[documentId:document.id, pageNumber:pageNumber])
+			image.savedHighlights = (map.permissions.getSigned || map.permissions.sign ? document.highlightsAsMap(pageNumber) : [:])
+			image
+		}
+
+		if (!map.permissions.notes) {
+			map.notes = []
+		}
+
+		render([document:map, pages:pages] as JSON)
 	}
 
 	def image = {
