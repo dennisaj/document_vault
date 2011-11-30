@@ -27,7 +27,7 @@ class CodeController {
 			}
 
 			if (party.documentPermission in allowedPermissions) {
-				def fragment = "${party.document.id},1"
+				def fragment = "/${party.document.id},1"
 				url = g.createLink(mapping: 'signPage', fragment: fragment, base: requestService.baseAddr)
 			}
 		} catch (Throwable e) {
@@ -37,6 +37,6 @@ class CodeController {
 		if (!url) {
 			url = g.createLink(mapping: 'homePage', base: requestService.baseAddr)
 		}
-		redirect url: url
+		redirect url: url.decodeURL()
 	}
 }

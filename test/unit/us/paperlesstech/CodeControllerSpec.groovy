@@ -23,6 +23,11 @@ class CodeControllerSpec extends ControllerSpec {
 		controller.userService = userService
 		mockDomain(Party, [party])
 		mockDomain(User, [generatedUser, normalUser])
+		String.metaClass.decodeURL = { delegate }
+	}
+
+	def cleanup() {
+		String.metaClass.decodeURL = null
 	}
 
 	def "index throws AssertionError when no code is given"() {
