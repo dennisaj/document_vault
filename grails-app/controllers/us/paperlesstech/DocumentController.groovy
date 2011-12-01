@@ -40,7 +40,7 @@ class DocumentController {
 		is.withStream {
 			response.setContentType(contentType)
 			response.setContentLength(length)
-			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
+			response.setHeader("Content-Disposition", "attachment; filename='${filename}'")
 			response.getOutputStream() << is
 		}
 	}
