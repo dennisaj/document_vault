@@ -42,6 +42,8 @@ public class SecurityFilters implements ApplicationContextAware {
 									return document && (authService.canSign(document) || authService.canGetSigned(document) || authService.canView(document))
 								case ['list', 'search']:
 									return true
+								case ['flag', 'unflag']:
+									return document && authService.canFlag(document)
 								default:
 									return false
 							}
@@ -73,7 +75,7 @@ public class SecurityFilters implements ApplicationContextAware {
 									return true
 								case 'create':
 									return group && authService.canManageFolders(group)
-								case ['delete', 'addDocument', 'removeDocument', 'update', 'addFolder', 'removeFolder']:
+								case ['delete', 'addDocument', 'removeDocument', 'update', 'addFolder', 'removeFolder', 'flag', 'unflag']:
 									return folder && authService.canManageFolders(folder.group)
 								default:
 									return false

@@ -56,6 +56,8 @@ class Profile {
 	static belongsTo = [owner:User]
 
 	static mapping = {
+		tenantId index: 'profile_tenant_id_idx'
+
 		cache usage: 'read-write', include: 'all'
 	}
 

@@ -8,7 +8,8 @@ public enum DocumentPermission {
 	Print,
 	Sign,
 	Upload,
-	View
+	View,
+	Flag
 
 	String getKey() {
 		name()

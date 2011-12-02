@@ -3,11 +3,13 @@ package us.paperlesstech
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
+import org.grails.taggable.Taggable
 
 @MultiTenant
-class Document {
+class Document implements Taggable {
 	static def authService
 	def grailsApplication
+	def tenantService
 
 	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField", "signed", 'asMap']
 	User createdBy
@@ -43,6 +45,8 @@ class Document {
 	}
 
 	static mapping = {
+		tenantId index: 'document_tenant_id_idx'
+
 		files joinTable: [name: 'document_to_document_data']
 		otherFieldsCollection cascade: "all, all-delete-orphan"
 		searchFieldsCollection cascade: "all, all-delete-orphan"
@@ -63,6 +67,11 @@ class Document {
 		}
 
 		lastUpdatedBy = authService?.authenticatedUser
+	}
+
+	List<String> getFlags() {
+		def t = this.tags
+		t ? t.intersect(tenantService?.getTenantConfigList('flag')) : []
 	}
 
 	/**
@@ -186,6 +195,7 @@ class Document {
 				mimeType:files.first().mimeType.name().toLowerCase()
 			],
 			thumbnail: previewImage(1).thumbnail.id,
+			flags: this.flags,
 			group: [
 				id:group.id,
 				name:group.name

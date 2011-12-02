@@ -1,29 +1,26 @@
 package us.paperlesstech
 
-import us.paperlesstech.nimble.User
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
 @MultiTenant
-class Preference {
+class TenantConfig {
 	String key
 	String value
 
-	static belongsTo = [user:User]
-
 	static constraints = {
-		key nullable: false, blank: false, unique: "user"
+		key nullable: false, blank: false
 		value nullable: true, blank: true, maxSize: 4096
 	}
 
 	static mapping = {
-		tenantId index: 'preference_tenant_id_idx'
+		tenantId index: 'tenant_config_tenant_id_idx'
 
-		key column:"_key"
-		value column:"_value"
+		key column: "_key"
+		value column: "_value"
 	}
 
 	@Override
 	String toString() {
-		"Preference($user, $key, $value)"
+		"TenantConfig($key, $value)"
 	}
 }

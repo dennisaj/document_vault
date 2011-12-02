@@ -20,6 +20,8 @@ class PreviewImage implements Cloneable, Comparable {
 	}
 
 	static mapping = {
+		tenantId index: 'preview_image_tenant_id_idx'
+
 		data nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh, evict"
 		thumbnail nullable: false, lazy: true, cascade: "persist, merge, save-update, lock, refresh, evict"
 	}

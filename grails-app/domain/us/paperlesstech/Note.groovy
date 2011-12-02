@@ -1,7 +1,9 @@
 package us.paperlesstech
 
 import us.paperlesstech.nimble.User
+import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
+@MultiTenant
 class Note implements Comparable<Note> {
 	DocumentData data
 	Date dateCreated
@@ -22,6 +24,8 @@ class Note implements Comparable<Note> {
 	}
 
 	static mapping = {
+		tenantId index: 'note_tenant_id_idx'
+
 		left column: "_left"
 		top column: "_top"
 	}

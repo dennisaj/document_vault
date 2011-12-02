@@ -22,6 +22,8 @@ class Highlight {
 	}
 
 	static mapping = {
+		tenantId index: 'highlight_tenant_id_idx'
+
 		left column: "_left"
 		top column: "_top"
 	}

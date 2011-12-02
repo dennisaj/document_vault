@@ -48,6 +48,8 @@ class Permission implements Serializable {
 	static transients = ["owner"]
 
 	static mapping = {
+		tenantId index: 'permission_tenant_id_idx'
+
 		sort dateCreated: 'asc'
 
 		cache usage: 'read-write', include: 'all'

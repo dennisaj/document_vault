@@ -27,6 +27,10 @@ class Party {
 
 	static hasMany = [highlights:Highlight]
 
+	static mapping = {
+		tenantId index: 'party_tenant_id_idx'
+	}
+
 	static constraints = {
 		code blank:false, nullable:false, unique:true
 		color nullable:false

@@ -19,6 +19,8 @@ class ActivityLog {
 	String userAgent
 
 	static mapping = {
+		tenantId index: 'activity_log_tenant_id_idx'
+
 		document index: "activity_log_document_idx"
 	}
 

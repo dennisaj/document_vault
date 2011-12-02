@@ -18,6 +18,8 @@ class DocumentData implements Cloneable, Comparable {
 	}
 
 	static mapping = {
+		tenantId index: 'document_data_tenant_id_idx'
+
 		cache 'read-only'
 	}
 

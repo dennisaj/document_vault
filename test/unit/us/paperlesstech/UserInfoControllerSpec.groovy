@@ -10,6 +10,7 @@ class UserInfoControllerSpec extends ControllerSpec {
 	def navigationTagLib = new Object()
 	AuthService authService = Mock()
 	NotificationService notificationService = Mock()
+	TenantService tenantService = Mock()
 	User user = Mock()
 	Group group = Mock()
 	Folder folder1
@@ -18,6 +19,7 @@ class UserInfoControllerSpec extends ControllerSpec {
 		controller.authService = authService
 		controller.notificationService = notificationService
 		controller.grailsApplication = grailsApplication
+		controller.tenantService = tenantService
 
 		grailsApplication.mainContext.metaClass.getBean = { String beanName -> navigationTagLib }
 		navigationTagLib.metaClass.eachItem = { Map map, Closure closure -> }
@@ -27,6 +29,12 @@ class UserInfoControllerSpec extends ControllerSpec {
 
 		group.id >>> 1
 		group.name >>> 'group name'
+
+		Folder.metaClass.getFlags = { -> [] }
+	}
+
+	def cleanup() {
+		Folder.metaClass.getFlags = null
 	}
 
 	def 'index returns an error if the user is not logged in'() {
@@ -53,5 +61,33 @@ class UserInfoControllerSpec extends ControllerSpec {
 		1 * user.pinnedFolders >> [folder1]
 		1 * authService.authenticatedUser >> user
 		1 * notificationService.success(_)
+	}
+
+	def 'index returns an empty flag list if the tenant does not have any'() {
+		when:
+		controller.index()
+		def results = JSON.parse(mockResponse.contentAsString)
+
+		then:
+		results.notification
+		!results.flags
+		1 * notificationService.success(_)
+		1 * authService.authenticatedUser >> user
+		1 * tenantService.getTenantConfigList('flag') >> []
+	}
+
+	def 'index returns tenant flags if there are any'() {
+		when:
+		controller.index()
+		def results = JSON.parse(mockResponse.contentAsString)
+
+		then:
+		results.notification
+		results.flags
+		results.flags[0] == 'Flag'
+		1 * notificationService.success(_)
+		1 * authService.authenticatedUser >> user
+		1 * tenantService.getTenantConfigList('flag') >> ['Flag']
+
 	}
 }

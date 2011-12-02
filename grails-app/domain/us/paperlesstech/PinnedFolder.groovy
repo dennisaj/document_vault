@@ -13,6 +13,8 @@ class PinnedFolder {
 	}
 
 	static mapping = {
+		tenantId index: 'pinned_folder_tenant_id_idx'
+
 		folder index: '_user_to_folder_folder_idx'
 		user index: '_user_to_folder_user_idx'
 		version false

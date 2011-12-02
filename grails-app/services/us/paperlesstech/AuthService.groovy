@@ -26,6 +26,10 @@ class AuthService {
 		isPermissionImplied("document:delete")
 	}
 
+	boolean canFlag(Document d) {
+		checkPermission(DocumentPermission.Flag, d)
+	}
+
 	boolean canGetSigned(Document d) {
 		checkPermission(DocumentPermission.GetSigned, d)
 	}

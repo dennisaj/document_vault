@@ -46,6 +46,8 @@ class Role {
 	static belongsTo = [Group]
 
 	static mapping = {
+		tenantId index: 'role_tenant_id_idx'
+
 		cache usage: 'read-write', include: 'all'
 		table '_role'
 

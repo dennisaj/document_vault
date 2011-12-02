@@ -3,11 +3,13 @@ package us.paperlesstech
 import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
+import org.grails.taggable.Taggable
 
 @MultiTenant
-class Folder {
+class Folder implements Taggable {
 	static def authService
 	def grailsApplication
+	def tenantService
 
 	User createdBy
 	Date dateCreated
@@ -45,6 +47,8 @@ class Folder {
 	}
 
 	static mapping = {
+		tenantId index: 'folder_tenant_id_idx'
+
 		children cascade:'none'
 	}
 
@@ -64,6 +68,7 @@ class Folder {
 				id:group.id,
 				name:group.name
 			],
+			flags: this.flags,
 			parent:[
 				id:parent?.id,
 				name:parent?.name
@@ -86,5 +91,10 @@ class Folder {
 		}
 
 		lastUpdatedBy = authService?.authenticatedUser
+	}
+
+	List<String> getFlags() {
+		def t = this.tags
+		t ? t.intersect(tenantService?.getTenantConfigList('flag')) : []
 	}
 }

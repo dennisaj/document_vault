@@ -21,6 +21,10 @@ class UploadControllerSpec extends ControllerSpec {
 		mockDomain(Folder)
 	}
 
+	def cleanup() {
+		Document.metaClass.getFlags = null
+	}
+
 	def "savePcl responds with a 500 error when the user can't upload to any group"() {
 		when:
 		controller.savePcl()
@@ -135,6 +139,7 @@ class UploadControllerSpec extends ControllerSpec {
 		mockRequest.metaClass.getMultiFileMap = { ["testFiles": [testFile]]}
 		def dd = new DocumentData(fileSize: fileSize, mimeType: MimeType.BMP)
 		mockDomain(Document)
+		Document.metaClass.getFlags = {-> [] }
 		def d = new Document(name: "docName", group: group)
 		d.addToFiles(dd)
 		d.addToPreviewImages(new PreviewImage(data:dd, pageNumber:1, thumbnail:dd))

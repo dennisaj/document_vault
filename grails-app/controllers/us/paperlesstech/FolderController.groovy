@@ -7,9 +7,11 @@ class FolderController {
 	static def allowedMethods = [create: 'POST', delete: 'POST', update: 'POST', addDocument: 'POST', removeDocument: 'POST', addFolder: 'POST',
 			pin: 'POST', unpin: 'POST', show: 'GET']
 
+	def authService
 	def documentService
 	def folderService
 	def notificationService
+	def tenantService
 
 	def create = {
 		def group = Group.load(params.long('groupId'))
@@ -205,6 +207,44 @@ class FolderController {
 
 		def returnMap = [:]
 		returnMap.notification = notificationService.success('document-vault.api.folder.unpin.success', [folder.name])
+
+		render(returnMap as JSON)
+	}
+
+	def flag = {
+		def folder = Folder.get(params.long('folderId'))
+		assert folder
+		def flag = params.flag
+		assert flag && tenantService.getTenantConfigList('flag').contains(flag)
+
+		assert authService.canManageFolders(folder.group)
+
+		folder.addTag(flag)
+		folder.save()
+
+		def returnMap = [:]
+		returnMap.notification = notificationService.success('document-vault.api.folder.flag.success', [folder.name, flag])
+		returnMap.folder = folder.asMap()
+
+		render(returnMap as JSON)
+	}
+
+	def unflag = {
+		def folder = Folder.get(params.long('folderId'))
+		assert folder
+		def flag = params.flag
+		assert flag && tenantService.getTenantConfigList('flag').contains(flag)
+
+		assert authService.canManageFolders(folder.group)
+
+		if(folder.tags.contains(flag)) {
+			folder.removeTag(flag)
+			folder.save()
+		}
+
+		def returnMap = [:]
+		returnMap.notification = notificationService.success('document-vault.api.folder.unflag.success', [folder.name, flag])
+		returnMap.folder = folder.asMap()
 
 		render(returnMap as JSON)
 	}

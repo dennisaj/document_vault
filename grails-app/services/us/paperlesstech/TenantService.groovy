@@ -8,11 +8,22 @@ import us.paperlesstech.nimble.User
 import us.paperlesstech.nimble.UserService
 
 class TenantService {
-
 	static transactional = true
 
 	def adminsService
 	def userService
+
+	/**
+	 * Returns all TenantConfig values that match the passed key
+	 *
+	 * @param key The key to lookup in TenantConfig
+	 * @return The list of values with the given key or an empty list
+	 */
+	List<String> getTenantConfigList(String key) {
+		def list = TenantConfig.findAllByKey(key, [sort: 'value'])
+
+		list.collect { it.value }
+	}
 
 	/** 
 	 * This method provides a tenant with the base roles and users it needs.

@@ -141,6 +141,8 @@ tenant {
 	resolver.request.dns.type = "db"
 }
 
+grails.taggable.preserve.case = true
+
 security {
 	shiro {
 		authc.required = false

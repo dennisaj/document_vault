@@ -10,6 +10,8 @@ grails.project.dependency.resolution = {
 	}
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 	repositories {
+		// Disable inheriting plugin repositories
+		inherit false
 		/*mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release-local"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-snapshot-local"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-release-local"
@@ -56,6 +58,10 @@ grails.project.dependency.resolution = {
 
 		// Nimble integration dependencies
 		compile group:'org.apache.santuario', name:'xmlsec', version:'1.4.5'
+	}
+
+	plugins {
+		compile ':taggable:1.0.1'
 	}
 }
 

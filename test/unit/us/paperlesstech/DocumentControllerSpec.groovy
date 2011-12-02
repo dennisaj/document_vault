@@ -10,6 +10,8 @@ class DocumentControllerSpec extends ControllerSpec {
 	AuthService authService = Mock()
 	DocumentService documentService = Mock()
 	Handler handlerChain = Mock()
+	NotificationService notificationService = Mock()
+	TenantService tenantService = Mock()
 
 	def group1 = new Group(id:1, name:'group1')
 	def documentData = new DocumentData(id:1, pages:4, dateCreated:new Date(), mimeType:MimeType.PNG, fileSize:123)
@@ -25,6 +27,8 @@ class DocumentControllerSpec extends ControllerSpec {
 		controller.authService = authService
 		controller.documentService = documentService
 		controller.handlerChain = handlerChain
+		controller.notificationService = notificationService
+		controller.tenantService = tenantService
 
 		mockDomain(Group, [group1])
 		mockDomain(Document, [document1, document2])
@@ -33,9 +37,17 @@ class DocumentControllerSpec extends ControllerSpec {
 		mockDomain(Party, [party])
 		mockDomain(Folder, [folder1])
 
+		Document.metaClass.getTags = { -> null }
+		Folder.metaClass.getTags = { -> null }
+
 		document1.group = group1
 		document2.group = group1
 		folder1.group = group1
+	}
+
+	def cleanup() {
+		Document.metaClass.getTags = null
+		Folder.metaClass.getTags = null
 	}
 
 	def "downloadImage should return a 404 when given invalid documentId"() {
@@ -199,5 +211,137 @@ class DocumentControllerSpec extends ControllerSpec {
 		folderId << [null, '1']
 		folder << [null, folder1]
 		pagination << [[:], [sort:'name', order:'asc', max:'10', offset:'0']]
+	}
+
+	def 'flag requires the documentId'() {
+		given:
+		controller.params.documentId = null
+		when:
+		controller.flag()
+		then:
+		thrown(AssertionError)
+	}
+
+	def 'flag requires the flag name'() {
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = null
+		when:
+		controller.flag()
+		then:
+		thrown(AssertionError)
+	}
+
+	def 'flag requires the flag is a tenant flag'() {
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = 'notaflag'
+		when:
+		controller.flag()
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		thrown(AssertionError)
+	}
+
+	def 'flag requires the user can flag the document'() {
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = 'notaflag'
+		when:
+		controller.flag()
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canFlag(document1) >> false
+		thrown(AssertionError)
+	}
+
+	def 'flag returns success after tagging the document'() {
+		def tagAdded = null
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = 'Waiting'
+		document1.metaClass.addTag = { String tag -> tagAdded = tag }
+		when:
+		controller.flag()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		tagAdded == 'Waiting'
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canFlag(document1) >> true
+		1 * notificationService.success(_, _)
+	}
+
+	def 'unflag requires the documentId'() {
+		given:
+		controller.params.documentId = null
+		when:
+		controller.unflag()
+		then:
+		thrown(AssertionError)
+	}
+
+	def 'unflag requires the flag name'() {
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = null
+		when:
+		controller.unflag()
+		then:
+		thrown(AssertionError)
+	}
+
+	def 'unflag requires the flag is a tenant flag'() {
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = 'notaflag'
+		when:
+		controller.unflag()
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		thrown(AssertionError)
+	}
+
+	def 'unflag requires the user can manager documents'() {
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = 'notaflag'
+		when:
+		controller.unflag()
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canFlag(document1) >> false
+		thrown(AssertionError)
+	}
+
+	def 'unflag returns success if the document did not have the tag'() {
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = 'Waiting'
+		document1.metaClass.getTags = { -> [] }
+		when:
+		controller.unflag()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canFlag(document1) >> true
+		1 * notificationService.success(_, _)
+	}
+
+	def 'unflag returns success after removing the tag from the document'() {
+		def tagRemoved = null
+		given:
+		controller.params.documentId = document1.id
+		controller.params.flag = 'Waiting'
+		document1.metaClass.getTags = { -> ['Waiting'] }
+		document1.metaClass.removeTag = { String tag -> tagRemoved = tag }
+		document1.metaClass.getFlags = { -> [] }
+		when:
+		controller.unflag()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		tagRemoved == 'Waiting'
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canFlag(document1) >> true
+		1 * notificationService.success(_, _)
 	}
 }

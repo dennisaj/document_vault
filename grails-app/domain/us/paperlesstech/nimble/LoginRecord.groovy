@@ -17,12 +17,14 @@
 package us.paperlesstech.nimble
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
 
 /**
  * Represents a system that a user logged into a Nimble based application from
  *
  * @author Bradley Beddoes
  */
+@MultiTenant
 class LoginRecord {
 	String remoteAddr
 	String remoteHost
@@ -34,6 +36,7 @@ class LoginRecord {
 	static belongsTo = [owner: User]
 
 	static mapping = {
+		tenantId index: 'login_record_tenant_id_idx'
 	}
 
 	static constraints = {

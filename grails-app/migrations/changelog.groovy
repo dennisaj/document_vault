@@ -1077,4 +1077,6 @@ databaseChangeLog = {
 	}
 
 	include file: '20111109_pinned_folder.groovy'
+
+	include file: '20111201_tags.groovy'
 }

@@ -9,6 +9,10 @@ class Printer {
 	String name
 	int port
 
+	static mapping = {
+		tenantId index: 'printer_tenant_id_idx'
+	}
+
 	static constraints = {
 		deviceType blank:false
 		host blank:false

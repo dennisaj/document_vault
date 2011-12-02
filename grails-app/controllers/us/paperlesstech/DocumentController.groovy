@@ -8,6 +8,8 @@ class DocumentController {
 	def authService
 	def documentService
 	def handlerChain
+	def notificationService
+	def tenantService
 
 	def downloadImage = {
 		def document = Document.get(params.long("documentId"))
@@ -130,5 +132,43 @@ class DocumentController {
 		def results = documentService.search(pagination, params.filter?.trim())
 
 		render([documents:results.results*.asMap(), documentTotal:results.total] as JSON)
+	}
+
+	def flag = {
+		def document = Document.get(params.long('documentId'))
+		assert document
+		def flag = params.flag
+		assert flag && tenantService.getTenantConfigList('flag').contains(flag)
+
+		assert authService.canFlag(document)
+
+		document.addTag(flag)
+		document.save()
+
+		def returnMap = [:]
+		returnMap.notification = notificationService.success('document-vault.api.document.flag.success', [document.name, flag])
+		returnMap.document = document.asMap()
+
+		render(returnMap as JSON)
+	}
+
+	def unflag = {
+		def document = Document.get(params.long('documentId'))
+		assert document
+		def flag = params.flag
+		assert flag && tenantService.getTenantConfigList('flag').contains(flag)
+
+		assert authService.canFlag(document)
+
+		if(document.tags.contains(flag)) {
+			document.removeTag(flag)
+			document.save()
+		}
+
+		def returnMap = [:]
+		returnMap.notification = notificationService.success('document-vault.api.document.unflag.success', [document.name, flag])
+		returnMap.document = document.asMap()
+
+		render(returnMap as JSON)
 	}
 }

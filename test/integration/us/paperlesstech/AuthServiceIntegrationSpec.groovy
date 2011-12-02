@@ -296,6 +296,35 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "*"]                   | true
 	}
 
+	@Unroll("Testing if user with permission #permission can flag document:#groupId:#documentId")
+	def "canFlag tests"() {
+		def user = newUser([permission])
+		def document = newDocument(documentId: documentId, groupId: groupId)
+		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
+		subject.metaClass.getPrincipal = { user.id }
+		subject.metaClass.isAuthenticated = { true }
+
+		expect:
+		service.canFlag(document) == result
+
+		where:
+		permission          | groupId | documentId | result
+		"*"                 | 1L      | 1L         | true
+		"*"                 | 2L      | 1L         | true
+		"document:flag:*"   | 1L      | 1L         | true
+		"document:flag:*"   | 2L      | 1L         | true
+		"document:flag:1"   | 1L      | 1L         | true
+		"document:flag:1"   | 2L      | 1L         | false
+		"document:flag:*:1" | 1L      | 1L         | true
+		"document:flag:*:1" | 2L      | 1L         | true
+		"document:flag:1:*" | 1L      | 1L         | true
+		"document:flag:1:*" | 2L      | 1L         | false
+		"document:flag:1:1" | 1L      | 1L         | true
+		"document:flag:1:1" | 2L      | 1L         | false
+		// Revisit sometime
+		// "document:*:1:1"      | 1L      | 1L         | true
+	}
+
 	@Unroll("Testing if user with permission #permission can sign document:#groupId:#documentId")
 	def "canGetSigned tests"() {
 		def user = newUser([permission])

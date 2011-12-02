@@ -63,6 +63,8 @@ class User implements Comparable<User> {
 	]
 
 	static mapping = {
+		tenantId index: 'user_tenant_id_idx'
+
 		sort username:'desc'
 
 		cache usage: 'read-write', include: 'all'

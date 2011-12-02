@@ -14,6 +14,8 @@ abstract class DocumentField {
 	}
 
 	static mapping = {
+		tenantId index: 'document_field_tenant_id_idx'
+
 		key column:"_key"
 		value column:"_value"
 		tablePerHierarchy(false)

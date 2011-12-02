@@ -6,6 +6,7 @@ import us.paperlesstech.flea.FleaServer
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.Role
 import us.paperlesstech.nimble.User
+import us.paperlesstech.TenantConfig
 
 class BootStrap {
 	def grailsApplication
@@ -50,9 +51,11 @@ class BootStrap {
 		if (Environment.currentEnvironment == Environment.DEVELOPMENT) {
 			System.setProperty('java.io.tmpdir', cache.absolutePath)
 			if (DomainTenantMap.count() == 0) {
-				new DomainTenantMap(domainName:"localhost", mappedTenantId:1, name:"default").save()
+				new DomainTenantMap(domainName: 'localhost', mappedTenantId: 1, name: 'default').save(failOnError: true)
 
 				tenantService.initTenant(1) {
+					new TenantConfig(key: 'flag', value: 'Waiting').save(failOnError: true)
+
 					if (Printer.count() == 0) {
 						new Printer(name:"LaserJet 5", host:"192.168.40.200", deviceType:"lj5gray", port:9100).save()
 					}

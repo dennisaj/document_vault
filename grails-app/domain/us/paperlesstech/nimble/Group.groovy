@@ -46,6 +46,8 @@ class Group implements Comparable<Group> {
 	]
 
 	static mapping = {
+		tenantId index: 'group_tenant_id_idx'
+
 		cache usage: 'read-write', include: 'all'
 		table '_group'
 

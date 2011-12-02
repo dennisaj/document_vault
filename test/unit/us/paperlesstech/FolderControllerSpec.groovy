@@ -6,9 +6,11 @@ import spock.lang.Shared
 import us.paperlesstech.nimble.Group
 
 class FolderControllerSpec extends ControllerSpec {
+	AuthService authService = Mock()
 	DocumentService documentService = Mock()
 	FolderService folderService = Mock()
 	NotificationService notificationService = Mock()
+	TenantService tenantService = Mock()
 
 	def group1 = new Group(id:1, name:'group1')
 	def group2 = new Group(id:2, name:'group2')
@@ -25,14 +27,19 @@ class FolderControllerSpec extends ControllerSpec {
 	def parent2 = new Folder(id:5, name:'parent2')
 
 	def setup() {
+		controller.authService = authService
 		controller.documentService = documentService
 		controller.folderService = folderService
 		controller.notificationService = notificationService
+		controller.tenantService = tenantService
 		controller.metaClass.message = { LinkedHashMap arg1-> 'this is stupid' }
 
 		mockDomain(Group, [group1, group2])
 		mockDomain(Folder, [folder1, folder2, folder3, parent1, parent2])
 		mockDomain(Document, [document1, document2, document3])
+
+		Document.metaClass.getTags = {-> null }
+		Folder.metaClass.getTags = {-> null }
 
 		folder1.group = group1
 		folder2.group = group1
@@ -50,6 +57,11 @@ class FolderControllerSpec extends ControllerSpec {
 
 		parent1.addToChildren(folder1)
 		folder1.parent = parent1
+	}
+
+	def cleanup() {
+		Document.metaClass.getTags = null
+		Folder.metaClass.getTags = null
 	}
 
 	def "create should throw an AssertError when given invalid input"() {
@@ -366,5 +378,137 @@ class FolderControllerSpec extends ControllerSpec {
 		results.documents[1].name == document3.name
 		results.searchFolder.ancestry[0].id == parent2.id
 		results.searchFolder.ancestry[0].name == parent2.name
+	}
+
+	def 'flag requires the folderId'() {
+		given:
+		controller.params.folderId = null
+		when:
+		controller.flag()
+		then:
+		thrown(AssertionError)
+	}
+
+	def 'flag requires the flag name'() {
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = null
+		when:
+		controller.flag()
+		then:
+		thrown(AssertionError)
+	}
+
+	def 'flag requires the flag is a tenant flag'() {
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = 'notaflag'
+		when:
+		controller.flag()
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		thrown(AssertionError)
+	}
+
+	def 'flag requires the user can manager folders'() {
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = 'notaflag'
+		when:
+		controller.flag()
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canManageFolders(folder1.group) >> false
+		thrown(AssertionError)
+	}
+
+	def 'flag returns success after tagging the folder'() {
+		def tagAdded = null
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = 'Waiting'
+		folder1.metaClass.addTag = { String tag -> tagAdded = tag }
+		when:
+		controller.flag()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		tagAdded == 'Waiting'
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canManageFolders(folder1.group) >> true
+		1 * notificationService.success(_, _)
+	}
+
+	def 'unflag requires the folderId'() {
+		given:
+		controller.params.folderId = null
+		when:
+		controller.unflag()
+		then:
+		thrown(AssertionError)
+	}
+
+	def 'unflag requires the flag name'() {
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = null
+		when:
+		controller.unflag()
+		then:
+		thrown(AssertionError)
+	}
+
+	def 'unflag requires the flag is a tenant flag'() {
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = 'notaflag'
+		when:
+		controller.unflag()
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		thrown(AssertionError)
+	}
+
+	def 'unflag requires the user can manager folders'() {
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = 'notaflag'
+		when:
+		controller.unflag()
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canManageFolders(folder1.group) >> false
+		thrown(AssertionError)
+	}
+
+	def 'unflag returns success if the folder did not have the tag'() {
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = 'Waiting'
+		folder1.metaClass.getTags = { -> [] }
+		when:
+		controller.unflag()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canManageFolders(folder1.group) >> true
+		1 * notificationService.success(_, _)
+	}
+
+	def 'unflag returns success after removing the tag from the folder'() {
+		def tagRemoved = null
+		given:
+		controller.params.folderId = folder1.id
+		controller.params.flag = 'Waiting'
+		folder1.metaClass.getTags = { -> ['Waiting'] }
+		folder1.metaClass.removeTag = { String tag -> tagRemoved = tag }
+		folder1.metaClass.getFlags = { -> [] }
+		when:
+		controller.unflag()
+		def results = JSON.parse(mockResponse.contentAsString)
+		then:
+		tagRemoved == 'Waiting'
+		1 * tenantService.getTenantConfigList('flag') >> ['Waiting']
+		authService.canManageFolders(folder1.group) >> true
+		1 * notificationService.success(_, _)
 	}
 }

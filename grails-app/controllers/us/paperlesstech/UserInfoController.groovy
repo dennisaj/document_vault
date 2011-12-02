@@ -6,6 +6,7 @@ class UserInfoController {
 	def authService
 	def grailsApplication
 	def notificationService
+	def tenantService
 
 	def index = {
 		def n = grailsApplication.mainContext.getBean('NavigationTagLib')
@@ -45,6 +46,8 @@ class UserInfoController {
 					username:delegateUser?.username
 				]
 			}
+
+			returnMap.flags = tenantService.getTenantConfigList('flag')
 
 			returnMap.user.groups = [:]
 
