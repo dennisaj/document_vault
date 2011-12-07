@@ -12,13 +12,13 @@ class RequestService {
 		def host = getHeader(HttpHeaders.HOST)
 		assert host
 
-		def parts = host.split(':')
-		assert parts.size() == 2
-
-		if (parts[1] == '443') {
+		def parts = host.split(':', 2)
+		if(parts.size() == 1) {
+			return "http://$host"
+		} else if(parts[1] == '443') {
 			return "https://${parts[0]}"
 		} else {
-			return "http://${parts[0]}"
+			return "http://${parts[0]}:${parts[1]}"
 		}
 	}
 

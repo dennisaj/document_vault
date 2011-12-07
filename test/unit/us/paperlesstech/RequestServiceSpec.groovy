@@ -119,8 +119,9 @@ class RequestServiceSpec extends UnitSpec {
 		request.getHeader(HttpHeaders.HOST) >> host
 
 		where:
-		host            | output
-		'localhost:80'  | 'http://localhost'
-		'localhost:443' | 'https://localhost'
+		host             | output
+		'localhost'      | 'http://localhost'
+		'localhost:443'  | 'https://localhost'
+		'localhost:8080' | 'http://localhost:8080'
 	}
 }
