@@ -43,6 +43,9 @@ class DocumentControllerSpec extends ControllerSpec {
 		document1.group = group1
 		document2.group = group1
 		folder1.group = group1
+
+		Document.authService = authService
+		Folder.authService = authService
 	}
 
 	def cleanup() {

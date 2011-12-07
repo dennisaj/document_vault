@@ -184,7 +184,11 @@ class Document implements Taggable {
 	}
 
 	def asMap() {
-		[
+		if (!authService) {
+			authService = grailsApplication?.mainContext?.getBean(AuthService.class)
+		}
+
+		def map = [
 			id:id,
 			name:name,
 			dateCreated:dateCreated,
@@ -207,6 +211,15 @@ class Document implements Taggable {
 			notes: notes?notes*.asMap():[],
 			signed: signed()
 		]
+
+		map.permissions = [:]
+		map.permissions.sign = authService.canSign(this)
+		map.permissions.getSigned = authService.canGetSigned(this)
+		map.permissions.notes = authService.canNotes(this)
+		map.permissions.print = authService.canPrint(this)
+		map.permissions.view = authService.canView(this)
+
+		map
 	}
 
 	@Override

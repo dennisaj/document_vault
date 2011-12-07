@@ -62,7 +62,7 @@ class DocumentController {
 		is.withStream {
 			response.setContentType(contentType)
 			response.setContentLength(length)
-			response.setHeader("Content-Disposition", "attachment; filename=${filename}")
+			response.setHeader("Content-Disposition", "attachment; filename='${filename}'")
 			response.getOutputStream() << is
 		}
 	}
@@ -72,13 +72,6 @@ class DocumentController {
 		assert document
 
 		def map = document.asMap()
-		map.permissions = [:]
-		map.permissions.sign = authService.canSign(document)
-		map.permissions.getSigned = authService.canGetSigned(document)
-		map.permissions.notes = authService.canNotes(document)
-		map.permissions.print = authService.canPrint(document)
-		// We cannot get to this action if this is false but we will include it for the sake of completeness.
-		map.permissions.view = authService.canView(document)
 
 		def pages = (1..map.data.pages).collect { pageNumber->
 			def image = document.previewImageAsMap(pageNumber)

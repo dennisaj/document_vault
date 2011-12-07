@@ -55,7 +55,11 @@ class Folder implements Taggable {
 	static transients = ['asMap']
 
 	def asMap() {
-		[
+		if (!authService) {
+			authService = grailsApplication?.mainContext?.getBean(AuthService.class)
+		}
+
+		def map = [
 			id:id,
 			name:name,
 			dateCreated:dateCreated,
@@ -74,6 +78,11 @@ class Folder implements Taggable {
 				name:parent?.name
 			]
 		]
+
+		map.permissions = [:]
+		map.permissions.manage = authService.canManageFolders(this.group)
+
+		map
 	}
 
 	def beforeInsert() {

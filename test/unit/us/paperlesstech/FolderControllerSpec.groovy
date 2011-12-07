@@ -57,6 +57,9 @@ class FolderControllerSpec extends ControllerSpec {
 
 		parent1.addToChildren(folder1)
 		folder1.parent = parent1
+
+		Folder.authService = authService
+		Document.authService = authService
 	}
 
 	def cleanup() {
