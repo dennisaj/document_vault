@@ -762,28 +762,6 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dbwatson (generated)", id: "1319809075898-26") {
-		createTable(tableName: "url") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "urlPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "alt_text", type: "varchar(255)")
-
-			column(name: "description", type: "varchar(255)")
-
-			column(name: "location", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "name", type: "varchar(255)")
-		}
-	}
-
 	changeSet(author: "dbwatson (generated)", id: "1319809075898-27") {
 		addPrimaryKey(columnNames: "group_id, role_id", tableName: "_group_to_role")
 	}

@@ -203,8 +203,4 @@ databaseChangeLog = {
 	changeSet(author: "dbwatson (generated)", id: "1322767004662-26") {
 		addForeignKeyConstraint(baseColumnNames: "tag_id", baseTableName: "tag_links", constraintName: "FK7C35D6D45A3B441D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "tags", referencesUniqueColumn: "false")
 	}
-
-	changeSet(author: "dbwatson (generated)", id: "1322767004662-27") {
-		dropTable(tableName: "URL")
-	}
 }
