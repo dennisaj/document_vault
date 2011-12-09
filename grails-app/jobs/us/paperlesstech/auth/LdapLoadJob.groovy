@@ -40,8 +40,8 @@ class LdapLoadJob {
 	}
 
 	def getBean() {
-		// Because the LdapRealm is registered by the Shiro plugin after this job is injected,
+		// Because the ZLdapRealm is registered by the Shiro plugin after this job is injected,
 		// we have to explicitly request it
-		grailsApplication.mainContext.getBean("LdapRealmInstance")
+		grailsApplication.mainContext.getBean("ZLdapRealmInstance")
 	}
 }

@@ -20,9 +20,9 @@ import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
 
 /**
- * A realm that authenticates users against an LDAP server.
+ * A realm that authenticates users against an LDAP server.  Prefixed with Z so it is tried last.
  */
-class LdapRealm implements InitializingBean {
+class ZLdapRealm implements InitializingBean {
 	static authTokenClass = org.apache.shiro.authc.UsernamePasswordToken
 	static final realmToken = "LdapRealmInstance"
 

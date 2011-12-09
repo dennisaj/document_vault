@@ -10,13 +10,13 @@ import us.paperlesstech.nimble.Group;
 import us.paperlesstech.nimble.GroupService;
 
 @Mixin(MetaClassMixin)
-class LdapRealmSpec extends UnitSpec {
-	LdapRealm realm
+class ZLdapRealmSpec extends UnitSpec {
+	ZLdapRealm realm
 	GroupService groupService = Mock()
 
 	def setup() {
-		mockLogging(LdapRealm)
-		realm = new LdapRealm()
+		mockLogging(ZLdapRealm)
+		realm = new ZLdapRealm()
 		realm.ldapEnabled = true
 		realm.groupService = groupService
 	}
