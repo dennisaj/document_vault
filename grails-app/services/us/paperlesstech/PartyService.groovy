@@ -55,8 +55,8 @@ class PartyService {
 		}
 
 		if (!party.signator.hasErrors() && !party.hasErrors()) {
-			Permission profileEdit = new Permission(managed:true, type: Permission.defaultPerm, target:"document:${party.documentPermission.name().toLowerCase()}:*:${document.id}")
-			permissionService.createPermission(profileEdit, party.signator)
+			Permission documentPermission = new Permission(managed:true, type: Permission.defaultPerm, target:"document:${party.documentPermission.name().toLowerCase()}:*:${document.id}")
+			permissionService.createPermission(documentPermission, party.signator)
 			def savedParty = party.save()
 			if (savedParty) {
 				return sendCode(savedParty)
@@ -297,12 +297,12 @@ class PartyService {
 		inParties.collect { inParty->
 			// Remove JSONObject.Null entries
 			// TODO replace with collectEntries with Groovy 1.8.0
-			inParty = [:].putAll(inParty.collect {k,v->
+			inParty = [:].putAll(inParty.collect { k, v->
 				if (v == JSONObject.NULL) {
 					v = null
 				}
 
-				new MapEntry(k,v)
+				new MapEntry(k, v)
 			})
 
 			def outParty = null

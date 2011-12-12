@@ -25,6 +25,7 @@ class GroupService {
 	boolean transactional = true
 
 	def authService
+	def permissionService
 
 	/**
 	 * Creates a new group.
@@ -50,6 +51,8 @@ class GroupService {
 		def savedGroup = group.save()
 		if (savedGroup) {
 			log.info "Created group [$savedGroup.id]$savedGroup.name"
+			Permission viewDocuments = new Permission(managed:false, type: Permission.defaultPerm, target:"document:view:${savedGroup.id}:*")
+			permissionService.createPermission(viewDocuments, savedGroup)
 			return savedGroup
 		}
 

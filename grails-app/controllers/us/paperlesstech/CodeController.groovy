@@ -1,42 +1,25 @@
 package us.paperlesstech
 
-import us.paperlesstech.auth.CodeToken
-import us.paperlesstech.nimble.User
+import java.util.concurrent.Callable
 
-class CodeController {
-	static def allowedMethods = [index: "GET"]
-	static def allowedPermissions = [DocumentPermission.Sign, DocumentPermission.View] as Set
+import org.apache.shiro.subject.PrincipalCollection
+import org.apache.shiro.subject.SimplePrincipalCollection
+import org.apache.shiro.subject.Subject
 
-	def authService
-	def requestService
-	def userService
+class CodeController extends DocumentController {
+	def beforeInterceptor = [action:this.&wrapper]
 
-	def index = {
-		def codeToken = new CodeToken(code: params.code)
-		assert codeToken.code
-		String url
+	def wrapper() {
+		def party = Party.findByCode(params.documentId)
+		assert party
+		params.documentId = party.document.id
 
-		try {
-			def party = Party.findByCode(codeToken.code)
-			assert party
+		PrincipalCollection principals = new SimplePrincipalCollection(party.signator.id, "localized")
+		Subject subject = new Subject.Builder().principals(principals).buildSubject()
+		subject.execute({
+			this[params.action]()
+		} as Callable)
 
-			// If the user is a generated user, log them in automatically.
-			if (party.signator.roles?.any { it.name == User.SIGNATOR_USER_ROLE }) {
-				authService.login(codeToken)
-				userService.createLoginRecord(request)
-			}
-
-			if (party.documentPermission in allowedPermissions) {
-				def fragment = "/${party.document.id},1"
-				url = g.createLink(mapping: 'signPage', fragment: fragment, base: requestService.baseAddr)
-			}
-		} catch (Throwable e) {
-			log.error "Error authenticating code $codeToken.code"
-		}
-
-		if (!url) {
-			url = g.createLink(mapping: 'homePage', base: requestService.baseAddr)
-		}
-		redirect url: url.decodeURL()
+		return false
 	}
 }

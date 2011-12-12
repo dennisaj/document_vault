@@ -54,7 +54,6 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		when:
 		def result = service.filter(null, [sort:'name', order:'asc', max:10, offset:0], '')
 		then:
-		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
 		result.results.size() == 1
 		result.results[0].id== document4.id
@@ -66,7 +65,6 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		when:
 		def result = service.filter(folder2, [sort:'name', order:'asc', max:10, offset:0], '')
 		then:
-		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
 		result.results.size() == 2
 		result.results[0].id== document2.id
@@ -76,23 +74,10 @@ class DocumentServiceIntegrationSpec extends IntegrationSpec {
 		result.total == 2
 	}
 
-	def "filter should limit by document ids when getIndividualDocumentsWithPermission returns values"() {
-		when:
-		def result = service.filter(document1.folder, [sort:'name', order:'asc', max:10, offset:0], '')
-		then:
-		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([document1.id] as Set)
-		1 * authService.getGroupsWithPermission(documentPerms) >> ([] as SortedSet)
-		result.results.size() == 1
-		result.results[0].id== document1.id
-		result.results[0].name == document1.name
-		result.total == 1
-	}
-
 	def "filter should apply the filter when it is supplied"() {
 		when:
 		def result = service.filter(document1.folder, [sort:'name', order:'asc', max:10, offset:0], 'document1')
 		then:
-		1 * authService.getIndividualDocumentsWithPermission(documentPerms) >> ([] as Set)
 		1 * authService.getGroupsWithPermission(documentPerms) >> ([group1] as SortedSet)
 		result.results.size() == 1
 		result.results[0].id== document1.id
