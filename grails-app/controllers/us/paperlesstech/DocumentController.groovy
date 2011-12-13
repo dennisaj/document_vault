@@ -42,7 +42,9 @@ class DocumentController {
 		is.withStream {
 			response.setContentType(contentType)
 			response.setContentLength(length)
-			response.setHeader("Content-Disposition", "attachment; filename='${filename}'")
+			if (!request.getHeader("User-Agent")?.contains("iPad")) {
+				response.setHeader("Content-Disposition", "attachment; filename=\"${filename}\"")
+			}
 			response.getOutputStream() << is
 		}
 	}
@@ -62,7 +64,9 @@ class DocumentController {
 		is.withStream {
 			response.setContentType(contentType)
 			response.setContentLength(length)
-			response.setHeader("Content-Disposition", "attachment; filename='${filename}'")
+			if (!request.getHeader("User-Agent")?.contains("iPad")) {
+				response.setHeader("Content-Disposition", "attachment; filename=\"${filename}\"")
+			}
 			response.getOutputStream() << is
 		}
 	}
@@ -75,7 +79,6 @@ class DocumentController {
 
 		def pages = (1..map.data.pages).collect { pageNumber->
 			def image = document.previewImageAsMap(pageNumber)
-			image.background = g.createLink(action:'downloadImage', params:[documentId:document.id, pageNumber:pageNumber])
 			image.savedHighlights = (map.permissions.getSigned || map.permissions.sign ? document.highlightsAsMap(pageNumber) : [:])
 			image
 		}
@@ -93,7 +96,6 @@ class DocumentController {
 		assert d
 
 		def map = d.previewImageAsMap(pageNumber)
-		map.background = g.createLink(action:'downloadImage', params:[documentId:d.id, pageNumber:pageNumber])
 		map.savedHighlights = (authService.canGetSigned(d) || authService.canSign(d) ? d.highlightsAsMap(pageNumber) : [:])
 
 		render(map as JSON)

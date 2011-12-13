@@ -26,7 +26,9 @@ class NoteController {
 		is.withStream { stream->
 			response.setContentType(contentType)
 			response.setContentLength(length)
-			response.setHeader("Content-Disposition", "attachment; filename='${filename}'")
+			if (!request.getHeader("User-Agent")?.contains("iPad")) {
+				response.setHeader("Content-Disposition", "attachment; filename=\"${filename}\"")
+			}
 			response.getOutputStream() << stream
 		}
 	}

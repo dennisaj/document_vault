@@ -1,7 +1,6 @@
 class UrlMappings {
-
 	static mappings = {
-		"/$controller/$action?/$id?"{
+		"/$controller/$action?/$id?" {
 			constraints {
 				// apply constraints here
 			}
@@ -21,20 +20,28 @@ class UrlMappings {
 		}
 
 		"/document/download/$documentId/$documentDataId" {
-			controller = "document"
+			controller = {
+				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
+			}
+
 			action = "download"
 		}
 
 		"/document/thumbnail/$documentId/$documentDataId/$pageNumber" {
-			controller = "document"
+			controller = {
+				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
+			}
+
 			action = "thumbnail"
 		}
 
-		"/document/$action?/$documentId?/$pageNumber?"{
-			controller = "document"
+		"/document/$action?/$documentId?/$pageNumber?" {
+			controller = {
+				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
+			}
 		}
 
-		"/party/removeParty/$documentId/$partyId"{
+		"/party/removeParty/$documentId/$partyId" {
 			controller = "party"
 			action = "removeParty"
 		}

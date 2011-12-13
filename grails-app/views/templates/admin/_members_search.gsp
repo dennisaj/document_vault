@@ -16,7 +16,7 @@
 		<g:else>
 			<td>${user.username?.encodeAsHTML()}</td>
 		</g:else>
-        <td>${user?.profile?.fullName.encodeAsHTML()}</td>
+        <td>${user.profile?.fullName?.encodeAsHTML()}</td>
         <td>
           <g:link controller="user" action="show" id="${user.id.encodeAsHTML()}" class="button icon icon_user_go"><g:message code="nimble.link.view" /></g:link>
           <a onClick="nimble.addMember('${parent.id.encodeAsHTML()}', '${user.id.encodeAsHTML()}', '${user.username.encodeAsHTML()}');" class="button icon icon_add"><g:message code="nimble.link.grant" /></a>

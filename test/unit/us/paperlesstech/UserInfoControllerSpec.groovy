@@ -31,6 +31,7 @@ class UserInfoControllerSpec extends ControllerSpec {
 		group.name >>> 'group name'
 
 		Folder.metaClass.getFlags = { -> [] }
+		Folder.authService = authService
 	}
 
 	def cleanup() {

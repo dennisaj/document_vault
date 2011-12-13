@@ -442,7 +442,7 @@ class UserService {
 		String realm = map.realm
 		boolean addSignatorRole = map.addSignatorRole ?: false
 
-		def password = UserHelpers.generatePassword(grailsApplication.config.nimble.passwords.minlength)
+		def password = UserHelpers.generatePassword(grailsApplication.config.nimble.passwords.minlength * 2)
 		def user = InstanceGenerator.user()
 		user.profile = InstanceGenerator.profile()
 

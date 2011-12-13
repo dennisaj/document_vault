@@ -21,13 +21,12 @@ class DocumentService {
 
 	private def commonQuery(Folder folder=null, Map params, String filter, boolean includeFolder) {
 		def allowedGroupIds = authService.getGroupsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]).collect { it.id } ?: -1L
-		def specificDocs = authService.getIndividualDocumentsWithPermission([DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View]) ?: -1L
 
 		DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Document.class)
 			.createAlias('searchFieldsCollection', 'sfc', JoinFragment.LEFT_OUTER_JOIN)
 			.createAlias('notes', 'n', JoinFragment.LEFT_OUTER_JOIN)
 			.setProjection(Projections.distinct(Projections.id()))
-			.add(Restrictions.or(Restrictions.in('id', specificDocs), Restrictions.in('group.id', allowedGroupIds)))
+			.add(Restrictions.in('group.id', allowedGroupIds))
 
 		if (filter) {
 			detachedCriteria.add(Restrictions.disjunction().add(Restrictions.ilike('name', "%$filter%"))

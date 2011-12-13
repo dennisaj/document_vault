@@ -1,12 +1,15 @@
 import grails.converters.JSON
+
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
+
 import us.paperlesstech.Document
+import us.paperlesstech.DocumentPermission
 import us.paperlesstech.Folder
 import us.paperlesstech.nimble.AdminsService
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
-import org.springframework.context.ApplicationContextAware
-import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
-import org.springframework.context.ApplicationContext
 
 public class SecurityFilters implements ApplicationContextAware {
 	private static String openControllers = "auth|logout|account|code|userInfo|error"
@@ -68,10 +71,9 @@ public class SecurityFilters implements ApplicationContextAware {
 							}
 
 							switch (action) {
-								case 'pin':
-									// TODO: Do an actual security check here.
-									return true
-								case ['list', 'search', 'unpin', 'show']:
+								case ['pin', 'show']:
+									return folder && folder.group in authService.getGroupsWithPermission([DocumentPermission.ManageFolders, DocumentPermission.GetSigned, DocumentPermission.Sign, DocumentPermission.View])
+								case ['list', 'search', 'unpin']:
 									return true
 								case 'create':
 									return group && authService.canManageFolders(group)
