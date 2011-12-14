@@ -81,7 +81,7 @@ class PartyControllerSpec extends ControllerSpec {
 
 	def "submitSignatures should throw an AssertionError when given an invalid documentId"() {
 		given:
-		controller.params.lines = null
+		controller.params.signatures = null
 		controller.params.documentId = null
 		when:
 		controller.submitSignatures()
@@ -89,10 +89,10 @@ class PartyControllerSpec extends ControllerSpec {
 		thrown(AssertionError)
 	}
 
-	def "submitSignatures should set flash yellow when given invalid lines"() {
+	def "submitSignatures should set flash yellow when given invalid signatures"() {
 		given:
 		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
-		controller.params.lines = '[]'
+		controller.params.signatures = '[]'
 		controller.params.documentId = '1'
 		when:
 		controller.submitSignatures()
@@ -100,10 +100,10 @@ class PartyControllerSpec extends ControllerSpec {
 		controller.flash.yellow
 	}
 
-	def "submitSignatures should call partyService's cursiveSign and set flash green when given valid lines"() {
+	def "submitSignatures should call partyService's cursiveSign and set flash green when given valid signatures"() {
 		given:
 		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
-		controller.params.lines = '{1:"lines"}'
+		controller.params.signatures = '{1:{lines:"lines"}}'
 		controller.params.documentId = '1'
 		1 * partyService.cursiveSign(document1, _) >> document1
 		when:
@@ -115,9 +115,9 @@ class PartyControllerSpec extends ControllerSpec {
 	def "submitSignatures should call partyService's cursiveSign and set flash red when an error is returned"() {
 		given:
 		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
-		controller.params.lines = '{1:"lines"}'
+		controller.params.signatures = '{1:{lines:"lines"}}'
 		controller.params.documentId = '1'
-		1 * partyService.cursiveSign(document1, _) >> { d, m-> d.errors.rejectValue('id', 'bacause'); d }
+		1 * partyService.cursiveSign(document1, _) >> { d, m-> d.errors.rejectValue('id', 'because'); d }
 		when:
 		controller.submitSignatures()
 		then:

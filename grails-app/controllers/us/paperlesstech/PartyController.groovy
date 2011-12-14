@@ -29,8 +29,8 @@ class PartyController {
 	def submitSignatures = {
 		def document = Document.get(params.long("documentId"))
 		assert document
-
-		def signatures = JSON.parse(params.lines).findAll { it.value }
+		
+		def signatures = JSON.parse(params.signatures).findAll { it.value }
 
 		if (signatures) {
 			document = partyService.cursiveSign(document, signatures)
@@ -81,7 +81,7 @@ class PartyController {
 			party = partyService.sendCode(party)
 		} else {
 			party = partyService.createParty(document,
-					[email: email, permission: DocumentPermission.View.name(), color: PartyColor.Beige.name()])
+					[email: email, permission: DocumentPermission.View.name(), color: PartyColor.Yellow.name()])
 		}
 
 		def returnMap = [:]

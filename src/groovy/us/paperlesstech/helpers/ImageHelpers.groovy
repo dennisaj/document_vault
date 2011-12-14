@@ -32,14 +32,22 @@ class ImageHelpers {
 	 * 		}
 	 * </pre>		
 	 */
-	static void drawLines(BufferedImage image, List lines) {
+	static void drawLines(BufferedImage image, Map signature) {
+		def top = signature.top as int
+		def left = signature.left as int
+		def color = Color.BLACK
+		
+		try {
+			color = Color[signature.color ?: "BLACK"]
+		} catch (MissingPropertyException mpe) {}
+		
 		Graphics2D buffer = image.createGraphics()
 		buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-		buffer.setColor(java.awt.Color.BLACK)
+		buffer.setColor(color)
 
-		lines.each {
+		signature.lines.each {
 			if (it != LINEBREAK) {
-				buffer.drawLine(it.a.x as int, it.a.y as int, it.b.x as int, it.b.y as int)
+				buffer.drawLine((it.a.x as int) + left, (it.a.y as int) + top, (it.b.x as int) + left, (it.b.y as int) + top)
 			}
 		}
 

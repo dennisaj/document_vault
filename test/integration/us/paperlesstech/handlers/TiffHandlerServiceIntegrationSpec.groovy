@@ -13,14 +13,14 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def tiffDocument
 	def tiffDocumentData
 	def tiffBytes = new ClassPathResource("multipage.tif").getFile().bytes
-	def line
+	def signature
+	def line = [a: [x: 0, y: 0], b: [x: 100, y: 100]]
 
 	def setup() {
+		signature = [height: 150, width: 750, top: 0, left: 0, lines:[line, 'LB']]
 		tiffDocument = new Document()
 		tiffDocument.group = DomainIntegrationSpec.group
 		tiffDocumentData = new DocumentData(mimeType: MimeType.TIFF)
-
-		line = [a: [x: 0, y: 0], b: [x: 100, y: 100]]
 	}
 
 	def "imagethumbnail should be set"() {
@@ -45,12 +45,10 @@ class TiffHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	}
 
 	def "cursiveSign a tiff"() {
-		given:
-		def lines = ['1': [line, 'LB'], '2': [line], '4': [line]]
 		when:
 		tiffHandlerService.importFile(document: tiffDocument, documentData: tiffDocumentData, bytes: tiffBytes)
 		tiffDocument.save()
-		tiffHandlerService.cursiveSign(document: tiffDocument, documentData: tiffDocument.files.first(), signatures: lines)
+		tiffHandlerService.cursiveSign(document: tiffDocument, documentData: tiffDocument.files.first(), signatures: ["1":[signature], "2":[signature]])
 
 		then:
 		tiffDocument.files.size() == 2

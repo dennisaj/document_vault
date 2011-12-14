@@ -13,10 +13,12 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def document
 	def pdfDocumentData
 	def pdfBytes = new ClassPathResource("2pages.pdf").getFile().bytes
+	def signature
 	def line = [a: [x: 0, y: 0], b: [x: 100, y: 100]]
 
 	@Override
 	def setup() {
+		signature = [height: 150, width: 750, top: 0, left: 0, lines:[line, 'LB']]
 		pdfHandlerService.authService = authService
 		document = new Document()
 		document.group = DomainIntegrationSpec.group
@@ -48,15 +50,13 @@ class PdfHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	}
 
 	def "cursiveSign pdf file"() {
-		given:
-		def lines = ['1': [line, 'LB'], '2': [line], '4': [line]]
 		when:
 		def document = new Document(group: DomainIntegrationSpec.group)
 		def input = [document: document, documentData: pdfDocumentData, bytes: pdfBytes]
 
 		pdfHandlerService.importFile(input)
 		document = document.save()
-		input = [document: document, documentData: document.files.first(), signatures: lines]
+		input = [document: document, documentData: document.files.first(), signatures: ["1": [signature]]]
 		pdfHandlerService.cursiveSign(input)
 
 		then:

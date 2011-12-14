@@ -121,7 +121,7 @@ class TiffHandlerService extends Handler {
 		ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param)
 
 		def images = []
-		(1..data.pages).each {i ->
+		(1..data.pages).each { i ->
 			// TIFF images are 0 indexed
 			PlanarImage planar = new NullOpImage(dec.decodeAsRenderedImage((i as int) - 1),  null, OpImage.OP_IO_BOUND, null)
 
@@ -142,9 +142,9 @@ class TiffHandlerService extends Handler {
 			}
 			
 			BufferedImage original = planar.getAsBufferedImage()
-
-			if (signatureData[i as String]) {
-				ImageHelpers.drawLines(original, signatureData[i as String])
+			
+			signatureData[i.toString()].each { signature ->
+				ImageHelpers.drawLines(original, signature)
 			}
 
 			images += original

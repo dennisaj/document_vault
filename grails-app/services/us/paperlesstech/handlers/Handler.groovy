@@ -53,6 +53,7 @@ class Handler {
 	 * Expects elements with keys document and documentData and signatures
 	 *
 	 * @param input the map to retrieve document and documentData and signatures from
+	 * @param input.signatures a map that maps page number to a list of signatures. Signature is a map that looks like this: { top: int, left: int, height: int, width: int, lines: [] }
 	 */
 	void cursiveSign(Map input) {
 		throw new UnsupportedOperationException("cursiveSign has no handler for ${input?.documentData?.mimeType}")
@@ -149,7 +150,7 @@ class Handler {
 
 			if (entry.lines) {
 				BufferedImage original = ImageHelpers.createBlankImage(width, height)
-				ImageHelpers.drawLines(original, entry.lines)
+				ImageHelpers.drawLines(original, [lines:entry.lines, top:0, left:0, width:width, height:height])
 				ByteArrayOutputStream output = new ByteArrayOutputStream()
 				ImageIO.write(original, mimeType.toString().toLowerCase(), output)
 

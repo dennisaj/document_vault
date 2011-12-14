@@ -87,7 +87,7 @@ class DocumentController {
 			map.notes = []
 		}
 
-		render([document:map, pages:pages] as JSON)
+		render([document:map, pages:pages, colors:PartyColor.values()*.name()] as JSON)
 	}
 
 	def image = {
