@@ -27,6 +27,14 @@ class UrlMappings {
 			action = "download"
 		}
 
+		"/document/downloadImage/$documentId/$documentDataId" {
+			controller = {
+				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
+			}
+
+			action = "downloadImage"
+		}
+
 		"/document/thumbnail/$documentId/$documentDataId/$pageNumber" {
 			controller = {
 				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"

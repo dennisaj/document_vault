@@ -175,11 +175,11 @@ class HandlerSpec extends UnitSpec {
 		authService.canView(d) >> true
 		def is = Mock(InputStream)
 		def dd = new DocumentData(mimeType: mimeType, fileSize: fileSize)
-		def pi = new PreviewImage(pageNumber: pageNumber, data: dd)
+		def pi = new PreviewImage(pageNumber: 2, data: dd)
 		d.addToPreviewImages(pi)
 
 		when:
-		def result = handler.downloadPreview(document: d, page: pageNumber)
+		def result = handler.downloadPreview(document: d, previewImage: pi)
 
 		then:
 		1 * fileService.getInputStream(dd) >> is

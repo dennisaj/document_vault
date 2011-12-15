@@ -62,20 +62,17 @@ class Handler {
 	 * Returns a quad of the preview image to be downloaded to the client. NOTE: The returned InputStream must be
 	 * closed by the caller.
 	 *
-	 * @param input a map that must contain document and page
+	 * @param input a map that must contain document and previewImage
 	 * @return a quad of (documentFilename, document data as an Input Stream, document mimetype, and content length
 	 */
 	def downloadPreview(Map input) {
 		def d = getDocument(input)
 		assert authService.canView(d) || authService.canSign(d)
 
-		def page = input.page
-		assert page, "This method requires a page number"
+		def previewImage = input.previewImage
+		assert previewImage, "Preview image is required"
 
-		def previewImage = d.previewImage(page)
-		assert previewImage, "No preview image exists for page '$page'"
-
-		def filename = "${d.toString()}-page($page)${d.previewImage(page).data.mimeType.getDownloadExtension()}"
+		def filename = "${d.toString()}-page(${previewImage.pageNumber})${previewImage.data.mimeType.getDownloadExtension()}"
 
 		[filename, fileService.getInputStream(previewImage.data), previewImage.data.mimeType.downloadContentType,
 				previewImage.data.fileSize]

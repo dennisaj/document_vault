@@ -13,17 +13,20 @@ class DocumentController {
 
 	def downloadImage = {
 		def document = Document.get(params.long("documentId"))
-		if (!document) {
+		def previewImage = document?.previewImages?.find { it.data.id == params.long("documentDataId") }
+		if (!document || !previewImage) {
 			response.status = 404
 			render text:'File not found'
 			return
 		}
 
-		def (filename, is, contentType, length) = handlerChain.downloadPreview(document:document, page:params.int('pageNumber') ?: 1)
-		is.withStream { stream->
-			response.setContentType(contentType)
-			response.setContentLength(length)
-			response.getOutputStream() << stream
+		cache neverExpires:true
+
+		def (filename, is, contentType, length) = handlerChain.downloadPreview(document:document, previewImage:previewImage)
+		is.withStream {
+			response.contentType = contentType
+			response.contentLength = length
+			response.outputStream << is
 		}
 	}
 
@@ -40,12 +43,12 @@ class DocumentController {
 
 		def (filename, is, contentType, length) = handlerChain.download(document:document, documentData:documentData)
 		is.withStream {
-			response.setContentType(contentType)
-			response.setContentLength(length)
+			response.contentType = contentType
+			response.contentLength = length
 			if (!request.getHeader("User-Agent")?.contains("iPad")) {
 				response.setHeader("Content-Disposition", "attachment; filename=\"${filename}\"")
 			}
-			response.getOutputStream() << is
+			response.outputStream << is
 		}
 	}
 
@@ -62,12 +65,12 @@ class DocumentController {
 
 		def (filename, is, contentType, length) = handlerChain.downloadThumbnail(document:document, page:params.int('pageNumber') ?: 1)
 		is.withStream {
-			response.setContentType(contentType)
-			response.setContentLength(length)
+			response.contentType = contentType
+			response.contentLength = length
 			if (!request.getHeader("User-Agent")?.contains("iPad")) {
 				response.setHeader("Content-Disposition", "attachment; filename=\"${filename}\"")
 			}
-			response.getOutputStream() << is
+			response.outputStream << is
 		}
 	}
 

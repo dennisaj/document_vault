@@ -66,12 +66,13 @@ class DocumentControllerSpec extends ControllerSpec {
 
 	def "downloadImage should call handlerChain's downloadPreview when given valid input"() {
 		given:
+		controller.metaClass.cache = { LinkedHashMap arg1 -> 'this is stupid' }
 		controller.params.documentId = '1'
-		controller.params.pageNumber = pageNumber
+		controller.params.documentDataId = previewImage.data.id
 		when:
 		controller.downloadImage()
 		then:
-		1 * handlerChain.downloadPreview([document:document1, page:1]) >> { LinkedHashMap-> ['filename', new ByteArrayInputStream([1] as byte[]), MimeType.PNG.downloadContentType, 1] }
+		1 * handlerChain.downloadPreview([document:document1, previewImage: previewImage]) >> { LinkedHashMap-> ['filename', new ByteArrayInputStream([1] as byte[]), MimeType.PNG.downloadContentType, 1] }
 		mockResponse.status == 200
 		where:
 		pageNumber << [null, 1]
