@@ -1,8 +1,8 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
+import spock.lang.Specification
 
-class DocumentDataSpec extends UnitSpec {
+class DocumentDataSpec extends Specification {
 	def "test the constraints"() {
 		given:
 		mockForConstraintsTests(DocumentData)

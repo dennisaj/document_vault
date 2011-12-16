@@ -1,6 +1,6 @@
 package us.paperlesstech
 
-import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+import grails.plugin.multitenant.core.annotation.MultiTenant
 
 @MultiTenant
 class DocumentData implements Cloneable, Comparable {

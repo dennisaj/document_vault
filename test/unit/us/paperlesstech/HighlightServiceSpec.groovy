@@ -1,17 +1,16 @@
 package us.paperlesstech
 
-import grails.plugin.spock.*
-
 import org.codehaus.groovy.grails.web.json.JSONObject
 
-import spock.lang.*
+import spock.lang.Specification
+import grails.test.mixin.TestFor
 
-class HighlightServiceSpec extends UnitSpec {
+@TestFor(HighlightService)
+class HighlightServiceSpec extends Specification {
 	HighlightService service
 	AuthService authService = Mock()
 
 	def setup() {
-		mockLogging(HighlightService)
 		service = new HighlightService()
 		service.authService = authService
 	}

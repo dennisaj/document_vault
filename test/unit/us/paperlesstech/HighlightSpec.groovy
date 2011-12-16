@@ -1,8 +1,8 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
+import spock.lang.Specification
 
-class HighlightSpec extends UnitSpec {
+class HighlightSpec extends Specification {
 	def "test toMap"() {
 		given:
 			def h = new Highlight(height: 10, left:20, width:30, top:40)

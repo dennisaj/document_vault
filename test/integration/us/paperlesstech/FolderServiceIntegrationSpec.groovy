@@ -1,61 +1,53 @@
 package us.paperlesstech
 
-import grails.plugin.spock.IntegrationSpec
 import us.paperlesstech.nimble.Group
 
-class FolderServiceIntegrationSpec extends IntegrationSpec {
+class FolderServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 	FolderService service
-	AuthService authService = Mock()
+	AuthService authService
 
 	Document document1
 	Document document2
 	Document document3
 	Document document4
-	DocumentData dd
-	Group group
 	Folder folder1
 	Folder folder2
 	Folder folder3
 	Folder parent1
 
 	def setup() {
+		authService = Mock()
 		service = new FolderService()
 		service.authService = authService
 		Document.authService = authService
 		Folder.authService = authService
 
-		dd = new DocumentData(mimeType:MimeType.PNG, fileSize:1, fileKey:'1234abc')
-		dd.save(flush:true)
-		group = new Group(name:'group')
-		group.save(flush:true)
-		parent1 = new Folder(name:'parent1', group:group)
+		document1 = createDocument(authService: authService)
+		document2 = createDocument(authService: authService, group: document1.group)
+		document3 = createDocument(authService: authService, group: document1.group)
+		document4 = createDocument(authService: authService, group: document1.group)
 
-		folder1 = new Folder(name:'folder1', group:group, parent:parent1)
-		folder2 = new Folder(name:'folder2', group:group, parent:parent1)
-		folder3 = new Folder(name:'folder3', group:group)
+		parent1 = new Folder(name: 'parent1', group: document1.group)
+		parent1.authService = authService
+		parent1.save(flush: true, failOnError:true)
 
-		document1 = new Document(group:group)
-		document1.addToFiles(dd)
-		document2 = new Document(group:group)
-		document2.addToFiles(dd)
-		document3 = new Document(group:group)
-		document3.addToFiles(dd)
-		document4 = new Document(group:group)
-		document4.addToFiles(dd)
-		document3.save(failOnError:true)
+		folder1 = new Folder(name: 'folder1', group: document1.group, parent: parent1)
+		folder1.authService = authService
+		folder2 = new Folder(name: 'folder2', group: document1.group, parent: parent1)
+		folder2.authService = authService
+		folder3 = new Folder(name: 'folder3', group: document1.group)
+		folder3.authService = authService
 
 		folder1.addToDocuments(document1)
+		folder1.save(flush: true, failOnError:true)
 		folder2.addToDocuments(document4)
+		folder2.save(flush: true, failOnError:true)
 		folder3.addToDocuments(document2)
+		folder3.save(flush: true, failOnError:true)
 
 		parent1.addToChildren(folder1)
 		parent1.addToChildren(folder2)
-
-		folder1.save(failOnError:true)
-		folder2.save(failOnError:true)
-		folder3.save(failOnError:true)
-
-		parent1.save(failOnError:true)
+		parent1.save(flush: true, failOnError:true)
 	}
 
 	def "deleteFolder should remove all of its documents before deleting the folder"() {
@@ -64,7 +56,7 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 		when:
 		service.deleteFolder(folder1)
 		then:
-		1 * authService.canManageFolders(group) >> true
+		1 * authService.canManageFolders(folder1.group) >> true
 		!Folder.get(folderId)
 		!Document.get(document1.id).folder
 		parent1.children.size() == 1
@@ -77,7 +69,7 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 		when:
 		service.deleteFolder(parent1)
 		then:
-		1 * authService.canManageFolders(group) >> true
+		1 * authService.canManageFolders(parent1.group) >> true
 		!Folder.get(folderId)
 		children.every { it.parent == null }
 	}
@@ -130,7 +122,7 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 		def result = service.filter(null, [max:10, offset:0, sort:'name', order:'asc'], '')
 		then:
 		0 * authService.checkGroupPermission(_, _)
-		1 * authService.getGroupsWithPermission(_) >> ([group] as SortedSet)
+		1 * authService.getGroupsWithPermission(_) >> ([document1.group] as SortedSet)
 		result.results.size() == 2
 		result.results.contains(folder3)
 		result.results.contains(parent1)
@@ -142,7 +134,7 @@ class FolderServiceIntegrationSpec extends IntegrationSpec {
 		def result = service.search([max:10, offset:0, sort:'name', order:'asc'], 'folder')
 		then:
 		0 * authService.checkGroupPermission(_, _)
-		1 * authService.getGroupsWithPermission(_) >> ([group] as SortedSet)
+		1 * authService.getGroupsWithPermission(_) >> ([document1.group] as SortedSet)
 		result.results.size() == 3
 		result.results.contains(folder1)
 		result.results.contains(folder2)

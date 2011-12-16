@@ -1,8 +1,8 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
+import spock.lang.Specification
 
-class MimeTypeSpec extends UnitSpec {
+class MimeTypeSpec extends Specification {
 	def "import from mimeType"() {
 		expect:
 		MimeType.getMimeType(mimeType:"iMaGe/pNg") == MimeType.PNG

@@ -1,61 +1,46 @@
 package us.paperlesstech
 
-import grails.plugin.spock.*
-import spock.lang.*
-import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.Permission
-import us.paperlesstech.nimble.Profile
-import us.paperlesstech.nimble.User
 
-class PartyServiceIntegrationSpec extends IntegrationSpec {
+class PartyServiceIntegrationSpec extends AbstractMultiTenantIntegrationSpec {
 	def partyService
-	def fileData
-	def fileService
-	AuthService authServiceMock = Mock()
+	AuthService authService
 
 	def setup() {
-		partyService.authService = authServiceMock
-		fileData = fileService.createDocumentData(mimeType: MimeType.PDF, bytes: new byte[1], dateCreated: new Date())
-	}
-
-	static def getGroup() {
-		def g = new Group(name: "test " + Math.random())
-		g.save()
-		g
-	}
-
-	def getDocument() {
-		def d = new Document()
-		d.addToFiles(fileData)
-		d.group = group
-		d
+		authService = Mock(AuthService)
+		partyService.authService = authService
 	}
 
 	def "removeParty should remove the party and the associated permission"() {
 		given:
-			def document = getDocument()
-			document.save(failOnError:true)
-			def user = new User(username:"user", profile:new Profile())
-			user.save()
+		def document = createDocument(authService: authService)
+		def user = createUser()
 
-			def permission = new Permission(owner:user, type:Permission.defaultPerm, target:"document:sign:*:${document.id}", managed:true)
-			user.addToPermissions(permission)
-			permission.save(failOnError:true)
-			user.save(failOnError:true)
+		def permission = new Permission(owner: user, type: Permission.defaultPerm, target: "document:sign:*:${document.id}", managed: true)
+		user.addToPermissions(permission)
+		permission.save(failOnError: true)
+		user.save(failOnError: true)
 
-			def party = new Party(document:document, signator:user, color:PartyColor.Red, documentPermission:DocumentPermission.Sign)
-			document.addToParties(party)
-			def highlight = new Highlight(party:party, pageNumber:1)
-			party.highlights = [highlight]
-			party.save(failOnError:true)
-			document.save(failOnError:true)
+		def party = new Party(document: document, signator: user, color: PartyColor.Red, documentPermission: DocumentPermission.Sign)
+		document.addToParties(party)
+		def highlight = new Highlight(party: party, pageNumber: 1)
+		party.highlights = [highlight]
+		party.save(failOnError: true)
+		document.save(failOnError: true)
 
-			1 * authServiceMock.canGetSigned(document) >> true
+		// I'm not sure why this is required a second time.  Maybe the save above is returning a new copy without
+		// authService set.
+		document.authService = authService
+		Document.authService = authService
+
 		when:
-			def savedParty = partyService.removeParty(party)
+		def savedParty = partyService.removeParty(party)
+
 		then:
-			Party.count() == 0
-			document.parties.empty
-			user.permissions.empty
+		1 * authService.canGetSigned(document) >> true
+		authService.authenticatedUser >>> user
+		Party.count() == 0
+		document.parties.empty
+		user.permissions.empty
 	}
 }

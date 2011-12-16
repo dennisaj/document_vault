@@ -1,7 +1,5 @@
 package us.paperlesstech
 
-import grails.plugin.spock.IntegrationSpec
-
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.UnavailableSecurityManagerException
 import org.apache.shiro.mgt.SecurityManager
@@ -10,7 +8,7 @@ import org.apache.shiro.subject.support.SubjectThreadState
 import org.apache.shiro.util.LifecycleUtils
 import org.apache.shiro.util.ThreadState
 
-class AbstractShiroIntegrationSpec extends IntegrationSpec {
+class AbstractShiroIntegrationSpec extends AbstractMultiTenantIntegrationSpec {
 	private static ThreadState subjectThreadState
 
 	/**

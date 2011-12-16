@@ -43,24 +43,6 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		setSubject(new Subject.Builder(getSecurityManager()).buildSubject())
 	}
 
-	User newUser(List<String> permissionStrings = null) {
-		def rand = new Random()
-		def profile = new Profile()
-		def name = rand.nextInt().toString()
-		def user = new User(username: name, profile: profile)
-
-		permissionStrings?.each { permissionString ->
-			def permission = new Permission(managed: true, type: Permission.defaultPerm, target: permissionString)
-			permission.save(flush: true)
-			user.addToPermissions(permission)
-			user.save(flush: true)
-		}
-
-		user.save(flush: true)
-
-		user
-	}
-
 	Document newDocument(Map input) {
 		def group = new Group()
 		if (input) {
@@ -95,7 +77,7 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 
 	def "authenticatedUser should return a user if one is logged in"() {
 		given:
-		def user = newUser()
+		def user = createUser()
 		subject.metaClass.getPrincipal = { user.id }
 
 		when:
@@ -141,9 +123,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		false   | false
 	}
 
-	@Unroll("Testing if user with permission #permission can delete document:#groupId:#documentId")
+	@Unroll({"Testing if user with permission $permission can delete document:$groupId:$documentId"})
 	def "canDelete tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def document = newDocument(documentId: documentId, groupId: groupId)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -170,9 +152,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// "document:*:1:1"      | 1L      | 1L         | true
 	}
 
-	@Unroll("Testing if user with permissions #permissions can delete any document")
+	@Unroll({"Testing if user with permissions $permissions can delete any document"})
 	def "canDeleteAnyDocument tests"() {
-		def user = newUser(permissions)
+		def user = createUser(permissions: permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
@@ -195,9 +177,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "document:*:1:1"]      | true
 	}
 
-	@Unroll("Testing if user with group permissions #permissions can delete any document")
+	@Unroll({"Testing if user with group permissions $permissions can delete any document"})
 	def "canDeleteAnyDocument group tests (for isPermissionImplied)"() {
-		def user = newUser()
+		def user = createUser()
 		def group = new Group(name: "group").save()
 		permissions.each {
 			def permission = new Permission(managed: true, type: Permission.defaultPerm, target: it)
@@ -228,9 +210,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "*"]                   | true
 	}
 
-	@Unroll("Testing if user with role permissions #permissions can delete any document")
+	@Unroll({"Testing if user with role permissions $permissions can delete any document"})
 	def "canDeleteAnyDocument role tests (for isPermissionImplied)"() {
-		def user = newUser()
+		def user = createUser()
 		def role = new Role(name: "role").save()
 		permissions.each {
 			def permission = new Permission(managed: true, type: Permission.defaultPerm, target: it)
@@ -261,9 +243,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "*"]                   | true
 	}
 
-	@Unroll("Testing if user with group-role permissions #permissions can delete any document")
+	@Unroll({"Testing if user with group-role permissions $permissions can delete any document"})
 	def "canDeleteAnyDocument group-role tests (for isPermissionImplied)"() {
-		def user = newUser()
+		def user = createUser()
 		def role = new Role(name: "role").save()
 		permissions.each {
 			def permission = new Permission(managed: true, type: Permission.defaultPerm, target: it)
@@ -296,9 +278,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "*"]                   | true
 	}
 
-	@Unroll("Testing if user with permission #permission can flag document:#groupId:#documentId")
+	@Unroll({"Testing if user with permission $permission can flag document:$groupId:$documentId"})
 	def "canFlag tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def document = newDocument(documentId: documentId, groupId: groupId)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -325,9 +307,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// "document:*:1:1"      | 1L      | 1L         | true
 	}
 
-	@Unroll("Testing if user with permission #permission can sign document:#groupId:#documentId")
+	@Unroll({"Testing if user with permission $permission can sign document:$groupId:$documentId"})
 	def "canGetSigned tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def document = newDocument(documentId: documentId, groupId: groupId)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -354,9 +336,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// "document:*:1:1"      | 1L      | 1L         | true
 	}
 
-	@Unroll("Testing if user with permission #permission can leave notes on document:#groupId:#documentId")
+	@Unroll({"Testing if user with permission $permission can leave notes on document:$groupId:$documentId"})
 	def "canNotes tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def document = newDocument(documentId: documentId, groupId: groupId)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -383,9 +365,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// "document:*:1:1"      | 1L      | 1L         | true
 	}
 
-	@Unroll("Testing if user with permissions #permissions can leave notes on any document")
+	@Unroll({"Testing if user with permissions $permissions can leave notes on any document"})
 	def "canNotesAnyDocument tests"() {
-		def user = newUser(permissions)
+		def user = createUser(permissions: permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
@@ -408,9 +390,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "document:*:1:1"]      | true
 	}
 
-	@Unroll("Testing if user with permission #permission can print document:#groupId:#documentId")
+	@Unroll({"Testing if user with permission $permission can print document:$groupId:$documentId"})
 	def "canPrint tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def document = newDocument(documentId: documentId, groupId: groupId)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -442,9 +424,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// "document:*:1:1"      | 1L      | 1L         | true
 	}
 
-	@Unroll("Testing if user with permissions #permissions can print any document")
+	@Unroll({"Testing if user with permissions $permissions can print any document"})
 	def "canPrintAnyDocument tests"() {
-		def user = newUser(permissions)
+		def user = createUser(permissions: permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
@@ -467,9 +449,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "document:*:1:1"]      | true
 	}
 
-	@Unroll("Testing if user with permission #permission can sign document:#groupId:#documentId")
+	@Unroll({"Testing if user with permission $permission can sign document:$groupId:$documentId"})
 	def "canSign tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def document = newDocument(documentId: documentId, groupId: groupId)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -496,9 +478,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// "document:*:1:1"      | 1L      | 1L         | true
 	}
 
-	@Unroll("Testing if user with permissions #permissions can sign any document")
+	@Unroll({"Testing if user with permissions $permissions can sign any document"})
 	def "canSignAnyDocument tests"() {
-		def user = newUser(permissions)
+		def user = createUser(permissions: permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
@@ -521,9 +503,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "document:*:1:1"]      | true
 	}
 
-	@Unroll("Testing if user with permission #permission can manager folders in group #groupId")
+	@Unroll({"Testing if user with permission $permission can manager folders in group $groupId"})
 	def "canManageFolders tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def group = new Group()
 		group.id = groupId
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
@@ -543,9 +525,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		"document:managefolders:1"   | 2L       | false
 	}
 
-	@Unroll("Testing if user with permission #permission can upload to group #groupId")
+	@Unroll({"Testing if user with permission $permission can upload to group $groupId"})
 	def "canUpload tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def group = new Group()
 		group.id = groupId
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
@@ -571,9 +553,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// "document:*:1:1"      | 1L     true
 	}
 
-	@Unroll("Testing if user with permissions #permissions can upload any document")
+	@Unroll({"Testing if user with permissions $permissions can upload any document"})
 	def "canUploadAnyGroup tests"() {
-		def user = newUser(permissions)
+		def user = createUser(permissions: permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
@@ -596,9 +578,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// ["document:view:1:1", "document:*:1:1"]      | true
 	}
 
-	@Unroll("Testing if user with permission #permission can view document:#groupId:#documentId")
+	@Unroll({"Testing if user with permission $permission can view document:$groupId:$documentId"})
 	def "canView tests"() {
-		def user = newUser([permission])
+		def user = createUser(permissions: [permission])
 		def document = newDocument(documentId: documentId, groupId: groupId)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -625,9 +607,9 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		// "document:*:1:1"      | 1L      | 1L         | true
 	}
 
-	@Unroll("Testing if user with permissions #permissions can view any document")
+	@Unroll({"Testing if user with permissions $permissions can view any document"})
 	def "canViewAnyDocument tests"() {
-		def user = newUser(permissions)
+		def user = createUser(permissions: permissions)
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
 		subject.metaClass.isAuthenticated = { true }
@@ -679,7 +661,7 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		def groups = (0..4).collect {
 			new Group(name: "group$it").save()
 		}
-		def user = newUser(["document:upload:${groups[0].id}", "document:view:${groups[1].id}:*",
+		def user = createUser(permissions: ["document:upload:${groups[0].id}", "document:view:${groups[1].id}:*",
 				"document:sign:${groups[2].id}:*", "document:view:${groups[3].id}:1"])
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -712,7 +694,7 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		def groups = (0..4).collect {
 			new Group(name: "group$it").save()
 		}
-		def user = newUser(["document:upload:${groups[0].id}", "document:view:${groups[1].id}:*",
+		def user = createUser(permissions: ["document:upload:${groups[0].id}", "document:view:${groups[1].id}:*",
 				"document:sign:${groups[2].id}:*", "document:view:${groups[3].id}:1"])
 		subject.@principals = new SimplePrincipalCollection(user.id, "localizedRealm")
 		subject.metaClass.getPrincipal = { user.id }
@@ -730,7 +712,7 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 
 	def "getIndividualDocumentsWithPermission should return the individual documents for a role"() {
 		def role = new Role(name: "rolePerm").save()
-		def user = newUser()
+		def user = createUser()
 		def permission = new Permission(managed: true, type: Permission.defaultPerm, target: "document:view:42:42")
 		role.addToPermissions(permission)
 		role.save()
@@ -755,7 +737,7 @@ class AuthServiceIntegrationSpec extends AbstractShiroIntegrationSpec {
 		role.addToPermissions(permission)
 		role.save()
 		def group = new Group(name: "groupPerm").save()
-		def user = newUser()
+		def user = createUser()
 		permission = new Permission(managed: true, type: Permission.defaultPerm, target: "document:view:42:42")
 		group.addToPermissions(permission)
 		group.save()

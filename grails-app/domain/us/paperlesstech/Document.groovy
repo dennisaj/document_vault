@@ -1,6 +1,6 @@
 package us.paperlesstech
 
-import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+import grails.plugin.multitenant.core.annotation.MultiTenant
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
 import org.grails.taggable.Taggable
@@ -11,7 +11,15 @@ class Document implements Taggable {
 	def grailsApplication
 	def tenantService
 
-	static transients = ["highlightsAsMap", "otherField", "previewImage", "previewImageAsMap", "searchField", "signed", 'asMap']
+	static transients = ['highlightsAsMap',
+			'otherField',
+			'previewImage',
+			'previewImageAsMap',
+			'searchField',
+			'signed',
+			'resetPreviewImages',
+			'asMap']
+
 	User createdBy
 	Date dateCreated
 	Date lastUpdated

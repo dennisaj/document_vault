@@ -1,6 +1,5 @@
 package us.paperlesstech
 
-import grails.plugin.multitenant.core.util.TenantUtils
 import us.paperlesstech.helpers.InstanceGenerator
 import us.paperlesstech.nimble.AdminsService
 import us.paperlesstech.nimble.Role
@@ -11,6 +10,7 @@ class TenantService {
 	static transactional = true
 
 	def adminsService
+	def tenantRepository
 	def userService
 
 	/**
@@ -25,13 +25,20 @@ class TenantService {
 		list.collect { it.value }
 	}
 
+	DomainTenantMap getCurrentTenant() {
+		tenantRepository.getCurrentTenant()
+	}
+
 	/** 
 	 * This method provides a tenant with the base roles and users it needs.
 	 * 
 	 * @param closure Optionally, a closure can be provided that will be executed against the given tenantId
 	 */
-	def initTenant(int tenantId, Closure closure=null) {
-		TenantUtils.doWithTenant(tenantId) {
+	def initTenant(Integer tenantId, Closure closure=null) {
+		DomainTenantMap tenant = DomainTenantMap.findByMappedTenantId(tenantId)
+		assert tenant
+
+		tenant.withThisTenant {
 			def userRole = Role.findByName(UserService.USER_ROLE)
 			if (!userRole) {
 				userRole = new Role()
@@ -71,11 +78,7 @@ class TenantService {
 				user.pass = 'useR123!'
 				user.passConfirm = 'useR123!'
 				user.enabled = true
-
-				def userProfile = InstanceGenerator.profile()
-				userProfile.fullName = "Test User"
-				userProfile.owner = user
-				user.profile = userProfile
+				user.profile.fullName = "Test User"
 
 				def savedUser = userService.createUser(user)
 				if (savedUser.hasErrors()) {
@@ -91,11 +94,7 @@ class TenantService {
 				admin.pass = "admiN123!"
 				admin.passConfirm = "admiN123!"
 				admin.enabled = true
-
-				def adminProfile = InstanceGenerator.profile()
-				adminProfile.fullName = "Administrator"
-				adminProfile.owner = admin
-				admin.profile = adminProfile
+				admin.profile.fullName = "Administrator"
 
 				def savedAdmin = userService.createUser(admin)
 				if (savedAdmin.hasErrors()) {

@@ -59,6 +59,10 @@ class FileService implements InitializingBean {
 		}
 
 		if (inputStream) {
+			// When using the @Unroll annotation with Spock, it is moving the input stream forward before
+			// passing it to the called method.  Calling reset here to fix that, it should do nothing on a normal,
+			// unread stream.
+			inputStream.reset()
 			bytes = inputStream.bytes
 		}
 

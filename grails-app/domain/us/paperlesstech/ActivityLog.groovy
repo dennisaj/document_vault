@@ -1,11 +1,12 @@
 package us.paperlesstech
 
-import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
-import grails.plugin.multitenant.core.util.TenantUtils
+import grails.plugin.multitenant.core.annotation.MultiTenant
 import us.paperlesstech.nimble.User
 
 @MultiTenant
 class ActivityLog {
+	def tenantService
+
 	String action
 	Date dateCreated
 	User delegate
@@ -45,7 +46,7 @@ class ActivityLog {
 				pageNumber: this.pageNumber,
 				params: this.params,
 				status: this.status,
-				tenant: TenantUtils.currentTenant,
+				tenant: this.tenantService.currentTenant.mappedTenantId,
 				uri: this.uri
 		]
 	}

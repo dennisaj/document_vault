@@ -1,6 +1,6 @@
 package us.paperlesstech
 
-import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+import grails.plugin.multitenant.core.annotation.MultiTenant
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
 import org.grails.taggable.Taggable
@@ -26,20 +26,25 @@ class Folder implements Taggable {
 		children nullable:true
 		createdBy nullable: true
 		lastUpdatedBy nullable: true
-		parent nullable:true, validator: { val, obj->
+		parent nullable:true, validator: { proposedParentValue, domainInstance ->
 			// If parent is null, return null to indicate valid.
-			if (!val) {
+			if (!proposedParentValue) {
 				return null
 			}
 
-			def check
-			check = { p->
-				p && (p.parent == obj || check(p?.parent))
+			def checkChildrenForFolder = null
+			checkChildrenForFolder = { Folder folder ->
+				if (folder == proposedParentValue) {
+					return true
+				}
+
+				// Recursively check if any of this folder's children (if present) are the proposed parent
+				return folder.children.any(checkChildrenForFolder)
 			}
 
 			// If parent is a descendant of this object, return an error code.
 			// Otherwise return null to indicate valid.
-			check(val) ? ['validator.fry'] : null
+			checkChildrenForFolder(domainInstance) ? ['validator.fry'] : null
 		}
 		documents nullable:true
 		group nullable:false

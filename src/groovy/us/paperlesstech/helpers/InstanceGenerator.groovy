@@ -25,12 +25,12 @@ import us.paperlesstech.nimble.User
  * @author Bradley Beddoes
  */
 class InstanceGenerator {
-	// TODO: Inline these methods
+	// TODO: Inline this
 	static user = {
-		User.newInstance()
-	}
-
-	static profile = { 
-		Profile.newInstance()
+		// As of Grails 2, this is not the same as
+		// def user = new User(); user.profile = new Profile()
+		// possibly a Grails bug? This works though
+		def user = new User(profile: new Profile())
+		user
 	}
 }

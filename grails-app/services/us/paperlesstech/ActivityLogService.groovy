@@ -8,7 +8,6 @@ import com.amazonaws.services.sqs.model.Message
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest
 import com.amazonaws.services.sqs.model.SendMessageRequest
 import grails.converters.JSON
-import grails.plugin.multitenant.core.util.TenantUtils
 import java.util.concurrent.Executors
 import org.springframework.beans.factory.InitializingBean
 import us.paperlesstech.nimble.User
@@ -51,34 +50,40 @@ class ActivityLogService implements InitializingBean {
 	 */
 	void addLog(String controller, String action, int status, Map params = [:]) {
 		action = action ?: "index"
-		def document = Document.load(params.remove("documentId"))
+		def documentId = params.remove("documentId")
+		def document = documentId ? Document.load(documentId as Long) : null
 		def pageNumber = params.remove("pageNumber")
 		// Don't log signature line or document notes data
 		params.remove("lines")
 		params.remove("notes")
 		params.remove("password")
 
-		def activityLog = new ActivityLog(
-				action: "$controller:$action",
-				delegate: authService.delegateUser,
-				document: document,
-				userAgent: requestService.getHeader("User-Agent"),
-				ip: requestService.getRemoteAddr(),
-				user: authService.authenticatedUser,
-				pageNumber: pageNumber,
-				params: params.toString(),
-				status: status,
-				uri: requestService.getRequestURI()).asMap()
+		def activityLog = newActivityLog()
+		activityLog.action = "$controller:$action"
+		activityLog.delegate = authService.delegateUser
+		activityLog.document = document
+		activityLog.userAgent = requestService.getHeader("User-Agent")
+		activityLog.ip = requestService.getRemoteAddr()
+		activityLog.user = authService.authenticatedUser
+		activityLog.pageNumber = pageNumber
+		activityLog.params = params.toString()
+		activityLog.status = status
+		activityLog.uri = requestService.getRequestURI()
 
-		sendMessage(activityLog)
+		def map = activityLog.asMap()
+
+		sendMessage(map)
 	}
 
 	ActivityLog createFromJson(String input) {
 		def json = JSON.parse(input)
 
-		def al = new ActivityLog()
+		def al = newActivityLog()
 		def tenant = json.getInt('tenant')
-		TenantUtils.doWithTenant(tenant) {
+		DomainTenantMap domainTenantMap = DomainTenantMap.findByMappedTenantId(tenant)
+		assert domainTenantMap
+
+		domainTenantMap.withThisTenant {
 			al.action = json.action
 			if (!json.isNull('delegate')) {
 				al.delegate = User.load(json.getLong('delegate'))
@@ -104,6 +109,10 @@ class ActivityLogService implements InitializingBean {
 		}
 
 		al
+	}
+
+	ActivityLog newActivityLog() {
+		new ActivityLog()
 	}
 
 	/**

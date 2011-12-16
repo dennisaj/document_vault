@@ -1,9 +1,9 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
 import us.paperlesstech.nimble.Group
+import spock.lang.Specification
 
-class DocumentSpec extends UnitSpec {
+class DocumentSpec extends Specification {
 	def "test constraints"() {
 		given:
 		mockDomain(Document)

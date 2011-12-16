@@ -1,11 +1,10 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
+import spock.lang.Specification
 
-class WriteLogsJobSpec extends UnitSpec {
+class WriteLogsJobSpec extends Specification {
 	def "test execute"() {
 		given:
-		mockLogging(WriteLogsJob)
 		ActivityLogService activityLogService = Mock()
 		def job = new WriteLogsJob()
 		job.activityLogService = activityLogService

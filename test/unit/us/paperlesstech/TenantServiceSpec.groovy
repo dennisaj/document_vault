@@ -1,16 +1,19 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
+import spock.lang.Specification
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
 
-class TenantServiceSpec extends UnitSpec {
+@TestFor(TenantService)
+@Mock(TenantConfig)
+class TenantServiceSpec extends Specification {
 	def service = new TenantService()
 
 	def setup() {
-		def list = [new TenantConfig(key: 'flag', value: 'v1'),
-				new TenantConfig(key: 'flag', value: 'v2'),
-				new TenantConfig(key: 'flag', value: 'v3'),
-				new TenantConfig(key: 'flag', value: 'v4')]
-		mockDomain(TenantConfig, list)
+		new TenantConfig(key: 'flag', value: 'v1').save(flush: true, failOnError: true)
+		new TenantConfig(key: 'flag', value: 'v2').save(flush: true, failOnError: true)
+		new TenantConfig(key: 'flag', value: 'v3').save(flush: true, failOnError: true)
+		new TenantConfig(key: 'flag', value: 'v4').save(flush: true, failOnError: true)
 	}
 
 	def 'getTenantConfigList returns an empty list if not match'() {

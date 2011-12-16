@@ -1,11 +1,10 @@
 package us.paperlesstech
 
-import grails.plugin.spock.IntegrationSpec
 import java.security.SecureRandom
 import spock.lang.Shared
 import spock.lang.Unroll
 
-class FileServiceIntegrationSpec extends IntegrationSpec {
+class FileServiceIntegrationSpec extends AbstractMultiTenantIntegrationSpec {
 	def fileService
 	def partyService
 	// If more tests are added and this is parallelized this will break
@@ -27,17 +26,11 @@ class FileServiceIntegrationSpec extends IntegrationSpec {
 		testBytes = randomText.bytes
 	}
 
-	@Unroll("testing fileService with #bytes | #file | #inputStream | #mimeType | #pages")
+	@Unroll({"testing fileService with $bytes | $file | $inputStream | $mimeType | $pages"})
 	def "test fileService"() {
 		when:
-		def dd = null
-		def exception = false
-		try {
-			dd = fileService.createDocumentData(bytes: bytes, file: file, inputStream: inputStream,
-					mimeType: mimeType, pages: pages)
-		} catch (Exception e) {
-			exception = true
-		}
+		def dd = fileService.createDocumentData(bytes: bytes, file: file, inputStream: inputStream,
+				mimeType: mimeType, pages: pages)
 
 		then:
 		verifyCreatedDocument(dd, mimeType, pages)

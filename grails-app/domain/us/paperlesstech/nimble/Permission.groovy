@@ -16,7 +16,7 @@
  */
 package us.paperlesstech.nimble
 
-import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+import grails.plugin.multitenant.core.annotation.MultiTenant
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 /**

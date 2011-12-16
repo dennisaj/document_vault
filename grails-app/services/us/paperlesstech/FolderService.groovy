@@ -33,7 +33,7 @@ class FolderService {
 	}
 
 	/**
-	 * Creates a new folder with given name in the given Group. If the new folder's parent is set if parent is not null.
+	 * Creates a new folder with given name in the given Group. The new folder's parent is set if parent is not null.
 	 *
 	 * @pre The current user must have the {@link DocumentPermission#ManageFolders} permission for group.
 	 * @throws RuntimeException if there is a problem saving
@@ -166,10 +166,12 @@ class FolderService {
 		assert authService.canManageFolders(parent.group)
 
 		child.parent?.removeFromChildren(child)
+		child.parent?.save(failOnError: true)
+
 		parent.addToChildren(child)
+		parent.save(failOnError: true)
 		child.parent = parent
-		child.parent?.save(failOnError:true)
-		parent.save(failOnError:true)
+		child.save(failOnError: true)
 		child
 	}
 
@@ -188,9 +190,10 @@ class FolderService {
 		}
 
 		def parent = child.parent
-		child.parent = null
 		parent.removeFromChildren(child)
 		parent.save(failOnError:true)
+		child.parent = null
+		child.save(failOnError: true)
 		child
 	}
 

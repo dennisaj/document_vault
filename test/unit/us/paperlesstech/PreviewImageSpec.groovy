@@ -1,10 +1,10 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
 import spock.lang.Unroll
+import spock.lang.Specification
 
-class PreviewImageSpec extends UnitSpec {
-	@Unroll("testConstraints new PreviewImage(#pageNumber, #data, #thumbnail).validate() ==  #expected")
+class PreviewImageSpec extends Specification {
+	@Unroll({"testConstraints new PreviewImage($pageNumber, $data, $thumbnail).validate() ==  $expected"})
 	def "test constraints"() {
 		given:
 		mockForConstraintsTests(PreviewImage)

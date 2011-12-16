@@ -1,26 +1,28 @@
 package us.paperlesstech
 
-import grails.plugin.spock.ControllerSpec
+import spock.lang.Specification
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import us.paperlesstech.nimble.Group
 
-class ActivityLogControllerSpec extends ControllerSpec {
+@TestFor(ActivityLogController)
+@Mock([ActivityLog, Document, DocumentData, PreviewImage, Group])
+class ActivityLogControllerSpec extends Specification {
 	def setup() {
-		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
-		def document = new Document(id:1)
-		def document2 = new Document(id:2)
-		def al1 = new ActivityLog(id:1, document:document)
-		def al2 = new ActivityLog(id:2, document:document)
-		def al3 = new ActivityLog(id:3, document:document2)
-		def al4 = new ActivityLog(id:4, document:document2)
-		def al5 = new ActivityLog(id:5, document:document2)
-		mockDomain(ActivityLog, [al1, al2, al3, al4, al5])
-		mockDomain(Document, [document, document2])
+		def document = UnitTestHelper.createDocument()
+		def document2 = UnitTestHelper.createDocument()
+		new ActivityLog(id:1, document:document).save(validate: false, failOnError: true, flush: true)
+		new ActivityLog(id:2, document:document).save(validate: false, failOnError: true, flush: true)
+		new ActivityLog(id:3, document:document2).save(validate: false, failOnError: true, flush: true)
+		new ActivityLog(id:4, document:document2).save(validate: false, failOnError: true, flush: true)
+		new ActivityLog(id:5, document:document2).save(validate: false, failOnError: true, flush: true)
 	}
 
 	def "index should redirect to list"() {
 		when:
 		controller.index()
 		then:
-		controller.redirectArgs.action == 'list'
+		response.redirectedUrl == '/activityLog/list'
 	}
 
 	def "list should only default max to 10 and allow only from 1 to 100"() {
@@ -58,12 +60,13 @@ class ActivityLogControllerSpec extends ControllerSpec {
 	}
 
 	def "show should return an error if an invalid log id is passed in"() {
+		messageSource.addMessage('default.not.found.message', request.locale, 'not found')
 		when:
 		controller.show()
 		then:
 		controller.flash.type == 'error'
-		controller.flash.message
-		controller.redirectArgs.action == 'list'
+		controller.flash.message.contains('not found')
+		response.redirectedUrl == '/activityLog/list'
 	}
 
 	def "show should return an ActivityLog if a valid log id is passed in"() {

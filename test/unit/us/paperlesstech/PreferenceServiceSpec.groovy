@@ -1,28 +1,28 @@
 package us.paperlesstech
 
-import grails.plugin.spock.*
-
 import org.apache.shiro.subject.Subject
 
-import spock.lang.*
 import us.paperlesstech.nimble.Profile
 import us.paperlesstech.nimble.User
+import spock.lang.Specification
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
 
-class PreferenceServiceSpec extends UnitSpec {
+@TestFor(PreferenceService)
+@Mock([Preference, User, Profile])
+class PreferenceServiceSpec extends Specification {
 	PreferenceService service
 	AuthService authService = Mock()
 	Subject subject = Mock()
 
 	def setup() {
-		mockLogging(PreferenceService)
 		service = new PreferenceService()
 		service.authService = authService
 	}
 
 	def "setPreference should throw an Assertion when the current User can't edit the passed in User"() {
 		given:
-		mockDomain(User)
-		def user = new User(id: 1)
+		def user = UnitTestHelper.createUser()
 		1 * authService.getAuthenticatedSubject() >> subject
 		1 * subject.isPermitted(_) >> false
 		when:
@@ -33,8 +33,7 @@ class PreferenceServiceSpec extends UnitSpec {
 
 	def "getPreference should throw an Assertion when the current User can't edit the passed in User"() {
 		given:
-		mockDomain(User)
-		def user = new User(id: 1)
+		def user = UnitTestHelper.createUser()
 		1 * authService.getAuthenticatedSubject() >> subject
 		1 * subject.isPermitted(_) >> false
 		when:
@@ -45,9 +44,7 @@ class PreferenceServiceSpec extends UnitSpec {
 
 	def "getPreference should return the value associated with a key"() {
 		given:
-		mockDomain(User)
-		mockDomain(Preference)
-		def user = new User(id:1)
+		def user = UnitTestHelper.createUser()
 		def preference = new Preference(key:"key", value:"cheese")
 		user.addToPreferences(preference)
 		user.save()
@@ -61,9 +58,7 @@ class PreferenceServiceSpec extends UnitSpec {
 
 	def "getPreference should null if no Preference with the given key is found"() {
 		given:
-		mockDomain(User)
-		mockDomain(Preference)
-		def user = new User(id:1)
+		def user = UnitTestHelper.createUser()
 		def preference = new Preference(key:"key", value:"cheese")
 		user.addToPreferences(preference)
 		user.save()
@@ -77,10 +72,7 @@ class PreferenceServiceSpec extends UnitSpec {
 
 	def "setPreference should create a new Preference if no existing Preference with the given key exists"() {
 		given:
-		mockDomain(User)
-		mockDomain(Preference)
-		def user = new User(id:1, username:"username", profile:new Profile(id:1))
-		user.save()
+		def user = UnitTestHelper.createUser()
 		1 * authService.getAuthenticatedSubject() >> subject
 		1 * subject.isPermitted(_) >> true
 		when:
@@ -95,9 +87,7 @@ class PreferenceServiceSpec extends UnitSpec {
 
 	def "setPreference should update an existing Preference"() {
 		given:
-		mockDomain(User)
-		mockDomain(Preference)
-		def user = new User(id:1, username:"username", profile:new Profile(id:1))
+		def user = UnitTestHelper.createUser()
 		def preference = new Preference(key:key, value:"cheese")
 		user.addToPreferences(preference)
 		user.save()
@@ -115,10 +105,7 @@ class PreferenceServiceSpec extends UnitSpec {
 
 	def "setPreference should return false if user save fails"() {
 		given:
-		mockDomain(User)
-		mockDomain(Preference)
-		def user = new User(id:1, username:"username", profile:new Profile(id:1))
-		user.save()
+		def user = UnitTestHelper.createUser()
 		user.metaClass.save = {
 			false
 		}

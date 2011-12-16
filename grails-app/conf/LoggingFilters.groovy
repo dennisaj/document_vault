@@ -5,7 +5,8 @@ public class LoggingFilters {
 	def activityLogService
 	def authService
 
-	def dependsOn = [TimingFilters, TenantFilters]
+	// This also comes after the Tenant Filter which is a standard java filter included in the web.xml
+	def dependsOn = [TimingFilters]
 
 	def filters = {
 		all(controller: '*') {

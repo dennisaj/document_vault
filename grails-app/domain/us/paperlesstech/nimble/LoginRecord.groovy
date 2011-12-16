@@ -17,7 +17,7 @@
 package us.paperlesstech.nimble
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import grails.plugin.multitenant.core.groovy.compiler.MultiTenant
+import grails.plugin.multitenant.core.annotation.MultiTenant
 
 /**
  * Represents a system that a user logged into a Nimble based application from

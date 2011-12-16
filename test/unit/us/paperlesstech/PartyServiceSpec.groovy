@@ -1,6 +1,5 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -9,8 +8,14 @@ import us.paperlesstech.nimble.PermissionService
 import us.paperlesstech.nimble.Profile
 import us.paperlesstech.nimble.User
 import us.paperlesstech.nimble.UserService
+import spock.lang.Specification
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import us.paperlesstech.nimble.Group
 
-class PartyServiceSpec extends UnitSpec {
+@TestFor(PartyService)
+@Mock([Party, User, Profile, ActivityLog, Document, DocumentData, PreviewImage, Group])
+class PartyServiceSpec extends Specification {
 	PartyService service
 	AuthService authService = Mock()
 	GrailsApplication grailsApplication = Mock()
@@ -19,7 +24,6 @@ class PartyServiceSpec extends UnitSpec {
 	UserService userService = Mock()
 
 	def setup() {
-		mockLogging(PartyService)
 		service = new PartyService()
 		service.authService = authService
 		service.grailsApplication = grailsApplication
@@ -39,9 +43,6 @@ class PartyServiceSpec extends UnitSpec {
 
 	def "test createParty"() {
 		given:
-		mockDomain(Document)
-		mockDomain(Party)
-		mockDomain(User)
 		def user = new User(id: 1)
 		def document = new Document(id: 1)
 		def highlights = [JSONObject.NULL, [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
@@ -65,9 +66,6 @@ class PartyServiceSpec extends UnitSpec {
 
 	def "createParty should return errors when signator has errors"() {
 		given:
-		mockDomain(Document)
-		mockDomain(Party)
-		mockDomain(User)
 		def user = new User(id: 1)
 		def document = new Document(id: 1)
 		def highlights = [JSONObject.NULL, [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
@@ -87,9 +85,6 @@ class PartyServiceSpec extends UnitSpec {
 
 	def "createParty should return errors when color or documentPermission is missing or expiration is malformed"() {
 		given:
-		mockDomain(Document)
-		mockDomain(Party)
-		mockDomain(User)
 		def user = new User(id: 1)
 		def document = new Document(id: 1)
 		def highlights = [JSONObject.NULL, [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
@@ -103,9 +98,9 @@ class PartyServiceSpec extends UnitSpec {
 		when:
 		def party = service.createParty(document, input)
 		then:
-		party.errors["color"] == "nullable"
-		party.errors["documentPermission"] == "nullable"
-		party.errors["expiration"] == "party.expiration.invalidformat"
+		party.errors["color"].codes.any { it == "nullable" }
+		party.errors["documentPermission"].codes.any { it == "nullable" }
+		party.errors["expiration"].codes.any { it == "party.expiration.invalidformat" }
 	}
 
 	def "createParty should throw AssertionError when the user is not authorized"() {
@@ -151,19 +146,20 @@ class PartyServiceSpec extends UnitSpec {
 
 	def "getSignator should return an existing user if the email address is already registered"() {
 		given:
-		def email = "email@email.com"
-		def fullName = "fullName"
-		def user = new User(id: 1)
-		def profile = new Profile()
-		profile.fullName = fullName
-		profile.email = email
-		profile.owner = user
-		mockDomain(User)
-		mockDomain(Profile, [profile])
+		def user = UnitTestHelper.createUser()
+		user.profile.fullName = fullName
+		user.profile.email = email
+		user.profile.save(flush: true, failOnError: true)
+
 		when:
 		def signator = service.getSignator(fullName, email)
+
 		then:
 		signator == user
+
+		where:
+		email = "email@email.com"
+		fullName = "fullName"
 	}
 
 	def "getSignator should create a new user if the email address is not already registered"() {
@@ -171,8 +167,6 @@ class PartyServiceSpec extends UnitSpec {
 		def email = "email@email.com"
 		def fullName = "fullName"
 		def user = new User(id: 1)
-		mockDomain(User)
-		mockDomain(Profile)
 		def map = [:]
 		1 * userService.createUser({ map = it}) >> {
 			user

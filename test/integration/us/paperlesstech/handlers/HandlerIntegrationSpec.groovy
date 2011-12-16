@@ -8,7 +8,6 @@ import us.paperlesstech.DocumentData
 import us.paperlesstech.DomainIntegrationSpec
 import us.paperlesstech.FileService
 import us.paperlesstech.MimeType
-import us.paperlesstech.Note
 
 class HandlerIntegrationSpec extends BaseHandlerSpec {
 	def defaultImageHandlerService

@@ -1,13 +1,12 @@
 package us.paperlesstech.handlers
 
-import grails.plugin.spock.IntegrationSpec
-
 import org.apache.shiro.subject.Subject
 
 import us.paperlesstech.nimble.Profile
 import us.paperlesstech.nimble.User
+import us.paperlesstech.AbstractMultiTenantIntegrationSpec
 
-class BaseHandlerSpec extends IntegrationSpec {
+class BaseHandlerSpec extends AbstractMultiTenantIntegrationSpec {
 	static User user
 
 	def authService

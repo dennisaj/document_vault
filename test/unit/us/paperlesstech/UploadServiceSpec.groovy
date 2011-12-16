@@ -1,17 +1,20 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
 import us.paperlesstech.handlers.HandlerChain
 import us.paperlesstech.nimble.Group
+import spock.lang.Specification
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
 
-class UploadServiceSpec extends UnitSpec {
+@TestFor(UploadService)
+@Mock([Group, Document])
+class UploadServiceSpec extends Specification {
 	UploadService service
 	AuthService authService = Mock()
 	FileService fileService = Mock()
 	HandlerChain handlerChain = Mock()
 
 	def setup() {
-		mockLogging(UploadService)
 		service = new UploadService()
 		service.authService = authService
 		service.fileService = fileService
@@ -27,9 +30,10 @@ class UploadServiceSpec extends UnitSpec {
 		given:
 		def d = new Document()
 		service.metaClass.uploadDocument = { byte[] bytes, Group group, String name, MimeType mimeType, Folder folder -> [d] }
+		InputStream is = null
 
 		when:
-		def result = service.uploadInputStream(null as InputStream, new Group(), "file.pdf", "application/pdf")
+		def result = service.uploadInputStream(is, new Group(), "file.pdf", "application/pdf")
 
 		then:
 		result == [d]
@@ -37,10 +41,12 @@ class UploadServiceSpec extends UnitSpec {
 
 	def "uploadDocument verifies the user can upload"() {
 		given:
-		def group = new Group()
+		def group = new Group(name: 'group')
+		group.save(flush: true, failOnError: true)
+		byte[] bytes = null
 
 		when:
-		service.uploadDocument(null as byte[], group, "file.pdf", MimeType.PDF)
+		service.uploadDocument(bytes, group, "file.pdf", MimeType.PDF)
 
 		then:
 		thrown AssertionError
@@ -49,7 +55,8 @@ class UploadServiceSpec extends UnitSpec {
 
 	def "uploadDocumentData doesn't return the document on error"() {
 		given:
-		def group = new Group()
+		def group = new Group(name: 'group')
+		group.save(flush: true, failOnError: true)
 		def bytes = new byte[1]
 
 		when:
@@ -57,13 +64,13 @@ class UploadServiceSpec extends UnitSpec {
 
 		then:
 		1 * authService.canUpload(group) >> true
-		1 * handlerChain.importFile(_) >> { throw new RuntimeException("Error") }
+		1 * handlerChain.importFile(_) >> { throw new RuntimeException("Expected Error") }
 	}
 
 	def "uploadDocumentData imports and saves the passed document"() {
 		given:
-		mockDomain(Document)
-		def group = new Group()
+		def group = new Group(name: 'group')
+		group.save(flush: true, failOnError: true)
 		def bytes = new byte[1]
 		def capturedDoc
 

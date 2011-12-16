@@ -71,8 +71,8 @@ class NoteController {
 		def pageNumber = Math.max(params.int('pageNumber') ?: 0, 0)
 		assert pageNumber <= document.files.first().pages
 
-		def left = params.float('left') as int ?: 0
-		def top = params.float('top') as int ?: 0
+		def left = params.float('left') ? params.float('left') as int : 0
+		def top = params.float('top') ? params.float('top') as int : 0
 
 		handlerChain.saveNotes(document:document, notes:[[text:text, left:left, top:top, pageNumber:pageNumber]])
 		document.save(flush:true)

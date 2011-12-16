@@ -1,9 +1,14 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
 import us.paperlesstech.nimble.User
+import spock.lang.Specification
+import grails.test.mixin.TestFor
 
-class ActivityLogSpec extends UnitSpec {
+@TestFor(ActivityLog)
+class ActivityLogSpec extends Specification {
+	TenantService tenantService = Mock()
+	DomainTenantMap domainTenantMap = Mock()
+
 	def "test map output"() {
 		given:
 		def doc = new Document()
@@ -14,6 +19,7 @@ class ActivityLogSpec extends UnitSpec {
 		del.id = 12
 
 		ActivityLog al = new ActivityLog()
+		al.tenantService = tenantService
 		al.action = action
 		al.delegate = del
 		al.document = doc
@@ -30,7 +36,9 @@ class ActivityLogSpec extends UnitSpec {
 		Map m = al.asMap()
 
 		then:
-		m.tenant == 0
+		1 * tenantService.currentTenant >> domainTenantMap
+		1 * domainTenantMap.mappedTenantId >> 42
+		m.tenant == 42
 		m.action == action
 		m.delegate == del.id
 		m.document == doc.id

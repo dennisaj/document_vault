@@ -444,7 +444,6 @@ class UserService {
 
 		def password = UserHelpers.generatePassword(grailsApplication.config.nimble.passwords.minlength * 2)
 		def user = InstanceGenerator.user()
-		user.profile = InstanceGenerator.profile()
 
 		user.username = username
 		user.enabled = true

@@ -1,13 +1,13 @@
 dataSource {
     pooled = true
-    driverClassName = "org.hsqldb.jdbcDriver"
+    driverClassName = "org.h2.Driver"
     username = "sa"
     password = ""
 }
 hibernate {
     cache.use_second_level_cache = true
     cache.use_query_cache = true
-    cache.provider_class = 'net.sf.ehcache.hibernate.EhCacheProvider'
+    cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory'
 }
 // environment specific settings
 environments {
@@ -15,14 +15,14 @@ environments {
         dataSource {
             loggingSql = true
             dbCreate = "none" // one of 'create', 'create-drop','update'
-            url = "jdbc:hsqldb:file:devDb;shutdown=true"
+            url = "jdbc:h2:devDb;MVCC=TRUE"
         }
     }
     test {
         dataSource {
             loggingSql = true
-            dbCreate = "create-drop"
-            url = "jdbc:hsqldb:mem:testDb"
+            dbCreate = "update"
+            url = "jdbc:h2:mem:testDb;MVCC=TRUE"
         }
     }
     production {

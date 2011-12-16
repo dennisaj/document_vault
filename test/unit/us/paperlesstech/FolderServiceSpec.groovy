@@ -1,57 +1,59 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
 import grails.validation.ValidationException
 import spock.lang.Shared
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
+import spock.lang.Specification
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import us.paperlesstech.nimble.Profile
 
-class FolderServiceSpec extends UnitSpec {
+@TestFor(FolderService)
+@Mock([Folder, PinnedFolder, Document, DocumentData, PreviewImage, Group, User, Profile])
+class FolderServiceSpec extends Specification {
 	AuthService authService = Mock()
 	FolderService service
 
-	Group group1 = new Group(id:1, name:'group1')
-	Group group2 = new Group(id:2, name:'group2')
-	Document document1 = new Document(id:1)
-	Document document2 = new Document(id:2)
-	@Shared
-	Document document3 = new Document(id:3)
-	Folder folder1 = new Folder(id:1, name:'folder1')
-	Folder folder2 = new Folder(id:2, name:'folder2')
-	Folder folder3 = new Folder(id:3, name:'folder3')
+	Document document1
+	Document document2
+	Document document3
 
-	Folder parent1 = new Folder(id:4, name:'parent1')
-	@Shared
-	Folder parent2 = new Folder(id:5, name:'parent2')
-	Folder parent3 = new Folder(id:5, name:'parent3')
+	Folder parent1
+	Folder parent2
+	Folder parent3
+
+	Folder folder1
+	Folder folder2
+	Folder folder3
+	
+	User user
 
 	def setup() {
-		mockLogging(FolderService)
 		service = new FolderService()
 		service.authService = authService
 
-		folder1.group = group1
-		folder2.group = group1
-		folder3.group = group1
-		document1.group = group1
-		document2.group = group1
-		document3.group = group2
+		document1 = UnitTestHelper.createDocument()
+		document2 = UnitTestHelper.createDocument(group: document1.group)
+		document3 = UnitTestHelper.createDocument()
 
-		parent1.group = group1
-		parent2.group = group2
-		parent3.group = group1
+		parent1 = new Folder(name: 'parent1', group: document1.group).save(flush: true, failOnError: true)
+		parent2 = new Folder(name: 'parent2', group: document2.group).save(flush: true, failOnError: true)
+		parent3 = new Folder(name: 'parent3', group: document1.group).save(flush: true, failOnError: true)
 
-		mockDomain(Document, [document1, document2, document3])
-		mockDomain(Folder, [folder1, folder2, folder3, parent1, parent2, parent3])
-		mockDomain(Group, [group1, group2])
+		folder1 = new Folder(name: 'folder1', group: document1.group).save(flush: true, failOnError: true)
+		folder2 = new Folder(name: 'folder2', group: document1.group).save(flush: true, failOnError: true)
+		folder3 = new Folder(name: 'folder3', group: document1.group).save(flush: true, failOnError: true)
 
-		document1.folder = folder1
-		document2.folder = folder2
 		folder1.addToDocuments(document1)
+		folder1.save()
 		folder2.addToDocuments(document2)
+		folder2.save()
 
 		parent1.addToChildren(folder1)
-		folder1.parent = parent1
+		parent1.save()
+
+		user = UnitTestHelper.createUser()
 	}
 
 	def "createFolder should require a group"() {
@@ -62,12 +64,13 @@ class FolderServiceSpec extends UnitSpec {
 	}
 
 	def "createFolder should require the given parent to be in the given group"() {
+		def group = new Group(name: 'new group').save(flush: true, failOnError: true)
+		def parent = new Folder(name: 'parent', group: group)
 		when:
-		service.createFolder(group1, parent, 'name')
+		service.createFolder(document1.group, parent, 'name')
 		then:
+		1 * authService.canManageFolders(document1.group) >> true
 		thrown(AssertionError)
-		where:
-		parent << [null, parent2]
 	}
 
 	def "createFolder should throw an AssertionError when the user lacks the ManageFolders permission"() {
@@ -80,19 +83,24 @@ class FolderServiceSpec extends UnitSpec {
 
 	def "createFolder should return errors if validation fails"() {
 		when:
-		def savedFolder = service.createFolder(group1, '')
+		def savedFolder = service.createFolder(document1.group, '')
 		then:
-		1 * authService.canManageFolders(group1) >> true
+		1 * authService.canManageFolders(document1.group) >> true
 		savedFolder.errors
 	}
 
 	def "createFolder should set the parent if it is passed in"() {
+		given:
+		parent1.parent = null
+
 		when:
-		def savedFolder = service.createFolder(parent1.group, parent1, 'new folder')
+		def newFolder = service.createFolder(parent1.group, parent1, 'new folder')
+
 		then:
 		1 * authService.canManageFolders(parent1.group) >> true
-		savedFolder.parent == parent1
-		parent1.children.contains(savedFolder)
+		newFolder.parent == parent1
+		newFolder.name == 'new folder'
+		parent1.children.contains(newFolder)
 	}
 
 	def "deleteFolder should require a folder"() {
@@ -207,17 +215,28 @@ class FolderServiceSpec extends UnitSpec {
 	}
 
 	def "addChildToFolder should check the ManageFolders permission if the document has a folder and continue if the user is permitted"() {
+		given:
+		parent3.parent = null
+		assert folder1.parent != parent3
+		assert !folder1.children
+		assert !parent3.children
+
 		when:
 		service.addChildToFolder(parent3, folder1)
+
 		then:
 		1 * authService.canManageFolders(parent3.group) >> true
 	}
 
 	def "addChildToFolder should freak out when trying to add a parent to its child"() {
+		given:
+		folder1.parent.parent = null
+
 		when:
-		service.addChildToFolder(folder1, parent1)
+		service.addChildToFolder(folder1, folder1.parent)
+
 		then:
-		1 * authService.canManageFolders(parent3.group) >> true
+		1 * authService.canManageFolders(folder1.group) >> true
 		thrown(ValidationException)
 	}
 
@@ -280,9 +299,8 @@ class FolderServiceSpec extends UnitSpec {
 	}
 
 	def "pin should do nothing if the folder is already pinned"() {
-		def user = new User()
 		def pinned = new PinnedFolder(user: user, folder: folder1)
-		mockDomain(PinnedFolder, [pinned])
+		pinned.save(flush: true, failOnError: true)
 
 		when:
 		service.pin(folder1)
@@ -294,9 +312,8 @@ class FolderServiceSpec extends UnitSpec {
 	}
 
 	def "pin should pin the folder for the user and up the count"() {
-		def user = new User()
 		def pinned = new PinnedFolder(user: user, folder: folder1)
-		mockDomain(PinnedFolder, [pinned])
+		pinned.save(flush: true, failOnError: true)
 
 		when:
 		service.pin(folder2)
@@ -308,9 +325,6 @@ class FolderServiceSpec extends UnitSpec {
 	}
 
 	def "unpin should do nothing if the folder is not pinned"() {
-		def user = new User()
-		mockDomain(PinnedFolder)
-
 		when:
 		service.unpin(folder1)
 
@@ -320,9 +334,8 @@ class FolderServiceSpec extends UnitSpec {
 	}
 
 	def "unpin should delete the matching pinnedFolder"() {
-		def user = new User()
 		def pinned = new PinnedFolder(user: user, folder: folder1)
-		mockDomain(PinnedFolder, [pinned])
+		pinned.save(flush: true, failOnError: true)
 
 		when:
 		service.unpin(folder1)

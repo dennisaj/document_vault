@@ -1,80 +1,86 @@
 package us.paperlesstech
 
-import grails.plugin.multitenant.core.CurrentTenant
-import grails.plugin.multitenant.core.util.TenantUtils
-import grails.plugin.spock.UnitSpec
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User
+import us.paperlesstech.nimble.Profile
 
-class ActivityLogServiceSpec extends UnitSpec {
+@TestFor(ActivityLogService)
+@Mock([ActivityLog, DomainTenantMap, User, Profile, Document, DocumentData, PreviewImage, Group])
+class ActivityLogServiceSpec extends Specification {
 	AuthService authService = Mock()
 	def service = new ActivityLogService()
 	RequestService request = Mock()
-	def activityMock
-	CurrentTenant currentTenant = Mock()
+	Document document
+	TenantService tenantService = Mock()
 
 	def setup() {
 		service.authService = authService
 		service.requestService = request
-		activityMock = mockFor(ActivityLog.class)
-		TenantUtils.currentTenant = currentTenant
+		service.metaClass.newActivityLog = {->
+			ActivityLog activityLog = new ActivityLog()
+			activityLog.tenantService = tenantService
+			activityLog
+		}
+
+		document = UnitTestHelper.createDocument()
+
+		new DomainTenantMap(domainName: 'test', name: 'test', mappedTenantId: 42).save(flush: true, failOnError: true)
+		DomainTenantMap.metaClass.withThisTenant = { Closure closure ->
+			closure.call()
+		}
 	}
 
 	def cleanup() {
-		TenantUtils.currentTenant = null
+		DomainTenantMap.metaClass.withThisTenant = null
 	}
 
-	def "add log should call methods off the request service"() {
-		mockDomain(ActivityLog)
-		mockDomain(Document, [new Document(id: 4)])
-		def activityLog = null
-		service.metaClass.sendMessage = { Map m -> activityLog = m }
+	def 'add log should call methods off the request service'() {
+		def activityLogMap = [:]
+		service.metaClass.sendMessage = { Map m -> activityLogMap = m }
+		def currentUser = UnitTestHelper.createUser()
 
-		when: "Try to save"
+		when: 'Try to save'
 		service.addLog(controller, action, status, params)
 
 		then:
-		1 * request.getHeader("User-Agent") >> userAgent
+		1 * tenantService.currentTenant >> DomainTenantMap.list()[0]
+		1 * request.getHeader('User-Agent') >> userAgent
 		1 * request.getRemoteAddr() >> ip
 		1 * request.getRequestURI() >> uri
 		1 * authService.authenticatedUser >> currentUser
-		activityLog.action == "document:index"
-		activityLog.document == 4
-		activityLog.ip == ip
-		activityLog.pageNumber == "2"
-		activityLog.params == [param1: "1", param2: "2"].toString()
-		activityLog.status == status
-		activityLog.user == currentUser.id
-		activityLog.userAgent == userAgent
-		activityLog.uri == uri
+		activityLogMap.tenant == DomainTenantMap.list()[0].mappedTenantId
+		activityLogMap.action == 'document:index'
+		activityLogMap.document == document.id
+		activityLogMap.ip == ip
+		activityLogMap.pageNumber == '2'
+		activityLogMap.params == [param1: '1', param2: '2'].toString()
+		activityLogMap.status == status
+		activityLogMap.user == currentUser.id
+		activityLogMap.userAgent == userAgent
+		activityLogMap.uri == uri
 
 		where:
 		action = null
-		controller = "document"
+		controller = 'document'
 		status = 200
-		userAgent = "FF"
-		ip = "127.0.0.1"
-		currentUser = new User()
-		uri = "/document_vault/document/index"
-		params = [param1: "1", param2: "2", documentId: "4", pageNumber: "2", lines: "blah", password: 'password']
+		userAgent = 'FF'
+		ip = '127.0.0.1'
+		uri = '/document_vault/document/index'
+		params = [param1: '1', param2: '2', documentId: '1', pageNumber: '2', lines: 'blah', password: 'password']
 	}
 
 	def "json parsing all fields"() {
-		given:
-		def d = new Document()
-		d.id = 42
-		mockDomain(Document, [d])
-		def u = new User()
-		u.id = 13
-		def del = new User()
-		del.id = 12
-		mockDomain(User, [u, del])
-		mockDomain(ActivityLog)
+		def user = UnitTestHelper.createUser()
+		def del = UnitTestHelper.createUser()
 
 		when:
 		def al = service.createFromJson("""
 {
-   "tenant": 0,
-   "document": 42,
+   "tenant": ${DomainTenantMap.list()[0].mappedTenantId},
+   "document": ${document.id},
    "status": 200,
    "userAgent": "Chrome",
    "action": "action",
@@ -82,14 +88,14 @@ class ActivityLogServiceSpec extends UnitSpec {
    "dateCreated": null,
    "params": "{param1=arg1, param2=arg2}",
    "uri": "/document/foo",
-   "user": 13,
+   "user": ${user.id},
    "ip": "ip addr",
-   "delegate": 12
+   "delegate": ${del.id}
 }""")
 
 		then:
 		al.delegate == del
-		al.document == d
+		al.document == document
 		al.status == 200
 		al.userAgent == "Chrome"
 		al.action == "action"
@@ -97,17 +103,15 @@ class ActivityLogServiceSpec extends UnitSpec {
 		al.dateCreated != null
 		al.params == "{param1=arg1, param2=arg2}"
 		al.uri == "/document/foo"
-		al.user == u
+		al.user == user
 		al.ip == "ip addr"
 	}
 
 	def "json no optional fields"() {
-		mockDomain(ActivityLog)
-
 		when:
 		def al = service.createFromJson("""
 {
-   "tenant": 0,
+   "tenant": ${DomainTenantMap.list()[0].mappedTenantId},
    "status": 200,
    "userAgent": "Chrome",
    "action": "action",
@@ -131,12 +135,10 @@ class ActivityLogServiceSpec extends UnitSpec {
 	}
 
 	def "json with null optional fields"() {
-		mockDomain(ActivityLog)
-
 		when:
 		def al = service.createFromJson("""
 {
-   "tenant": 0,
+   "tenant": ${DomainTenantMap.list()[0].mappedTenantId},
    "document": null,
    "status": 200,
    "userAgent": "Chrome",

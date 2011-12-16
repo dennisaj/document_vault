@@ -1,12 +1,11 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
-
 import javax.servlet.http.HttpServletRequest
 
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
+import spock.lang.Specification
 
-class RequestServiceSpec extends UnitSpec {
+class RequestServiceSpec extends Specification {
 	RequestService service = new RequestService()
 	HttpServletRequest request = Mock()
 

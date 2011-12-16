@@ -35,6 +35,9 @@ grails.mime.types = [html: ['text/html','application/xhtml+xml'],
 // URL Mapping Cache Max Size, defaults to 5000
 //grails.urlmapping.cache.maxsize = 1000
 
+// What URL patterns should be processed by the resources plugin
+grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']
+
 grails.app.context="/api"
 
 grails.views.javascript.library="jquery"
@@ -55,6 +58,14 @@ grails.enable.native2ascii = true
 grails.logging.jul.usebridge = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
+// whether to disable processing of multi part requests
+grails.web.disable.multipart=false
+
+// request parameters to mask when logging exceptions
+grails.exceptionresolver.params.exclude = ['password', 'currentPassword', 'pass', 'passConfirm']
+
+// enable query caching by default
+grails.hibernate.cache.queries = true
 
 // Set resources plugin filter rules
 grails.resources.cssrewriter.includes = ['**/*.css', '**/*.less']
@@ -136,9 +147,8 @@ grails {
 
 grails.mail.default.from = "Paperless Tech <donotreply@paperlesstech.us>"
 
-tenant {
-	domainTenantBeanName = "us.paperlesstech.DomainTenantMap"
-	resolver.request.dns.type = "db"
+multiTenant {
+	tenantClass = us.paperlesstech.DomainTenantMap
 }
 
 grails.taggable.preserve.case = true
@@ -149,7 +159,7 @@ security {
 		filter.config = """\
 [filters]
 # HTTP Basic authentication
-multitenant = grails.plugin.multitenant.core.MultiTenantFilter
+multitenant = grails.plugin.multitenant.core.servlet.CurrentTenantServletFilter
 authcBasic = org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
 authcBasic.applicationName = Document Vault API
 [urls]
@@ -198,3 +208,4 @@ document_vault {
 		}
 	}
 }
+

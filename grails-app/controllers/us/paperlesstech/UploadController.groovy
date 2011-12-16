@@ -5,23 +5,15 @@ import us.paperlesstech.helpers.FileHelpers
 import us.paperlesstech.nimble.Group
 
 class UploadController {
-	static allowedMethods = [save:'POST', saveAjax:'POST']
-	static navigation = [[group:'tabs', action:'index', isVisible: { authService.canUploadAnyGroup() }, order:10, title:'Upload']]
+	static allowedMethods = [save:'POST']
 
 	def authService
 	def uploadService
 
-	def ajaxSave = {
-		params.ajax = true
-
-		save(params)
-	}
-
 	def save = {
-		def isAjax = params.ajax || request.xhr
 		def results = []
 		def folder = Folder.load(params.long('folderId'))
-		def group = folder?.group ?: Group.load(params.long('group'))
+		def group = folder?.group ?: Group.get(params.long('group'))
 
 		if (group) {
 			request.getMultiFileMap().each { inputName, files->
@@ -50,7 +42,7 @@ class UploadController {
 			results.add([name:"", error:error])
 		}
 
-		isAjax ? render(text:results as JSON, contentType:"text/plain") : chain(action:"index", model:[results:results])
+		render(text:results as JSON, contentType:"text/plain")
 	}
 
 	def savePcl = {

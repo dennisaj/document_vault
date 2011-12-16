@@ -1,6 +1,9 @@
+grails.servlet.version = "2.5" // Change depending on target container compliance (2.5 or 3.0)
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
+grails.project.target.level = 1.6
+grails.project.source.level = 1.6
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 grails.project.dependency.resolution = {
 	// inherit Grails' default dependencies
@@ -42,7 +45,10 @@ grails.project.dependency.resolution = {
 
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-		compile group:'us.paperlesstech', name:'flea', version:'0.9.4'
+		compile group:'us.paperlesstech', name:'flea', version:'0.9.4', {
+			// Grails 2 now includes the log4j slf4j binding.
+			excludes([group: 'org.slf4j', name: 'slf4j-log4j12'])
+		}
 		// The most recent version of iText has an incompatible license. 2.1.7 is the latest version that we can use.
 		compile group:'com.lowagie', name:'itext', version:'2.1.7'
 		runtime group:'mysql', name:'mysql-connector-java', version:'5.1.15'
@@ -61,7 +67,22 @@ grails.project.dependency.resolution = {
 	}
 
 	plugins {
-		compile ':taggable:1.0.1'
+		runtime ':cache-headers:1.1.5'
+		runtime ':code-coverage:1.2.5'
+		runtime ':database-migration:1.0'
+		runtime ":hibernate:$grailsVersion"
+		runtime ':jquery:1.7.1'
+		runtime ':mail:1.0'
+		runtime ':hibernate-hijacker:0.8.1'
+		runtime ':hawk-eventing:0.5.1'
+		runtime ':multi-tenant-single-db:0.8.1'
+		runtime ':quartz:0.4.2'
+		runtime ':resources:1.1.6'
+		runtime ':taggable:1.0.1'
+		runtime ':shiro:1.1.3'
+		runtime ':spock:0.6-SNAPSHOT'
+
+		build ":tomcat:$grailsVersion"
 	}
 }
 

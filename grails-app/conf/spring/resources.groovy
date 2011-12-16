@@ -3,6 +3,10 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import com.mchange.v2.c3p0.ComboPooledDataSource
 
 beans = {
+	// Multi-Tenant beans
+	tenantResolver(us.paperlesstech.DomainTenantResolver)
+	tenantRepository(us.paperlesstech.CachingTenantRepository)
+
 	dataSource(ComboPooledDataSource) { bean ->
 		bean.destroyMethod = 'close'
 		//use grails' datasource configuration for connection user, password, driver and JDBC url
@@ -43,3 +47,4 @@ beans = {
 		handlers = [pclService, pdfService, defaultImageService, tiffService]
 	}
 }
+

@@ -1,30 +1,39 @@
 package us.paperlesstech
 
-import grails.plugin.spock.UnitSpec
 import spock.lang.Shared
 import spock.lang.Unroll
 import us.paperlesstech.nimble.Group
+import spock.lang.Specification
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import us.paperlesstech.nimble.User
+import us.paperlesstech.nimble.Profile
 
-class FolderSpec extends UnitSpec {
-	Document document = new Document(id:1, group:new Group(name:'name'))
-	DocumentData documentData = new DocumentData(mimeType:MimeType.PDF, fileSize:1, fileKey:"asdf")
-	@Shared
-	def group = new Group(id:1, name:'group1')
-	def parentFolder = new Folder(id:1, name:'parent', group:group)
-	@Shared
-	def childFolder1 = new Folder(id:2, name:'child1', group:group)
-	def childFolder2 = new Folder(id:3, name:'child2', group:group)
-	def childFolder3 = new Folder(id:4, name:'child3', group:group)
-	@Shared
-	def grandchildFolder1 = new Folder(id:5, name:'grandchild1', group:group)
-	def nonchildFolder1 = new Folder(id:6, name:'nonchild1', group:group)
-
+@TestFor(Folder)
+@Mock([Folder, PinnedFolder, Document, DocumentData, PreviewImage, Group, User, Profile])
+class FolderSpec extends Specification {
+	Document document
+	
+	def parentFolder
+	
+	def childFolder1
+	def childFolder2
+	def childFolder3
+	
+	def grandchildFolder1
+	def nonchildFolder1
+	
 	def setup() {
-		mockDomain(Group, [group])
-		mockDomain(Document, [document])
-		mockDomain(DocumentData, [documentData])
-		mockDomain(Folder, [parentFolder, childFolder1, childFolder2, childFolder3, grandchildFolder1, nonchildFolder1])
+		document = UnitTestHelper.createDocument()
+		parentFolder = new Folder(id: 1, name: 'parent', group: document.group).save(flush: true, failOnError: true)
 
+		childFolder1 = new Folder(id: 2, name: 'child1', group: document.group).save(flush: true, failOnError: true)
+		childFolder2 = new Folder(id: 3, name: 'child2', group: document.group).save(flush: true, failOnError: true)
+		childFolder3 = new Folder(id: 4, name: 'child3', group: document.group).save(flush: true, failOnError: true)
+
+		grandchildFolder1 = new Folder(id: 5, name: 'grandchild1', group: document.group).save(flush: true, failOnError: true)
+		nonchildFolder1 = new Folder(id: 6, name: 'nonchild1', group: document.group).save(flush: true, failOnError: true)
+		
 		parentFolder.addToChildren(childFolder1)
 		parentFolder.addToChildren(childFolder2)
 		parentFolder.addToChildren(childFolder3)
@@ -33,9 +42,11 @@ class FolderSpec extends UnitSpec {
 		childFolder1.parent = parentFolder
 		childFolder2.parent = parentFolder
 		childFolder3.parent = parentFolder
+		parentFolder.save(flush: true, failOnError: true)
 
 		childFolder1.addToChildren(grandchildFolder1)
 		grandchildFolder1.parent = childFolder1
+		childFolder1.save(flush: true, failOnError: true)
 	}
 
 	def "folders with no documents or name should not be saved"() {
@@ -48,30 +59,39 @@ class FolderSpec extends UnitSpec {
 	}
 
 	def "deleting a folder should leave the documents"() {
+		assert Document.count() == 1
+		assert Folder.count() == 6
+
 		given:
-		document.addToFiles(documentData)
-		document.save(flush:true)
+		def documentId = document.id
 		def folder = new Folder(name:'folder')
 		folder.addToDocuments(document)
 		folder.save(flush:true)
 		when:
 		folder.delete(flush:true)
 		then:
-		Document.get(1)
+		Document.get(documentId)
 		Folder.count() == 6
 	}
 
-	@Unroll("Testing if parentFolder can have its parent set to #newParent")
-	def "a folder should not be able set its parent to a descendant"() {
+	def "a folder should not be able set its parent to a sub folder"() {
 		when:
-		parentFolder.parent = newParent
-		newParent.addToChildren(parentFolder)
+		parentFolder.parent = childFolder1
+		childFolder1.addToChildren(parentFolder)
 		def result = parentFolder.validate()
 		then:
 		!result
 		parentFolder.errors.hasFieldErrors('parent')
-		where:
-		newParent << [childFolder1, grandchildFolder1]
+	}
+
+	def "a folder should not be able set its parent to a folder descendant"() {
+		when:
+		parentFolder.parent = grandchildFolder1
+		grandchildFolder1.addToChildren(parentFolder)
+		def result = parentFolder.validate()
+		then:
+		!result
+		parentFolder.errors.hasFieldErrors('parent')
 	}
 
 	def "a folder should be able set its parent to a nondescendant"() {

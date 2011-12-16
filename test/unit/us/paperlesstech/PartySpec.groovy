@@ -1,9 +1,9 @@
 package us.paperlesstech
 
-import spock.lang.*
-import grails.plugin.spock.*
+import spock.lang.Specification
+import spock.lang.Shared
 
-class PartySpec extends UnitSpec {
+class PartySpec extends Specification {
 	@Shared
 	Date now = new Date()
 	@Shared

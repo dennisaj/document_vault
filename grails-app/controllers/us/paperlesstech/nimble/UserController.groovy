@@ -26,8 +26,6 @@ import us.paperlesstech.helpers.InstanceGenerator
  * @author Bradley Beddoes
  */
 class UserController {
-	static navigation = [[group:'user', action:'list', isVisible: { authService.isAdmin() }, order:90, title:'Admin']]
-
 	static Map allowedMethods = [save: 'POST', update: 'POST', enable: 'POST', disable: 'POST', enableapi: 'POST', disableapi: 'POST',
 			savepassword: 'POST', validusername: 'POST', searchgroups: 'POST', grantgroup: 'POST', removegroup: 'POST',
 			createpermission: 'POST', removepermisson: 'POST', searchroles: 'POST', grantrole: 'POST', removerole: 'POST']
@@ -131,14 +129,12 @@ class UserController {
 
 	def create = {
 		def user = InstanceGenerator.user()
-		user.profile = InstanceGenerator.profile()
 		log.debug "Starting user creation process"
 		[user: user]
 	}
 
 	def save = {
 		def user = InstanceGenerator.user()
-		user.profile = InstanceGenerator.profile()
 		def userFields = grailsApplication.config.nimble.fields.enduser.user
 		def profileFields = grailsApplication.config.nimble.fields.enduser.profile
 		user.properties[userFields] = params

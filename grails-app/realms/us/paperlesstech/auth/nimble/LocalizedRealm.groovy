@@ -25,6 +25,7 @@ import org.apache.shiro.authz.permission.AllPermission
 import org.apache.shiro.authz.permission.WildcardPermission
 
 import us.paperlesstech.nimble.User
+import grails.util.Environment
 
 /**
  * Integrates with Shiro to establish a session for users accessing the system based
@@ -193,6 +194,14 @@ class LocalizedRealm {
 		try {
 			session = sessionFactory.openSession()
 			def user = session.get(User.class, new Long(principal))
+			if (!user) {
+				// In tests session.get does not work so fall back to the domain object method
+				if (Environment.currentEnvironment == Environment.TEST) {
+					user = User.get(new Long(principal))
+				} else {
+					throw new IllegalStateException("Unable to load user for principal: $principal")
+				}
+			}
 
 			log.debug "Determining if permissions assigned to user [$user.id]$user.username contain a permission that implies $requiredPermission"
 			// Try all directly assigned permissions

@@ -48,7 +48,7 @@ class BootStrap {
 			log.info("no custom bootstrapping")
 		}
 
-		if (Environment.currentEnvironment == Environment.DEVELOPMENT) {
+		if ([Environment.DEVELOPMENT, Environment.TEST].contains(Environment.currentEnvironment)) {
 			System.setProperty('java.io.tmpdir', cache.absolutePath)
 			if (DomainTenantMap.count() == 0) {
 				new DomainTenantMap(domainName: 'localhost', mappedTenantId: 1, name: 'default').save(failOnError: true)

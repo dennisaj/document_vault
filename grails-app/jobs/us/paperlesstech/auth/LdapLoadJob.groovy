@@ -1,6 +1,6 @@
 package us.paperlesstech.auth
 
-import grails.plugin.multitenant.core.util.TenantUtils
+import us.paperlesstech.DomainTenantMap
 
 class LdapLoadJob {
 	static triggers = {
@@ -18,11 +18,13 @@ class LdapLoadJob {
 		}
 
 		// Currently LDAP only works when there is only one tenant
-		def tenants = TenantUtils.allTenantData.values().collect { it.mappedTenantId } as Set
+		def tenants = DomainTenantMap.createCriteria() {
+			distinct('mappedTenantId')
+		}.list()
 		assert tenants.size() == 1
-		def tenantId = tenants.iterator().next()
+		def tenantId = tenants[0]
 
-		TenantUtils.doWithTenant(tenantId) {
+		DomainTenantMap.withTenantId(tenantId) {
 			loadLdap()
 		}
 	}

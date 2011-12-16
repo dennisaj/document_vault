@@ -9,15 +9,14 @@ class UserInfoController {
 	def tenantService
 
 	def index = {
-		def n = grailsApplication.mainContext.getBean('NavigationTagLib')
 		def user = authService.authenticatedUser
 		if (user) {
 			def returnMap = [:]
 			returnMap.menu = []
-			n.eachItem([group:'user']) {
+			if(authService.admin) {
 				returnMap.menu << [
-					title:g.message(code:'navigation.user.' + it.title, default:it.title, encodeAs:'HTML'),
-					url:it.link
+						title: g.message(code: 'navigation.user.admin', default: 'Admin', encodeAs: 'HTML'),
+						url: g.createLink(controller: 'user', action: 'list')
 				]
 			}
 

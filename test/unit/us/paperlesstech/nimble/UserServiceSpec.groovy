@@ -33,12 +33,10 @@ class UserServiceSpec extends UnitSpec {
 		given:
 		mockDomain(User)
 		mockDomain(Profile)
-		def user = new User()
-		def profile = new Profile()
+		def user = new User(profile: new Profile())
 		def ig = mockFor(InstanceGenerator)
 
 		ig.demand.static.user {-> user}
-		ig.demand.static.profile {-> profile}
 		roleService.addMember(user, role) >> {
 			user.addToRoles(role)
 			user
@@ -63,12 +61,10 @@ class UserServiceSpec extends UnitSpec {
 		given:
 		mockDomain(User)
 		mockDomain(Profile)
-		def user = new User()
-		def profile = new Profile()
+		def user = new User(profile: new Profile())
 		def ig = mockFor(InstanceGenerator)
 
 		ig.demand.static.user {-> user}
-		ig.demand.static.profile {-> profile}
 		service.metaClass.createUser = { User u ->
 			u.errors.reject("nope")
 			u

@@ -3,8 +3,6 @@ package us.paperlesstech
 import grails.converters.JSON
 
 class DocumentController {
-	static navigation = [[group:'tabs', action:'index', isVisible: { authService.isLoggedIn() }, order:0, title:'Search']]
-
 	def authService
 	def documentService
 	def handlerChain
