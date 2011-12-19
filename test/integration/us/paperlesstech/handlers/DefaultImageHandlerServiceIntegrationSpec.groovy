@@ -9,11 +9,12 @@ import us.paperlesstech.DocumentData
 class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	def defaultImageHandlerService
 	def fileService
-	def line
+	def signature
+	def line = [a:[x:0,y:0], b:[x:100,y:100]]
 
 	@Override
 	def setup() {
-		line = [a:[x:0,y:0], b:[x:100,y:100]]
+		signature = [height: 150, width: 750, top: 0, left: 0, lines:[line, 'LB']]
 		defaultImageHandlerService.authService = authService
 	}
 
@@ -43,8 +44,6 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 	}
 
 	def "cursiveSign image files"() {
-		given:
-			def lines = ['1':[line, 'LB'], '2':[line], '4':[line]]
 		when:
 			def document = new Document(group: DomainIntegrationSpec.group)
 			def documentData = new DocumentData(mimeType: mimeType)
@@ -53,7 +52,7 @@ class DefaultImageHandlerServiceIntegrationSpec extends BaseHandlerSpec {
 
 			defaultImageHandlerService.importFile(input)
 			document = document.save()
-			input = [document: document, documentData: document.files.first(), signatures: lines]
+			input = [document: document, documentData: document.files.first(), signatures: ["1":[signature]]]
 			defaultImageHandlerService.cursiveSign(input)
 
 		then:

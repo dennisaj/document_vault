@@ -128,20 +128,27 @@ class PdfHandlerService extends Handler {
 			pdfStamper = new PdfStamper(pdfReader, output)
 
 			(1..data.pages).each { i ->
-				def lines = signatures[i.toString()]
-				if (!lines) {
-					return
-				}
-
 				PdfContentByte content = pdfStamper.getOverContent(i)
 				Rectangle psize = pdfReader.getPageSize(i)
-
 				content.setLineWidth(0.05f)
-				lines.each {
-					if (it != LINEBREAK) {
-						content.moveTo(it.a.x as float, (psize.height - it.a.y) as float)
-						content.lineTo(it.b.x as float, (psize.height - it.b.y) as float)
-						content.stroke()
+				
+				signatures[i.toString()].each { signature ->
+					def top = signature.top as float
+					def left = signature.left as float
+					def color = Color.BLACK
+					
+					try {
+						color = Color[signature.color ?: "BLACK"]
+					} catch (MissingPropertyException mpe) {}
+					
+					content.setColorStroke(color)
+					
+					signature.lines.each {
+						if (it != LINEBREAK) {
+							content.moveTo((it.a.x + left) as float, ((psize.height - it.a.y + top) as float))
+							content.lineTo((it.b.x + left) as float, ((psize.height - it.b.y + top) as float))
+							content.stroke()
+						}
 					}
 				}
 			}

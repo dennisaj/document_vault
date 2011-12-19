@@ -84,7 +84,9 @@ class DefaultImageHandlerService extends Handler {
 			original = ImageIO.read(is)
 		}
 
-		ImageHelpers.drawLines(original, signatureData)
+		signatureData.each { signature ->
+			ImageHelpers.drawLines(original, signature)
+		}
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream()
 		ImageIO.write(original, data.mimeType.toString().toLowerCase(), output)
