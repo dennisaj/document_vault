@@ -64,6 +64,14 @@
 
     <!-- Grails dispatcher servlet -->
     <servlet>
+		<servlet-name>default</servlet-name>
+		<servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
+		<init-param>
+			<param-name>dirAllowed</param-name>
+			<param-value>false</param-value>
+		</init-param>
+	</servlet>
+    <servlet>
         <servlet-name>grails</servlet-name>
         <servlet-class>org.codehaus.groovy.grails.web.servlet.GrailsDispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
