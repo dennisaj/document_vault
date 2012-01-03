@@ -2,6 +2,12 @@ package us.paperlesstech
 
 import grails.converters.JSON
 
+import java.util.concurrent.Callable
+
+import org.apache.shiro.subject.PrincipalCollection
+import org.apache.shiro.subject.SimplePrincipalCollection
+import org.apache.shiro.subject.Subject
+
 class PartyController {
 	static def allowedMethods = [addParty: "POST", image: "POST", removeParty: "POST", resend: "POST",
 			submitParties: "POST", submitSignatures: "POST", emailDocument: "POST"]
@@ -25,13 +31,25 @@ class PartyController {
 
 		render([status:"success"] as JSON)
 	}
+	
+	def codeSignatures = {
+		def party = Party.findByCode(params.documentId)
+		assert party
+		params.documentId = party.document.id
+		
+		PrincipalCollection principals = new SimplePrincipalCollection(party.signator.id, "localized")
+		Subject subject = new Subject.Builder().principals(principals).buildSubject()
+		subject.execute({
+			this.submitSignatures()
+		} as Callable)
+	}
 
 	def submitSignatures = {
 		def document = Document.get(params.long("documentId"))
 		assert document
 		
 		def signatures = JSON.parse(params.signatures).findAll { it.value }
-
+		
 		if (signatures) {
 			document = partyService.cursiveSign(document, signatures)
 			if (!document.hasErrors()) {
@@ -42,7 +60,7 @@ class PartyController {
 		} else {
 			flash.yellow = g.message(code:"document-vault.signature.error.nosignatures", args:[document])
 		}
-
+		
 		render([status:"success"] as JSON)
 	}
 
@@ -81,7 +99,7 @@ class PartyController {
 			party = partyService.sendCode(party)
 		} else {
 			party = partyService.createParty(document,
-					[email: email, permission: DocumentPermission.View.name(), color: PartyColor.Yellow.name()])
+					[email: email, permission: DocumentPermission.View.name()])
 		}
 
 		def returnMap = [:]

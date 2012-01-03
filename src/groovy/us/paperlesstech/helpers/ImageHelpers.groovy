@@ -11,6 +11,7 @@ import javax.imageio.stream.ImageInputStream
 import javax.imageio.stream.MemoryCacheImageInputStream
 
 import us.paperlesstech.MimeType
+import us.paperlesstech.PartyColor
 
 class ImageHelpers {
 	static final String LINEBREAK = 'LB'
@@ -18,7 +19,7 @@ class ImageHelpers {
 	/**
 	 * Draw lines on the passed in BufferedImage.
 	 * 
-	 * @param lines A list of maps. The maps should be formatted as
+	 * @param signature A signature object. The lines should be formatted as
 	 * <pre>
 	 * 		line = {
 	 * 			a: {
@@ -38,8 +39,8 @@ class ImageHelpers {
 		def color = Color.BLACK
 		
 		try {
-			color = Color[signature.color ?: "BLACK"]
-		} catch (MissingPropertyException mpe) {}
+			color = PartyColor.valueOf(signature.color?.toLowerCase()?.capitalize() ?: "Black").color
+		} catch (IllegalArgumentException iae) {}
 		
 		Graphics2D buffer = image.createGraphics()
 		buffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)

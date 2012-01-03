@@ -98,7 +98,6 @@ class PartyServiceSpec extends Specification {
 		when:
 		def party = service.createParty(document, input)
 		then:
-		party.errors["color"].codes.any { it == "nullable" }
 		party.errors["documentPermission"].codes.any { it == "nullable" }
 		party.errors["expiration"].codes.any { it == "party.expiration.invalidformat" }
 	}

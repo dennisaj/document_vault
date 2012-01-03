@@ -53,7 +53,7 @@ class PartyControllerSpec extends ControllerSpec {
 		then:
 		thrown(AssertionError)
 		where:
-		partyId << [null, '3']
+		partyId << [null, '1100']
 	}
 
 	def "removeParty should throw an AssertionError when given an invalid documentId"() {
@@ -145,7 +145,7 @@ class PartyControllerSpec extends ControllerSpec {
 		then:
 		thrown(AssertionError)
 		where:
-		partyId << [null, '3']
+		partyId << [null, '1100']
 	}
 
 	def "resend should call partyService's sendCode when given valid input"() {
@@ -258,5 +258,14 @@ class PartyControllerSpec extends ControllerSpec {
 		1 * notificationService.error(_, _) >> [message:'message']
 		results.notification.message == 'message'
 		document1.parties.size() == 0
+	}
+	
+	def "codeSignatures should throw an error given an invalid document code"() {
+		given:
+		controller.params.documentId = null
+		when:
+		controller.codeSignatures()
+		then:
+		thrown(AssertionError)
 	}
 }

@@ -52,6 +52,8 @@ public class SecurityFilters implements ApplicationContextAware {
 							}
 						case "party":
 							switch (action) {
+								case ["codeSignatures"]:
+									return true
 								case ["submitSignatures"]:
 									return document && authService.canSign(document)
 								case ["emailDocument"]:

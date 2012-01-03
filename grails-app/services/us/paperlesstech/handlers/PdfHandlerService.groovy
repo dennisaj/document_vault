@@ -6,6 +6,7 @@ import org.springframework.core.io.ClassPathResource
 
 import us.paperlesstech.DocumentData
 import us.paperlesstech.MimeType
+import us.paperlesstech.PartyColor
 import us.paperlesstech.PreviewImage
 import us.paperlesstech.Printer
 import us.paperlesstech.helpers.FileHelpers
@@ -130,7 +131,7 @@ class PdfHandlerService extends Handler {
 			(1..data.pages).each { i ->
 				PdfContentByte content = pdfStamper.getOverContent(i)
 				Rectangle psize = pdfReader.getPageSize(i)
-				content.setLineWidth(0.05f)
+				content.setLineWidth(0.5f)
 
 				signatures[i.toString()].each { signature ->
 					def top = signature.top as float
@@ -138,8 +139,8 @@ class PdfHandlerService extends Handler {
 					def color = Color.BLACK
 
 					try {
-						color = Color[signature.color ?: "BLACK"]
-					} catch (MissingPropertyException mpe) {}
+						color = PartyColor.valueOf(signature.color?.toLowerCase()?.capitalize() ?: "Black").color
+					} catch (IllegalArgumentException iae) {}
 
 					content.setColorStroke(color)
 

@@ -33,7 +33,7 @@ class Party {
 
 	static constraints = {
 		code blank:false, nullable:false, unique:true
-		color nullable:false
+		color nullable:true
 		documentPermission nullable:false, inList:allowedPermissions
 		expiration nullable:true, validator: {val, obj->
 			if (!val || obj.id) {

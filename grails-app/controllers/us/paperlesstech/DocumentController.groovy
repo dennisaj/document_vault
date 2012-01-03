@@ -77,6 +77,9 @@ class DocumentController {
 		assert document
 
 		def map = document.asMap()
+		
+		def party = Party.findByDocumentAndSignator(document, authService.authenticatedUser)
+		def colors = party?.color ? [party?.color?.name()] : PartyColor.values()*.name()
 
 		def pages = (1..map.data.pages).collect { pageNumber->
 			def image = document.previewImageAsMap(pageNumber)
@@ -88,7 +91,7 @@ class DocumentController {
 			map.notes = []
 		}
 
-		render([document:map, pages:pages, colors:PartyColor.values()*.name()] as JSON)
+		render([document:map, pages:pages, colors:colors] as JSON)
 	}
 
 	def image = {

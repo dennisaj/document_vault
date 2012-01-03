@@ -46,7 +46,6 @@ class PartyService {
 		}
 
 		party.highlights = highlightService.fromJsonList(party, p.highlights)
-
 		party.validate()
 
 		// Add this error here because validate wipes existing errors
@@ -87,7 +86,7 @@ class PartyService {
 		Party party = document.parties.find { it.signator == user }
 
 		if (!party) {
-			party = new Party(signator:user, color:PartyColor.Yellow, documentPermission:DocumentPermission.Sign, document:document)
+			party = new Party(signator:user, documentPermission:DocumentPermission.Sign, document:document)
 			def highlight = new Highlight(pageNumber:1, party:party)
 			party.highlights = [highlight]
 			document.addToParties(party)
@@ -101,6 +100,10 @@ class PartyService {
 				throw new RuntimeException("Unable to create party for the current user.")
 			}
 			party = savedParty
+		} else if (party.color) {
+			signatures.each { p, s ->
+				s*.color = party.color.name()
+			}
 		}
 
 		markAccepted(party)

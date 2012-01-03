@@ -62,6 +62,13 @@ class UrlMappings {
 		"/party/$action?/$documentId?" {
 			controller = "party"
 		}
+		
+		"/party/submitSignatures/$documentId" {
+			controller = "party"
+			action = {
+				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "codeSignatures" : "submitSignatures"
+			}
+		}
 
 		"/note/download/$documentId/$noteDataId" {
 			controller = "note"
