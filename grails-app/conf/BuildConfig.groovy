@@ -82,7 +82,9 @@ grails.project.dependency.resolution = {
 		runtime ':shiro:1.1.3'
 		runtime ':spock:0.6-SNAPSHOT'
 
-		build ":tomcat:$grailsVersion"
+		runtime ':jetty:1.2-SNAPSHOT', {
+			excludes([group: 'org.slf4j', name: 'slf4j-simple'])
+		}
 	}
 }
 
