@@ -68,7 +68,7 @@ grails.project.dependency.resolution = {
 
 	plugins {
 		runtime ':cache-headers:1.1.5'
-		runtime ':code-coverage:1.2.5'
+		test ':code-coverage:1.2.5'
 		runtime ':database-migration:1.0'
 		runtime ":hibernate:$grailsVersion"
 		runtime ':jquery:1.7.1'
@@ -80,7 +80,7 @@ grails.project.dependency.resolution = {
 		runtime ':resources:1.1.6'
 		runtime ':taggable:1.0.1'
 		runtime ':shiro:1.1.3'
-		runtime ':spock:0.6-SNAPSHOT'
+		test ':spock:0.6-SNAPSHOT'
 
 		runtime ':jetty:1.2-SNAPSHOT', {
 			excludes([group: 'org.slf4j', name: 'slf4j-simple'])
