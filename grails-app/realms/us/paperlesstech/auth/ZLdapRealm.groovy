@@ -78,6 +78,8 @@ class ZLdapRealm implements InitializingBean {
 
 		// Set up the configuration for the LDAP search we are about to do.
 		def env = new Hashtable()
+		// 10s timeout on read operations
+		env["com.sun.jndi.ldap.read.timeout"] = "10000"
 		env[Context.INITIAL_CONTEXT_FACTORY] = "com.sun.jndi.ldap.LdapCtxFactory"
 		if (searchUser) {
 			// Non-anonymous access for the search.

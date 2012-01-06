@@ -18,11 +18,13 @@ class LdapLoadJob {
 		}
 
 		// Currently LDAP only works when there is only one tenant
-		def tenants = DomainTenantMap.createCriteria() {
-			distinct('mappedTenantId')
-		}.list()
-		assert tenants.size() == 1
-		def tenantId = tenants[0]
+		def tenantIds = DomainTenantMap.createCriteria().list() {
+			projections {
+				distinct 'mappedTenantId'
+			}
+		}
+		assert tenantIds.size() == 1
+		def tenantId = tenantIds[0]
 
 		DomainTenantMap.withTenantId(tenantId) {
 			loadLdap()
