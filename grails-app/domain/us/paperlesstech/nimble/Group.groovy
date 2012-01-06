@@ -18,8 +18,6 @@ package us.paperlesstech.nimble
 
 import grails.plugin.multitenant.core.annotation.MultiTenant
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
 /**
  * Represents a grouping of users in a Nimble based application
  *

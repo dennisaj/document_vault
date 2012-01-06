@@ -31,12 +31,12 @@ class PartyController {
 
 		render([status:"success"] as JSON)
 	}
-	
+
 	def codeSignatures = {
 		def party = Party.findByCode(params.documentId)
 		assert party
 		params.documentId = party.document.id
-		
+
 		PrincipalCollection principals = new SimplePrincipalCollection(party.signator.id, "localized")
 		Subject subject = new Subject.Builder().principals(principals).buildSubject()
 		subject.execute({
@@ -47,9 +47,9 @@ class PartyController {
 	def submitSignatures = {
 		def document = Document.get(params.long("documentId"))
 		assert document
-		
+
 		def signatures = JSON.parse(params.signatures).findAll { it.value }
-		
+
 		if (signatures) {
 			document = partyService.cursiveSign(document, signatures)
 			if (!document.hasErrors()) {
@@ -60,7 +60,7 @@ class PartyController {
 		} else {
 			flash.yellow = g.message(code:"document-vault.signature.error.nosignatures", args:[document])
 		}
-		
+
 		render([status:"success"] as JSON)
 	}
 

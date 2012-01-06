@@ -17,12 +17,9 @@
 package us.paperlesstech.nimble
 
 import grails.plugin.multitenant.core.annotation.MultiTenant
-
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
-import us.paperlesstech.Preference
 import us.paperlesstech.Folder
 import us.paperlesstech.PinnedFolder
+import us.paperlesstech.Preference
 
 /**
  * Represents a user within a Nimble Application

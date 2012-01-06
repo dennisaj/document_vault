@@ -24,17 +24,16 @@ class FolderController {
 		if (folder.hasErrors()) {
 			returnMap.notification = notificationService.error('document-vault.api.folder.create.error')
 
-			// TODO replace with collectEntries with Groovy 1.8.0
-			returnMap.validation = [:].putAll(['group', 'name', 'documents', 'parent'].collect { field->
-				new MapEntry(field,
+			returnMap.validation = ['group', 'name', 'documents', 'parent'].collectEntries { field->
+				[(field):
 					[
 						errors:folder.errors.getFieldErrors(field).collect {
 							g.message(error:it, encodeAs:'HTML')
 						},
 						valid:!folder.errors.hasFieldErrors(field)
 					]
-				)
-			})
+				]
+			}
 		} else {
 			returnMap.notification = notificationService.success('document-vault.api.folder.create.success', [folder.name])
 			returnMap.folder = folder.asMap()
@@ -80,17 +79,16 @@ class FolderController {
 		if (folder.hasErrors()) {
 			returnMap.notification = notificationService.error('document-vault.api.folder.update.error')
 
-			// TODO replace with collectEntries with Groovy 1.8.0
-			returnMap.validation = [:].putAll(['group', 'name', 'documents', 'parent'].collect { field->
-				new MapEntry(field,
+			returnMap.validation = ['group', 'name', 'documents', 'parent'].collectEntries { field->
+				[(field):
 					[
 						errors:folder.errors.getFieldErrors(field).collect {
 							g.message(error:it, encodeAs:'HTML')
 						},
 						valid:!folder.errors.hasFieldErrors(field)
 					]
-				)
-			})
+				]
+			}
 		} else {
 			returnMap.notification = notificationService.success('document-vault.api.folder.update.success', [folder.name])
 			returnMap.folder = folder.asMap()

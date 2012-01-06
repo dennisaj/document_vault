@@ -2,7 +2,6 @@ package us.paperlesstech.nimble
 
 import grails.plugin.spock.UnitSpec
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 
 import us.paperlesstech.helpers.InstanceGenerator
@@ -21,7 +20,6 @@ class UserServiceSpec extends UnitSpec {
 
 		def config = new ConfigObject()
 		config.nimble.passwords.minlength = 8
-		ConfigurationHolder.config = config
 
 		grailsApplication.metaClass.getConfig = {-> config }
 

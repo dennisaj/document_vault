@@ -19,7 +19,6 @@ package us.paperlesstech.nimble
 import grails.plugin.multitenant.core.annotation.MultiTenant
 
 import org.apache.shiro.crypto.hash.Md5Hash
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 /**
  * Represents generic details about users that are useful to many applications
@@ -52,7 +51,7 @@ class Profile {
 			emailHash = hasher.toHex()
 		}
 	}
-	
+
 	static belongsTo = [owner:User]
 
 	static mapping = {

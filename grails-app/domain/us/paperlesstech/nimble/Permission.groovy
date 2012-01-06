@@ -17,7 +17,6 @@
 package us.paperlesstech.nimble
 
 import grails.plugin.multitenant.core.annotation.MultiTenant
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 /**
  * Our permission object encapsulates details that a normal Shiro deployment

@@ -11,23 +11,14 @@ grails.project.dependency.resolution = {
 		// uncomment to disable ehcache
 		// excludes 'ehcache'
 	}
+
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+
 	repositories {
 		// Disable inheriting plugin repositories
 		inherit false
-		/*mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release-local"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-snapshot-local"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-release-local"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/remote-repos"*/
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-release"
 		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/libs-snapshot"
-		/*mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-release"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins-snapshot"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/itextpdf/"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/thebuzzmedia/"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/jboss/"
-		mavenRepo "http://artifactory.ptdev.lan.vbn/artifactory/mygrid/"
-		grailsRepo "http://artifactory.ptdev.lan.vbn/artifactory/plugins.grails.org"*/
 
 		grailsPlugins()
 		grailsHome()

@@ -1,6 +1,5 @@
 package us.paperlesstech
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -33,12 +32,6 @@ class PartyServiceSpec extends Specification {
 		service.metaClass.sendMail = {Closure c ->
 			true
 		}
-
-		def config = new ConfigObject()
-		config.nimble.passwords.minlength = 8
-		ConfigurationHolder.config = config
-
-		grailsApplication.metaClass.getConfig = {-> config }
 	}
 
 	def "test createParty"() {

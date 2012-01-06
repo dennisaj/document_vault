@@ -18,8 +18,6 @@ package us.paperlesstech.nimble
 
 import grails.plugin.multitenant.core.annotation.MultiTenant
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
 /**
  * Represents a role within a Nimble application
  *
@@ -30,7 +28,7 @@ class Role {
 	String name
 	String description
 	String realm
-	
+
 	boolean external = false
 	boolean protect = false
 
