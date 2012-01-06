@@ -5,7 +5,7 @@ import grails.converters.JSON
 class ErrorController {
 	def notificationService
 
-	def index = {
+	def index() {
 		def error = [:]
 		try {
 			error.statusCode = request.'javax.servlet.error.status_code'

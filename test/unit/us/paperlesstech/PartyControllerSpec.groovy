@@ -1,200 +1,164 @@
 package us.paperlesstech
 
 import grails.converters.JSON
-import grails.plugin.spock.ControllerSpec
-import us.paperlesstech.nimble.User
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.Profile
+import us.paperlesstech.nimble.User
 
-class PartyControllerSpec extends ControllerSpec {
+@TestFor(PartyController)
+@Mock([Party, Document, DocumentData, PreviewImage, Group, User])
+class PartyControllerSpec extends Specification {
 	NotificationService notificationService = Mock()
 	PartyService partyService = Mock()
 
-	def document1 = new Document(id:1, parties: [] as Set)
-	def document2 = new Document(id:2)
-	def party1 = new Party(id:1, document:document1)
-	def party2 = new Party(id:2, document:document1)
 
 	def setup() {
 		controller.notificationService = notificationService
 		controller.partyService = partyService
 
-		mockDomain(Party,[party1, party2])
-		mockDomain(Document, [document1, document2])
+		def document1 = UnitTestHelper.createDocument()
+		def document2 = UnitTestHelper.createDocument()
+
+		new Party(id:1, document:document1, documentPermission:DocumentPermission.Sign, signator:UnitTestHelper.createUser(), highlights:[new Highlight()]).save(failOnError: true, flush: true)
+		new Party(id:2, document:document1, documentPermission:DocumentPermission.Sign, signator:UnitTestHelper.createUser(), highlights:[new Highlight()]).save(failOnError: true, flush: true)
 	}
 
 	def "addParty should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.documentId = null
 		when:
-		controller.addParty()
+		controller.addParty(null)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "addParty should return a filled in model when given valid data"() {
-		given:
-		controller.params.documentId = '1'
 		when:
-		controller.addParty()
+		controller.addParty(1L)
+		def results = JSON.parse(response.contentAsString)
 		then:
-		controller.renderArgs.template == 'party'
-		controller.renderArgs.model.document == document1
-		controller.renderArgs.model.colors == PartyColor.values()
-		controller.renderArgs.model.permissions == Party.allowedPermissions
-		controller.renderArgs.model.party
+		1 * notificationService.success(_)
+		results.document.id == 1
+		results.colors == PartyColor.values()*.name()
+		results.permissions == Party.allowedPermissions*.name()
 	}
 
 	def "removeParty should throw an AssertionError when given an invalid partyId"() {
-		given:
-		controller.params.partyId = partyId
-		controller.params.documentId = null
 		when:
-		controller.removeParty()
+		controller.removeParty(null, partyId)
 		then:
 		thrown(AssertionError)
 		where:
-		partyId << [null, '1100']
+		partyId << [null, 1100L]
 	}
 
 	def "removeParty should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.partyId = '1'
-		controller.params.documentId = documentId
 		when:
-		controller.removeParty()
+		controller.removeParty(documentId, 1L)
 		then:
 		thrown(AssertionError)
 		where:
-		documentId << [null, '2']
+		documentId << [null, 2L]
 	}
 
 	def "removeParty should call partyService's removeParty when given valid input"() {
-		given:
-		controller.params.partyId = '1'
-		controller.params.documentId = '1'
-		1 * partyService.removeParty(party1)
 		when:
-		controller.removeParty()
+		controller.removeParty(documentId, partyId)
 		then:
-		JSON.parse(mockResponse.contentAsString).status == 'success'
+		1 * partyService.removeParty(Party.get(partyId))
+		1 * notificationService.success(_, [documentId, partyId])
+		where:
+		documentId << 1L
+		partyId << 1L
 	}
 
 	def "submitSignatures should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.signatures = null
-		controller.params.documentId = null
 		when:
-		controller.submitSignatures()
+		controller.submitSignatures(null, null)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "submitSignatures should set flash yellow when given invalid signatures"() {
-		given:
-		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
-		controller.params.signatures = '[]'
-		controller.params.documentId = '1'
 		when:
-		controller.submitSignatures()
+		controller.submitSignatures(1L, '[]')
 		then:
 		controller.flash.yellow
 	}
 
 	def "submitSignatures should call partyService's cursiveSign and set flash green when given valid signatures"() {
 		given:
-		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
-		controller.params.signatures = '{1:{lines:"lines"}}'
-		controller.params.documentId = '1'
-		1 * partyService.cursiveSign(document1, _) >> document1
+		def document1 = Document.get(1L)
 		when:
-		controller.submitSignatures()
+		controller.submitSignatures(document1.id, '{1:{lines:"lines"}}')
 		then:
+		1 * partyService.cursiveSign(document1, _) >> document1
 		controller.flash.green
 	}
 
 	def "submitSignatures should call partyService's cursiveSign and set flash red when an error is returned"() {
 		given:
-		controller.metaClass.message = { LinkedHashMap arg1 -> 'this is stupid' }
-		controller.params.signatures = '{1:{lines:"lines"}}'
-		controller.params.documentId = '1'
-		1 * partyService.cursiveSign(document1, _) >> { d, m-> d.errors.rejectValue('id', 'because'); d }
+		def document1 = Document.get(1L)
 		when:
-		controller.submitSignatures()
+		controller.submitSignatures(document1.id, '{1:{lines:"lines"}}')
 		then:
+		1 * partyService.cursiveSign(document1, _) >> { d, m-> d.errors.rejectValue('id', 'because'); d }
 		controller.flash.red
 	}
 
 	def "resend should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.partyId = '1'
-		controller.params.documentId = documentId
 		when:
-		controller.resend()
+		controller.resend(documentId, 1L)
 		then:
 		thrown(AssertionError)
 		where:
-		documentId << [null, '2']
+		documentId << [null, 2L]
 	}
 
 	def "resend should throw an AssertionError when given an invalid partyId"() {
-		given:
-		controller.params.partyId = partyId
-		controller.params.documentId = '1'
 		when:
-		controller.resend()
+		controller.resend(1L, partyId)
 		then:
 		thrown(AssertionError)
 		where:
-		partyId << [null, '1100']
+		partyId << [null, 1100L]
 	}
 
 	def "resend should call partyService's sendCode when given valid input"() {
-		given:
-		controller.params.partyId = '1'
-		controller.params.documentId = '1'
-		1 * partyService.sendCode(party1)
 		when:
-		controller.resend()
+		controller.resend(1L, 1L)
 		then:
-		JSON.parse(mockResponse.contentAsString).status == 'success'
+		1 * partyService.sendCode(Party.get(1L))
+		JSON.parse(response.contentAsString).status == 'success'
 	}
 
 	def "submitParties should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.parties = null
-		controller.params.documentId = documentId
 		when:
-		controller.submitParties()
+		controller.submitParties(documentId, null)
 		then:
 		thrown(AssertionError)
 		where:
-		documentId << [null, '3']
+		documentId << [null, 3L]
 	}
 
 	def "submitParties should return a filled in model when given valid data"() {
 		given:
-		controller.params.documentId = '1'
-		controller.params.parties = '["parties"]'
-		1 * partyService.submitParties(document1, _) >> outParties
+		def document1 = Document.get(1L)
 		when:
-		controller.submitParties()
+		controller.submitParties(document1.id, '["parties"]')
+		def results = JSON.parse(response.contentAsString)
 		then:
-		controller.renderArgs.template == 'parties'
-		controller.renderArgs.model.document == document1
-		controller.renderArgs.model.colors == PartyColor.values()
-		controller.renderArgs.model.permissions == Party.allowedPermissions
-		controller.renderArgs.model.parties == outParties
+		1 * partyService.submitParties(document1, _) >> outParties
+		1 * notificationService.success(_, _)
+		results.document.id == document1.id
 		where:
 		outParties = ['outParties']
 	}
 
 	def "email parties throws an error if there is no document or no email address"() {
-		given:
-		controller.params.documentId = documentId
-		controller.params.email = email
-
 		when:
-		controller.emailDocument()
+		controller.emailDocument(documentId, email)
 
 		then:
 		thrown(AssertionError)
@@ -202,41 +166,36 @@ class PartyControllerSpec extends ControllerSpec {
 		where:
 		documentId | email
 		null       | null
-		''         | null
-		null       | ''
-		1          | null
-		1          | ''
+		1L         | null
 		null       | 'test@example.com'
-		''         | 'test@example.com'
 	}
 
 	def "email creates a party if there is not one with the given email address"() {
 		given:
-		controller.params.documentId = 1
-		controller.params.email = 'test@example.com'
-
+		def document1 = Document.get(1L)
 		when:
-		controller.emailDocument()
-		def results = JSON.parse(mockResponse.contentAsString)
+		controller.emailDocument(1L, 'test@example.com')
+		def results = JSON.parse(response.contentAsString)
 
 		then:
-		1 * partyService.createParty(document1, _) >> party1
+		1 * partyService.createParty(document1, _) >> Party.get(1L)
 		1 * notificationService.success(_, _) >> [message:'message']
 		results.notification.message == 'message'
-		document1.parties.contains(party1)
+		document1.parties.contains(Party.get(1L))
 	}
 
 	def "email resends the code if a party with the email address already exists"() {
 		given:
-		controller.params.documentId = 1
-		controller.params.email = 'test@example.com'
+		def party1 = Party.get(1L)
+		def party2 = Party.get(2L)
+		def document1 = Document.get(1L)
 		document1.parties = [party1, party2] as Set
 		party1.signator = new User(profile: new Profile(email: 'test@example.co'))
 		party2.signator = new User(profile: new Profile(email: 'test@example.com'))
 
 		when:
-		controller.emailDocument()
-		def results = JSON.parse(mockResponse.contentAsString)
+		controller.emailDocument(1L, 'test@example.com')
+		def results = JSON.parse(response.contentAsString)
 
 		then:
 		1 * partyService.sendCode(party2) >> party2
@@ -246,25 +205,21 @@ class PartyControllerSpec extends ControllerSpec {
 
 	def "email returns an error if a party can't be created"() {
 		given:
-		controller.params.documentId = 1
-		controller.params.email = 'test@example.com'
-
+		def document2 = Document.get(2L)
 		when:
-		controller.emailDocument()
-		def results = JSON.parse(mockResponse.contentAsString)
+		controller.emailDocument(document2.id, 'test@example.com')
+		def results = JSON.parse(response.contentAsString)
 
 		then:
-		1 * partyService.createParty(document1, _) >> null
+		1 * partyService.createParty(document2, _) >> null
 		1 * notificationService.error(_, _) >> [message:'message']
 		results.notification.message == 'message'
-		document1.parties.size() == 0
+		!document2.parties
 	}
-	
+
 	def "codeSignatures should throw an error given an invalid document code"() {
-		given:
-		controller.params.documentId = null
 		when:
-		controller.codeSignatures()
+		controller.codeSignatures('', '["signatures"]')
 		then:
 		thrown(AssertionError)
 	}

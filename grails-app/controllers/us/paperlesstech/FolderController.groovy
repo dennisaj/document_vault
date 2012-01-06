@@ -13,12 +13,12 @@ class FolderController {
 	def notificationService
 	def tenantService
 
-	def create = {
-		def group = Group.load(params.long('groupId'))
+	def create(Long groupId, String name, Long folderId) {
+		def group = Group.get(groupId)
 		assert group
-		def parent = Folder.load(params.long('parentId'))
+		def parent = Folder.get(folderId)
 
-		def folder = folderService.createFolder(group, parent, params.name?.trim())
+		def folder = folderService.createFolder(group, name?.trim(), parent)
 		def returnMap = [:]
 
 		if (folder.hasErrors()) {
@@ -42,8 +42,8 @@ class FolderController {
 		render(returnMap as JSON)
 	}
 
-	def show = {
-		def searchFolder = Folder.get(params.long('folderId'))
+	def show(Long folderId) {
+		def searchFolder = Folder.get(folderId)
 		assert searchFolder
 
 		def pagination = [:]
@@ -69,11 +69,11 @@ class FolderController {
 				documentTotal: docResults.total] as JSON)
 	}
 
-	def update = {
-		def folder = Folder.get(params.long('folderId'))
+	def update(Long folderId, String name) {
+		def folder = Folder.get(folderId)
 		assert folder
 
-		folder = folderService.renameFolder(folder, params.name?.trim())
+		folder = folderService.renameFolder(folder, name?.trim())
 		def returnMap = [:]
 
 		if (folder.hasErrors()) {
@@ -97,8 +97,8 @@ class FolderController {
 		render(returnMap as JSON)
 	}
 
-	def delete = {
-		def folder = Folder.get(params.long('folderId'))
+	def delete(Long folderId) {
+		def folder = Folder.get(folderId)
 		assert folder
 
 		def folderName = folder.name
@@ -107,37 +107,36 @@ class FolderController {
 		render([notification:notificationService.success('document-vault.api.folder.delete.success', [folderName])] as JSON)
 	}
 
-	def list = {
-		def searchFolder = Folder.load(params.long('folderId'))
+	def list(Long folderId, String filter, Integer max, String sort, String order, Integer offset) {
+		def searchFolder = Folder.load(folderId)
 
 		def pagination = [:]
-		def max = params.int('max')
 		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
-		pagination.sort = params.sort ?: 'name'
-		pagination.order = params.order ?: 'asc'
-		pagination.offset = params.int('offset') ?: 0
+		pagination.sort = sort ?: 'name'
+		pagination.order = order ?: 'asc'
+		pagination.offset = offset ?: 0
 
-		def results = folderService.filter(searchFolder, pagination, params.filter?.trim())
+		def results = folderService.filter(searchFolder, pagination, filter?.trim())
 
 		render([searchFolder:searchFolder?.asMap(), folders:results.results*.asMap(), folderTotal:results.total] as JSON)
 	}
 
-	def addDocument = {
-		def destination = Folder.get(params.long('folderId'))
+	def addDocument(Long folderId, Long documentId, Long currentFolderId) {
+		def destination = Folder.get(folderId)
 		assert destination
-		def document = Document.get(params.long('documentId'))
+		def document = Document.get(documentId)
 		assert document
-		assert document.folder?.id == params.long('currentFolderId')
+		assert document.folder?.id == currentFolderId
 
 		folderService.addDocumentToFolder(destination, document)
 
 		render([notification:notificationService.success('document-vault.api.folder.addDocument.success', [document.name, destination.name])] as JSON)
 	}
 
-	def removeDocument = {
-		def folder = Folder.get(params.long('folderId'))
+	def removeDocument(Long folderId, Long documentId) {
+		def folder = Folder.get(folderId)
 		assert folder
-		def document = Document.get(params.long('documentId'))
+		def document = Document.get(documentId)
 		assert document
 		assert document.folder?.id == folder.id
 
@@ -146,13 +145,13 @@ class FolderController {
 		render([notification:notificationService.success('document-vault.api.folder.removeDocument.success', [document.name, folder.name])] as JSON)
 	}
 
-	def addFolder = {
-		def parent = Folder.get(params.long('parentId'))
+	def addFolder(Long parentId, Long childId, Long currentParentId) {
+		def parent = Folder.get(parentId)
 		assert parent
-		def child = Folder.get(params.long('folderId'))
+		def child = Folder.get(childId)
 		assert child
 
-		def currentParent = Folder.get(params.long('currentParentId'))
+		def currentParent = Folder.get(currentParentId)
 		assert currentParent == child.parent
 
 		folderService.addChildToFolder(parent, child)
@@ -160,10 +159,10 @@ class FolderController {
 		render([notification:notificationService.success('document-vault.api.folder.addFolder.success', [child.name, parent.name])] as JSON)
 	}
 
-	def removeFolder = {
-		def parent = Folder.get(params.long('parentId'))
+	def removeFolder(Long parentId, Long folderId) {
+		def parent = Folder.get(parentId)
 		assert parent
-		def child = Folder.get(params.long('folderId'))
+		def child = Folder.get(folderId)
 		assert child
 
 		assert parent == child.parent
@@ -173,21 +172,20 @@ class FolderController {
 		render([notification:notificationService.success('document-vault.api.folder.removeFolder.success', [child.name, parent.name])] as JSON)
 	}
 
-	def search = {
+	def search(String filter, Integer max, String sort, String order, Integer offset) {
 		def pagination = [:]
-		def max = params.int('max')
 		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
-		pagination.sort = params.sort ?: 'name'
-		pagination.order = params.order ?: 'asc'
-		pagination.offset = params.int('offset') ?: 0
+		pagination.sort = sort ?: 'name'
+		pagination.order = order ?: 'asc'
+		pagination.offset = offset ?: 0
 
-		def results = folderService.search(pagination, params.filter?.trim())
+		def results = folderService.search(pagination, filter?.trim())
 
 		render([folders:results.results*.asMap(), folderTotal:results.total] as JSON)
 	}
 
-	def pin = {
-		def folder = Folder.get(params.long('folderId'))
+	def pin(Long folderId) {
+		def folder = Folder.get(folderId)
 
 		folderService.pin(folder)
 
@@ -198,8 +196,8 @@ class FolderController {
 		render(returnMap as JSON)
 	}
 
-	def unpin = {
-		def folder = Folder.get(params.long('folderId'))
+	def unpin(Long folderId) {
+		def folder = Folder.get(folderId)
 
 		folderService.unpin(folder)
 
@@ -209,10 +207,9 @@ class FolderController {
 		render(returnMap as JSON)
 	}
 
-	def flag = {
-		def folder = Folder.get(params.long('folderId'))
+	def flag(Long folderId, String flag) {
+		def folder = Folder.get(folderId)
 		assert folder
-		def flag = params.flag
 		assert flag && tenantService.getTenantConfigList('flag').contains(flag)
 
 		assert authService.canManageFolders(folder.group)
@@ -227,10 +224,9 @@ class FolderController {
 		render(returnMap as JSON)
 	}
 
-	def unflag = {
-		def folder = Folder.get(params.long('folderId'))
+	def unflag(Long folderId, String flag) {
+		def folder = Folder.get(folderId)
 		assert folder
-		def flag = params.flag
 		assert flag && tenantService.getTenantConfigList('flag').contains(flag)
 
 		assert authService.canManageFolders(folder.group)

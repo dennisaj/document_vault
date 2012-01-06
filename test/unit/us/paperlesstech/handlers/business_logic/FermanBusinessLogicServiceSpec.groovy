@@ -302,7 +302,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		def created = service.createFolderAndAddOrphans(folderName: "folderName", vin: "", group: group)
 
 		then:
-		1 * folderService.createFolder(group, null, "folderName") >> folder
+		1 * folderService.createFolder(group, "folderName", null) >> folder
 		created == folder
 	}
 
@@ -324,7 +324,7 @@ class FermanBusinessLogicServiceSpec extends UnitSpec {
 		def created = service.createFolderAndAddOrphans(folderName: folderName, vin: vin, group: group)
 
 		then:
-		1 * folderService.createFolder(group, null, folderName) >> folder
+		1 * folderService.createFolder(group, folderName, null) >> folder
 		created == folder
 		created.documents.size() == 2
 		created.documents.contains(d1)

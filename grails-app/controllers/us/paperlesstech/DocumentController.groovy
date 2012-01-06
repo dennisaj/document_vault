@@ -9,9 +9,9 @@ class DocumentController {
 	def notificationService
 	def tenantService
 
-	def downloadImage = {
-		def document = Document.get(params.long("documentId"))
-		def previewImage = document?.previewImages?.find { it.data.id == params.long("documentDataId") }
+	def downloadImage(Long documentId, Long documentDataId) {
+		def document = Document.get(documentId)
+		def previewImage = document?.previewImages?.find { it.data.id == documentDataId }
 		if (!document || !previewImage) {
 			response.status = 404
 			render text:'File not found'
@@ -28,9 +28,9 @@ class DocumentController {
 		}
 	}
 
-	def download = {
-		def document = Document.get(params.long("documentId"))
-		def documentData = document?.files?.find { it.id == params.long("documentDataId")}
+	def download(Long documentId, Long documentDataId) {
+		def document = Document.get(documentId)
+		def documentData = document?.files?.find { it.id == documentDataId }
 		if (!document || !documentData) {
 			response.status = 404
 			render text:'File not found'
@@ -50,9 +50,9 @@ class DocumentController {
 		}
 	}
 
-	def thumbnail = {
-		def document = Document.get(params.long("documentId"))
-		def documentData = document?.previewImages?.find { it.thumbnail.id == params.long("documentDataId") }
+	def thumbnail(Long documentId, Long documentDataId, Integer pageNumber) {
+		def document = Document.get(documentId)
+		def documentData = document?.previewImages?.find { it.thumbnail.id == documentDataId }
 		if (!document || !documentData) {
 			response.status = 404
 			render text:'File not found'
@@ -61,7 +61,7 @@ class DocumentController {
 
 		cache neverExpires:true
 
-		def (filename, is, contentType, length) = handlerChain.downloadThumbnail(document:document, page:params.int('pageNumber') ?: 1)
+		def (filename, is, contentType, length) = handlerChain.downloadThumbnail(document:document, page:pageNumber ?: 1)
 		is.withStream {
 			response.contentType = contentType
 			response.contentLength = length
@@ -72,12 +72,12 @@ class DocumentController {
 		}
 	}
 
-	def show = {
-		def document = Document.get(params.long('documentId'))
+	def show(Long documentId) {
+		def document = Document.get(documentId)
 		assert document
 
 		def map = document.asMap()
-		
+
 		def party = Party.findByDocumentAndSignator(document, authService.authenticatedUser)
 		def colors = party?.color ? [party?.color?.name()] : PartyColor.values()*.name()
 
@@ -94,9 +94,8 @@ class DocumentController {
 		render([document:map, pages:pages, colors:colors] as JSON)
 	}
 
-	def image = {
-		def d = Document.get(params.long("documentId"))
-		def pageNumber = params.int("pageNumber")
+	def image(Long documentId, Integer pageNumber) {
+		def d = Document.get(documentId)
 		assert d
 
 		def map = d.previewImageAsMap(pageNumber)
@@ -105,38 +104,35 @@ class DocumentController {
 		render(map as JSON)
 	}
 
-	def list = {
-		def searchFolder = Folder.load(params.long('folderId'))
+	def list(Long folderId, String filter, Integer max, String sort, String order, Integer offset) {
+		def searchFolder = Folder.load(folderId)
 
 		def pagination = [:]
-		def max = params.int('max')
 		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
-		pagination.sort = params.sort ?: 'dateCreated'
-		pagination.order = params.order ?: 'desc'
-		pagination.offset = params.int('offset') ?: 0
+		pagination.sort = sort ?: 'dateCreated'
+		pagination.order = order ?: 'desc'
+		pagination.offset = offset ?: 0
 
-		def results = documentService.filter(searchFolder, pagination, params.filter?.trim())
+		def results = documentService.filter(searchFolder, pagination, filter?.trim())
 
 		render([searchFolder:searchFolder?.asMap(), documents:results.results*.asMap(), documentTotal:results.total] as JSON)
 	}
 
-	def search = {
+	def search(String filter, Integer max, String sort, String order, Integer offset) {
 		def pagination = [:]
-		def max = params.int('max')
 		pagination.max = max in 10..100 ? max : (max > 100 ? 100 : 10)
-		pagination.sort = params.sort ?: 'dateCreated'
-		pagination.order = params.order ?: 'asc'
-		pagination.offset = params.int('offset') ?: 0
+		pagination.sort = sort ?: 'dateCreated'
+		pagination.order = order ?: 'asc'
+		pagination.offset = offset ?: 0
 
-		def results = documentService.search(pagination, params.filter?.trim())
+		def results = documentService.search(pagination, filter?.trim())
 
 		render([documents:results.results*.asMap(), documentTotal:results.total] as JSON)
 	}
 
-	def flag = {
-		def document = Document.get(params.long('documentId'))
+	def flag(Long documentId, String flag) {
+		def document = Document.get(documentId)
 		assert document
-		def flag = params.flag
 		assert flag && tenantService.getTenantConfigList('flag').contains(flag)
 
 		assert authService.canFlag(document)
@@ -151,10 +147,9 @@ class DocumentController {
 		render(returnMap as JSON)
 	}
 
-	def unflag = {
-		def document = Document.get(params.long('documentId'))
+	def unflag(Long documentId, String flag) {
+		def document = Document.get(documentId)
 		assert document
-		def flag = params.flag
 		assert flag && tenantService.getTenantConfigList('flag').contains(flag)
 
 		assert authService.canFlag(document)

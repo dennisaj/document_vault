@@ -1,136 +1,114 @@
 package us.paperlesstech
 
 import grails.converters.JSON
-import grails.plugin.spock.ControllerSpec
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
+import org.junit.Test
 
+import spock.lang.Specification
 import us.paperlesstech.handlers.Handler
+import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.Profile
 import us.paperlesstech.nimble.User
 
-class NoteControllerSpec extends ControllerSpec {
+@TestFor(NoteController)
+@Mock([Document, DocumentData, Note, User, Profile, Group, PreviewImage])
+class NoteControllerSpec extends Specification {
 	Handler handlerChain = Mock()
 	NotificationService notificationService = Mock()
 
-	def documentData = new DocumentData(id:1, pages:4, dateCreated: new Date())
-	def note1 = new Note(id:1, document:document1, dateCreated: new Date() - 1)
-	def note2 = new Note(id:2, document:document1, dateCreated: new Date())
-	def note3 = new Note(id:3, document:document2, dateCreated: new Date(), data:documentData)
-	def document1 = new Document(id:1, files:([documentData] as SortedSet), notes:([note1, note2] as SortedSet))
-	def document2 = new Document(id:2, files:([documentData] as SortedSet), notes:([note3] as SortedSet))
-	def user = new User(id:1, profile:new Profile(id:1, fullName:'Bob'))
-
 	def setup() {
-		controller.metaClass.createLink = { LinkedHashMap arg1 -> 'this is stupid' }
 		controller.handlerChain = handlerChain
 		controller.notificationService = notificationService
 
-		mockDomain(Document, [document1, document2])
-		mockDomain(DocumentData, [documentData])
-		mockDomain(Note, [note1, note2, note3])
-		mockDomain(User, [user])
+		def documentData = new DocumentData(id:1, pages:4, dateCreated: new Date(), mimeType:MimeType.PNG, fileSize:1, fileKey:'1234').save(failOnError:true)
+		def note1 = new Note(id:1, dateCreated: new Date() - 2)
+		def note2 = new Note(id:2, dateCreated: new Date() - 1)
+		def note3 = new Note(id:3, dateCreated: new Date(), data:documentData)
+
+		def document1 = UnitTestHelper.createDocument()
+		def document2 = UnitTestHelper.createDocument()
+		def user = UnitTestHelper.createUser()
 
 		note1.user = user
 		note2.user = user
 		note3.user = user
+
+		document1.addToNotes(note1)
+		document1.addToNotes(note2)
+		document2.addToNotes(note3)
+
+		document1.save(failOnError:true)
+		document2.save(failOnError:true)
 	}
 
 	def "saveText should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.documentId = null
 		when:
-		controller.saveText()
+		controller.saveText(null, 'text', 0, 0, 0)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "saveText should throw an AssertionError when given an invalid value"() {
-		given:
-		controller.params.documentId = '1'
-		controller.params.text = null
 		when:
-		controller.saveText()
+		controller.saveText(1L, null, 0, 0, 0)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "saveText should throw an AssertionError when given an invalid page"() {
-		given:
-		controller.params.documentId = '1'
-		controller.params.text = 'valid'
-		controller.params.pageNumber = '100'
 		when:
-		controller.saveText()
+		controller.saveText(1L, 'valid', 100, 0, 0)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "saveText should default pageNumbers below 0 or empty pageNumbers to 0"() {
-		given:
-		controller.params.documentId = '1'
-		controller.params.text = text
-		controller.params.pageNumber = pageNumber
-		controller.params.left = left
-		controller.params.top = top
 		when:
-		controller.saveText()
+		controller.saveText(documentId, text, pageNumber, left, top)
 		then:
-		1 * handlerChain.saveNotes([document:document1, notes:[[text:text, left:left, top:top, pageNumber:0]]])
+		1 * handlerChain.saveNotes([document:Document.get(documentId), notes:[[text:text, left:left, top:top, pageNumber:0]]])
 		where:
+		documentId = 1L
 		text = 'valid'
 		left = 100
 		top = 100
-		pageNumber << ['-1', null]
+		pageNumber << [-1, null]
 	}
 
 	def "saveText should call handerChain's saveNotes when given valid values"() {
-		given:
-		controller.params.documentId = '1'
-		controller.params.text = 'valid'
-		controller.params.pageNumber = '1'
 		when:
-		controller.saveText()
+		controller.saveText(1L, 'valid', 1, 0, 0)
 		then:
 		1 * notificationService.success(_)
 	}
 
 	def "saveLines should throw an NullPointerException when given null notes"() {
-		given:
-		controller.params.notes = null
-		controller.params.documentId = null
 		when:
-		controller.saveLines()
+		controller.saveLines(1L, null)
 		then:
 		thrown(NullPointerException)
 	}
 
 	def "saveLines should throw an ConverterException when given '' notes"() {
-		given:
-		controller.params.notes = ''
-		controller.params.documentId = null
 		when:
-		controller.saveLines()
+		controller.saveLines(1L, '')
 		then:
 		thrown(ConverterException)
 	}
 
 	def "saveLines should throw an AssertionError when given empty notes"() {
-		given:
-		controller.params.notes = '[]'
-		controller.params.documentId = null
 		when:
-		controller.saveLines()
+		controller.saveLines(1L, '[]')
 		then:
 		thrown(AssertionError)
 	}
 
 	def "saveLines should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.notes = '[lines]'
-		controller.params.documentId = null
 		when:
-		controller.saveLines()
+		controller.saveLines(null, '["lines"]')
 		then:
 		thrown(AssertionError)
 	}
@@ -138,10 +116,8 @@ class NoteControllerSpec extends ControllerSpec {
 	def "saveLines should call handlerChain's saveNotes when given valid data"() {
 		given:
 		def outputNotes = null
-		controller.params.notes = notes
-		controller.params.documentId = '1'
 		when:
-		controller.saveLines()
+		controller.saveLines(1L, notes)
 		then:
 		1 * handlerChain.saveNotes(_) >> { LinkedHashMap arg1-> outputNotes = arg1.notes }
 		1 * notificationService.success(_)
@@ -151,56 +127,51 @@ class NoteControllerSpec extends ControllerSpec {
 	}
 
 	def "list should throw an AssertionError when given an invalid documentId"() {
-		given:
-		controller.params.documentId = null
 		when:
-		controller.list()
+		controller.list(null)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "list should return the notes for a document when given a valid documentId"() {
-		given:
-		controller.params.documentId = '1'
 		when:
-		controller.list()
-		def results = JSON.parse(mockResponse.contentAsString)
+		controller.list(1L)
+		def results = JSON.parse(response.contentAsString)
 		then:
 		results.notes.size() == 2
 	}
 
 	def "download should throw an AssertionError when given an invalid noteDataId"() {
-		given:
-		controller.params.documentId = '1'
-		controller.params.noteDataId = null
 		when:
-		controller.download()
+		controller.download(1L, null)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "download should return a 404 when given invalid documentId or noteDataId"() {
-		given:
-		controller.params.documentId = documentId
-		controller.params.noteDataId = noteDataId
 		when:
-		controller.download()
+		controller.download(documentId, noteDataId)
 		then:
-		mockResponse.status == 404
+		response.status == 404
 		where:
-		documentId << [null, 1]
-		noteDataId << [3, 3]
+		documentId << [null, 1L]
+		noteDataId << [3L, 3L]
 	}
 
 	def "download should call handlerChain's downloadNote when given valid input"() {
 		given:
 		controller.metaClass.cache = { LinkedHashMap arg1 -> 'this is stupid' }
-		controller.params.documentId = '2'
-		controller.params.noteDataId = '1'
 		when:
-		controller.download()
+		controller.download(documentId, noteDataId)
+		println response.properties
 		then:
-		1 * handlerChain.downloadNote([document:document2, note:note3]) >> { LinkedHashMap-> ['filename', new ByteArrayInputStream([1] as byte[]), MimeType.PNG.downloadContentType, 1] }
-		mockResponse.status == 200
+		1 * handlerChain.downloadNote([document:Document.get(documentId), note:Note.findByData(DocumentData.get(noteDataId))]) >> { LinkedHashMap args ->
+			println args
+			['filename', new ByteArrayInputStream([1] as byte[]), MimeType.PNG.downloadContentType, 1]
+		}
+		response.status == 200
+		where:
+		documentId = 2L
+		noteDataId = 1L
 	}
 }

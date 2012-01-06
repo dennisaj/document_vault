@@ -81,10 +81,10 @@ class RequestServiceSpec extends Specification {
 
 		when: "Get the remote request"
 		def t1 = service.remoteAddr
+		0 * request.getRemoteAddr()
 
 		then: "The address is returned"
 		1 * request.getHeader(HttpHeaders.X_FORWARDED_FOR) >> addr
-		0 * request.getRemoteAddr()
 		t1 == addr
 
 		where:

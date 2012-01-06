@@ -110,7 +110,7 @@ class FermanBusinessLogicService {
 		String vin = input.vin
 		Group group = input.group
 
-		Folder f = folderService.createFolder(group, null, folderName)
+		Folder f = folderService.createFolder(group, folderName, null)
 
 		if (!vin) {
 			return f

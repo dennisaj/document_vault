@@ -4,11 +4,10 @@ import grails.converters.JSON
 
 class UserInfoController {
 	def authService
-	def grailsApplication
 	def notificationService
 	def tenantService
 
-	def index = {
+	def index() {
 		def user = authService.authenticatedUser
 		if (user) {
 			def returnMap = [:]
@@ -48,10 +47,10 @@ class UserInfoController {
 
 			returnMap.flags = tenantService.getTenantConfigList('flag')
 
-			returnMap.user.groups = [:]
-
-			returnMap.user.groups.upload = authService.getGroupsWithPermission([DocumentPermission.Upload])*.asMap()
-			returnMap.user.groups.manageFolders = authService.getGroupsWithPermission([DocumentPermission.ManageFolders])*.asMap()
+			returnMap.user.groups = [
+				upload: authService.getGroupsWithPermission([DocumentPermission.Upload])*.asMap(),
+				manageFolders: authService.getGroupsWithPermission([DocumentPermission.ManageFolders])*.asMap()
+			]
 
 			returnMap.user.pinnedFolders = user.pinnedFolders*.asMap()
 

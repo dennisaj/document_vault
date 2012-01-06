@@ -8,11 +8,10 @@ class NoteController {
 	def handlerChain
 	def notificationService
 
-	def download = {
-		def noteDataId = params.long('noteDataId')
+	def download(Long documentId, Long noteDataId) {
 		assert noteDataId != null
 
-		def document = Document.get(params.long('documentId'))
+		def document = Document.get(documentId)
 		def note = document?.notes?.find { it.data?.id == noteDataId }
 		if (!document || !note) {
 			response.status = 404
@@ -33,46 +32,43 @@ class NoteController {
 		}
 	}
 
-	def list = {
-		def document = Document.get(params.documentId)
+	def list(Long documentId) {
+		def document = Document.get(documentId)
 		assert document
 
 		render([notes:document.notes*.asMap()] as JSON)
 	}
 
-	def saveLines = {
-		def inputNotes = JSON.parse(params.notes)
+	def saveLines(Long documentId, String notes) {
+		def inputNotes = JSON.parse(notes)
 		assert inputNotes
 
-		def document = Document.get(params.documentId)
+		def document = Document.get(documentId)
 		assert document
 
-		def notes = []
+		def outputNotes = []
 		inputNotes.each {
 			if (it) {
 				it.value
-				notes << [lines:it.value]
+				outputNotes << [lines:it.value]
 			}
 		}
 
-		handlerChain.saveNotes(document:document, notes:notes)
+		handlerChain.saveNotes(document:document, notes:outputNotes)
 		document.save(flush:true)
 
 		render([notification:notificationService.success('document-vault.api.notes.saveLines.success')] as JSON)
 	}
 
-	def saveText = {
-		def document = Document.get(params.long('documentId'))
+	def saveText(Long documentId, String text, Integer pageNumber, int left, int top) {
+		def document = Document.get(documentId)
 		assert document
 
-		def text = params.text?.trim()
+		text = text?.trim()
 		assert text
 
-		def pageNumber = Math.max(params.int('pageNumber') ?: 0, 0)
+		pageNumber = Math.max(pageNumber ?: 0, 0)
 		assert pageNumber <= document.files.first().pages
-
-		def left = params.float('left') ? params.float('left') as int : 0
-		def top = params.float('top') ? params.float('top') as int : 0
 
 		handlerChain.saveNotes(document:document, notes:[[text:text, left:left, top:top, pageNumber:pageNumber]])
 		document.save(flush:true)

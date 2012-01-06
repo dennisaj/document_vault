@@ -10,10 +10,10 @@ class UploadController {
 	def authService
 	def uploadService
 
-	def save = {
+	def save(Long folderId, Long groupId) {
 		def results = []
-		def folder = Folder.load(params.long('folderId'))
-		def group = folder?.group ?: Group.get(params.long('group'))
+		def folder = Folder.load(folderId)
+		def group = folder?.group ?: Group.get(groupId)
 
 		if (group) {
 			request.getMultiFileMap().each { inputName, files->
@@ -45,7 +45,7 @@ class UploadController {
 		render(text:results as JSON, contentType:"text/plain")
 	}
 
-	def savePcl = {
+	def savePcl(String data) {
 		def documents
 
 		try {
@@ -53,7 +53,7 @@ class UploadController {
 			assert group, "The user must be able to upload to at least one group"
 			def now = new Date()
 			def fileName = String.format("%tF %tT.pcl", now, now)
-			documents = uploadService.uploadDocument(params.data?.bytes, group, fileName, MimeType.PCL)
+			documents = uploadService.uploadDocument(data?.bytes, group, fileName, MimeType.PCL)
 		} catch (Throwable e) {
 			log.error "Unable to save uploaded document", e
 		}

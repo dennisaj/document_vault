@@ -26,7 +26,7 @@ class FolderServiceSpec extends Specification {
 	Folder folder1
 	Folder folder2
 	Folder folder3
-	
+
 	User user
 
 	def setup() {
@@ -67,7 +67,7 @@ class FolderServiceSpec extends Specification {
 		def group = new Group(name: 'new group').save(flush: true, failOnError: true)
 		def parent = new Folder(name: 'parent', group: group)
 		when:
-		service.createFolder(document1.group, parent, 'name')
+		service.createFolder(document1.group, 'name', parent)
 		then:
 		1 * authService.canManageFolders(document1.group) >> true
 		thrown(AssertionError)
@@ -94,7 +94,7 @@ class FolderServiceSpec extends Specification {
 		parent1.parent = null
 
 		when:
-		def newFolder = service.createFolder(parent1.group, parent1, 'new folder')
+		def newFolder = service.createFolder(parent1.group, 'new folder', parent1)
 
 		then:
 		1 * authService.canManageFolders(parent1.group) >> true

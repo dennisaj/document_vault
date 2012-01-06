@@ -1,26 +1,29 @@
 package us.paperlesstech
 
 import grails.converters.JSON
-import grails.plugin.spock.ControllerSpec
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 
 import org.apache.shiro.subject.SimplePrincipalCollection
 import org.apache.shiro.subject.Subject
 
+import spock.lang.Specification
 import us.paperlesstech.nimble.User
 
-class RunAsControllerSpec extends ControllerSpec {
+@TestFor(RunAsController)
+@Mock([User])
+class RunAsControllerSpec extends Specification {
 	AuthService authService = Mock()
 	NotificationService notificationService = Mock()
-
 	Subject subject = Mock()
 
-	def user = new User(id:1)
+	def user
 
 	def setup() {
 		controller.authService = authService
 		controller.notificationService = notificationService
 
-		mockDomain(User, [user])
+		user = UnitTestHelper.createUser()
 	}
 
 	def "runas throws an assertion error when no userid is passed in"() {
@@ -32,8 +35,7 @@ class RunAsControllerSpec extends ControllerSpec {
 
 	def "runas should call runAs when a valid id is passed in"() {
 		when:
-		controller.params.userId = 1
-		controller.runas()
+		controller.runas(1L)
 		then:
 		1 * authService.authenticatedSubject >> subject
 		1 * subject.runAs(new SimplePrincipalCollection(user.id, 'localized'))
@@ -43,8 +45,7 @@ class RunAsControllerSpec extends ControllerSpec {
 		given:
 		user.realm = 'blah'
 		when:
-		controller.params.userId = 1
-		controller.runas()
+		controller.runas(1L)
 		then:
 		1 * authService.authenticatedSubject >> subject
 		1 * subject.runAs(new SimplePrincipalCollection(user.id, 'blah'))
@@ -63,7 +64,7 @@ class RunAsControllerSpec extends ControllerSpec {
 		when:
 		controller.params.targetUri = targetUri
 		controller.afterInterceptor()
-		def result = JSON.parse(mockResponse.contentAsString)
+		def result = JSON.parse(response.contentAsString)
 		then:
 		1 * notificationService.success(_)
 		result.uri == expected

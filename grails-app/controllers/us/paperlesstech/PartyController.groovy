@@ -15,43 +15,42 @@ class PartyController {
 	def notificationService
 	def partyService
 
-	def addParty = {
-		def document = Document.get(params.long("documentId"))
+	def addParty(Long documentId) {
+		def document = Document.get(documentId)
 		assert document
 
-		render(template:"party", model:[document:document, colors:PartyColor.values(), permissions:Party.allowedPermissions, party:new Party()])
+		render([notification:notificationService.success('document-vault.api.party.addParty.success'), document:document, colors:PartyColor.values()*.name(), permissions:Party.allowedPermissions*.name(), party:new Party()] as JSON)
 	}
 
-	def removeParty = {
-		def party = Party.get(params.long("partyId"))
+	def removeParty(Long documentId, Long partyId) {
+		def party = Party.get(partyId)
 		assert party
-		assert party.document.id == params.long("documentId")
+		assert party.document.id == documentId
 
 		partyService.removeParty(party)
 
-		render([status:"success"] as JSON)
+		render([notification:notificationService.success('document-vault.api.party.removeParty.success', [partyId, documentId])] as JSON)
 	}
 
-	def codeSignatures = {
-		def party = Party.findByCode(params.documentId)
+	def codeSignatures(String documentId, String signatures) {
+		def party = Party.findByCode(documentId)
 		assert party
-		params.documentId = party.document.id
 
 		PrincipalCollection principals = new SimplePrincipalCollection(party.signator.id, "localized")
 		Subject subject = new Subject.Builder().principals(principals).buildSubject()
 		subject.execute({
-			this.submitSignatures()
+			this.submitSignatures(party.document.id, signatures)
 		} as Callable)
 	}
 
-	def submitSignatures = {
-		def document = Document.get(params.long("documentId"))
+	def submitSignatures(Long documentId, String signatures) {
+		def document = Document.get(documentId)
 		assert document
 
-		def signatures = JSON.parse(params.signatures).findAll { it.value }
+		def signatureList = JSON.parse(signatures).findAll { it.value }
 
-		if (signatures) {
-			document = partyService.cursiveSign(document, signatures)
+		if (signatureList) {
+			document = partyService.cursiveSign(document, signatureList)
 			if (!document.hasErrors()) {
 				flash.green = g.message(code:"document-vault.signature.success", args:[document])
 			} else {
@@ -64,31 +63,35 @@ class PartyController {
 		render([status:"success"] as JSON)
 	}
 
-	def submitParties = {
-		def document = Document.get(params.long("documentId"))
+	def submitParties(Long documentId, String parties) {
+		def document = Document.get(documentId)
 		assert document
 
-		def inParties = JSON.parse(params.parties)
+		def inParties = JSON.parse(parties)
 
 		def outParties = partyService.submitParties(document, inParties)
 
-		render(template:"parties", model:[colors:PartyColor.values(), document:document, permissions:Party.allowedPermissions, parties:outParties])
+		render([
+			notification:notificationService.success('document-vault.api.party.submitParties.success', [outParties.size()]),
+			document:document,
+			parties:outParties
+		] as JSON)
 	}
 
-	def resend = {
-		def party = Party.get(params.long("partyId"))
+	def resend(Long documentId, Long partyId) {
+		def party = Party.get(partyId)
 		assert party
-		assert party.document.id == params.long("documentId")
+		assert party.document.id == documentId
 
 		partyService.sendCode(party)
 
 		render([status:"success"] as JSON)
 	}
 
-	def emailDocument = {
-		def document = Document.get(params.long("documentId"))
+	def emailDocument(Long documentId, String email) {
+		def document = Document.get(documentId)
 		assert document
-		def email = params.email?.trim()?.toLowerCase()
+		email = email?.trim()?.toLowerCase()
 		assert email
 
 		def party = document.parties.find {

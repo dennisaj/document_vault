@@ -8,10 +8,9 @@ class PrintQueueController {
 	def notificationService
 	def preferenceService
 
-	def push = {
-		def printer = Printer.load(params.printerId)
-		def document = Document.load(params.documentId)
-		def addNotes = params.boolean('addNotes')
+	def push(Long documentId, Long printerId, boolean addNotes) {
+		def document = Document.load(documentId)
+		def printer = Printer.load(printerId)
 		boolean printed = false
 
 		if (printer && document) {
@@ -25,8 +24,8 @@ class PrintQueueController {
 		}
 	}
 
-	def details = {
-		def document = Document.load(params.documentId)
+	def details(Long documentId) {
+		def document = Document.load(documentId)
 		assert document
 
 		render([

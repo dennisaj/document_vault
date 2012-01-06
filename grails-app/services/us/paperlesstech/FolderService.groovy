@@ -38,7 +38,7 @@ class FolderService {
 	 * @pre The current user must have the {@link DocumentPermission#ManageFolders} permission for group.
 	 * @throws RuntimeException if there is a problem saving
 	 */
-	Folder createFolder(Group group, Folder parent=null, String name) {
+	Folder createFolder(Group group, String name, Folder parent=null) {
 		assert group
 		assert authService.canManageFolders(group)
 		assert !parent || parent.group == group

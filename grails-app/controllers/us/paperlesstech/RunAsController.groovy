@@ -16,14 +16,14 @@ class RunAsController {
 		render([notification:notificationService.success('document-vault.api.runas.success'), uri:params.targetUri?:'/'] as JSON)
 	}
 
-	def runas = {
-		def user = User.get(params.long('userId'))
+	def runas(Long userId) {
+		def user = User.get(userId)
 		assert user
 
 		authService.authenticatedSubject.runAs(new SimplePrincipalCollection(user.id, user.realm?:'localized'))
 	}
 
-	def release = {
+	def release() {
 		authService.authenticatedSubject.releaseRunAs()
 	}
 }
