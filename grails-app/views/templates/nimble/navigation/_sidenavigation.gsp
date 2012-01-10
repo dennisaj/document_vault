@@ -132,6 +132,16 @@
 			</g:if>
 		</li>
 		<li>
+			<g:link controller="configuration" action="index"><g:message code="document-vault.link.configuration" /></g:link>
+			<g:if test="${controllerName == 'configuration'}">
+				<ul>
+					<li>
+						<g:link controller="configuration" action="listFlags"><g:message code="document-vault.link.flags" /></g:link>
+					</li>
+				</ul>
+			</g:if>
+		</li>
+		<li>
 			<g:message code="document-vault.link.reports" />
 			<ul>
 				<li><a href="${createLink(controller: 'activityLog', action: 'list')}"><g:message code="document-vault.link.activitylog" /></a></li>

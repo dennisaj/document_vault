@@ -13,7 +13,7 @@ import us.paperlesstech.nimble.User
 
 public class SecurityFilters implements ApplicationContextAware {
 	private static String openControllers = "auth|logout|account|code|userInfo|error"
-	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role"
+	private static String adminControllers = "activityLog|printer|admin|admins|user|group|role|configuration"
 	def dependsOn = [LoggingFilters]
 
 	private ApplicationTagLib g
