@@ -4,7 +4,6 @@ import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
-import org.hibernate.sql.JoinFragment
 
 import us.paperlesstech.nimble.Group
 import us.paperlesstech.nimble.User

@@ -60,7 +60,7 @@ class NoteController {
 		render([notification:notificationService.success('document-vault.api.notes.saveLines.success')] as JSON)
 	}
 
-	def saveText(Long documentId, String text, Integer pageNumber, int left, int top) {
+	def saveText(Long documentId, String text, Integer pageNumber, float left, float top) {
 		def document = Document.get(documentId)
 		assert document
 
@@ -70,7 +70,7 @@ class NoteController {
 		pageNumber = Math.max(pageNumber ?: 0, 0)
 		assert pageNumber <= document.files.first().pages
 
-		handlerChain.saveNotes(document:document, notes:[[text:text, left:left, top:top, pageNumber:pageNumber]])
+		handlerChain.saveNotes(document:document, notes:[[text:text, left:(left as int), top:(top as int), pageNumber:pageNumber]])
 		document.save(flush:true)
 
 		render ([notification:notificationService.success('document-vault.api.notes.saveNote.success')] as JSON)

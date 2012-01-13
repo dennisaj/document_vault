@@ -46,21 +46,21 @@ class NoteControllerSpec extends Specification {
 
 	def "saveText should throw an AssertionError when given an invalid documentId"() {
 		when:
-		controller.saveText(null, 'text', 0, 0, 0)
+		controller.saveText(null, 'text', 0, 0f, 0f)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "saveText should throw an AssertionError when given an invalid value"() {
 		when:
-		controller.saveText(1L, null, 0, 0, 0)
+		controller.saveText(1L, null, 0, 0f, 0f)
 		then:
 		thrown(AssertionError)
 	}
 
 	def "saveText should throw an AssertionError when given an invalid page"() {
 		when:
-		controller.saveText(1L, 'valid', 100, 0, 0)
+		controller.saveText(1L, 'valid', 100, 0f, 0f)
 		then:
 		thrown(AssertionError)
 	}
@@ -73,14 +73,14 @@ class NoteControllerSpec extends Specification {
 		where:
 		documentId = 1L
 		text = 'valid'
-		left = 100
-		top = 100
+		left = 100f
+		top = 100f
 		pageNumber << [-1, null]
 	}
 
 	def "saveText should call handerChain's saveNotes when given valid values"() {
 		when:
-		controller.saveText(1L, 'valid', 1, 0, 0)
+		controller.saveText(1L, 'valid', 1, 0f, 0f)
 		then:
 		1 * notificationService.success(_)
 	}
