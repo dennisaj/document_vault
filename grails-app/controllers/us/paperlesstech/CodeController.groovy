@@ -17,7 +17,7 @@ class CodeController extends DocumentController {
 		PrincipalCollection principals = new SimplePrincipalCollection(party.signator.id, "localized")
 		Subject subject = new Subject.Builder().principals(principals).buildSubject()
 		subject.execute({
-			this[params.action]()
+			this."${params.action}"()
 		} as Callable)
 
 		return false

@@ -7,7 +7,7 @@ class HighlightSpec extends Specification {
 		given:
 			def h = new Highlight(height: 10, left:20, width:30, top:40)
 		when:
-			def m = h.toMap()
+			def m = h.asMap()
 		then:
 			m.height == h.height
 			m.left == h.left

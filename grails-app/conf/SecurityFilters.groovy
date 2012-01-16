@@ -56,7 +56,7 @@ public class SecurityFilters implements ApplicationContextAware {
 									return true
 								case ["submitSignatures"]:
 									return document && authService.canSign(document)
-								case ["emailDocument"]:
+								case ["emailDocument", "submitParties", "remove", "resend"]:
 									return document && authService.canGetSigned(document)
 								default:
 									return false
