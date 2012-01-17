@@ -49,20 +49,10 @@ class UrlMappings {
 			}
 		}
 
-		"/party/removeParty/$documentId/$partyId" {
+		"/party/$action?/$documentId?/$partyId?" {
 			controller = "party"
-			action = "removeParty"
 		}
 
-		"/party/resend/$documentId/$partyId" {
-			controller = "party"
-			action = "resend"
-		}
-
-		"/party/$action?/$documentId?" {
-			controller = "party"
-		}
-		
 		"/party/submitSignatures/$documentId" {
 			controller = "party"
 			action = {

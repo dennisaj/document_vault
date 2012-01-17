@@ -28,7 +28,7 @@ class Highlight {
 		top column: "_top"
 	}
 
-	Map toMap() {
+	Map asMap() {
 		[height:height, left:left, width:width, top:top]
 	}
 }

@@ -15,14 +15,7 @@ class PartyController {
 	def notificationService
 	def partyService
 
-	def addParty(Long documentId) {
-		def document = Document.get(documentId)
-		assert document
-
-		render([notification:notificationService.success('document-vault.api.party.addParty.success'), document:document, colors:PartyColor.values()*.name(), permissions:Party.allowedPermissions*.name(), party:new Party()] as JSON)
-	}
-
-	def removeParty(Long documentId, Long partyId) {
+	def remove(Long documentId, Long partyId) {
 		def party = Party.get(partyId)
 		assert party
 		assert party.document.id == documentId
@@ -49,18 +42,21 @@ class PartyController {
 
 		def signatureList = JSON.parse(signatures).findAll { it.value }
 
+		def notification
+
 		if (signatureList) {
 			document = partyService.cursiveSign(document, signatureList)
 			if (!document.hasErrors()) {
-				flash.green = g.message(code:"document-vault.signature.success", args:[document])
+				notification = notificationService.success('document-vault.api.party.submitSignatures.success', [document.id])
 			} else {
-				flash.red = g.message(code:"document-vault.signature.error.failure", args:[document])
+				//TODO: Add errors to JSON
+				notification = notificationService.error('document-vault.api.party.submitSignatures.error.failure', [document.id])
 			}
 		} else {
-			flash.yellow = g.message(code:"document-vault.signature.error.nosignatures", args:[document])
+			notification = notificationService.info('document-vault.api.party.submitSignatures.info.nosignatures', [document.id])
 		}
 
-		render([status:"success"] as JSON)
+		render([notification:notification] as JSON)
 	}
 
 	def submitParties(Long documentId, String parties) {
@@ -73,8 +69,7 @@ class PartyController {
 
 		render([
 			notification:notificationService.success('document-vault.api.party.submitParties.success', [outParties.size()]),
-			document:document,
-			parties:outParties
+			parties:outParties*.asMap()
 		] as JSON)
 	}
 
@@ -85,7 +80,7 @@ class PartyController {
 
 		partyService.sendCode(party)
 
-		render([status:"success"] as JSON)
+		render([notification:notificationService.success('document-vault.api.party.resend.success', [party.signator.profile.email, documentId])] as JSON)
 	}
 
 	def emailDocument(Long documentId, String email) {

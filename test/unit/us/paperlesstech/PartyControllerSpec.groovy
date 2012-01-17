@@ -26,27 +26,9 @@ class PartyControllerSpec extends Specification {
 		new Party(id:2, document:document1, documentPermission:DocumentPermission.Sign, signator:UnitTestHelper.createUser(), highlights:[new Highlight()]).save(failOnError: true, flush: true)
 	}
 
-	def "addParty should throw an AssertionError when given an invalid documentId"() {
-		when:
-		controller.addParty(null)
-		then:
-		thrown(AssertionError)
-	}
-
-	def "addParty should return a filled in model when given valid data"() {
-		when:
-		controller.addParty(1L)
-		def results = JSON.parse(response.contentAsString)
-		then:
-		1 * notificationService.success(_)
-		results.document.id == 1
-		results.colors == PartyColor.values()*.name()
-		results.permissions == Party.allowedPermissions*.name()
-	}
-
 	def "removeParty should throw an AssertionError when given an invalid partyId"() {
 		when:
-		controller.removeParty(null, partyId)
+		controller.remove(null, partyId)
 		then:
 		thrown(AssertionError)
 		where:
@@ -55,7 +37,7 @@ class PartyControllerSpec extends Specification {
 
 	def "removeParty should throw an AssertionError when given an invalid documentId"() {
 		when:
-		controller.removeParty(documentId, 1L)
+		controller.remove(documentId, 1L)
 		then:
 		thrown(AssertionError)
 		where:
@@ -64,7 +46,7 @@ class PartyControllerSpec extends Specification {
 
 	def "removeParty should call partyService's removeParty when given valid input"() {
 		when:
-		controller.removeParty(documentId, partyId)
+		controller.remove(documentId, partyId)
 		then:
 		1 * partyService.removeParty(Party.get(partyId))
 		1 * notificationService.success(_, [documentId, partyId])
@@ -84,7 +66,7 @@ class PartyControllerSpec extends Specification {
 		when:
 		controller.submitSignatures(1L, '[]')
 		then:
-		controller.flash.yellow
+		1 * notificationService.info(_, _)
 	}
 
 	def "submitSignatures should call partyService's cursiveSign and set flash green when given valid signatures"() {
@@ -94,7 +76,7 @@ class PartyControllerSpec extends Specification {
 		controller.submitSignatures(document1.id, '{1:{lines:"lines"}}')
 		then:
 		1 * partyService.cursiveSign(document1, _) >> document1
-		controller.flash.green
+		1 * notificationService.success(_, _)
 	}
 
 	def "submitSignatures should call partyService's cursiveSign and set flash red when an error is returned"() {
@@ -104,7 +86,7 @@ class PartyControllerSpec extends Specification {
 		controller.submitSignatures(document1.id, '{1:{lines:"lines"}}')
 		then:
 		1 * partyService.cursiveSign(document1, _) >> { d, m-> d.errors.rejectValue('id', 'because'); d }
-		controller.flash.red
+		1 * notificationService.error(_, _)
 	}
 
 	def "resend should throw an AssertionError when given an invalid documentId"() {
@@ -130,7 +112,7 @@ class PartyControllerSpec extends Specification {
 		controller.resend(1L, 1L)
 		then:
 		1 * partyService.sendCode(Party.get(1L))
-		JSON.parse(response.contentAsString).status == 'success'
+		1 * notificationService.success(_, _)
 	}
 
 	def "submitParties should throw an AssertionError when given an invalid documentId"() {
@@ -144,16 +126,14 @@ class PartyControllerSpec extends Specification {
 
 	def "submitParties should return a filled in model when given valid data"() {
 		given:
-		def document1 = Document.get(1L)
+		def document1 = Document.get(1)
+		def party1 = Party.get(1)
 		when:
 		controller.submitParties(document1.id, '["parties"]')
 		def results = JSON.parse(response.contentAsString)
 		then:
-		1 * partyService.submitParties(document1, _) >> outParties
+		1 * partyService.submitParties(document1, _) >> [party1]
 		1 * notificationService.success(_, _)
-		results.document.id == document1.id
-		where:
-		outParties = ['outParties']
 	}
 
 	def "email parties throws an error if there is no document or no email address"() {

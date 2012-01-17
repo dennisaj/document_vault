@@ -1,7 +1,6 @@
 package us.paperlesstech
 
 import grails.plugin.multitenant.core.annotation.MultiTenant
-
 import us.paperlesstech.nimble.User
 
 @MultiTenant
@@ -55,8 +54,8 @@ class Party {
 		highlights && highlights*.accepted?.every {it}
 	}
 
-	def pageHighlights = {pageNumber->
-		highlights.findAll { it.pageNumber == pageNumber }.collect { it.toMap() }
+	def pageHighlights = { pageNumber->
+		highlights.findAll { it.pageNumber == pageNumber }.collect { it.asMap() }
 	}
 
 	def partiallySigned = {
@@ -100,5 +99,18 @@ class Party {
 		}
 
 		status
+	}
+
+	def asMap() {
+		[
+			id:id,
+			color:color?.name(),
+			documentPermission:documentPermission.name(),
+			expiration:expiration,
+			signator:signator.asMap(),
+			status:status(),
+			removable:removable(),
+			highlights:highlights*.asMap()
+		]
 	}
 }

@@ -39,6 +39,7 @@ grails.project.dependency.resolution = {
 		compile group:'us.paperlesstech', name:'flea', version:'0.9.4', {
 			// Grails 2 now includes the log4j slf4j binding.
 			excludes([group: 'org.slf4j', name: 'slf4j-log4j12'])
+			excludes([group: 'org.codehaus.groovy', name: 'groovy'])
 		}
 		// The most recent version of iText has an incompatible license. 2.1.7 is the latest version that we can use.
 		compile group:'com.lowagie', name:'itext', version:'2.1.7'
