@@ -1,5 +1,9 @@
 class UrlMappings {
 	static mappings = {
+		def codeClosure = {
+			params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
+		}
+
 		"/$controller/$action?/$id?" {
 			constraints {
 				// apply constraints here
@@ -8,49 +12,30 @@ class UrlMappings {
 
 		"500"(controller:'error', action:'index')
 
-		name homePage: "/index.html" {
-		}
+		name homePage: "/index.html" {}
 
-		name signPage: "/sign.html" {
-		}
-
-		"/api/upload/savePcl" {
-			controller = "upload"
-			action = "savePcl"
-		}
+		name signPage: "/sign.html" {}
 
 		"/document/download/$documentId/$documentDataId" {
-			controller = {
-				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
-			}
+			controller = codeClosure
 
 			action = "download"
 		}
 
 		"/document/downloadImage/$documentId/$documentDataId" {
-			controller = {
-				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
-			}
+			controller = codeClosure
 
 			action = "downloadImage"
 		}
 
 		"/document/thumbnail/$documentId/$documentDataId/$pageNumber" {
-			controller = {
-				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
-			}
+			controller = codeClosure
 
 			action = "thumbnail"
 		}
 
 		"/document/$action?/$documentId?/$pageNumber?" {
-			controller = {
-				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "code" : "document"
-			}
-		}
-
-		"/party/$action?/$documentId?/$partyId?" {
-			controller = "party"
+			controller = codeClosure
 		}
 
 		"/party/submitSignatures/$documentId" {
@@ -58,6 +43,10 @@ class UrlMappings {
 			action = {
 				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "codeSignatures" : "submitSignatures"
 			}
+		}
+
+		"/party/$action?/$documentId?/$partyId?" {
+			controller = "party"
 		}
 
 		"/note/download/$documentId/$noteDataId" {
@@ -83,21 +72,6 @@ class UrlMappings {
 		"/printQueue/push/$printerId/$documentId" {
 			controller = "printQueue"
 			action = "push"
-		}
-
-		"/api/printQueue/get" {
-			controller = "printQueue"
-			action = "pop"
-		}
-
-		"/c/$code" {
-			controller = "code"
-			action = "index"
-		}
-
-		"/printQueue/printWindow/$documentId" {
-			controller = "printQueue"
-			action = "printWindow"
 		}
 
 		"/p/details/$documentId?" {

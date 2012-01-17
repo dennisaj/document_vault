@@ -25,6 +25,12 @@ public class SecurityFilters implements ApplicationContextAware {
 	def filters = {
 		secure(controller: "($openControllers|$adminControllers)", invert: true) {
 			before = {
+				// Create a special case for party/codeSignatures so we can expose it to users with one-off permissions.
+				// Permissions checking will be done once in the action itself.
+				if (controllerName == 'party' && actionName == 'codeSignatures') {
+					return true
+				}
+
 				def document
 				if (params.documentId) {
 					document = Document.get(params.long('documentId'))
