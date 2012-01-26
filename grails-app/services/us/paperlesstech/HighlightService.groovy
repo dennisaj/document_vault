@@ -8,12 +8,13 @@ class HighlightService {
 	def authService
 
 	/**
-	* Sets {@link Highlight#accepted} dates to now.
-	*
-	* @return The updated Highlight.
-	*
-	* @throws RuntimeException If there is a error saving the Highlight.
-	*/
+	 *
+	 * Sets {@link Highlight#accepted} dates to now.
+	 *
+	 * @return The updated Highlight.
+	 *
+	 * @throws RuntimeException If there is a error saving the Highlight.
+	 */
 	Highlight markAccepted(Highlight highlight) {
 		assert highlight
 		assert authService.canSign(highlight.party.document) || authService.canGetSigned(highlight.party.document)
@@ -32,17 +33,15 @@ class HighlightService {
 		throw new RuntimeException("Unable to mark Highlight(${highlight.id}) accepted.")
 	}
 
-	List fromJsonList(Party party, List jsonHighlights) {
+	List fromJsonMap(Party party, Map jsonHighlights) {
 		def highlights = []
-		jsonHighlights?.eachWithIndex {page, pageNumber->
-			if (page && page != JSONObject.NULL) {
-				page.each {highlight->
-					if (highlight && highlight != JSONObject.NULL) {
-						def h = fromMap(highlight)
-						h.pageNumber = pageNumber
-						h.party = party
-						highlights.add(h)
-					}
+		jsonHighlights?.each { String pageNumber, highlightList ->
+			highlightList.each { highlight ->
+				if (highlight && highlight != JSONObject.NULL) {
+					def h = fromMap(highlight)
+					h.pageNumber = pageNumber as int
+					h.party = party
+					highlights.add(h)
 				}
 			}
 		}

@@ -82,11 +82,12 @@ class DocumentController {
 		def parties = map.permissions.getSigned ? document.parties*.asMap() : []
 		def partyColors = PartyColor.values()*.name()
 		def signingColors = party?.color ? [party?.color?.name()] : partyColors
+		def highlights = party?.highlightsMappedByPage() ?: [:]
 
 		def pages = (1..map.data.pages).collect { pageNumber->
-			def image = document.previewImageAsMap(pageNumber)
-			image.savedHighlights = (map.permissions.getSigned || map.permissions.sign ? document.highlightsAsMap(pageNumber) : [:])
-			image
+			def page = document.previewImageAsMap(pageNumber)
+			page.highlights = highlights[pageNumber] ?: []
+			page
 		}
 
 		if (!map.permissions.notes) {
@@ -94,16 +95,6 @@ class DocumentController {
 		}
 
 		render([document:map, parties:parties, pages:pages, partyColors:partyColors, signingColors:signingColors] as JSON)
-	}
-
-	def image(Long documentId, Integer pageNumber) {
-		def d = Document.get(documentId)
-		assert d
-
-		def map = d.previewImageAsMap(pageNumber)
-		map.savedHighlights = (authService.canGetSigned(d) || authService.canSign(d) ? d.highlightsAsMap(pageNumber) : [:])
-
-		render(map as JSON)
 	}
 
 	def list(Long folderId, String filter, Integer max, String sort, String order, Integer offset) {

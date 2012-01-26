@@ -6,7 +6,7 @@ import us.paperlesstech.nimble.User
 @MultiTenant
 class Party {
 	static final List allowedPermissions = [DocumentPermission.Sign, DocumentPermission.View]
-	static transients = ["completelySigned", "pageHighlights", "partiallySigned", "removable", "status", "resetHighlights"]
+	static transients = ["completelySigned", "partiallySigned", "removable", "status", "resetHighlights"]
 
 	String code
 	PartyColor color
@@ -54,10 +54,6 @@ class Party {
 		highlights && highlights*.accepted?.every {it}
 	}
 
-	def pageHighlights = { pageNumber->
-		highlights.findAll { it.pageNumber == pageNumber }.collect { it.asMap() }
-	}
-
 	def partiallySigned = {
 		highlights*.accepted?.any {it} && !highlights*.accepted?.every {it}
 	}
@@ -73,6 +69,14 @@ class Party {
 		highlights?.clear()
 		// TODO Find a way to remove this save
 		save(flush:true, failOnError: true)
+	}
+
+	def highlightsMappedByPage() {
+		highlights.groupBy { highlight ->
+			highlight.pageNumber
+		}.collectEntries { pageNumber, highlights ->
+			[(pageNumber): highlights*.asMap()]
+		}
 	}
 
 	def removable = {
@@ -110,7 +114,7 @@ class Party {
 			signator:signator.asMap(),
 			status:status(),
 			removable:removable(),
-			highlights:highlights*.asMap()
+			highlights:highlightsMappedByPage()
 		]
 	}
 }

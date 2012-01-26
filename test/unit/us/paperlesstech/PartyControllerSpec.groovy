@@ -9,11 +9,10 @@ import us.paperlesstech.nimble.Profile
 import us.paperlesstech.nimble.User
 
 @TestFor(PartyController)
-@Mock([Party, Document, DocumentData, PreviewImage, Group, User])
+@Mock([Party, Document, Highlight, DocumentData, PreviewImage, Group, User])
 class PartyControllerSpec extends Specification {
 	NotificationService notificationService = Mock()
 	PartyService partyService = Mock()
-
 
 	def setup() {
 		controller.notificationService = notificationService
@@ -22,8 +21,17 @@ class PartyControllerSpec extends Specification {
 		def document1 = UnitTestHelper.createDocument()
 		def document2 = UnitTestHelper.createDocument()
 
-		new Party(id:1, document:document1, documentPermission:DocumentPermission.Sign, signator:UnitTestHelper.createUser(), highlights:[new Highlight()]).save(failOnError: true, flush: true)
-		new Party(id:2, document:document1, documentPermission:DocumentPermission.Sign, signator:UnitTestHelper.createUser(), highlights:[new Highlight()]).save(failOnError: true, flush: true)
+		def highlight1 = new Highlight(id: 1)
+		def highlight2 = new Highlight(id: 2)
+
+		def party1 = new Party(id:1, document:document1, documentPermission:DocumentPermission.Sign, signator:UnitTestHelper.createUser())
+		def party2 = new Party(id:2, document:document1, documentPermission:DocumentPermission.Sign, signator:UnitTestHelper.createUser())
+
+		party1.addToHighlights(highlight1)
+		party2.addToHighlights(highlight2)
+
+		party1.save(failOnError: true, flush: true)
+		party2.save(failOnError: true, flush: true)
 	}
 
 	def "removeParty should throw an AssertionError when given an invalid partyId"() {

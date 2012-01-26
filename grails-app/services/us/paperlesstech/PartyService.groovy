@@ -25,7 +25,7 @@ class PartyService {
 	 *
 	 * @pre The current user must have the {@link DocumentPermission#GetSigned} permission for document.
 	 *
-	 * @param p a Map of Party values (eg: [highlights:[list of highlights], color:..., permission:..., fullName:..., email:..., expiration:...])
+	 * @param p a Map of Party values (eg: [highlights:[map of pageNumbers to highlights], color:..., permission:..., fullName:..., email:..., expiration:...])
 	 * @return The Party object, with errors populated if any occur.
 	 */
 	Party createParty(Document document, Map p) {
@@ -45,7 +45,7 @@ class PartyService {
 			dateParseError = true
 		}
 
-		party.highlights = highlightService.fromJsonList(party, p.highlights)
+		party.highlights = highlightService.fromJsonMap(party, p.highlights)
 		party.validate()
 
 		// Add this error here because validate wipes existing errors
@@ -136,7 +136,7 @@ class PartyService {
 		assert authService.canSign(party.document) || authService.canGetSigned(party.document)
 
 		if (!party.rejected) {
-			party.highlights = party.highlights.collect {highlight->
+			party.highlights = party.highlights.collect { highlight->
 				highlightService.markAccepted(highlight)
 			}
 		}
@@ -261,11 +261,11 @@ class PartyService {
 	 * @pre The current user must have the {@link DocumentPermission#GetSigned} permission for party.document.
 	 *
 	 */
-	Party updateHighlights(Party party, List jsonHighlights) {
+	Party updateHighlights(Party party, Map jsonHighlights) {
 		assert party
 		assert authService.canGetSigned(party.document)
 
-		highlightService.fromJsonList(party, jsonHighlights)?.each {highlight->
+		highlightService.fromJsonMap(party, jsonHighlights)?.each { highlight->
 			party.addToHighlights(highlight)
 		}
 

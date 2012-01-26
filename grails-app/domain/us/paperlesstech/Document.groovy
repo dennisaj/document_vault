@@ -11,8 +11,7 @@ class Document implements Taggable {
 	def grailsApplication
 	def tenantService
 
-	static transients = ['highlightsAsMap',
-			'otherField',
+	static transients = ['otherField',
 			'previewImage',
 			'previewImageAsMap',
 			'searchField',
@@ -83,22 +82,6 @@ class Document implements Taggable {
 	}
 
 	/**
-	* Returns the highlight data for the given page.
-	*
-	* @param pageNumber Retrieve the data for this page
-	*
-	* @return A map of the highlights for all parties on the given page.
-	*/
-	def highlightsAsMap = { int pageNumber ->
-		def m = [:]
-		parties?.each{ party->
-			m.(party.id) = party.pageHighlights(pageNumber)
-		}
-
-		m
-	}
-
-	/**
 	 * Retrieves the value of the passed other field
 	 *
 	 * @param key They key to look up
@@ -130,7 +113,7 @@ class Document implements Taggable {
 	 *
 	 * @return the preview image with the given page number or null if it is not found
 	 */
-	def previewImage = {int pageNumber ->
+	def previewImage = { int pageNumber ->
 		previewImages.find { it.pageNumber == pageNumber }
 	}
 

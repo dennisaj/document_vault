@@ -13,7 +13,7 @@ import grails.test.mixin.Mock
 import us.paperlesstech.nimble.Group
 
 @TestFor(PartyService)
-@Mock([Party, User, Profile, ActivityLog, Document, DocumentData, PreviewImage, Group])
+@Mock([Party, User, Highlight, Profile, ActivityLog, Document, DocumentData, PreviewImage, Group])
 class PartyServiceSpec extends Specification {
 	PartyService service
 	AuthService authService = Mock()
@@ -38,7 +38,7 @@ class PartyServiceSpec extends Specification {
 		given:
 		def user = new User(id: 1)
 		def document = new Document(id: 1)
-		def highlights = [JSONObject.NULL, [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
+		def highlights = ["1": JSONObject.NULL, "2": [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
 		def input = [fullName: "fullName", email: "email@email.com", color: PartyColor.Red.name(), permission: DocumentPermission.Sign.name(), highlights: highlights]
 
 		service.metaClass.getSignator = {String a, String b ->
@@ -54,14 +54,14 @@ class PartyServiceSpec extends Specification {
 		party.signator == user
 		party.color.name() == input.color
 		party.documentPermission.name() == input.permission
-		party.highlights.size() == highlightService.fromJsonList(party, highlights).size()
+		party.highlights.size() == highlightService.fromJsonMap(party, highlights).size()
 	}
 
 	def "createParty should return errors when signator has errors"() {
 		given:
 		def user = new User(id: 1)
 		def document = new Document(id: 1)
-		def highlights = [JSONObject.NULL, [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
+		def highlights = ["1": JSONObject.NULL, "2": [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
 		def input = [fullName: "fullName", email: "email@email.com", color: PartyColor.Red.name(), permission: DocumentPermission.Sign.name(), highlights: highlights]
 
 		service.metaClass.getSignator = {String a, String b ->
@@ -80,7 +80,7 @@ class PartyServiceSpec extends Specification {
 		given:
 		def user = new User(id: 1)
 		def document = new Document(id: 1)
-		def highlights = [JSONObject.NULL, [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
+		def highlights = ["1": JSONObject.NULL, "2": [[left: 10, top: 20, width: 30, height: 40], JSONObject.NULL]]
 		def input = [fullName: "fullName", email: "email@email.com", highlights: highlights, expiration: "bad date"]
 
 		service.metaClass.getSignator = {String a, String b ->
@@ -124,14 +124,14 @@ class PartyServiceSpec extends Specification {
 		given:
 		1 * authService.canGetSigned(_) >> false
 		when:
-		service.updateHighlights(new Party(id: 1), [])
+		service.updateHighlights(new Party(id: 1), [:])
 		then:
 		thrown AssertionError
 	}
 
 	def "updateHighlights should throw AssertionError when party is null"() {
 		when:
-		service.updateHighlights(null, [])
+		service.updateHighlights(null, [:])
 		then:
 		thrown AssertionError
 	}

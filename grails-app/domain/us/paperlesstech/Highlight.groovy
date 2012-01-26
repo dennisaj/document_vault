@@ -29,6 +29,15 @@ class Highlight {
 	}
 
 	Map asMap() {
-		[height:height, left:left, width:width, top:top]
+		[
+			id:id,
+			partyId: party.id,
+			pageNumber: pageNumber,
+			accepted: accepted,
+			height:height,
+			left:left,
+			width:width,
+			top:top
+		]
 	}
 }

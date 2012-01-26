@@ -133,41 +133,6 @@ class DocumentControllerSpec extends Specification {
 		documentJSON.document.id == document1.id
 	}
 
-	def "image should throw an AssertionError when given an invalid documentId"() {
-		when:
-		controller.image(null, null)
-		then:
-		thrown(AssertionError)
-	}
-
-	def "image should return a map representing a previewImage when given valid input"() {
-		when:
-		controller.image(1L, pageNumber)
-		def previewImageMap = JSON.parse(response.contentAsString)
-		then:
-		previewImageMap.pageNumber == pageNumber
-		!previewImageMap.savedHighlights
-		where:
-		pageNumber = 1
-	}
-
-	def "image should include savedHighlights when the user canSign or canGetSigned"() {
-		given:
-		document1.metaClass.highlightsAsMap = { int pageNumber -> [1:'highlight'] }
-		when:
-		controller.image(1L, 1)
-		def previewImageMap = JSON.parse(response.contentAsString)
-		then:
-		previewImageMap.pageNumber == pageNumber
-		previewImageMap.savedHighlights
-		1 * authService.canGetSigned(document1) >> canGetSigned
-		authService.canSign(document1) >> canSign
-		where:
-		pageNumber = 1
-		canGetSigned << [true, false]
-		canSign << [false, true]
-	}
-
 	def "list should pass folder, pagination and filter to search then return the results as JSON"() {
 		when:
 		controller.list(folderId, filter, pagination.max, pagination.sort, pagination.order, pagination.offset)
