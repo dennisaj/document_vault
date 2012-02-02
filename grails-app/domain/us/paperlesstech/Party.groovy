@@ -34,7 +34,7 @@ class Party {
 		code blank:false, nullable:false, unique:true
 		color nullable:true
 		documentPermission nullable:false, inList:allowedPermissions
-		expiration nullable:true, validator: {val, obj->
+		expiration nullable:true, validator: { val, obj->
 			if (!val || obj.id) {
 				return true
 			}
@@ -44,9 +44,7 @@ class Party {
 
 			(now > val) ? ['validator.pastdate'] : null
 		}
-		highlights nullable: true, validator: {val, obj->
-			(!val && obj.documentPermission == DocumentPermission.Sign) ? ['validator.nullwhensign'] : null
-		}
+		highlights nullable: true
 		signator unique:"document"
 	}
 

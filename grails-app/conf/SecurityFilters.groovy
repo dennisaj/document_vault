@@ -27,7 +27,7 @@ public class SecurityFilters implements ApplicationContextAware {
 			before = {
 				// Create a special case for party/codeSignatures so we can expose it to users with one-off permissions.
 				// Permissions checking will be done once in the action itself.
-				if (controllerName == 'party' && actionName == 'codeSignatures') {
+				if (controllerName == 'party' && actionName in ['codeSign', 'codeClickWrap']) {
 					return true
 				}
 
@@ -58,9 +58,7 @@ public class SecurityFilters implements ApplicationContextAware {
 							}
 						case "party":
 							switch (action) {
-								case ["codeSignatures"]:
-									return true
-								case ["submitSignatures"]:
+								case ["cursiveSign"]:
 									return document && authService.canSign(document)
 								case ["emailDocument", "submitParties", "remove", "resend"]:
 									return document && authService.canGetSigned(document)

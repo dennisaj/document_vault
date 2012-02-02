@@ -1,10 +1,6 @@
 package us.paperlesstech
 
-import java.util.concurrent.Callable
-
-import org.apache.shiro.subject.PrincipalCollection
-import org.apache.shiro.subject.SimplePrincipalCollection
-import org.apache.shiro.subject.Subject
+import us.paperlesstech.helpers.ShiroHelpers
 
 class CodeController extends DocumentController {
 	def beforeInterceptor = [action:this.&wrapper]
@@ -14,11 +10,9 @@ class CodeController extends DocumentController {
 		assert party
 		params.documentId = party.document.id
 
-		PrincipalCollection principals = new SimplePrincipalCollection(party.signator.id, "localized")
-		Subject subject = new Subject.Builder().principals(principals).buildSubject()
-		subject.execute({
+		ShiroHelpers.runas(party.signator) {
 			this."${params.action}"()
-		} as Callable)
+		}
 
 		return false
 	}

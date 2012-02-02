@@ -175,7 +175,8 @@ class PdfHandlerService extends Handler {
 		def pdfPath = fileService.getAbsolutePath(data)
 
 		if (input.addNotes) {
-			def f = PdfHelpers.addNotesToPdf(d, data, pdfPath)
+			def notesByPage = d.notes.groupBy { it.pageNumber }
+			def f = PdfHelpers.addNotesToPdf(notesByPage, pdfPath)
 			pdfPath = f.getAbsolutePath()
 		}
 
@@ -196,6 +197,28 @@ class PdfHandlerService extends Handler {
 			if (input.addNotes) {
 				new File(pdfPath).delete()
 			}
+		}
+	}
+
+	@Override
+	void clickWrap(Map input) {
+		def d = getDocument(input)
+		def data = d.files.first()
+
+		def pdfPath = fileService.getAbsolutePath(data)
+		def highlightsByPage = input.highlights.groupBy { it.pageNumber }
+		def f
+
+		try {
+			f = PdfHelpers.addNotesToPdf(highlightsByPage, pdfPath)
+
+			DocumentData newPdf = fileService.createDocumentData(mimeType: data.mimeType, pages: data.pages, bytes: f.bytes)
+			d.addToFiles(newPdf)
+			input.documentData = newPdf
+
+			handlerChain.generatePreview(input)
+		} finally {
+			f.delete()
 		}
 	}
 }

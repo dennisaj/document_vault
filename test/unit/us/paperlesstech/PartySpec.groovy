@@ -96,7 +96,7 @@ class PartySpec extends Specification {
 		when:
 			def party = new Party(highlights:highlights)
 		then:
-			party.partiallySigned() == expected 
+			party.partiallySigned() == expected
 		where:
 			highlights << [[new Highlight(accepted:now), new Highlight(accepted:now), new Highlight(accepted:now)],
 				[new Highlight(accepted:null), new Highlight(accepted:null), new Highlight(accepted:null)],
@@ -109,7 +109,7 @@ class PartySpec extends Specification {
 		when:
 			def party = new Party(highlights:highlights)
 		then:
-			party.completelySigned() == expected 
+			party.completelySigned() == expected
 		where:
 			highlights << [[new Highlight(accepted:now), new Highlight(accepted:null), new Highlight(accepted:now)],
 				[new Highlight(accepted:null), new Highlight(accepted:null), new Highlight(accepted:null)],
@@ -129,7 +129,7 @@ class PartySpec extends Specification {
 				params.completelySigned
 			}
 		then:
-			party.removable() == expected 
+			party.removable() == expected
 		where:
 			//!rejected && !partiallySigned() && !completelySigned()
 			params << [[completelySigned:false, partiallySigned:false, rejected:false],
@@ -137,26 +137,5 @@ class PartySpec extends Specification {
 				[completelySigned:false, partiallySigned:true, rejected:false],
 				[completelySigned:false, partiallySigned:false, rejected:true]]
 			expected << [true, false, false, false]
-	}
-
-	def "highlights cannot be null or empty when documentPermission is Sign"() {
-		when:
-			def party = new Party(highlights:highlights, documentPermission:DocumentPermission.Sign)
-			def v = party.validate()
-		then:
-			!v
-			party.errors['highlights'] == 'validator.nullwhensign'
-		where:
-			highlights << [[], null]
-	}
-
-	def "highlights can be null or empty when documentPermission is View"() {
-		when:
-			def party = new Party(highlights:highlights, documentPermission:DocumentPermission.View)
-			def v = party.validate()
-		then:
-			!party.errors['highlights']
-		where:
-			highlights << [[], null]
 	}
 }

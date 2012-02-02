@@ -63,35 +63,35 @@ class PartyControllerSpec extends Specification {
 		partyId << 1L
 	}
 
-	def "submitSignatures should throw an AssertionError when given an invalid documentId"() {
+	def "cursiveSign should throw an AssertionError when given an invalid documentId"() {
 		when:
-		controller.submitSignatures(null, null)
+		controller.cursiveSign(null, null)
 		then:
 		thrown(AssertionError)
 	}
 
-	def "submitSignatures should set flash yellow when given invalid signatures"() {
+	def "cursiveSign should set flash yellow when given invalid signatures"() {
 		when:
-		controller.submitSignatures(1L, '[]')
+		controller.cursiveSign(1L, '[]')
 		then:
 		1 * notificationService.info(_, _)
 	}
 
-	def "submitSignatures should call partyService's cursiveSign and set flash green when given valid signatures"() {
+	def "cursiveSign should call partyService's cursiveSign and set flash green when given valid signatures"() {
 		given:
 		def document1 = Document.get(1L)
 		when:
-		controller.submitSignatures(document1.id, '{1:{lines:"lines"}}')
+		controller.cursiveSign(document1.id, '{1:{lines:"lines"}}')
 		then:
 		1 * partyService.cursiveSign(document1, _) >> document1
 		1 * notificationService.success(_, _)
 	}
 
-	def "submitSignatures should call partyService's cursiveSign and set flash red when an error is returned"() {
+	def "cursiveSign should call partyService's cursiveSign and set flash red when an error is returned"() {
 		given:
 		def document1 = Document.get(1L)
 		when:
-		controller.submitSignatures(document1.id, '{1:{lines:"lines"}}')
+		controller.cursiveSign(document1.id, '{1:{lines:"lines"}}')
 		then:
 		1 * partyService.cursiveSign(document1, _) >> { d, m-> d.errors.rejectValue('id', 'because'); d }
 		1 * notificationService.error(_, _)
@@ -205,9 +205,9 @@ class PartyControllerSpec extends Specification {
 		!document2.parties
 	}
 
-	def "codeSignatures should throw an error given an invalid document code"() {
+	def "codeSign should throw an error given an invalid document code"() {
 		when:
-		controller.codeSignatures('', '["signatures"]')
+		controller.codeSign('', '["signatures"]')
 		then:
 		thrown(AssertionError)
 	}

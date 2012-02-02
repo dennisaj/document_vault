@@ -90,6 +90,14 @@ class HandlerChain extends Handler {
 		handle("downloadNote", input)
 	}
 
+	@Override
+	void clickWrap(Map input) {
+		def document = getDocument(input)
+		assert authService.canSign(document)
+
+		handle("clickWrap", input)
+	}
+
 	private def handle(String methodName, Map input) {
 		def document = getDocument(input)
 		def data = input.documentData ?: document.files.first()

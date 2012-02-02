@@ -38,10 +38,17 @@ class UrlMappings {
 			controller = codeClosure
 		}
 
-		"/party/submitSignatures/$documentId" {
+		"/party/cursiveSign/$documentId" {
 			controller = "party"
 			action = {
-				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "codeSignatures" : "submitSignatures"
+				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "codeSign" : "cursiveSign"
+			}
+		}
+
+		"/party/clickWrap/$documentId" {
+			controller = "party"
+			action = {
+				params.documentId ==~ /^(?i)[A-F\d]{8}(?:-[A-F\d]{4}){3}-[A-F\d]{12}$/ ? "codeClickWrap" : "clickWrap"
 			}
 		}
 

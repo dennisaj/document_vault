@@ -1,8 +1,5 @@
 package us.paperlesstech.helpers
 
-import us.paperlesstech.Document
-import us.paperlesstech.DocumentData
-
 import com.lowagie.text.PageSize
 import com.lowagie.text.Paragraph
 import com.lowagie.text.Rectangle
@@ -12,20 +9,20 @@ import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfStamper
 
 class PdfHelpers {
-	public static File addNotesToPdf(Document d, DocumentData data, pdfPath) {
+	public static File addNotesToPdf(Map notesByPage, String pdfPath) {
 		PdfReader pdfReader
 		PdfStamper pdfStamper
 		ByteArrayOutputStream output = new ByteArrayOutputStream()
-		def notesByPage = d.notes.groupBy { it.pageNumber }
 
 		try {
 			pdfReader = new PdfReader(pdfPath)
 			pdfStamper = new PdfStamper(pdfReader, output)
+			int pageCount = pdfReader.getNumberOfPages()
 
 			// Handle notes added to the zeroth page
 			if (notesByPage[0]) {
 				Rectangle size = PageSize.LETTER
-				int lastPage = pdfReader.getNumberOfPages()
+				int lastPage = pageCount
 				pdfStamper.insertPage(++lastPage, size)
 				ColumnText columnText = new ColumnText(pdfStamper.getOverContent(lastPage))
 				columnText.setSimpleColumn(size.llx, size.lly, size.urx, size.ury)
@@ -43,7 +40,7 @@ class PdfHelpers {
 				}
 			}
 
-			(1..data.pages).each { i ->
+			(1..pageCount).each { i ->
 				def notes = notesByPage[i]
 				if (!notes) {
 					return
@@ -64,7 +61,7 @@ class PdfHelpers {
 			pdfReader?.close()
 		}
 
-		def f = File.createTempFile("printnotes-", ".pdf")
+		def f = File.createTempFile("notes-on-pdf-", ".pdf")
 		f << output.toByteArray()
 
 		f

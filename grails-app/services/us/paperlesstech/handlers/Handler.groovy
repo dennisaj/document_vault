@@ -44,7 +44,7 @@ class Handler {
 	 * @return true if the document is successfully printed
 	 */
 	boolean print(Map input) {
-		throw new UnsupportedOperationException("print has no handler for ${input?.document?.files?.first?.mimeType}")
+		throw new UnsupportedOperationException("print has no handler for ${input?.document?.files?.first()?.mimeType}")
 	}
 
 	/**
@@ -176,6 +176,10 @@ class Handler {
 		def filename = "${d.toString()}-note($note.id)-${note.data.id}.$note.data.mimeType.downloadExtension"
 
 		[filename, fileService.getInputStream(note.data), note.data.mimeType.downloadContentType, note.data.fileSize]
+	}
+
+	void clickWrap(Map input) {
+		throw new UnsupportedOperationException("clickWrap has no handler for ${input?.documentData?.mimeType}")
 	}
 
 	/**

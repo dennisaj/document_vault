@@ -2,16 +2,15 @@ package us.paperlesstech
 
 import grails.converters.JSON
 
-import java.util.concurrent.Callable
 
-import org.apache.shiro.subject.PrincipalCollection
-import org.apache.shiro.subject.SimplePrincipalCollection
-import org.apache.shiro.subject.Subject
+import us.paperlesstech.helpers.ShiroHelpers
 
 class PartyController {
 	static def allowedMethods = [addParty: "POST", image: "POST", removeParty: "POST", resend: "POST",
 			submitParties: "POST", submitSignatures: "POST", emailDocument: "POST"]
 
+	def authService
+	def highlightService
 	def notificationService
 	def partyService
 
@@ -25,18 +24,16 @@ class PartyController {
 		render([notification:notificationService.success('document-vault.api.party.removeParty.success', [partyId, documentId])] as JSON)
 	}
 
-	def codeSignatures(String documentId, String signatures) {
+	def codeSign(String documentId, String signatures) {
 		def party = Party.findByCode(documentId)
 		assert party
 
-		PrincipalCollection principals = new SimplePrincipalCollection(party.signator.id, "localized")
-		Subject subject = new Subject.Builder().principals(principals).buildSubject()
-		subject.execute({
-			this.submitSignatures(party.document.id, signatures)
-		} as Callable)
+		ShiroHelpers.runas(party.signator) {
+			this.cursiveSign(party.document.id, signatures)
+		}
 	}
 
-	def submitSignatures(Long documentId, String signatures) {
+	def cursiveSign(Long documentId, String signatures) {
 		def document = Document.get(documentId)
 		assert document
 
@@ -57,6 +54,26 @@ class PartyController {
 		}
 
 		render([notification:notification] as JSON)
+	}
+
+	def codeClickWrap(String documentId, String highlights) {
+		def party = Party.findByCode(documentId)
+		assert party
+
+		ShiroHelpers.runas(party.signator) {
+			this.clickWrap(party.document.id, highlights)
+		}
+	}
+
+	def clickWrap(Long documentId, String highlights) {
+		def document = Document.get(documentId)
+		assert document
+
+		Map highlightMap = JSON.parse(highlights)
+
+		def updatedHighlights = partyService.clickWrap(document, highlightMap)
+
+		render([notification:notificationService.success('document-vault.api.party.clickWrap.success', [documentId])] as JSON)
 	}
 
 	def submitParties(Long documentId, String parties) {

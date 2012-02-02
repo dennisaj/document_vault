@@ -16,7 +16,7 @@ class DefaultImageHandlerService extends Handler {
 	static final handlerFor = [MimeType.BMP, MimeType.GIF, MimeType.JPEG, MimeType.PNG]
 	static transactional = true
 	static imagethumbnail = new ClassPathResource("scripts/imagethumbnail.sh").file.absolutePath
-	
+
 	def handlerChain
 
 	@Override
@@ -87,6 +87,32 @@ class DefaultImageHandlerService extends Handler {
 		signatureData.each { signature ->
 			ImageHelpers.drawLines(original, signature)
 		}
+
+		ByteArrayOutputStream output = new ByteArrayOutputStream()
+		ImageIO.write(original, data.mimeType.toString().toLowerCase(), output)
+
+		DocumentData newImage = fileService.createDocumentData(bytes: output.toByteArray(), mimeType: data.mimeType, pages: data.pages)
+		d.addToFiles(newImage)
+		input.documentData = newImage
+		handlerChain.generatePreview(input)
+	}
+
+	@Override
+	void clickWrap(Map input) {
+		def d = getDocument(input)
+		def data = getDocumentData(input)
+		def highlights = input.highlights
+
+		assert highlights, "This method requires a highlight"
+
+		log.info "clickWraping the images for document ${d}"
+
+		Image original
+		fileService.withInputStream(data) { is ->
+			original = ImageIO.read(is)
+		}
+
+		ImageHelpers.addNotesToImage(original, highlights)
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream()
 		ImageIO.write(original, data.mimeType.toString().toLowerCase(), output)

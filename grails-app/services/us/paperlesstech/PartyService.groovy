@@ -65,6 +65,36 @@ class PartyService {
 		party
 	}
 
+	List clickWrap(Document document, Map highlights) {
+		assert document
+		assert highlights
+		assert authService.canSign(document)
+
+		def user = authService.authenticatedUser
+		Party party = document.parties.find { it.signator == user }
+		assert party
+
+		def partyHighlights = Highlight.findAllByPartyAndAcceptedIsNull(party)
+		def highlightsToStamp = []
+
+		partyHighlights.each { highlight->
+			def incomingHighlight = highlights[highlight.pageNumber as String]?.find {
+				it.id == highlight.id
+			}
+
+			if (incomingHighlight) {
+				highlight = highlightService.markAccepted(highlight)
+				highlightsToStamp << (highlight.asMap() + ['note': incomingHighlight.note ?: "Signed by ${user.profile.email} on ${highlight.accepted} from ip ${requestService.remoteAddr}"])
+			}
+		}
+
+		if (highlightsToStamp) {
+			handlerChain.clickWrap(document:document, documentData: document.files.first(), highlights:highlightsToStamp)
+		}
+
+		partyHighlights
+	}
+
 	/**
 	 * Applies the signatures to the document for the currently logged in user.
 	 *
