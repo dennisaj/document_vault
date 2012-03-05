@@ -36,7 +36,7 @@ grails.project.dependency.resolution = {
 
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-		compile group:'us.paperlesstech', name:'flea', version:'0.9.4', {
+		compile group:'us.paperlesstech', name:'flea', version:'0.9.5', {
 			// Grails 2 now includes the log4j slf4j binding.
 			excludes([group: 'org.slf4j', name: 'slf4j-log4j12'])
 			excludes([group: 'org.codehaus.groovy', name: 'groovy'])
