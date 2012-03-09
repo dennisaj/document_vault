@@ -164,6 +164,7 @@ authcBasic = org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
 authcBasic.applicationName = Document Vault API
 [urls]
 /api/** = multitenant, authcBasic
+/upload/savePcl = multitenant, authcBasic
 """
 	}
 }

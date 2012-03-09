@@ -45,7 +45,8 @@ class UploadController {
 		render(text:results as JSON, contentType:"text/plain")
 	}
 
-	def savePcl(String data) {
+	def savePcl() {
+		def bytes = params.data.bytes
 		def documents
 
 		try {
@@ -53,7 +54,7 @@ class UploadController {
 			assert group, "The user must be able to upload to at least one group"
 			def now = new Date()
 			def fileName = String.format("%tF %tT.pcl", now, now)
-			documents = uploadService.uploadDocument(data?.bytes, group, fileName, MimeType.PCL)
+			documents = uploadService.uploadDocument(bytes, group, fileName, MimeType.PCL)
 		} catch (Throwable e) {
 			log.error "Unable to save uploaded document", e
 		}
