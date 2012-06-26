@@ -58,6 +58,7 @@ class AuthController {
 		log.info("Attempting to authenticate user, $params.username. RememberMe is $authToken.rememberMe")
 
 		try {
+			
 			authService.login(authToken)
 			userService.createLoginRecord(request)
 
@@ -71,7 +72,6 @@ class AuthController {
 		} catch (IncorrectCredentialsException e) {
 			log.info "Credentials failure for user '${params.username}'."
 			log.debug e
-
 			flash.type = 'error'
 			flash.message = g.message(code: "nimble.login.failed.credentials")
 		} catch (DisabledAccountException e) {
@@ -117,7 +117,7 @@ class AuthController {
 		} catch (IncorrectCredentialsException e) {
 			log.info "Credentials failure for user '${params.username}'."
 			log.debug e
-
+				
 			notification = 'nimble.login.failed.credentials'
 		} catch (DisabledAccountException e) {
 			log.info "Attempt to login to disabled account for user '${params.username}'."
